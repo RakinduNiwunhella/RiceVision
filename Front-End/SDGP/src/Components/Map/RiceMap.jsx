@@ -122,26 +122,30 @@ export default function RiceMap({ filters, layers }) {
         <GeoJSON data={paddyGeo} style={paddyStyle} />
       )}
 
-      {/* 🔵🟢🟡🔴 PADDY POINTS */}
-      {visiblePoints.map((p, idx) => (
-        <CircleMarker
-          key={idx}
-          center={[p.lat, p.lng]}
-          radius={4}
-          pathOptions={{
-            color:
-              selectedHealth.length === 0
-                ? "#2563eb"
-                : getHealthColor(p.paddy_health),
-            fillColor:
-              selectedHealth.length === 0
-                ? "#2563eb"
-                : getHealthColor(p.paddy_health),
-            fillOpacity: 0.75,
-            weight: 1,
-          }}
-        />
-      ))}
+      
+{/* 🔵🟢🟡🔴 PADDY POINTS (ONLY WHEN SHOW CIRCLES IS ON) */}
+{selectedDistrict &&
+  layers.showCircles &&
+  visiblePoints.map((p, idx) => (
+    <CircleMarker
+      key={idx}
+      center={[p.lat, p.lng]}
+      radius={4}
+      pathOptions={{
+        color:
+          selectedHealth.length === 0
+            ? "#2563eb"
+            : getHealthColor(p.paddy_health),
+        fillColor:
+          selectedHealth.length === 0
+            ? "#2563eb"
+            : getHealthColor(p.paddy_health),
+        fillOpacity: 0.75,
+        weight: 1,
+      }}
+    />
+  ))}
+
     </MapContainer>
   );
 }
