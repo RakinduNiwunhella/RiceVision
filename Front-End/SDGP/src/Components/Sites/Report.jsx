@@ -76,7 +76,7 @@ const Report = () => {
     const doc = new jsPDF({ orientation: "landscape" });
 
     doc.setFontSize(18);
-    doc.text("Rice Vision – Prediction Report", 14, 15);
+    doc.text("Rice Vision - Prediction Report", 14, 15);
     doc.setFontSize(11);
     doc.text(
       `Month: ${selectedMonth || "All"} | District: ${selectedDistrict}`,
@@ -125,10 +125,10 @@ const Report = () => {
       {/* HEADER */}
       <header className="mb-6">
         <h1 className="text-3xl font-bold">
-          Rice Vision – Prediction Reports
+          Rice Vision - Prediction Reports
         </h1>
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          Monthly and district-based rice yield prediction analysis for Sri Lanka
+          Monthly and district based rice yield prediction analysis for Sri Lanka
         </p>
       </header>
 
@@ -139,10 +139,23 @@ const Report = () => {
           value={selectedMonth}
           onChange={e => setSelectedMonth(e.target.value)}
         >
-          <option value="">All Months</option>
-          {[...Array(12)].map((_, i) => (
-            <option key={i} value={i + 1}>
-              Month {i + 1}
+          <option value="">All</option>
+          {[
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December"
+          ].map((month, index) => (
+            <option key={month} value={index + 1}>
+              {month}
             </option>
           ))}
         </select>
@@ -153,9 +166,31 @@ const Report = () => {
           onChange={e => setSelectedDistrict(e.target.value)}
         >
           <option>All Sri Lanka</option>
-          {[...new Set(reports.map(r => r.district))].map(d => (
-            <option key={d}>{d}</option>
-          ))}
+          <option>Colombo</option>
+          <option>Gampaha</option>
+          <option>Kalutara</option>
+          <option>Kandy</option>
+          <option>Matale</option>
+          <option>Nuwara Eliya</option>
+          <option>Galle</option>
+          <option>Matara</option>
+          <option>Hambantota</option>
+          <option>Jaffna</option>
+          <option>Kilinochchi</option>
+          <option>Mannar</option>
+          <option>Mullaitivu</option>
+          <option>Vavuniya</option>
+          <option>Trincomalee</option>
+          <option>Batticaloa</option>
+          <option>Ampara</option>
+          <option>Kurunegala</option>
+          <option>Puttalam</option>
+          <option>Anuradhapura</option>
+          <option>Polonnaruwa</option>
+          <option>Badulla</option>
+          <option>Monaragala</option>
+          <option>Ratnapura</option>
+          <option>Kegalle</option>
         </select>
 
         <select
