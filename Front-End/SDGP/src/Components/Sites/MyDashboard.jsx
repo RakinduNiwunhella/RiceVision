@@ -17,7 +17,7 @@ import { supabase } from "../../supabaseClient";
 /* ------------------ Components ------------------ */
 
 const StatWidget = ({ title, value, subtitle }) => (
-  <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm">
+  <div className="bg-white dark:bg-slate-900 rounded-xl p-5 shadow-sm">
     <p className="text-sm text-gray-500 dark:text-gray-400">{title}</p>
     <p className="text-3xl font-semibold text-gray-900 dark:text-white">
       {value}
@@ -39,7 +39,7 @@ const ProgressWidget = ({ label, value, color }) => {
         <span>{label}</span>
         <span>{value}%</span>
       </div>
-      <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full">
+      <div className="w-full h-2 bg-gray-200 dark:bg-gray-800 rounded-full">
         <div
           className={`h-2 rounded-full ${bar[color]}`}
           style={{ width: `${value}%` }}
@@ -160,15 +160,15 @@ const MyDashboard = () => {
   /* ------------------ RENDER ------------------ */
 
   return (
-    <div className="space-y-12 max-w-7xl mx-auto">
+    <div className="space-y-12 max-w-7xl mx-auto text-gray-900 dark:text-gray-100">
 
       {/* OVERVIEW */}
       <div>
-        <h1 className="text-xl font-semibold">National Overview</h1>
+        <h1 className="text-xl font-semibold text-gray-900 dark:text-white">National Overview</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm">
-            <h3 className="text-lg font-medium mb-4">
+          <div className="bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
               Field Health Distribution
             </h3>
 
@@ -190,7 +190,7 @@ const MyDashboard = () => {
                         <Cell key={i} fill={pieColors[i]} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(v) => `${v.toFixed(1)}%`} />
+                    <Tooltip contentStyle={{ backgroundColor: "#020617", borderColor: "#334155" }} />
                     <Legend />
                   </PieChart>
                 </ResponsiveContainer>
@@ -222,16 +222,16 @@ const MyDashboard = () => {
 
       {/* OUTBREAKS */}
       <div>
-        <h2 className="text-lg font-medium">Outbreaks</h2>
+        <h2 className="text-lg font-medium text-gray-900 dark:text-white">Outbreaks</h2>
         <p className="text-sm text-gray-500 mb-4">
           Disease and disaster outbreak monitoring
         </p>
 
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm">
+        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
           {(showAllOutbreaks ? outbreaks : outbreaks.slice(0, 5)).map((o) => (
             <div
               key={o.id}
-              className="flex justify-between items-center px-6 py-4 hover:bg-gray-50 dark:hover:bg-slate-700"
+              className="flex justify-between items-center px-6 py-4 hover:bg-gray-50 dark:hover:bg-slate-800 transition"
             >
               <div>
                 <p className="font-medium">
@@ -261,8 +261,8 @@ const MyDashboard = () => {
 
       {/* LOWER ANALYTICS */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm">
-          <h3 className="text-lg font-medium mb-4">
+        <div className="bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
             National NDVI Trend (30 days)
           </h3>
 
@@ -270,7 +270,7 @@ const MyDashboard = () => {
             <LineChart data={ndviTrend}>
               <XAxis dataKey="day" />
               <YAxis domain={[0, 1]} />
-              <Tooltip />
+              <Tooltip contentStyle={{ backgroundColor: "#020617", borderColor: "#334155" }} />
               <Line dataKey="value" stroke="#10b981" />
             </LineChart>
           </ResponsiveContainer>
@@ -298,15 +298,15 @@ const MyDashboard = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm">
-          <h3 className="text-lg font-medium mb-4">
+        <div className="bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
             District Health Overview
           </h3>
 
           {districtHealth.map((d, i) => (
             <div
               key={i}
-              className="flex justify-between px-4 py-3 text-sm"
+              className="flex justify-between px-4 py-3 text-sm border-b border-gray-200 dark:border-gray-700 last:border-b-0"
             >
               <span className="font-medium capitalize">{d.district}</span>
               <span>{Math.round(d.normal_pct)}% Healthy</span>
