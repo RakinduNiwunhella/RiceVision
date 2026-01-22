@@ -1,9 +1,10 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import useComplaints from "./hooks/useComplaints";
-import ComplaintsTable from "./components/admin/ComplaintsTable";
 import AdminLayout from "./components/admin/AdminLayout";
-import ComplaintDetails from "./components/pages/ComplaintDetails";
+import ComplaintsTable from "./components/admin/ComplaintsTable";
+import useComplaints from "./hooks/useComplaints";
+import Dashboard from "./components/admin/Dashboard";
 
+/* Complaints page */
 function ComplaintsPage() {
   const { complaints, loading } = useComplaints();
 
@@ -21,17 +22,18 @@ function ComplaintsPage() {
 
 export default function App() {
   return (
-    <AdminLayout>
-      <Routes>
-        {/* Default route */}
-        <Route path="/" element={<Navigate to="/complaints" replace />} />
+    <Routes>
+      {/* Root redirect */}
+      <Route path="/" element={<Navigate to="/admin" replace />} />
 
-        {/* Complaints list */}
-        <Route path="/complaints" element={<ComplaintsPage />} />
+      {/* Admin routes */}
+      <Route path="/admin" element={<AdminLayout />}>
+        <Route index element={<Dashboard />} />
+        <Route path="complaints" element={<ComplaintsPage />} />
+      </Route>
 
-        {/* Complaint details */}
-        <Route path="/complaints/:id" element={<ComplaintDetails />} />
-      </Routes>
-    </AdminLayout>
+      {/* Fallback */}
+      <Route path="*" element={<Navigate to="/admin" replace />} />
+    </Routes>
   );
 }

@@ -2,7 +2,7 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 
 const navItems = [
-  { id: "dashboard", label: "Dashboard", icon: "dashboard" },
+  { id: "", label: "Dashboard", icon: "dashboard" },
   { id: "complaints", label: "Complaints", icon: "report_problem" },
   { id: "analytics", label: "Analytics", icon: "analytics" },
   { id: "settings", label: "Settings", icon: "settings" },
@@ -17,12 +17,12 @@ const Sidebar = () => {
   return (
     <aside className="h-screen w-60 bg-white dark:bg-slate-900 px-6 py-6 flex flex-col justify-between border-r border-slate-200 dark:border-slate-800">
       <div>
-        {/* Main navigation */}
         <nav className="flex flex-col gap-1">
           {navItems.map((item) => (
             <NavLink
-              key={item.id}
-              to={`/${item.id}`}
+              key={item.label}
+              to={`/admin${item.id ? `/${item.id}` : ""}`}
+              end={item.id === ""} // IMPORTANT for Dashboard active state
               className={({ isActive }) =>
                 `flex items-center gap-3 py-3 px-3 rounded-md transition-all duration-150 ${
                   isActive
@@ -31,10 +31,7 @@ const Sidebar = () => {
                 }`
               }
             >
-              <span
-                className="w-8 shrink-0 flex items-center justify-center material-symbols-outlined"
-                style={{ fontSize: "22px" }}
-              >
+              <span className="w-8 shrink-0 flex items-center justify-center material-symbols-outlined">
                 {item.icon}
               </span>
               <span className="font-medium">{item.label}</span>
@@ -43,13 +40,12 @@ const Sidebar = () => {
         </nav>
       </div>
 
-      {/* Bottom navigation */}
       <div>
         <nav className="flex flex-col gap-1">
           {bottomItems.map((item) => (
             <NavLink
               key={item.id}
-              to={`/${item.id}`}
+              to={`/admin/${item.id}`}
               className={({ isActive }) =>
                 `flex items-center gap-3 py-2 px-3 rounded-md transition-all duration-150 ${
                   isActive
@@ -58,10 +54,7 @@ const Sidebar = () => {
                 }`
               }
             >
-              <span
-                className="w-8 shrink-0 flex items-center justify-center material-symbols-outlined"
-                style={{ fontSize: "22px" }}
-              >
+              <span className="w-8 shrink-0 flex items-center justify-center material-symbols-outlined">
                 {item.icon}
               </span>
               <span className="font-medium">{item.label}</span>
