@@ -8,10 +8,7 @@ const navItems = [
   { id: "settings", label: "Settings", icon: "settings" },
 ];
 
-const bottomItems = [
-  { id: "profile", label: "My Profile", icon: "person" },
-  { id: "logout", label: "Logout", icon: "logout" },
-];
+const bottomItems = [{ id: "logout", label: "Logout", icon: "logout" }];
 
 const Sidebar = () => {
   return (

@@ -4,6 +4,7 @@ import ComplaintsTable from "./components/admin/ComplaintsTable";
 import useComplaints from "./hooks/useComplaints";
 import Dashboard from "./components/admin/Dashboard";
 import { AnalyticsPage } from "./components/pages/AnalyticsPage";
+import SettingsPage from "./components/pages/SettingsPage";
 
 /* Complaints page */
 function ComplaintsPage() {
@@ -37,6 +38,9 @@ export default function App() {
 
         {/* Analytics */}
         <Route path="analytics" element={<AnalyticsPage />} />
+
+        {/* ✅ Settings */}
+        <Route path="settings" element={<SettingsPage />} />
       </Route>
 
       {/* Fallback */}
