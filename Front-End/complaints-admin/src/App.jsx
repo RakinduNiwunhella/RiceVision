@@ -3,6 +3,7 @@ import AdminLayout from "./components/admin/AdminLayout";
 import ComplaintsTable from "./components/admin/ComplaintsTable";
 import useComplaints from "./hooks/useComplaints";
 import Dashboard from "./components/admin/Dashboard";
+import { AnalyticsPage } from "./components/pages/AnalyticsPage";
 
 /* Complaints page */
 function ComplaintsPage() {
@@ -28,8 +29,14 @@ export default function App() {
 
       {/* Admin routes */}
       <Route path="/admin" element={<AdminLayout />}>
+        {/* Dashboard */}
         <Route index element={<Dashboard />} />
+
+        {/* Complaints */}
         <Route path="complaints" element={<ComplaintsPage />} />
+
+        {/* Analytics */}
+        <Route path="analytics" element={<AnalyticsPage />} />
       </Route>
 
       {/* Fallback */}
