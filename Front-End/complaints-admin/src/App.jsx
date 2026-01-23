@@ -3,7 +3,7 @@ import AdminLayout from "./components/admin/AdminLayout";
 import ComplaintsTable from "./components/admin/ComplaintsTable";
 import useComplaints from "./hooks/useComplaints";
 import Dashboard from "./components/admin/Dashboard";
-import { AnalyticsPage } from "./components/pages/AnalyticsPage";
+import AnalyticsPage from "./components/pages/AnalyticsPage";
 import SettingsPage from "./components/pages/SettingsPage";
 
 /* Complaints page */
