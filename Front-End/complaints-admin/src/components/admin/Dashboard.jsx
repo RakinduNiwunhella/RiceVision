@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   BarChart,
   Bar,
@@ -8,38 +9,110 @@ import {
   ScatterChart,
   Scatter,
 } from "recharts";
-
-const stats = [
-  { title: "Total Complaints", value: "1,247", sub: "All time submissions" },
-  { title: "Anonymous Complaints", value: "423", sub: "34% of total" },
-  { title: "Open Complaints", value: "189", sub: "Requires attention" },
-  { title: "Resolved Complaints", value: "1,058", sub: "85% resolution rate" },
-];
-
-const complaintTypes = [
-  { name: "Service Quality", value: 400 },
-  { name: "Delivery Delay", value: 300 },
-  { name: "Technical Issue", value: 230 },
-  { name: "Billing", value: 180 },
-  { name: "Other", value: 140 },
-];
-
-const complaintsOverTime = [
-  { month: "Jan", value: 95 },
-  { month: "Feb", value: 110 },
-  { month: "Mar", value: 98 },
-  { month: "Apr", value: 125 },
-  { month: "May", value: 145 },
-  { month: "Jun", value: 175 },
-  { month: "Jul", value: 190 },
-  { month: "Aug", value: 160 },
-  { month: "Sep", value: 135 },
-  { month: "Oct", value: 98 },
-  { month: "Nov", value: 65 },
-  { month: "Dec", value: 50 },
-];
+import { supabase } from "@/services/client";
 
 export default function Dashboard() {
+  const [stats, setStats] = useState([]);
+  const [complaintTypes, setComplaintTypes] = useState([]);
+  const [complaintsOverTime, setComplaintsOverTime] = useState([]);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      /* =========================
+         STAT CARDS
+      ========================= */
+
+      const { count: total } = await supabase
+        .from("complains")
+        .select("*", { count: "exact", head: true });
+
+      const { count: anonymous } = await supabase
+        .from("complains")
+        .select("*", { count: "exact", head: true })
+        .eq("is_anonymous", true);
+
+      const { count: pending } = await supabase
+        .from("complains")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "pending");
+
+      const { count: resolved } = await supabase
+        .from("complains")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "resolved");
+
+      setStats([
+        {
+          title: "Total Complaints",
+          value: total ?? 0,
+          sub: "All time submissions",
+        },
+        {
+          title: "Anonymous Complaints",
+          value: anonymous ?? 0,
+          sub: total
+            ? `${Math.round((anonymous / total) * 100)}% of total`
+            : "—",
+        },
+        {
+          title: "Pending Complaints",
+          value: pending ?? 0,
+          sub: "Requires attention",
+        },
+        {
+          title: "Resolved Complaints",
+          value: resolved ?? 0,
+          sub: total
+            ? `${Math.round((resolved / total) * 100)}% resolution rate`
+            : "—",
+        },
+      ]);
+
+      /* =========================
+         COMPLAINTS BY TYPE
+      ========================= */
+
+      const { data: typeData } = await supabase
+        .from("complains")
+        .select("complaint_type");
+
+      const groupedTypes = Object.values(
+        typeData.reduce((acc, row) => {
+          const type = row.complaint_type || "Other";
+          acc[type] = acc[type] || { name: type, value: 0 };
+          acc[type].value += 1;
+          return acc;
+        }, {}),
+      );
+
+      setComplaintTypes(groupedTypes);
+
+      /* =========================
+         COMPLAINTS OVER TIME
+      ========================= */
+
+      const { data: timeData } = await supabase
+        .from("complains")
+        .select("created_at");
+
+      const groupedMonths = Object.values(
+        timeData.reduce((acc, row) => {
+          const month = new Date(row.created_at).toLocaleString("default", {
+            month: "short",
+          });
+
+          acc[month] = acc[month] || { month, value: 0 };
+          acc[month].value += 1;
+          return acc;
+        }, {}),
+      );
+
+      setComplaintsOverTime(groupedMonths);
+    };
+
+    fetchDashboardData();
+  }, []);
+
   return (
     <div className="space-y-8">
       {/* Page title */}
@@ -58,7 +131,7 @@ export default function Dashboard() {
 
       {/* Charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Bar Chart */}
+        {/* Complaints by Type */}
         <div className="bg-white rounded-xl shadow-sm p-6">
           <h2 className="font-semibold mb-4">Complaints by Type</h2>
           <BarChart width={450} height={300} data={complaintTypes}>
@@ -70,7 +143,7 @@ export default function Dashboard() {
           </BarChart>
         </div>
 
-        {/* Scatter Chart */}
+        {/* Complaints Over Time */}
         <div className="bg-white rounded-xl shadow-sm p-6">
           <h2 className="font-semibold mb-4">Complaints Over Time</h2>
           <ScatterChart width={450} height={300}>
