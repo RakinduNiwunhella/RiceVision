@@ -3,9 +3,12 @@ import Sidebar from "./Sidebar/Sidebar";
 
 export default function AdminLayout() {
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-50 overflow-hidden">
+      {/* Sidebar */}
       <Sidebar />
-      <main className="flex-1 p-8">
+
+      {/* Main content */}
+      <main className="flex-1 overflow-y-auto p-8">
         <Outlet />
       </main>
     </div>

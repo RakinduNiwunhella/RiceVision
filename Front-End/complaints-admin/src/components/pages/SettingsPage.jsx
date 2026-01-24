@@ -126,35 +126,6 @@ export default function SettingsPage() {
               <Button onClick={handleSaveProfile}>Save Changes</Button>
             </CardContent>
           </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Organization Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
-                <Input
-                  value={orgName}
-                  onChange={(e) => setOrgName(e.target.value)}
-                />
-                <Input
-                  value={department}
-                  onChange={(e) => setDepartment(e.target.value)}
-                />
-              </div>
-              <Select value={timezone} onValueChange={setTimezone}>
-                <SelectTrigger className="max-w-md">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="America/New_York">Eastern Time</SelectItem>
-                  <SelectItem value="Europe/London">London</SelectItem>
-                  <SelectItem value="Asia/Tokyo">Tokyo</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button onClick={handleSaveProfile}>Save Changes</Button>
-            </CardContent>
-          </Card>
         </TabsContent>
 
         {/* SECURITY */}
