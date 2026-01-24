@@ -66,7 +66,7 @@ const ProgressWidget = ({ label, value, color }) => {
 
   return (
     <div>
-      <div className="flex justify-between text-xs text-gray-600 dark:text-gray-300 mb-1">
+      <div className="flex justify-between text-sm text-slate-500 dark:text-slate-400 mb-1">
         <span>{label}</span>
         <span className="font-medium">{value?.toFixed?.(1) ?? value}%</span>
       </div>
@@ -207,54 +207,42 @@ const MyDashboard = () => {
   /* ------------------ RENDER ------------------ */
 
   return (
-    <div className="space-y-10 max-w-7xl mx-auto text-gray-900 dark:text-gray-100">
-      {/* PAGE HEADER */}
-      <header className="flex flex-col gap-2">
-        <h1 className="text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">
-          National Overview
-        </h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          High-level health, yield, and risk insights for Sri Lankan paddy fields.
-        </p>
-      </header>
+    <div className="max-w-7xl mx-auto bg-white dark:bg-slate-900 rounded-xl shadow-sm p-6 text-slate-700 dark:text-slate-300">
 
-      {/* OVERVIEW GRID */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card
-          title="Field Health Distribution"
-          subtitle="Kurunegala district • Current season"
-          className="lg:col-span-1"
-        >
-          <div className="w-full h-64">
-            {loadingHealth ? (
-              <div className="h-full flex items-center justify-center text-xs text-gray-400">
-                Loading distribution…
-              </div>
-            ) : healthSummary ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={healthPieData}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={45}
-                    outerRadius={80}
-                    label={({ value }) => `${value.toFixed(1)}%`}
-                  >
-                    {healthPieData.map((_, i) => (
-                      <Cell key={i} fill={pieColors[i]} />
-                    ))}
-                  </Pie>
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="h-full flex items-center justify-center text-xs text-gray-400">
-                No health data available.
-              </div>
-            )}
+      {/* OVERVIEW */}
+      <div>
+        <h1 className="text-xl font-semibold text-slate-900 dark:text-white">National Overview</h1>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+          <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm">
+            <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-4">
+              Field Health Distribution
+            </h3>
+
+            <div className="w-full h-64">
+              {healthSummary && (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={healthPieData}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={45}
+                      outerRadius={80}
+                      label={({ value }) => `${value.toFixed(1)}%`}
+                    >
+                      {healthPieData.map((_, i) => (
+                        <Cell key={i} fill={pieColors[i]} />
+                      ))}
+                    </Pie>
+                    <Tooltip contentStyle={{ backgroundColor: "#020617", borderColor: "#334155" }} />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              )}
+            </div>
           </div>
         </Card>
 
@@ -278,26 +266,39 @@ const MyDashboard = () => {
       </div>
 
       {/* OUTBREAKS */}
-      <section>
-        <div className="flex items-center justify-between mb-2">
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Outbreaks
-            </h2>
-            <p className="text-xs text-gray-500">
-              Disease and disaster monitoring across all districts.
-            </p>
-          </div>
-        </div>
+      <div className="mt-12">
+        <h2 className="text-lg font-medium text-slate-900 dark:text-white">Outbreaks</h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+          Disease and disaster outbreak monitoring
+        </p>
 
-        <Card>
-          {loadingOutbreaks ? (
-            <div className="py-6 text-center text-xs text-gray-400">
-              Loading outbreaks…
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+          {(showAllOutbreaks ? outbreaks : outbreaks.slice(0, 5)).map((o) => (
+            <div
+              key={o.id}
+              className="flex justify-between items-center px-6 py-4 hover:bg-gray-50 dark:hover:bg-slate-700 transition"
+            >
+              <div>
+                <p className="font-medium text-slate-900 dark:text-white">
+                  {o.title} – {o.district}
+                </p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{o.event_date}</p>
+              </div>
+
+              <button className="text-sm rounded-md bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 transition">
+                View
+              </button>
             </div>
-          ) : outbreaks.length === 0 ? (
-            <div className="py-6 text-center text-xs text-gray-400">
-              No active or recent outbreaks reported.
+          ))}
+
+          {outbreaks.length > 5 && (
+            <div className="px-6 py-4 text-center border-t border-gray-200 dark:border-gray-700">
+              <button
+                onClick={() => setShowAllOutbreaks(!showAllOutbreaks)}
+                className="text-sm rounded-md bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 transition"
+              >
+                {showAllOutbreaks ? "View Less" : "View More"}
+              </button>
             </div>
           ) : (
             <>
@@ -351,42 +352,20 @@ const MyDashboard = () => {
       </section>
 
       {/* LOWER ANALYTICS */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card
-          title="National NDVI Trend (30 days)"
-          subtitle="Mean NDVI values across all monitored paddy fields"
-        >
-          <div className="space-y-4">
-            <div className="h-48">
-              {loadingNdvi ? (
-                <div className="h-full flex items-center justify-center text-xs text-gray-400">
-                  Loading NDVI trend…
-                </div>
-              ) : ndviTrend.length ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={ndviTrend}>
-                    <XAxis dataKey="day" tick={{ fontSize: 10 }} />
-                    <YAxis
-                      domain={[0, 1]}
-                      tick={{ fontSize: 10 }}
-                      tickFormatter={(v) => v.toFixed(2)}
-                    />
-                    <Tooltip />
-                    <Line
-                      type="monotone"
-                      dataKey="value"
-                      stroke="#10b981"
-                      strokeWidth={2}
-                      dot={false}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="h-full flex items-center justify-center text-xs text-gray-400">
-                  No NDVI data available.
-                </div>
-              )}
-            </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-12">
+        <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm">
+          <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-4">
+            National NDVI Trend (30 days)
+          </h3>
+
+          <ResponsiveContainer width="100%" height={180}>
+            <LineChart data={ndviTrend}>
+              <XAxis dataKey="day" stroke="#64748b" />
+              <YAxis domain={[0, 1]} stroke="#64748b" />
+              <Tooltip contentStyle={{ backgroundColor: "#020617", borderColor: "#334155" }} />
+              <Line dataKey="value" stroke="#10b981" />
+            </LineChart>
+          </ResponsiveContainer>
 
             {healthSummary && (
               <div className="space-y-2">
@@ -408,15 +387,20 @@ const MyDashboard = () => {
               </div>
             )}
           </div>
-        </Card>
+        </div>
 
-        <Card
-          title="District Health Overview"
-          subtitle="Ranked by share of healthy fields"
-        >
-          {loadingDistrictHealth ? (
-            <div className="py-6 text-center text-xs text-gray-400">
-              Loading district health…
+        <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm">
+          <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-4">
+            District Health Overview
+          </h3>
+
+          {districtHealth.map((d, i) => (
+            <div
+              key={i}
+              className="flex justify-between px-4 py-3 text-sm border-b border-gray-200 dark:border-gray-700 last:border-b-0"
+            >
+              <span className="font-medium capitalize text-slate-900 dark:text-white">{d.district}</span>
+              <span className="text-slate-700 dark:text-slate-300">{Math.round(d.normal_pct)}% Healthy</span>
             </div>
           ) : districtHealth.length === 0 ? (
             <div className="py-6 text-center text-xs text-gray-400">
