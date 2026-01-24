@@ -8,10 +8,23 @@ import Weather from "./Components/Sites/Weather";
 import Report from "./Components/Sites/Report";
 import Profile from "./Components/Profile/Profile";
 import Help from "./Components/Sites/Help";
+import Signin from "./Components/authentication/Signin";
+import Signup from "./Components/authentication/Signup";
 
 const router = createBrowserRouter([
   {
+    // 1. The Default Root is now the Signin Page
     path: "/",
+    element: <Signin />, 
+  },
+  
+  {
+    path: "/signup",
+    element: <Signup />, 
+  },
+  
+  {
+    path: "/app",
     element: <App />,
     children: [
       { index: true, element: <MyDashboard /> }, // default open page
