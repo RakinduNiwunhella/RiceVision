@@ -1,116 +1,178 @@
-import { useState } from "react";
-import InputField from "./InputField";
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../../supabaseClient';
 
-const ProfileForm = () => {
-  const [profile, setProfile] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    nic: "",
-    district: "",
-    address: "",
-  });
-
-  const handleChange = (e) => {
-    setProfile({
-      ...profile,
-      [e.target.name]: e.target.value,
+export default function Profile() {
+    const [loading, setLoading] = useState(true);
+    const [formData, setFormData] = useState({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        nic: '',
+        district: '',
+        address: ''
     });
-  };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    console.log("Profile Data:", profile);
-  };
+    useEffect(() => {
+        getProfile();
+    }, []);
 
-  return (
-    <form onSubmit={handleSubmit} className="space-y-10 mt-6">
-      
-      {/* Avatar */}
-      <div className="flex items-center gap-6 pb-6 border-b border-slate-200 dark:border-slate-800">
-        <div className="w-28 h-28 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center border border-emerald-300 dark:border-emerald-700">
-          <span className="text-3xl font-semibold text-emerald-700 dark:text-emerald-300">
-            {profile.firstName
-              ? profile.firstName.charAt(0).toUpperCase()
-              : "U"}
-          </span>
+    async function getProfile() {
+        try {
+            setLoading(true);
+            const { data: { user } } = await supabase.auth.getUser();
+
+            if (user) {
+                // Extracting name from metadata we saved during signup
+                const fullName = user.user_metadata?.full_name || '';
+                const nameParts = fullName.split(' ');
+                
+                setFormData({
+                    firstName: nameParts[0] || '',
+                    lastName: nameParts.slice(1).join(' ') || '',
+                    email: user.email || '',
+                    phone: user.user_metadata?.phone || '',
+                    nic: user.user_metadata?.nic || '',
+                    district: user.user_metadata?.district || '',
+                    address: user.user_metadata?.address || ''
+                });
+            }
+        } catch (error) {
+            console.error('Error loading user data:', error.message);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const handleUpdate = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        const { error } = await supabase.auth.updateUser({
+            data: { 
+                full_name: `${formData.firstName} ${formData.lastName}`,
+                phone: formData.phone,
+                nic: formData.nic,
+                district: formData.district,
+                address: formData.address
+            }
+        });
+
+        if (error) {
+            alert(error.message);
+        } else {
+            alert('Profile updated successfully!');
+        }
+        setLoading(false);
+    };
+
+    if (loading && !formData.email) return <div className="p-10 text-center">Loading Profile...</div>;
+
+    return (
+        <div className="p-8 bg-slate-50 dark:bg-slate-950 min-h-screen">
+            <div className="max-w-4xl mx-auto bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-8">
+                <h2 className="text-2xl font-bold text-slate-800 dark:text-white">User Profile</h2>
+                <p className="text-slate-500 dark:text-slate-400 mb-8">Update your profile details below.</p>
+
+                {/* Avatar Section */}
+                <div className="flex items-center mb-8">
+                    <div className="w-24 h-24 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-3xl font-bold text-green-600 border-4 border-white dark:border-slate-800 shadow-sm">
+                        {formData.firstName.charAt(0)}{formData.lastName.charAt(0)}
+                    </div>
+                </div>
+
+                <form onSubmit={handleUpdate} className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* First Name */}
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">First Name</label>
+                            <input 
+                                type="text"
+                                value={formData.firstName}
+                                onChange={(e) => setFormData({...formData, firstName: e.target.value})}
+                                className="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-green-500 outline-none"
+                            />
+                        </div>
+
+                        {/* Last Name */}
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Last Name</label>
+                            <input 
+                                type="text"
+                                value={formData.lastName}
+                                onChange={(e) => setFormData({...formData, lastName: e.target.value})}
+                                className="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-green-500 outline-none"
+                            />
+                        </div>
+
+                        {/* Email - Read Only usually */}
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Email</label>
+                            <input 
+                                type="email"
+                                disabled
+                                value={formData.email}
+                                className="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 text-slate-500 cursor-not-allowed"
+                            />
+                        </div>
+
+                        {/* Phone Number */}
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Phone Number</label>
+                            <input 
+                                type="text"
+                                placeholder="07XXXXXXXX"
+                                value={formData.phone}
+                                onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                                className="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-green-500 outline-none"
+                            />
+                        </div>
+
+                        {/* NIC */}
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">NIC Number</label>
+                            <input 
+                                type="text"
+                                value={formData.nic}
+                                onChange={(e) => setFormData({...formData, nic: e.target.value})}
+                                className="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-green-500 outline-none"
+                            />
+                        </div>
+
+                        {/* District */}
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">District</label>
+                            <input 
+                                type="text"
+                                value={formData.district}
+                                onChange={(e) => setFormData({...formData, district: e.target.value})}
+                                className="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-green-500 outline-none"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Address */}
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Address</label>
+                        <textarea 
+                            rows="3"
+                            value={formData.address}
+                            onChange={(e) => setFormData({...formData, address: e.target.value})}
+                            className="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-green-500 outline-none"
+                        ></textarea>
+                    </div>
+
+                    <div className="flex justify-end mt-4">
+                        <button 
+                            type="submit"
+                            disabled={loading}
+                            className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg shadow-green-500/20 active:scale-95 disabled:opacity-50"
+                        >
+                            {loading ? 'Saving...' : 'Save Profile'}
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
-        
-      </div>
-
-      {/* Form Fields */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <InputField
-          label="First Name"
-          name="firstName"
-          value={profile.firstName}
-          onChange={handleChange}
-          placeholder="Enter your first name"
-        />
-
-        <InputField
-          label="Last Name"
-          name="lastName"
-          value={profile.lastName}
-          onChange={handleChange}
-          placeholder="Enter your last name"
-        />
-
-        <InputField
-          label="Email"
-          type="email"
-          name="email"
-          value={profile.email}
-          onChange={handleChange}
-          placeholder="example@email.com"
-        />
-
-        <InputField
-          label="Phone Number"
-          name="phone"
-          value={profile.phone}
-          onChange={handleChange}
-          placeholder="07XXXXXXXX"
-        />
-
-        <InputField
-          label="NIC Number"
-          name="nic"
-          value={profile.nic}
-          onChange={handleChange}
-          placeholder="200012345678"
-        />
-
-        <InputField
-          label="District"
-          name="district"
-          value={profile.district}
-          onChange={handleChange}
-          placeholder="Enter your district"
-        />
-
-        <div className="md:col-span-2">
-          <InputField
-            label="Address"
-            name="address"
-            value={profile.address}
-            onChange={handleChange}
-            placeholder="Enter your address"
-          />
-        </div>
-      </div>
-
-      <div className="flex justify-end">
-        <button
-          type="submit"
-          className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg transition font-semibold"
-        >
-          Save Profile
-        </button>
-      </div>
-    </form>
-  );
-};
-
-export default ProfileForm;
+    );
+}
