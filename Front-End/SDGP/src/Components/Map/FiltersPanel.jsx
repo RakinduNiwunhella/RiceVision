@@ -1,9 +1,31 @@
 export default function FiltersPanel({ filters, setFilters }) {
+  // Alphabetically sorted district list
   const districts = [
-    "Kurunegala",
+    "Ampara",
     "Anuradhapura",
+    "Badulla",
+    "Batticaloa",
+    "Colombo",
+    "Galle",
+    "Gampaha",
+    "Hambantota",
+    "Jaffna",
+    "Kalutara",
+    "Kandy",
+    "Kegalle",
+    "Kilinochchi",
+    "Kurunegala",
+    "Mannar",
+    "Matale",
+    "Matara",
+    "Moneragala",
+    "Mullaitivu",
+    "NuwaraEliya",
     "Polonnaruwa",
-    "Dambulla",
+    "Puttalam",
+    "Ratnapura",
+    "Trincomalee",
+    "Vavuniya",
   ];
 
   const healthStatuses = ["Healthy", "Stressed", "Damaged"];
@@ -27,7 +49,7 @@ export default function FiltersPanel({ filters, setFilters }) {
       {/* District (Single Selection) */}
       <div className="mb-5">
         <p className="text-sm font-medium text-gray-600 mb-2">District</p>
-        <div className="space-y-2 text-sm">
+        <div className="space-y-2 text-sm max-h-64 overflow-y-auto">
           {districts.map((d) => (
             <label key={d} className="flex items-center gap-2">
               <input
@@ -45,7 +67,7 @@ export default function FiltersPanel({ filters, setFilters }) {
             </label>
           ))}
 
-          {/* Clear district selection */}
+          {/* Clear district */}
           <button
             className="text-xs text-blue-600 mt-2"
             onClick={() =>
@@ -76,7 +98,7 @@ export default function FiltersPanel({ filters, setFilters }) {
         </select>
       </div>
 
-      {/* Health Status (Multi Selection) */}
+      {/* Health Status */}
       <div>
         <p className="text-sm font-medium text-gray-600 mb-2">Health Status</p>
         <div className="space-y-2 text-sm">
