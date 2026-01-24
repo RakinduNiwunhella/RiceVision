@@ -21,7 +21,7 @@ function getHealthColor(health) {
 
 /* ---------- POLYGON STYLE ---------- */
 const paddyStyle = {
-  fillColor: "#f59e0b",   // orange
+  fillColor: "#f59e0b",
   fillOpacity: 0.7,
   color: "#b45309",
   weight: 1,
@@ -35,13 +35,21 @@ export default function RiceMap({ filters, layers }) {
   const selectedDistrict = filters.districts[0];
   const selectedHealth = filters.health;
 
-  /* ---------- LOAD GEOJSON ---------- */
+  /* ---------- LOAD GEOJSON (FIXED) ---------- */
   useEffect(() => {
-    fetch("/Kurunagala.geojson")
+    // If no district OR layer turned off → clear polygons
+    if (!selectedDistrict || !layers.paddyExtent) {
+      setPaddyGeo(null);
+      return;
+    }
+
+    // Load district-specific geojson from public folder
+    fetch(`/${selectedDistrict}.geojson`)
       .then((res) => res.json())
       .then(setPaddyGeo)
       .catch(console.error);
-  }, []);
+
+  }, [selectedDistrict, layers.paddyExtent]);
 
   /* ---------- FETCH POINTS ---------- */
   useEffect(() => {
@@ -109,31 +117,35 @@ export default function RiceMap({ filters, layers }) {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
 
-      {/* 🟧 PADDY EXTENT POLYGONS */}
-      {layers.paddyExtent && paddyGeo && (
+      {/* 🟧 PADDY EXTENT POLYGONS (CORRECTED) */}
+      {selectedDistrict && layers.paddyExtent && paddyGeo && (
         <GeoJSON data={paddyGeo} style={paddyStyle} />
       )}
 
-      {/* 🔵🟢🟡🔴 PADDY POINTS */}
-      {visiblePoints.map((p, idx) => (
-        <CircleMarker
-          key={idx}
-          center={[p.lat, p.lng]}
-          radius={4}
-          pathOptions={{
-            color:
-              selectedHealth.length === 0
-                ? "#2563eb"
-                : getHealthColor(p.paddy_health),
-            fillColor:
-              selectedHealth.length === 0
-                ? "#2563eb"
-                : getHealthColor(p.paddy_health),
-            fillOpacity: 0.75,
-            weight: 1,
-          }}
-        />
-      ))}
+      
+{/* 🔵🟢🟡🔴 PADDY POINTS (ONLY WHEN SHOW CIRCLES IS ON) */}
+{selectedDistrict &&
+  layers.showCircles &&
+  visiblePoints.map((p, idx) => (
+    <CircleMarker
+      key={idx}
+      center={[p.lat, p.lng]}
+      radius={4}
+      pathOptions={{
+        color:
+          selectedHealth.length === 0
+            ? "#2563eb"
+            : getHealthColor(p.paddy_health),
+        fillColor:
+          selectedHealth.length === 0
+            ? "#2563eb"
+            : getHealthColor(p.paddy_health),
+        fillOpacity: 0.75,
+        weight: 1,
+      }}
+    />
+  ))}
+
     </MapContainer>
   );
 }
