@@ -1,4 +1,4 @@
-// MyDashboard.jsx
+// MyDashboard.jsx - Pie chart tooltip completely removed
 import { useState, useEffect } from "react";
 import {
   LineChart,
@@ -12,18 +12,49 @@ import {
   Cell,
   Legend,
 } from "recharts";
+import { AlertTriangle, MapPin, Calendar, ChevronRight } from "lucide-react";
 import { supabase } from "../../supabaseClient";
 
-/* ------------------ Components ------------------ */
+/* ------------------ Reusable UI ------------------ */
+
+const Card = ({ title, subtitle, children, className = "" }) => (
+  <section
+    className={`bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm ${className}`}
+  >
+    {(title || subtitle) && (
+      <header className="px-6 pt-5 pb-3 border-b border-gray-100 dark:border-gray-800">
+        {title && (
+          <h3 className="text-sm font-semibold tracking-tight text-gray-900 dark:text-white">
+            {title}
+          </h3>
+        )}
+        {subtitle && (
+          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            {subtitle}
+          </p>
+        )}
+      </header>
+    )}
+    <div className={title || subtitle ? "px-6 pb-5 pt-3" : "p-6"}>
+      {children}
+    </div>
+  </section>
+);
 
 const StatWidget = ({ title, value, subtitle }) => (
-  <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm">
-    <p className="text-sm text-slate-500 dark:text-slate-400">{title}</p>
-    <p className="text-3xl font-semibold text-slate-900 dark:text-white">
+  <Card>
+    <p className="text-xs font-medium tracking-wide text-gray-500 uppercase dark:text-gray-400">
+      {title}
+    </p>
+    <p className="mt-2 text-3xl font-semibold text-gray-900 dark:text-white">
       {value}
     </p>
-    {subtitle && <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{subtitle}</p>}
-  </div>
+    {subtitle && (
+      <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
+        {subtitle}
+      </p>
+    )}
+  </Card>
 );
 
 const ProgressWidget = ({ label, value, color }) => {
@@ -37,11 +68,11 @@ const ProgressWidget = ({ label, value, color }) => {
     <div>
       <div className="flex justify-between text-sm text-slate-500 dark:text-slate-400 mb-1">
         <span>{label}</span>
-        <span>{value}%</span>
+        <span className="font-medium">{value?.toFixed?.(1) ?? value}%</span>
       </div>
-      <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full">
+      <div className="w-full h-1.5 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
         <div
-          className={`h-2 rounded-full ${bar[color]}`}
+          className={`h-1.5 rounded-full ${bar[color]}`}
           style={{ width: `${value}%` }}
         />
       </div>
@@ -59,6 +90,12 @@ const MyDashboard = () => {
   const [showAllOutbreaks, setShowAllOutbreaks] = useState(false);
   const [districtHealth, setDistrictHealth] = useState([]);
 
+  const [loadingHealth, setLoadingHealth] = useState(true);
+  const [loadingYield, setLoadingYield] = useState(true);
+  const [loadingOutbreaks, setLoadingOutbreaks] = useState(true);
+  const [loadingNdvi, setLoadingNdvi] = useState(true);
+  const [loadingDistrictHealth, setLoadingDistrictHealth] = useState(true);
+
   const pieColors = ["#10b981", "#f59e0b", "#ef4444"];
 
   const healthPieData = healthSummary
@@ -72,6 +109,7 @@ const MyDashboard = () => {
   /* ------------------ FETCH HEALTH ------------------ */
   useEffect(() => {
     const fetchHealthSummary = async () => {
+      setLoadingHealth(true);
       const { data } = await supabase
         .from("paddy_health_summary_view")
         .select("normal_pct, mild_stress_pct, severe_stress_pct")
@@ -79,6 +117,7 @@ const MyDashboard = () => {
         .single();
 
       setHealthSummary(data);
+      setLoadingHealth(false);
     };
 
     fetchHealthSummary();
@@ -87,6 +126,7 @@ const MyDashboard = () => {
   /* ------------------ FETCH YIELD ------------------ */
   useEffect(() => {
     const fetchYieldForecast = async () => {
+      setLoadingYield(true);
       const { data } = await supabase
         .from("yield_forecast_view")
         .select("total_yield_tons, confidence")
@@ -94,6 +134,7 @@ const MyDashboard = () => {
         .single();
 
       setYieldForecast(data);
+      setLoadingYield(false);
     };
 
     fetchYieldForecast();
@@ -102,12 +143,14 @@ const MyDashboard = () => {
   /* ------------------ FETCH OUTBREAKS ------------------ */
   useEffect(() => {
     const fetchOutbreaks = async () => {
+      setLoadingOutbreaks(true);
       const { data } = await supabase
         .from("disaster_risk_overview_view")
         .select("id, title, district, event_date")
         .order("event_date", { ascending: false });
 
       setOutbreaks(data || []);
+      setLoadingOutbreaks(false);
     };
 
     fetchOutbreaks();
@@ -116,6 +159,7 @@ const MyDashboard = () => {
   /* ------------------ FETCH NATIONAL NDVI TREND ------------------ */
   useEffect(() => {
     const fetchNdviTrend = async () => {
+      setLoadingNdvi(true);
       const { data, error } = await supabase
         .from("national_ndvi_trend_view")
         .select("date, mean_ndvi")
@@ -129,6 +173,7 @@ const MyDashboard = () => {
           }))
         );
       }
+      setLoadingNdvi(false);
     };
 
     fetchNdviTrend();
@@ -137,6 +182,7 @@ const MyDashboard = () => {
   /* ------------------ FETCH DISTRICT HEALTH OVERVIEW ------------------ */
   useEffect(() => {
     const fetchDistrictHealth = async () => {
+      setLoadingDistrictHealth(true);
       const { data, error } = await supabase
         .from("paddy_health_summary_view")
         .select("district, normal_pct")
@@ -145,6 +191,7 @@ const MyDashboard = () => {
       if (!error && data) {
         setDistrictHealth(data);
       }
+      setLoadingDistrictHealth(false);
     };
 
     fetchDistrictHealth();
@@ -197,27 +244,25 @@ const MyDashboard = () => {
               )}
             </div>
           </div>
+        </Card>
 
-          <StatWidget
-            title="Yield Forecast (MT)"
-            value={
-              yieldForecast
-                ? formatMT(yieldForecast.total_yield_tons)
-                : "Loading..."
-            }
-            subtitle={
-              yieldForecast
-                ? `Confidence: ${yieldForecast.confidence}%`
-                : null
-            }
-          />
+        <StatWidget
+          title="Yield Forecast (MT)"
+          value={loadingYield ? "…" : yieldForecast ? formatMT(yieldForecast.total_yield_tons) : "-"}
+          subtitle={
+            !loadingYield && yieldForecast
+              ? `Confidence: ${yieldForecast.confidence}%`
+              : loadingYield
+              ? "Loading forecast…"
+              : "No forecast available"
+          }
+        />
 
-          <StatWidget
-            title="Expected Shortfall (MT)"
-            value="220K MT"
-            subtitle="vs 3.0M MT demand"
-          />
-        </div>
+        <StatWidget
+          title="Expected Shortfall (MT)"
+          value="220K MT"
+          subtitle="Against 3.0M MT national demand"
+        />
       </div>
 
       {/* OUTBREAKS */}
@@ -255,9 +300,56 @@ const MyDashboard = () => {
                 {showAllOutbreaks ? "View Less" : "View More"}
               </button>
             </div>
+          ) : (
+            <>
+              {(showAllOutbreaks ? outbreaks : outbreaks.slice(0, 5)).map(
+                (o) => (
+                  <div
+                    key={o.id}
+                    className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-800 last:border-b-0 hover:bg-gray-50 dark:hover:bg-slate-800/70 transition-colors px-2 sm:px-0"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="mt-1 text-red-500">
+                        <AlertTriangle size={18} />
+                      </div>
+
+                      <div>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          {o.title}
+                        </p>
+
+                        <div className="flex flex-wrap items-center gap-3 mt-1 text-xs text-gray-500 dark:text-gray-400">
+                          <span className="inline-flex items-center gap-1">
+                            <MapPin size={12} /> {o.district}
+                          </span>
+                          <span className="inline-flex items-center gap-1">
+                            <Calendar size={12} /> {o.event_date}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:underline">
+                      View <ChevronRight size={14} />
+                    </button>
+                  </div>
+                )
+              )}
+
+              {outbreaks.length > 5 && (
+                <div className="pt-3 text-center">
+                  <button
+                    onClick={() => setShowAllOutbreaks(!showAllOutbreaks)}
+                    className="text-xs font-medium text-blue-600 hover:underline"
+                  >
+                    {showAllOutbreaks ? "View less" : "View more"}
+                  </button>
+                </div>
+              )}
+            </>
           )}
-        </div>
-      </div>
+        </Card>
+      </section>
 
       {/* LOWER ANALYTICS */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-12">
@@ -275,9 +367,8 @@ const MyDashboard = () => {
             </LineChart>
           </ResponsiveContainer>
 
-          <div className="mt-4 space-y-3">
             {healthSummary && (
-              <>
+              <div className="space-y-2">
                 <ProgressWidget
                   label="Normal"
                   value={healthSummary.normal_pct}
@@ -293,7 +384,7 @@ const MyDashboard = () => {
                   value={healthSummary.severe_stress_pct}
                   color="blue"
                 />
-              </>
+              </div>
             )}
           </div>
         </div>
@@ -311,8 +402,28 @@ const MyDashboard = () => {
               <span className="font-medium capitalize text-slate-900 dark:text-white">{d.district}</span>
               <span className="text-slate-700 dark:text-slate-300">{Math.round(d.normal_pct)}% Healthy</span>
             </div>
-          ))}
-        </div>
+          ) : districtHealth.length === 0 ? (
+            <div className="py-6 text-center text-xs text-gray-400">
+              No district health data available.
+            </div>
+          ) : (
+            <div className="divide-y divide-gray-100 dark:divide-gray-800">
+              {districtHealth.map((d, i) => (
+                <div
+                  key={d.district ?? i}
+                  className="flex justify-between items-center px-1 py-2 text-xs sm:text-sm"
+                >
+                  <span className="font-medium capitalize text-gray-900 dark:text-white">
+                    {d.district}
+                  </span>
+                  <span className="text-gray-600 dark:text-gray-300">
+                    {Math.round(d.normal_pct)}% healthy
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
       </div>
     </div>
   );
