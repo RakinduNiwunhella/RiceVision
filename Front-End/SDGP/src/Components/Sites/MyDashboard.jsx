@@ -13,6 +13,7 @@ import {
   Legend,
 } from "recharts";
 import { supabase } from "../../supabaseClient";
+import { AlertTriangle, CloudRain, Bug } from "lucide-react";
 
 /* ------------------ Components ------------------ */
 
@@ -54,10 +55,12 @@ const ProgressWidget = ({ label, value, color }) => {
 const MyDashboard = () => {
   const [healthSummary, setHealthSummary] = useState(null);
   const [yieldForecast, setYieldForecast] = useState(null);
+  const [bestYieldDistricts, setBestYieldDistricts] = useState([]);
   const [outbreaks, setOutbreaks] = useState([]);
   const [ndviTrend, setNdviTrend] = useState([]);
   const [showAllOutbreaks, setShowAllOutbreaks] = useState(false);
   const [districtHealth, setDistrictHealth] = useState([]);
+  const [showAllDistricts, setShowAllDistricts] = useState(false);
 
   const pieColors = ["#10b981", "#f59e0b", "#ef4444"];
 
@@ -87,16 +90,33 @@ const MyDashboard = () => {
   /* ------------------ FETCH YIELD ------------------ */
   useEffect(() => {
     const fetchYieldForecast = async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("yield_forecast_view")
-        .select("total_yield_tons, confidence")
-        .eq("district", "kurunegala")
+        .select("total_yield_tons")
         .single();
 
-      setYieldForecast(data);
+      if (!error) {
+        setYieldForecast(data);
+      }
     };
 
     fetchYieldForecast();
+  }, []);
+
+  /* ------------------ FETCH BEST YIELD DISTRICTS ------------------ */
+  useEffect(() => {
+    const fetchBestYieldDistricts = async () => {
+      const { data, error } = await supabase
+        .from("best_yield_districts_view")
+        .select("District, total_yield_ton_ha")
+        .limit(5);
+
+      if (!error && data) {
+        setBestYieldDistricts(data);
+      }
+    };
+
+    fetchBestYieldDistricts();
   }, []);
 
   /* ------------------ FETCH OUTBREAKS ------------------ */
@@ -157,6 +177,15 @@ const MyDashboard = () => {
     return value.toFixed(1) + " MT";
   };
 
+  const getOutbreakIcon = (title) => {
+    const t = title.toLowerCase();
+    if (t.includes("flood") || t.includes("rain") || t.includes("storm"))
+      return <CloudRain className="w-5 h-5 text-blue-500" />;
+    if (t.includes("pest") || t.includes("insect"))
+      return <Bug className="w-5 h-5 text-rose-500" />;
+    return <AlertTriangle className="w-5 h-5 text-amber-500" />;
+  };
+
   /* ------------------ RENDER ------------------ */
 
   return (
@@ -185,12 +214,15 @@ const MyDashboard = () => {
                       innerRadius={45}
                       outerRadius={80}
                       label={({ value }) => `${value.toFixed(1)}%`}
+                      isAnimationActive={false}
+                      activeIndex={-1}
+                      style={{ outline: "none", cursor: "default" }}
                     >
                       {healthPieData.map((_, i) => (
                         <Cell key={i} fill={pieColors[i]} />
                       ))}
                     </Pie>
-                    <Tooltip contentStyle={{ backgroundColor: "#020617", borderColor: "#334155" }} />
+                    
                     <Legend />
                   </PieChart>
                 </ResponsiveContainer>
@@ -198,19 +230,45 @@ const MyDashboard = () => {
             </div>
           </div>
 
-          <StatWidget
-            title="Yield Forecast (MT)"
-            value={
-              yieldForecast
+          <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm">
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              Yield Forecast (MT)
+            </p>
+
+            <p className="text-3xl font-semibold text-slate-900 dark:text-white mt-1">
+              {yieldForecast
                 ? formatMT(yieldForecast.total_yield_tons)
-                : "Loading..."
-            }
-            subtitle={
-              yieldForecast
-                ? `Confidence: ${yieldForecast.confidence}%`
-                : null
-            }
-          />
+                : "Loading..."}
+            </p>
+
+            {yieldForecast && (
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                Confidence: {yieldForecast.confidence}%
+              </p>
+            )}
+
+            <div className="mt-4 border-t border-gray-200 dark:border-gray-700 pt-3">
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">
+                Top Producing Districts
+              </p>
+
+              <ul className="space-y-1">
+                {bestYieldDistricts.map((d, i) => (
+                  <li
+                    key={i}
+                    className="flex justify-between text-sm"
+                  >
+                    <span className="text-slate-700 dark:text-slate-300">
+                      {i + 1}. {d.District}
+                    </span>
+                    <span className="font-medium text-emerald-600">
+                      {formatMT(d.total_yield_ton_ha)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
 
           <StatWidget
             title="Expected Shortfall (MT)"
@@ -233,11 +291,14 @@ const MyDashboard = () => {
               key={o.id}
               className="flex justify-between items-center px-6 py-4 hover:bg-gray-50 dark:hover:bg-slate-700 transition"
             >
-              <div>
-                <p className="font-medium text-slate-900 dark:text-white">
-                  {o.title} – {o.district}
-                </p>
-                <p className="text-sm text-slate-500 dark:text-slate-400">{o.event_date}</p>
+              <div className="flex items-start gap-3">
+                {getOutbreakIcon(o.title)}
+                <div>
+                  <p className="font-medium text-slate-900 dark:text-white">
+                    {o.title} – {o.district}
+                  </p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">{o.event_date}</p>
+                </div>
               </div>
 
               <button className="text-sm rounded-md bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 transition">
@@ -270,7 +331,19 @@ const MyDashboard = () => {
             <LineChart data={ndviTrend}>
               <XAxis dataKey="day" stroke="#64748b" />
               <YAxis domain={[0, 1]} stroke="#64748b" />
-              <Tooltip contentStyle={{ backgroundColor: "#020617", borderColor: "#334155" }} />
+              <Tooltip
+                cursor={{ strokeDasharray: "3 3", strokeWidth: 1 }}
+                contentStyle={{
+                  backgroundColor: "rgba(15, 23, 42, 0.95)",
+                  border: "1px solid #334155",
+                  borderRadius: "8px",
+                  padding: "8px 12px",
+                  boxShadow: "0 10px 25px rgba(0,0,0,0.25)",
+                }}
+                labelStyle={{ color: "#94a3b8", fontSize: "12px" }}
+                itemStyle={{ color: "#10b981", fontSize: "13px", fontWeight: 500 }}
+                formatter={(value) => [`${value.toFixed(3)} NDVI`, "Index"]}
+              />
               <Line dataKey="value" stroke="#10b981" />
             </LineChart>
           </ResponsiveContainer>
@@ -303,7 +376,7 @@ const MyDashboard = () => {
             District Health Overview
           </h3>
 
-          {districtHealth.map((d, i) => (
+          {(showAllDistricts ? districtHealth : districtHealth.slice(0, 7)).map((d, i) => (
             <div
               key={i}
               className="flex justify-between px-4 py-3 text-sm border-b border-gray-200 dark:border-gray-700 last:border-b-0"
@@ -312,6 +385,16 @@ const MyDashboard = () => {
               <span className="text-slate-700 dark:text-slate-300">{Math.round(d.normal_pct)}% Healthy</span>
             </div>
           ))}
+          {districtHealth.length > 7 && (
+            <div className="px-4 py-4 text-center border-t border-gray-200 dark:border-gray-700">
+              <button
+                onClick={() => setShowAllDistricts(!showAllDistricts)}
+                className="text-sm rounded-md bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-1.5 transition"
+              >
+                {showAllDistricts ? "Show Less" : "Show More"}
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
