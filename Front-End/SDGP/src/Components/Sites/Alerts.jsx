@@ -181,19 +181,19 @@ const Alerts = () => {
   const formatTimestamp = (iso) => new Date(iso).toLocaleString();
 
   return (
-    <div className="p-6 max-w-6xl mx-auto bg-gray-50 dark:bg-slate-900 min-h-screen text-gray-900 dark:text-gray-100">
+    <div className="p-6 max-w-6xl mx-auto bg-white dark:bg-slate-900 min-h-screen text-gray-900 dark:text-gray-100">
       <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">Paddy Field Risk Alerts</h1>
 
       {/* Tabs */}
-      <div className="flex gap-4 mb-6 border-b border-gray-200 dark:border-gray-700">
+      <div className="flex gap-4 mb-6 border-b border-slate-200 dark:border-slate-700">
         {tabOptions.map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`pb-2 px-4 font-semibold border-b-4 ${
               activeTab === tab
-                ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                : "border-transparent text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
+                ? "border-emerald-600 text-emerald-700 dark:text-emerald-400"
+                : "border-transparent text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400"
             }`}
           >
             {tab} ({counts[tab]})
@@ -207,7 +207,7 @@ const Alerts = () => {
         placeholder="Search alerts..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        className="w-full mb-6 px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+        className="w-full mb-6 px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
       />
 
       {/* Alerts */}
@@ -219,14 +219,13 @@ const Alerts = () => {
         {filteredAlerts.map((alert) => (
           <div
             key={alert.id}
-            className={`p-6 rounded-xl border-l-8 shadow-sm transition
-  ${
-    alert.status === "Open"
-      ? "border-red-500 bg-red-50 dark:bg-red-950/30"
-      : alert.status === "Resolved"
-      ? "border-green-500 bg-green-50 dark:bg-green-950/30"
-      : "border-gray-500 bg-gray-100 dark:bg-slate-800"
-  }`}
+            className={`p-6 rounded-xl border-l-8 shadow-sm transition bg-white dark:bg-slate-800 ${
+              alert.status === "Open"
+                ? "border-red-500"
+                : alert.status === "Resolved"
+                ? "border-emerald-500"
+                : "border-gray-500"
+            }`}
           >
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">
               {alert.title}
@@ -245,7 +244,7 @@ const Alerts = () => {
               <div className="flex gap-3 mt-4">
                 <button
                   onClick={() => handleResolve(alert.id)}
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-500 transition"
+                  className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 dark:hover:bg-emerald-500 transition"
                 >
                   Resolve
                 </button>

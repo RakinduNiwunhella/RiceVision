@@ -97,7 +97,7 @@ const Help = () => {
     "w-full rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-4 py-2 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 dark:focus:ring-emerald-900/30 outline-none transition";
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 px-6 py-10">
+    <div className="min-h-screen bg-white dark:bg-slate-900 px-6 py-10">
       <div className="max-w-7xl mx-auto space-y-12">
         {/* Header */}
         <div>
@@ -264,7 +264,7 @@ const Help = () => {
 
                 {openFaq === faq.id && (
                   <div className="px-4 pb-4">
-                    <div className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-4 text-slate-700 dark:text-slate-300 text-sm leading-relaxed">
+                    <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-4 text-slate-700 dark:text-slate-300 text-sm leading-relaxed">
                       {faq.answer}
                     </div>
                   </div>

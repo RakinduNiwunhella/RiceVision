@@ -148,7 +148,7 @@ const Report = () => {
       </header>
 
       {/* FILTERS */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 rounded shadow-sm dark:bg-slate-800">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 rounded shadow-sm bg-white dark:bg-slate-800">
         <select
           className="border rounded p-2 dark:bg-gray-900"
           value={selectedMonth}
@@ -264,7 +264,7 @@ const Report = () => {
 
       {/* INSIGHTS */}
       {filteredReports.length > 0 && (
-        <div className="p-4 rounded shadow-sm bg-green-50 dark:bg-slate-800 border-l-4 border-green-600 mb-6">
+        <div className="p-4 rounded shadow-sm bg-white dark:bg-slate-800 border-l-4 border-green-600 mb-6">
           <p className="text-sm">
             Rice yield trends indicate variations across selected months and
             districts. Higher yields are observed in favorable growing periods.
