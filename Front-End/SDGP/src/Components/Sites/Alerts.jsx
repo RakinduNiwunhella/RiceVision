@@ -181,8 +181,8 @@ const Alerts = () => {
   const formatTimestamp = (iso) => new Date(iso).toLocaleString();
 
   return (
-    <div className="p-6 max-w-6xl mx-auto bg-white dark:bg-slate-900 min-h-screen text-gray-900 dark:text-gray-100">
-      <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">Paddy Field Risk Alerts</h1>
+    <div className="p-6 max-w-6xl mx-auto bg-white dark:bg-slate-900 min-h-screen text-slate-900 dark:text-white">
+      <h1 className="text-3xl font-bold mb-6 text-slate-900 dark:text-white">Paddy Field Risk Alerts</h1>
 
       {/* Tabs */}
       <div className="flex gap-4 mb-6 border-b border-slate-200 dark:border-slate-700">
@@ -190,7 +190,7 @@ const Alerts = () => {
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`pb-2 px-4 font-semibold border-b-4 ${
+            className={`pb-2 px-4 font-semibold border-b-4 rounded transition ${
               activeTab === tab
                 ? "border-emerald-600 text-emerald-700 dark:text-emerald-400"
                 : "border-transparent text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400"
@@ -207,19 +207,19 @@ const Alerts = () => {
         placeholder="Search alerts..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        className="w-full mb-6 px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+        className="w-full mb-6 px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition"
       />
 
       {/* Alerts */}
       <div className="space-y-5 max-h-[70vh] overflow-y-auto">
         {filteredAlerts.length === 0 && (
-          <p className="text-center text-gray-500 dark:text-gray-400">No alerts found</p>
+          <p className="text-center text-slate-500 dark:text-slate-400">No alerts found</p>
         )}
 
         {filteredAlerts.map((alert) => (
           <div
             key={alert.id}
-            className={`p-6 rounded-xl border-l-8 shadow-sm transition bg-white dark:bg-slate-800 ${
+            className={`p-6 rounded-xl border-l-8 shadow-md transition bg-white dark:bg-slate-800 ${
               alert.status === "Open"
                 ? "border-red-500"
                 : alert.status === "Resolved"
@@ -227,16 +227,16 @@ const Alerts = () => {
                 : "border-gray-500"
             }`}
           >
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white">
               {alert.title}
-              <span className="text-sm text-gray-500 ml-2">
+              <span className="text-sm text-slate-500 dark:text-slate-400 ml-2">
                 ({alert.field})
               </span>
             </h2>
 
-            <p className="mt-2 text-gray-700 dark:text-gray-300">{alert.description}</p>
+            <p className="mt-2 text-slate-700 dark:text-slate-300">{alert.description}</p>
 
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
               Priority: {alert.priority} | {formatTimestamp(alert.timestamp)}
             </p>
 

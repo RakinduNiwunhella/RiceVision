@@ -139,10 +139,10 @@ const Report = () => {
     <div className="min-h-screen p-6 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100">
       {/* HEADER */}
       <header className="mb-6">
-        <h1 className="text-3xl font-bold">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
           Prediction Report
         </h1>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+        <p className="text-sm text-slate-600 dark:text-slate-400">
           Monthly and district based rice yield prediction analysis for Sri Lanka
         </p>
       </header>
@@ -150,7 +150,7 @@ const Report = () => {
       {/* FILTERS */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 rounded shadow-sm bg-white dark:bg-slate-800">
         <select
-          className="border rounded p-2 dark:bg-gray-900"
+          className="border rounded p-2 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
           value={selectedMonth}
           onChange={e => setSelectedMonth(e.target.value)}
         >
@@ -163,7 +163,7 @@ const Report = () => {
         </select>
 
         <select
-          className="border rounded p-2 dark:bg-gray-900"
+          className="border rounded p-2 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
           value={selectedDistrict}
           onChange={e => setSelectedDistrict(e.target.value)}
         >
@@ -196,7 +196,7 @@ const Report = () => {
         </select>
 
         <select
-          className="border rounded p-2 dark:bg-gray-900"
+          className="border rounded p-2 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
           value={comparisonMode}
           onChange={e => setComparisonMode(e.target.value)}
         >
@@ -207,7 +207,7 @@ const Report = () => {
 
         <button
           onClick={() => setGenerated(true)}
-          className="bg-green-700 text-white rounded px-4 py-2"
+          className="bg-emerald-600 hover:bg-emerald-700 text-white rounded px-4 py-2 transition"
         >
           Generate Report
         </button>
@@ -217,18 +217,18 @@ const Report = () => {
       {generated && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div className="p-4 rounded shadow-sm bg-white dark:bg-slate-800">
-            <p className="text-sm text-gray-500">Total Predicted Yield</p>
-            <p className="text-2xl font-semibold">
+            <p className="text-sm text-slate-500 dark:text-slate-400">Total Predicted Yield</p>
+            <p className="text-2xl font-semibold text-gray-900 dark:text-white">
               {totalYield.toFixed(1)} tons
             </p>
           </div>
           <div className="p-4 rounded shadow-sm bg-white dark:bg-slate-800">
-            <p className="text-sm text-gray-500">Selected Month</p>
-            <p>{selectedMonth ? monthNames[selectedMonth - 1] : "All Months"}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Selected Month</p>
+            <p className="text-gray-900 dark:text-white">{selectedMonth ? monthNames[selectedMonth - 1] : "All Months"}</p>
           </div>
           <div className="p-4 rounded shadow-sm bg-white dark:bg-slate-800">
-            <p className="text-sm text-gray-500">Selected District</p>
-            <p>{selectedDistrict}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Selected District</p>
+            <p className="text-gray-900 dark:text-white">{selectedDistrict}</p>
           </div>
         </div>
       )}
@@ -264,8 +264,8 @@ const Report = () => {
 
       {/* INSIGHTS */}
       {filteredReports.length > 0 && (
-        <div className="p-4 rounded shadow-sm bg-white dark:bg-slate-800 border-l-4 border-green-600 mb-6">
-          <p className="text-sm">
+        <div className="p-4 rounded shadow-sm bg-white dark:bg-slate-800 border-l-4 border-emerald-600 mb-6">
+          <p className="text-sm text-slate-700 dark:text-slate-300">
             Rice yield trends indicate variations across selected months and
             districts. Higher yields are observed in favorable growing periods.
           </p>
@@ -277,13 +277,13 @@ const Report = () => {
         <div className="flex gap-4">
           <button
             onClick={downloadPDF}
-            className="bg-green-700 text-white px-4 py-2 rounded"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded transition"
           >
             Download PDF
           </button>
           <button
             onClick={exportCSV}
-            className="bg-yellow-600 text-white px-4 py-2 rounded"
+            className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded transition"
           >
             Export CSV
           </button>
