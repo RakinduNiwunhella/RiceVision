@@ -3,12 +3,12 @@ import { EyeIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import ComplaintDetails from "../pages/ComplaintDetails";
 import { updateComplaintStatus } from "../../services/supabase/complaints";
 
-/* -------------------- CONSTANTS -------------------- */
-
+/* -------------------- STATUS STYLES -------------------- */
+/* Lowercase keys = safe with DB values */
 const STATUS_STYLES = {
-  New: "bg-blue-100 text-blue-700",
-  "In Progress": "bg-yellow-100 text-yellow-700",
-  Resolved: "bg-green-100 text-green-700",
+  new: "bg-blue-100 text-blue-700",
+  "in progress": "bg-amber-100 text-amber-700",
+  resolved: "bg-emerald-100 text-emerald-700",
 };
 
 /* -------------------- COMPONENT -------------------- */
@@ -20,7 +20,8 @@ export default function ComplaintsTable({ complaints }) {
   const [statusFilter, setStatusFilter] = useState("All Statuses");
   const [typeFilter, setTypeFilter] = useState("All Types");
 
-  /* Update status (optimistic UI) */
+  /* -------------------- STATUS UPDATE -------------------- */
+
   const handleStatusChange = async (id, newStatus) => {
     setLocalComplaints((prev) =>
       prev.map((c) => (c.id === id ? { ...c, status: newStatus } : c)),
@@ -56,9 +57,17 @@ export default function ComplaintsTable({ complaints }) {
   });
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div>
+        <h1 className="text-xl font-semibold text-gray-900">Complaints</h1>
+        <p className="text-sm text-gray-500 mt-1">
+          View, filter, and manage submitted complaints
+        </p>
+      </div>
+
       {/* Search & Filters */}
-      <div className="bg-white p-4 rounded-xl shadow-sm flex flex-col md:flex-row md:items-center md:gap-4">
+      <div className="bg-white border border-gray-200 rounded-xl p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="flex items-center gap-2 flex-1">
           <MagnifyingGlassIcon className="w-5 h-5 text-gray-400" />
           <input
@@ -66,15 +75,15 @@ export default function ComplaintsTable({ complaints }) {
             placeholder="Search by ID, name, or type..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            className="w-full h-10 border border-gray-300 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
           />
         </div>
 
-        <div className="flex gap-2 mt-2 md:mt-0">
+        <div className="flex gap-2">
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            className="h-10 border border-gray-300 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
           >
             <option>All Statuses</option>
             <option>New</option>
@@ -85,7 +94,7 @@ export default function ComplaintsTable({ complaints }) {
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            className="h-10 border border-gray-300 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
           >
             <option>All Types</option>
             {Array.from(
@@ -100,59 +109,76 @@ export default function ComplaintsTable({ complaints }) {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl shadow-sm overflow-x-auto">
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b">
+          <thead className="bg-gray-50 border-b border-gray-200 text-xs uppercase tracking-wide text-gray-500">
             <tr>
-              <th className="px-4 py-3 text-left">Complaint ID</th>
-              <th className="px-4 py-3 text-left">Full Name</th>
-              <th className="px-4 py-3 text-left">Anonymous</th>
-              <th className="px-4 py-3 text-left">Type</th>
-              <th className="px-4 py-3 text-left">Province / District</th>
-              <th className="px-4 py-3 text-left">Status</th>
-              <th className="px-4 py-3 text-left">Date</th>
-              <th className="px-4 py-3 text-left">Actions</th>
+              <th className="px-4 py-3 text-left font-semibold">
+                Complaint ID
+              </th>
+              <th className="px-4 py-3 text-left font-semibold">Full Name</th>
+              <th className="px-4 py-3 text-left font-semibold">Anonymous</th>
+              <th className="px-4 py-3 text-left font-semibold">Type</th>
+              <th className="px-4 py-3 text-left font-semibold">
+                Province / District
+              </th>
+              <th className="px-4 py-3 text-center font-semibold">Status</th>
+              <th className="px-4 py-3 text-left font-semibold">Date</th>
+              <th className="px-4 py-3 text-left font-semibold">Actions</th>
             </tr>
           </thead>
 
           <tbody>
-            {filteredComplaints.map((c) => (
-              <tr key={c.id} className="border-b hover:bg-gray-50">
-                <td className="px-4 py-3 font-medium">{c.id}</td>
-                <td className="px-4 py-3">
-                  {c.is_anonymous ? "Anonymous" : c.full_name}
-                </td>
-                <td className="px-4 py-3">{c.is_anonymous ? "Yes" : "No"}</td>
-                <td className="px-4 py-3">{c.complaint_type || "—"}</td>
-                <td className="px-4 py-3">
-                  {c.province} / {c.district}
-                </td>
-                <td className="px-4 py-3">
-                  <span
-                    className={`px-2 py-1 text-xs font-medium rounded-full ${
-                      STATUS_STYLES[c.status || "New"]
-                    }`}
-                  >
-                    {c.status || "New"}
-                  </span>
-                </td>
-                <td className="px-4 py-3">
-                  {new Date(c.created_at).toLocaleDateString()}
-                </td>
-                <td className="px-4 py-3">
-                  <button
-                    onClick={() => setSelectedComplaintId(c.id)}
-                    className="flex items-center gap-1 px-3 py-1 border rounded-md hover:bg-gray-100"
-                  >
-                    <EyeIcon className="w-4 h-4" /> View
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {filteredComplaints.map((c) => {
+              const statusKey = (c.status || "new").toLowerCase();
+
+              return (
+                <tr
+                  key={c.id}
+                  className="border-b last:border-b-0 hover:bg-teal-50/40 transition-colors"
+                >
+                  <td className="px-4 py-3 font-medium">{c.id}</td>
+                  <td className="px-4 py-3">
+                    {c.is_anonymous ? "Anonymous" : c.full_name}
+                  </td>
+                  <td className="px-4 py-3">{c.is_anonymous ? "Yes" : "No"}</td>
+                  <td className="px-4 py-3">{c.complaint_type || "—"}</td>
+                  <td className="px-4 py-3">
+                    {c.province} / {c.district}
+                  </td>
+
+                  {/* Status Badge */}
+                  <td className="px-4 py-3 text-center">
+                    <span
+                      className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium capitalize ${
+                        STATUS_STYLES[statusKey] || "bg-gray-100 text-gray-700"
+                      }`}
+                    >
+                      <span className="w-2 h-2 rounded-full bg-current" />
+                      {c.status || "New"}
+                    </span>
+                  </td>
+
+                  <td className="px-4 py-3">
+                    {new Date(c.created_at).toLocaleDateString()}
+                  </td>
+
+                  <td className="px-4 py-3">
+                    <button
+                      onClick={() => setSelectedComplaintId(c.id)}
+                      className="inline-flex items-center gap-1 text-teal-600 hover:text-teal-800 font-medium text-sm"
+                    >
+                      <EyeIcon className="w-4 h-4" />
+                      View
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
 
             {filteredComplaints.length === 0 && (
               <tr>
-                <td colSpan={8} className="text-center py-4 text-gray-500">
+                <td colSpan={8} className="text-center py-6 text-gray-500">
                   No complaints found.
                 </td>
               </tr>
@@ -160,7 +186,8 @@ export default function ComplaintsTable({ complaints }) {
           </tbody>
         </table>
 
-        <div className="p-3 text-sm text-gray-500">
+        {/* Footer */}
+        <div className="p-4 text-sm text-gray-500 border-t bg-gray-50">
           Showing {filteredComplaints.length} of {localComplaints.length}{" "}
           complaints
         </div>
