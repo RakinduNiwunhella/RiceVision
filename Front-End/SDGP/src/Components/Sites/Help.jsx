@@ -94,11 +94,11 @@ const Help = () => {
   };
 
   const inputClass =
-    "w-full rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-4 py-2 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 dark:focus:ring-emerald-900/30 outline-none transition";
+    "w-full rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-4 py-2 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 dark:focus:ring-emerald-900/30 outline-none transition";
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-900 px-6 py-10">
-      <div className="max-w-7xl mx-auto space-y-12">
+      <div className="max-w-7xl mx-auto bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6 space-y-12">
         {/* Header */}
         <div>
           <h1 className="flex items-center gap-2 text-3xl font-bold text-slate-900 dark:text-white">
@@ -133,7 +133,7 @@ const Help = () => {
                 {card.icon}
                 {card.title}
               </h3>
-              <p className="text-slate-600 dark:text-slate-400 text-sm">
+              <p className="text-slate-700 dark:text-slate-300 text-sm">
                 {card.desc}
               </p>
             </div>
@@ -141,7 +141,7 @@ const Help = () => {
         </div>
 
         {/* Complaint Section */}
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm p-8">
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-6">
           <h2 className="flex items-center gap-2 text-xl font-semibold mb-6 text-slate-900 dark:text-white">
             <ExclamationTriangleIcon className="w-6 h-6" />
             Submit a Complaint
@@ -154,7 +154,7 @@ const Help = () => {
                 { label: "Position", name: "position" },
               ].map((field) => (
                 <div key={field.name}>
-                  <label className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300">
+                  <label className="block text-sm font-medium mb-1 text-slate-500 dark:text-slate-400">
                     {field.label}
                   </label>
                   <input
@@ -170,7 +170,7 @@ const Help = () => {
               <div className="grid grid-cols-2 gap-4">
                 {["province", "district"].map((name) => (
                   <div key={name}>
-                    <label className="block text-sm font-medium mb-1 capitalize text-slate-700 dark:text-slate-300">
+                    <label className="block text-sm font-medium mb-1 capitalize text-slate-500 dark:text-slate-400">
                       {name}
                     </label>
                     <input
@@ -185,7 +185,7 @@ const Help = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300">
+                <label className="block text-sm font-medium mb-1 text-slate-500 dark:text-slate-400">
                   Complaint Type
                 </label>
                 <select
@@ -204,7 +204,7 @@ const Help = () => {
             </div>
 
             <div className="flex flex-col">
-              <label className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300">
+              <label className="block text-sm font-medium mb-1 text-slate-500 dark:text-slate-400">
                 Complaint Description
               </label>
               <textarea
@@ -227,7 +227,7 @@ const Help = () => {
         </div>
 
         {/* FAQ Section */}
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm p-8">
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-6">
           <h2 className="text-xl font-semibold mb-6 text-slate-900 dark:text-white">
             Frequently Asked Questions
           </h2>
@@ -252,7 +252,7 @@ const Help = () => {
               >
                 <button
                   onClick={() => setOpenFaq(openFaq === faq.id ? null : faq.id)}
-                  className="w-full flex justify-between items-center px-4 py-3 text-left font-medium text-slate-800 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-emerald-800/50 transition"
+                  className="w-full flex justify-between items-center px-4 py-3 text-left font-medium text-slate-900 dark:text-white hover:bg-emerald-50 dark:hover:bg-emerald-800/50 transition"
                 >
                   {faq.question}
                   <ChevronDownIcon

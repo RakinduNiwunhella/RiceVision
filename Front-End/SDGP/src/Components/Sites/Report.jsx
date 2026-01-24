@@ -136,159 +136,161 @@ const Report = () => {
   };
 
   return (
-    <div className="min-h-screen p-6 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100">
-      {/* HEADER */}
-      <header className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Prediction Report
-        </h1>
-        <p className="text-sm text-slate-600 dark:text-slate-400">
-          Monthly and district based rice yield prediction analysis for Sri Lanka
-        </p>
-      </header>
+    <div className="min-h-screen bg-white dark:bg-slate-900 p-6">
+      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6">
+        {/* HEADER */}
+        <header className="mb-6">
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
+            Prediction Report
+          </h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            Monthly and district based rice yield prediction analysis for Sri Lanka
+          </p>
+        </header>
 
-      {/* FILTERS */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 rounded shadow-sm bg-white dark:bg-slate-800">
-        <select
-          className="border rounded p-2 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-          value={selectedMonth}
-          onChange={e => setSelectedMonth(e.target.value)}
-        >
-          <option value="">All</option>
-          {monthNames.map((month, index) => (
-            <option key={month} value={index + 1}>
-              {month}
-            </option>
-          ))}
-        </select>
+        {/* FILTERS */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 rounded shadow-sm bg-white dark:bg-slate-800">
+          <select
+            className="border rounded p-2 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-700 dark:text-slate-300"
+            value={selectedMonth}
+            onChange={e => setSelectedMonth(e.target.value)}
+          >
+            <option value="" className="text-slate-700 dark:text-slate-300">All</option>
+            {monthNames.map((month, index) => (
+              <option key={month} value={index + 1} className="text-slate-700 dark:text-slate-300">
+                {month}
+              </option>
+            ))}
+          </select>
 
-        <select
-          className="border rounded p-2 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-          value={selectedDistrict}
-          onChange={e => setSelectedDistrict(e.target.value)}
-        >
-          <option>All Sri Lanka</option>
-          <option>Colombo</option>
-          <option>Gampaha</option>
-          <option>Kalutara</option>
-          <option>Kandy</option>
-          <option>Matale</option>
-          <option>Nuwara Eliya</option>
-          <option>Galle</option>
-          <option>Matara</option>
-          <option>Hambantota</option>
-          <option>Jaffna</option>
-          <option>Kilinochchi</option>
-          <option>Mannar</option>
-          <option>Mullaitivu</option>
-          <option>Vavuniya</option>
-          <option>Trincomalee</option>
-          <option>Batticaloa</option>
-          <option>Ampara</option>
-          <option>Kurunegala</option>
-          <option>Puttalam</option>
-          <option>Anuradhapura</option>
-          <option>Polonnaruwa</option>
-          <option>Badulla</option>
-          <option>Monaragala</option>
-          <option>Ratnapura</option>
-          <option>Kegalle</option>
-        </select>
+          <select
+            className="border rounded p-2 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-700 dark:text-slate-300"
+            value={selectedDistrict}
+            onChange={e => setSelectedDistrict(e.target.value)}
+          >
+            <option className="text-slate-700 dark:text-slate-300">All Sri Lanka</option>
+            <option className="text-slate-700 dark:text-slate-300">Colombo</option>
+            <option className="text-slate-700 dark:text-slate-300">Gampaha</option>
+            <option className="text-slate-700 dark:text-slate-300">Kalutara</option>
+            <option className="text-slate-700 dark:text-slate-300">Kandy</option>
+            <option className="text-slate-700 dark:text-slate-300">Matale</option>
+            <option className="text-slate-700 dark:text-slate-300">Nuwara Eliya</option>
+            <option className="text-slate-700 dark:text-slate-300">Galle</option>
+            <option className="text-slate-700 dark:text-slate-300">Matara</option>
+            <option className="text-slate-700 dark:text-slate-300">Hambantota</option>
+            <option className="text-slate-700 dark:text-slate-300">Jaffna</option>
+            <option className="text-slate-700 dark:text-slate-300">Kilinochchi</option>
+            <option className="text-slate-700 dark:text-slate-300">Mannar</option>
+            <option className="text-slate-700 dark:text-slate-300">Mullaitivu</option>
+            <option className="text-slate-700 dark:text-slate-300">Vavuniya</option>
+            <option className="text-slate-700 dark:text-slate-300">Trincomalee</option>
+            <option className="text-slate-700 dark:text-slate-300">Batticaloa</option>
+            <option className="text-slate-700 dark:text-slate-300">Ampara</option>
+            <option className="text-slate-700 dark:text-slate-300">Kurunegala</option>
+            <option className="text-slate-700 dark:text-slate-300">Puttalam</option>
+            <option className="text-slate-700 dark:text-slate-300">Anuradhapura</option>
+            <option className="text-slate-700 dark:text-slate-300">Polonnaruwa</option>
+            <option className="text-slate-700 dark:text-slate-300">Badulla</option>
+            <option className="text-slate-700 dark:text-slate-300">Monaragala</option>
+            <option className="text-slate-700 dark:text-slate-300">Ratnapura</option>
+            <option className="text-slate-700 dark:text-slate-300">Kegalle</option>
+          </select>
 
-        <select
-          className="border rounded p-2 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-          value={comparisonMode}
-          onChange={e => setComparisonMode(e.target.value)}
-        >
-          <option value="single">Single View</option>
-          <option value="month">Month Comparison</option>
-          <option value="district">District Comparison</option>
-        </select>
+          <select
+            className="border rounded p-2 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-700 dark:text-slate-300"
+            value={comparisonMode}
+            onChange={e => setComparisonMode(e.target.value)}
+          >
+            <option value="single" className="text-slate-700 dark:text-slate-300">Single View</option>
+            <option value="month" className="text-slate-700 dark:text-slate-300">Month Comparison</option>
+            <option value="district" className="text-slate-700 dark:text-slate-300">District Comparison</option>
+          </select>
 
-        <button
-          onClick={() => setGenerated(true)}
-          className="bg-emerald-600 hover:bg-emerald-700 text-white rounded px-4 py-2 transition"
-        >
-          Generate Report
-        </button>
-      </div>
+          <button
+            onClick={() => setGenerated(true)}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white rounded px-4 py-2 transition"
+          >
+            Generate Report
+          </button>
+        </div>
 
-      {/* SUMMARY */}
-      {generated && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="p-4 rounded shadow-sm bg-white dark:bg-slate-800">
-            <p className="text-sm text-slate-500 dark:text-slate-400">Total Predicted Yield</p>
-            <p className="text-2xl font-semibold text-gray-900 dark:text-white">
-              {totalYield.toFixed(1)} tons
+        {/* SUMMARY */}
+        {generated && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div className="p-4 rounded shadow-sm bg-white dark:bg-slate-800">
+              <p className="text-sm text-slate-500 dark:text-slate-400">Total Predicted Yield</p>
+              <p className="text-2xl font-semibold text-slate-900 dark:text-white">
+                {totalYield.toFixed(1)} tons
+              </p>
+            </div>
+            <div className="p-4 rounded shadow-sm bg-white dark:bg-slate-800">
+              <p className="text-sm text-slate-500 dark:text-slate-400">Selected Month</p>
+              <p className="text-slate-900 dark:text-white">{selectedMonth ? monthNames[selectedMonth - 1] : "All Months"}</p>
+            </div>
+            <div className="p-4 rounded shadow-sm bg-white dark:bg-slate-800">
+              <p className="text-sm text-slate-500 dark:text-slate-400">Selected District</p>
+              <p className="text-slate-900 dark:text-white">{selectedDistrict}</p>
+            </div>
+          </div>
+        )}
+
+        {/* CHARTS */}
+        {filteredReports.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div className="p-4 rounded shadow-sm bg-white dark:bg-slate-800">
+              <Line
+                data={{
+                  labels: filteredReports.map(r => r.date),
+                  datasets: [{
+                    label: "Monthly Yield Trend",
+                    data: filteredReports.map(r => r.estimated_yield)
+                  }]
+                }}
+              />
+            </div>
+
+            <div className="p-4 rounded shadow-sm bg-white dark:bg-slate-800">
+              <Bar
+                data={{
+                  labels: filteredReports.map(r => r.district),
+                  datasets: [{
+                    label: "District Comparison",
+                    data: filteredReports.map(r => r.estimated_yield)
+                  }]
+                }}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* INSIGHTS */}
+        {filteredReports.length > 0 && (
+          <div className="p-4 rounded shadow-sm bg-white dark:bg-slate-800 border-l-4 border-emerald-600 mb-6">
+            <p className="text-sm text-slate-700 dark:text-slate-300">
+              Rice yield trends indicate variations across selected months and
+              districts. Higher yields are observed in favorable growing periods.
             </p>
           </div>
-          <div className="p-4 rounded shadow-sm bg-white dark:bg-slate-800">
-            <p className="text-sm text-slate-500 dark:text-slate-400">Selected Month</p>
-            <p className="text-gray-900 dark:text-white">{selectedMonth ? monthNames[selectedMonth - 1] : "All Months"}</p>
-          </div>
-          <div className="p-4 rounded shadow-sm bg-white dark:bg-slate-800">
-            <p className="text-sm text-slate-500 dark:text-slate-400">Selected District</p>
-            <p className="text-gray-900 dark:text-white">{selectedDistrict}</p>
-          </div>
-        </div>
-      )}
+        )}
 
-      {/* CHARTS */}
-      {filteredReports.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div className="p-4 rounded shadow-sm bg-white dark:bg-slate-800">
-            <Line
-              data={{
-                labels: filteredReports.map(r => r.date),
-                datasets: [{
-                  label: "Monthly Yield Trend",
-                  data: filteredReports.map(r => r.estimated_yield)
-                }]
-              }}
-            />
+        {/* ACTIONS */}
+        {filteredReports.length > 0 && (
+          <div className="flex gap-4">
+            <button
+              onClick={downloadPDF}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded transition"
+            >
+              Download PDF
+            </button>
+            <button
+              onClick={exportCSV}
+              className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded transition"
+            >
+              Export CSV
+            </button>
           </div>
-
-          <div className="p-4 rounded shadow-sm bg-white dark:bg-slate-800">
-            <Bar
-              data={{
-                labels: filteredReports.map(r => r.district),
-                datasets: [{
-                  label: "District Comparison",
-                  data: filteredReports.map(r => r.estimated_yield)
-                }]
-              }}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* INSIGHTS */}
-      {filteredReports.length > 0 && (
-        <div className="p-4 rounded shadow-sm bg-white dark:bg-slate-800 border-l-4 border-emerald-600 mb-6">
-          <p className="text-sm text-slate-700 dark:text-slate-300">
-            Rice yield trends indicate variations across selected months and
-            districts. Higher yields are observed in favorable growing periods.
-          </p>
-        </div>
-      )}
-
-      {/* ACTIONS */}
-      {filteredReports.length > 0 && (
-        <div className="flex gap-4">
-          <button
-            onClick={downloadPDF}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded transition"
-          >
-            Download PDF
-          </button>
-          <button
-            onClick={exportCSV}
-            className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded transition"
-          >
-            Export CSV
-          </button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
