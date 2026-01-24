@@ -17,12 +17,12 @@ import { supabase } from "../../supabaseClient";
 /* ------------------ Components ------------------ */
 
 const StatWidget = ({ title, value, subtitle }) => (
-  <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm">
-    <p className="text-sm text-slate-500 dark:text-slate-400">{title}</p>
-    <p className="text-3xl font-semibold text-slate-900 dark:text-white">
+  <div className="bg-white dark:bg-slate-900 rounded-xl p-5 shadow-sm">
+    <p className="text-sm text-gray-500 dark:text-gray-400">{title}</p>
+    <p className="text-3xl font-semibold text-gray-900 dark:text-white">
       {value}
     </p>
-    {subtitle && <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{subtitle}</p>}
+    {subtitle && <p className="text-xs text-gray-400 mt-1">{subtitle}</p>}
   </div>
 );
 
@@ -35,11 +35,11 @@ const ProgressWidget = ({ label, value, color }) => {
 
   return (
     <div>
-      <div className="flex justify-between text-sm text-slate-500 dark:text-slate-400 mb-1">
+      <div className="flex justify-between text-sm text-gray-600 dark:text-gray-300 mb-1">
         <span>{label}</span>
         <span>{value}%</span>
       </div>
-      <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full">
+      <div className="w-full h-2 bg-gray-200 dark:bg-gray-800 rounded-full">
         <div
           className={`h-2 rounded-full ${bar[color]}`}
           style={{ width: `${value}%` }}
@@ -160,15 +160,15 @@ const MyDashboard = () => {
   /* ------------------ RENDER ------------------ */
 
   return (
-    <div className="max-w-7xl mx-auto bg-white dark:bg-slate-900 rounded-xl shadow-sm p-6 text-slate-700 dark:text-slate-300">
+    <div className="space-y-12 max-w-7xl mx-auto text-gray-900 dark:text-gray-100">
 
       {/* OVERVIEW */}
       <div>
-        <h1 className="text-xl font-semibold text-slate-900 dark:text-white">National Overview</h1>
+        <h1 className="text-xl font-semibold text-gray-900 dark:text-white">National Overview</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm">
-            <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-4">
+          <div className="bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
               Field Health Distribution
             </h3>
 
@@ -221,36 +221,36 @@ const MyDashboard = () => {
       </div>
 
       {/* OUTBREAKS */}
-      <div className="mt-12">
-        <h2 className="text-lg font-medium text-slate-900 dark:text-white">Outbreaks</h2>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+      <div>
+        <h2 className="text-lg font-medium text-gray-900 dark:text-white">Outbreaks</h2>
+        <p className="text-sm text-gray-500 mb-4">
           Disease and disaster outbreak monitoring
         </p>
 
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
           {(showAllOutbreaks ? outbreaks : outbreaks.slice(0, 5)).map((o) => (
             <div
               key={o.id}
-              className="flex justify-between items-center px-6 py-4 hover:bg-gray-50 dark:hover:bg-slate-700 transition"
+              className="flex justify-between items-center px-6 py-4 hover:bg-gray-50 dark:hover:bg-slate-800 transition"
             >
               <div>
-                <p className="font-medium text-slate-900 dark:text-white">
+                <p className="font-medium">
                   {o.title} – {o.district}
                 </p>
-                <p className="text-sm text-slate-500 dark:text-slate-400">{o.event_date}</p>
+                <p className="text-sm text-gray-500">{o.event_date}</p>
               </div>
 
-              <button className="text-sm rounded-md bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 transition">
+              <button className="text-sm text-blue-600 hover:underline">
                 View
               </button>
             </div>
           ))}
 
           {outbreaks.length > 5 && (
-            <div className="px-6 py-4 text-center border-t border-gray-200 dark:border-gray-700">
+            <div className="px-6 py-4 text-center border-t">
               <button
                 onClick={() => setShowAllOutbreaks(!showAllOutbreaks)}
-                className="text-sm rounded-md bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 transition"
+                className="text-sm text-blue-600 hover:underline"
               >
                 {showAllOutbreaks ? "View Less" : "View More"}
               </button>
@@ -260,16 +260,16 @@ const MyDashboard = () => {
       </div>
 
       {/* LOWER ANALYTICS */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-12">
-        <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm">
-          <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
             National NDVI Trend (30 days)
           </h3>
 
           <ResponsiveContainer width="100%" height={180}>
             <LineChart data={ndviTrend}>
-              <XAxis dataKey="day" stroke="#64748b" />
-              <YAxis domain={[0, 1]} stroke="#64748b" />
+              <XAxis dataKey="day" />
+              <YAxis domain={[0, 1]} />
               <Tooltip contentStyle={{ backgroundColor: "#020617", borderColor: "#334155" }} />
               <Line dataKey="value" stroke="#10b981" />
             </LineChart>
@@ -298,8 +298,8 @@ const MyDashboard = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm">
-          <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-4">
+        <div className="bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
             District Health Overview
           </h3>
 
@@ -308,8 +308,8 @@ const MyDashboard = () => {
               key={i}
               className="flex justify-between px-4 py-3 text-sm border-b border-gray-200 dark:border-gray-700 last:border-b-0"
             >
-              <span className="font-medium capitalize text-slate-900 dark:text-white">{d.district}</span>
-              <span className="text-slate-700 dark:text-slate-300">{Math.round(d.normal_pct)}% Healthy</span>
+              <span className="font-medium capitalize">{d.district}</span>
+              <span>{Math.round(d.normal_pct)}% Healthy</span>
             </div>
           ))}
         </div>
