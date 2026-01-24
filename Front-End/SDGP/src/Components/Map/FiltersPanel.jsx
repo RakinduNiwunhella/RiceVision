@@ -24,20 +24,39 @@ export default function FiltersPanel({ filters, setFilters }) {
     <div className="w-72 bg-white rounded-xl shadow-sm p-4">
       <h2 className="font-semibold text-gray-800 mb-4">Filters</h2>
 
-      {/* Districts */}
+      {/* District (Single Selection) */}
       <div className="mb-5">
-        <p className="text-sm font-medium text-gray-600 mb-2">Districts</p>
+        <p className="text-sm font-medium text-gray-600 mb-2">District</p>
         <div className="space-y-2 text-sm">
           {districts.map((d) => (
             <label key={d} className="flex items-center gap-2">
               <input
-                type="checkbox"
-                checked={filters.districts.includes(d)}
-                onChange={() => toggleArrayValue("districts", d)}
+                type="radio"
+                name="district"
+                checked={filters.districts[0] === d}
+                onChange={() =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    districts: [d], // enforce single district
+                  }))
+                }
               />
               {d}
             </label>
           ))}
+
+          {/* Clear district selection */}
+          <button
+            className="text-xs text-blue-600 mt-2"
+            onClick={() =>
+              setFilters((prev) => ({
+                ...prev,
+                districts: [],
+              }))
+            }
+          >
+            Clear district
+          </button>
         </div>
       </div>
 
@@ -57,7 +76,7 @@ export default function FiltersPanel({ filters, setFilters }) {
         </select>
       </div>
 
-      {/* Health Status */}
+      {/* Health Status (Multi Selection) */}
       <div>
         <p className="text-sm font-medium text-gray-600 mb-2">Health Status</p>
         <div className="space-y-2 text-sm">
