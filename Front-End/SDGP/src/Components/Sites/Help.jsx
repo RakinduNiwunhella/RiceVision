@@ -94,18 +94,18 @@ const Help = () => {
   };
 
   const inputClass =
-    "w-full rounded-md border border-gray-200 dark:border-neutral-600 bg-white dark:bg-neutral-900 text-gray-900 dark:text-gray-100 px-4 py-2 focus:border-gray-400 focus:ring-1 focus:ring-gray-300 dark:focus:ring-gray-600 outline-none";
+    "w-full rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-4 py-2 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 dark:focus:ring-emerald-900/30 outline-none transition";
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-neutral-900 px-6 py-10">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 px-6 py-10">
       <div className="max-w-7xl mx-auto space-y-12">
         {/* Header */}
         <div>
-          <h1 className="flex items-center gap-2 text-3xl font-bold text-gray-900 dark:text-gray-100">
+          <h1 className="flex items-center gap-2 text-3xl font-bold text-slate-900 dark:text-white">
             <QuestionMarkCircleIcon className="w-8 h-8" />
             Help & Support
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-2 max-w-3xl">
+          <p className="text-slate-500 dark:text-slate-400 mt-2 max-w-3xl">
             Find answers to common questions or submit a complaint to our
             support team. We’re here to help you.
           </p>
@@ -127,13 +127,13 @@ const Help = () => {
           ].map((card, idx) => (
             <div
               key={idx}
-              className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 shadow-sm p-6"
+              className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-6"
             >
-              <h3 className="flex items-center gap-2 font-semibold text-lg mb-2 text-gray-900 dark:text-gray-100">
+              <h3 className="flex items-center gap-2 font-semibold text-lg mb-2 text-slate-900 dark:text-white">
                 {card.icon}
                 {card.title}
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 text-sm">
+              <p className="text-slate-600 dark:text-slate-400 text-sm">
                 {card.desc}
               </p>
             </div>
@@ -141,8 +141,8 @@ const Help = () => {
         </div>
 
         {/* Complaint Section */}
-        <div className="bg-white dark:bg-neutral-800 rounded-2xl border border-gray-200 dark:border-neutral-700 shadow-sm p-8">
-          <h2 className="flex items-center gap-2 text-xl font-semibold mb-6 text-gray-900 dark:text-gray-100">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm p-8">
+          <h2 className="flex items-center gap-2 text-xl font-semibold mb-6 text-slate-900 dark:text-white">
             <ExclamationTriangleIcon className="w-6 h-6" />
             Submit a Complaint
           </h2>
@@ -154,7 +154,7 @@ const Help = () => {
                 { label: "Position", name: "position" },
               ].map((field) => (
                 <div key={field.name}>
-                  <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                  <label className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300">
                     {field.label}
                   </label>
                   <input
@@ -170,7 +170,7 @@ const Help = () => {
               <div className="grid grid-cols-2 gap-4">
                 {["province", "district"].map((name) => (
                   <div key={name}>
-                    <label className="block text-sm font-medium mb-1 capitalize text-gray-700 dark:text-gray-300">
+                    <label className="block text-sm font-medium mb-1 capitalize text-slate-700 dark:text-slate-300">
                       {name}
                     </label>
                     <input
@@ -185,7 +185,7 @@ const Help = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                <label className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300">
                   Complaint Type
                 </label>
                 <select
@@ -204,7 +204,7 @@ const Help = () => {
             </div>
 
             <div className="flex flex-col">
-              <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+              <label className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300">
                 Complaint Description
               </label>
               <textarea
@@ -218,7 +218,7 @@ const Help = () => {
               <button
                 onClick={handleSubmit}
                 disabled={loading}
-                className="mt-5 bg-black dark:bg-gray-100 text-white dark:text-black py-3 rounded-md hover:bg-gray-800 dark:hover:bg-gray-200 transition disabled:opacity-50"
+                className="mt-5 bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-md transition disabled:opacity-50"
               >
                 {loading ? "Submitting..." : "Submit Complaint"}
               </button>
@@ -227,19 +227,19 @@ const Help = () => {
         </div>
 
         {/* FAQ Section */}
-        <div className="bg-white dark:bg-neutral-800 rounded-2xl border border-gray-200 dark:border-neutral-700 shadow-sm p-8">
-          <h2 className="text-xl font-semibold mb-6 text-gray-900 dark:text-gray-100">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm p-8">
+          <h2 className="text-xl font-semibold mb-6 text-slate-900 dark:text-white">
             Frequently Asked Questions
           </h2>
 
           {faqLoading && (
-            <p className="text-gray-500 dark:text-gray-400 text-sm">
+            <p className="text-slate-500 dark:text-slate-400 text-sm">
               Loading FAQs...
             </p>
           )}
 
           {!faqLoading && faqs.length === 0 && (
-            <p className="text-gray-500 dark:text-gray-400 text-sm">
+            <p className="text-slate-500 dark:text-slate-400 text-sm">
               No FAQs available.
             </p>
           )}
@@ -248,11 +248,11 @@ const Help = () => {
             {faqs.map((faq) => (
               <div
                 key={faq.id}
-                className="border border-gray-200 dark:border-neutral-700 rounded-lg"
+                className="border border-slate-200 dark:border-slate-700 rounded-lg"
               >
                 <button
                   onClick={() => setOpenFaq(openFaq === faq.id ? null : faq.id)}
-                  className="w-full flex justify-between items-center px-4 py-3 text-left font-medium text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-neutral-700 transition"
+                  className="w-full flex justify-between items-center px-4 py-3 text-left font-medium text-slate-800 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-emerald-800/50 transition"
                 >
                   {faq.question}
                   <ChevronDownIcon
@@ -264,7 +264,7 @@ const Help = () => {
 
                 {openFaq === faq.id && (
                   <div className="px-4 pb-4">
-                    <div className="bg-gray-50 dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 rounded-lg p-4 text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+                    <div className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-4 text-slate-700 dark:text-slate-300 text-sm leading-relaxed">
                       {faq.answer}
                     </div>
                   </div>

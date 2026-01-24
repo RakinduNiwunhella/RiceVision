@@ -33,6 +33,21 @@ const Report = () => {
   const [comparisonMode, setComparisonMode] = useState("single");
   const [generated, setGenerated] = useState(false);
 
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
+  ];
+
   useEffect(() => {
     loadReports();
   }, []);
@@ -76,7 +91,7 @@ const Report = () => {
     const doc = new jsPDF({ orientation: "landscape" });
 
     doc.setFontSize(18);
-    doc.text("Rice Vision - Prediction Report", 14, 15);
+    doc.text("RiceVision - Prediction Report", 14, 15);
     doc.setFontSize(11);
     doc.text(
       `Month: ${selectedMonth || "All"} | District: ${selectedDistrict}`,
@@ -121,11 +136,11 @@ const Report = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6 text-gray-900 dark:text-gray-100">
+    <div className="min-h-screen p-6 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100">
       {/* HEADER */}
       <header className="mb-6">
         <h1 className="text-3xl font-bold">
-          Rice Vision - Prediction Reports
+          Prediction Report
         </h1>
         <p className="text-sm text-gray-600 dark:text-gray-400">
           Monthly and district based rice yield prediction analysis for Sri Lanka
@@ -133,27 +148,14 @@ const Report = () => {
       </header>
 
       {/* FILTERS */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-white dark:bg-gray-800 p-4 rounded-lg shadow mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 rounded shadow-sm dark:bg-slate-800">
         <select
           className="border rounded p-2 dark:bg-gray-900"
           value={selectedMonth}
           onChange={e => setSelectedMonth(e.target.value)}
         >
           <option value="">All</option>
-          {[
-            "January",
-            "February",
-            "March",
-            "April",
-            "May",
-            "June",
-            "July",
-            "August",
-            "September",
-            "October",
-            "November",
-            "December"
-          ].map((month, index) => (
+          {monthNames.map((month, index) => (
             <option key={month} value={index + 1}>
               {month}
             </option>
@@ -214,17 +216,17 @@ const Report = () => {
       {/* SUMMARY */}
       {generated && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-white dark:bg-gray-800 p-4 rounded shadow">
+          <div className="p-4 rounded shadow-sm bg-white dark:bg-slate-800">
             <p className="text-sm text-gray-500">Total Predicted Yield</p>
             <p className="text-2xl font-semibold">
               {totalYield.toFixed(1)} tons
             </p>
           </div>
-          <div className="bg-white dark:bg-gray-800 p-4 rounded shadow">
+          <div className="p-4 rounded shadow-sm bg-white dark:bg-slate-800">
             <p className="text-sm text-gray-500">Selected Month</p>
-            <p>{selectedMonth || "All"}</p>
+            <p>{selectedMonth ? monthNames[selectedMonth - 1] : "All Months"}</p>
           </div>
-          <div className="bg-white dark:bg-gray-800 p-4 rounded shadow">
+          <div className="p-4 rounded shadow-sm bg-white dark:bg-slate-800">
             <p className="text-sm text-gray-500">Selected District</p>
             <p>{selectedDistrict}</p>
           </div>
@@ -234,7 +236,7 @@ const Report = () => {
       {/* CHARTS */}
       {filteredReports.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div className="bg-white dark:bg-gray-800 p-4 rounded shadow">
+          <div className="p-4 rounded shadow-sm bg-white dark:bg-slate-800">
             <Line
               data={{
                 labels: filteredReports.map(r => r.date),
@@ -246,7 +248,7 @@ const Report = () => {
             />
           </div>
 
-          <div className="bg-white dark:bg-gray-800 p-4 rounded shadow">
+          <div className="p-4 rounded shadow-sm bg-white dark:bg-slate-800">
             <Bar
               data={{
                 labels: filteredReports.map(r => r.district),
@@ -262,7 +264,7 @@ const Report = () => {
 
       {/* INSIGHTS */}
       {filteredReports.length > 0 && (
-        <div className="bg-green-50 dark:bg-gray-800 border-l-4 border-green-600 p-4 rounded mb-6">
+        <div className="p-4 rounded shadow-sm bg-green-50 dark:bg-slate-800 border-l-4 border-green-600 mb-6">
           <p className="text-sm">
             Rice yield trends indicate variations across selected months and
             districts. Higher yields are observed in favorable growing periods.

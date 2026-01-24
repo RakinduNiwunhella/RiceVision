@@ -181,7 +181,7 @@ const Alerts = () => {
   const formatTimestamp = (iso) => new Date(iso).toLocaleString();
 
   return (
-    <div className="p-6 max-w-6xl mx-auto bg-gray-50 dark:bg-slate-950 min-h-screen text-gray-900 dark:text-gray-100">
+    <div className="p-6 max-w-6xl mx-auto bg-gray-50 dark:bg-slate-900 min-h-screen text-gray-900 dark:text-gray-100">
       <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">Paddy Field Risk Alerts</h1>
 
       {/* Tabs */}
@@ -207,7 +207,7 @@ const Alerts = () => {
         placeholder="Search alerts..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        className="w-full mb-6 px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+        className="w-full mb-6 px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
       />
 
       {/* Alerts */}
