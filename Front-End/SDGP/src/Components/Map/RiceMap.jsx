@@ -14,13 +14,6 @@ const HEALTH_MAP = {
   Damaged: "Severe Stress",
 };
 
-/* ---------- DISTRICT → BOUNDARY FILE MAP ---------- */
-const DISTRICT_BOUNDARY_FILES = {
-  Kurunegala: "/Kurunegala_District_Boundary.geojson",
-  Anuradhapura: "/Anuradhapura_District_Boundary.geojson",
-  Polonnaruwa: "/Polonnaruwa_District_Boundary.geojson",
-};
-
 function getHealthColor(health) {
   if (health === "Normal") return "#16a34a";
   if (health === "Mild Stress") return "#facc15";
@@ -39,7 +32,7 @@ const paddyStyle = {
 const districtBoundaryStyle = {
   color: "#1e3a8a",
   weight: 3,
-  fillOpacity: 0, // line only
+  fillOpacity: 0,
 };
 
 export default function RiceMap({ filters, layers }) {
@@ -52,7 +45,7 @@ export default function RiceMap({ filters, layers }) {
   const selectedDistrict = filters.districts[0];
   const selectedHealth = filters.health;
 
-  /* ---------- LOAD PADDY EXTENT GEOJSON ---------- */
+  /* ---------- LOAD PADDY EXTENT ---------- */
   useEffect(() => {
     if (!selectedDistrict || !layers.paddyExtent) {
       setPaddyGeo(null);
@@ -68,20 +61,19 @@ export default function RiceMap({ filters, layers }) {
       .catch(console.error);
   }, [selectedDistrict, layers.paddyExtent]);
 
-  /* ---------- LOAD DISTRICT BOUNDARY (FIXED) ---------- */
+  /* ---------- LOAD DISTRICT BOUNDARY (DYNAMIC) ---------- */
   useEffect(() => {
-    // 🔴 CRITICAL FIX: clear old boundary immediately
+    // Clear old boundary immediately
     setDistrictBoundary(null);
 
     if (!selectedDistrict) return;
 
-    const boundaryPath = DISTRICT_BOUNDARY_FILES[selectedDistrict];
-    if (!boundaryPath) return;
+    const boundaryFile = `/${selectedDistrict}_District_Boundary.geojson`;
 
-    fetch(boundaryPath)
+    fetch(boundaryFile)
       .then((res) => {
         if (!res.ok) {
-          throw new Error(`Failed to load boundary for ${selectedDistrict}`);
+          throw new Error(`Boundary not found for ${selectedDistrict}`);
         }
         return res.json();
       })
@@ -89,7 +81,7 @@ export default function RiceMap({ filters, layers }) {
       .catch(console.error);
   }, [selectedDistrict]);
 
-  /* ---------- AUTO ZOOM TO DISTRICT ---------- */
+  /* ---------- AUTO ZOOM ---------- */
   useEffect(() => {
     if (districtBoundary && mapRef.current) {
       const layer = L.geoJSON(districtBoundary);
@@ -139,7 +131,7 @@ export default function RiceMap({ filters, layers }) {
     );
   }
 
-  /* ---------- FALLBACK BOUNDS (POINTS) ---------- */
+  /* ---------- FALLBACK BOUNDS ---------- */
   const bounds =
     visiblePoints.length > 0
       ? latLngBounds(visiblePoints.map((p) => [p.lat, p.lng]))
@@ -153,26 +145,23 @@ export default function RiceMap({ filters, layers }) {
       bounds={!districtBoundary ? bounds : null}
       className="h-full w-full rounded-xl"
     >
-      {/* Base Map */}
+      {/* Base map */}
       <TileLayer
         attribution="© OpenStreetMap"
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
 
-      {/* 🔷 DISTRICT BOUNDARY */}
+      {/* District Boundary */}
       {districtBoundary && (
-        <GeoJSON
-          data={districtBoundary}
-          style={districtBoundaryStyle}
-        />
+        <GeoJSON data={districtBoundary} style={districtBoundaryStyle} />
       )}
 
-      {/* 🟧 PADDY EXTENT POLYGONS */}
+      {/* Paddy Extent */}
       {selectedDistrict && layers.paddyExtent && paddyGeo && (
         <GeoJSON data={paddyGeo} style={paddyStyle} />
       )}
 
-      {/* 🔵🟢🟡🔴 ML HEALTH POINTS */}
+      {/* ML Health Points */}
       {selectedDistrict &&
         layers.showCircles &&
         visiblePoints.map((p, idx) => (
