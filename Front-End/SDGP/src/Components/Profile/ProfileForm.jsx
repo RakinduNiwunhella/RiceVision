@@ -25,12 +25,12 @@ const ProfileForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <form onSubmit={handleSubmit} className="space-y-10 mt-6">
       
       {/* Avatar */}
-      <div className="flex items-center gap-6">
-        <div className="w-28 h-28 rounded-full bg-green-100 flex items-center justify-center">
-          <span className="text-3xl font-semibold text-green-700">
+      <div className="flex items-center gap-6 pb-6 border-b border-slate-200 dark:border-slate-800">
+        <div className="w-28 h-28 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center border border-emerald-300 dark:border-emerald-700">
+          <span className="text-3xl font-semibold text-emerald-700 dark:text-emerald-300">
             {profile.firstName
               ? profile.firstName.charAt(0).toUpperCase()
               : "U"}
@@ -104,7 +104,7 @@ const ProfileForm = () => {
       <div className="flex justify-end">
         <button
           type="submit"
-          className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition font-semibold"
+          className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg transition font-semibold"
         >
           Save Profile
         </button>
