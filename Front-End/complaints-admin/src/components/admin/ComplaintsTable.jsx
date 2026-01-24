@@ -1,17 +1,17 @@
 import { useState } from "react";
-import {
-  EyeIcon,
-  ChevronDownIcon,
-  MagnifyingGlassIcon,
-} from "@heroicons/react/24/outline";
-import ComplaintDetailsModal from "./ComplaintDetailsModal";
+import { EyeIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import ComplaintDetails from "../pages/ComplaintDetails";
 import { updateComplaintStatus } from "../../services/supabase/complaints";
 
+/* -------------------- CONSTANTS -------------------- */
+
 const STATUS_STYLES = {
-  New: "bg-red-100 text-red-700",
+  New: "bg-blue-100 text-blue-700",
   "In Progress": "bg-yellow-100 text-yellow-700",
   Resolved: "bg-green-100 text-green-700",
 };
+
+/* -------------------- COMPONENT -------------------- */
 
 export default function ComplaintsTable({ complaints }) {
   const [localComplaints, setLocalComplaints] = useState(complaints);
@@ -20,21 +20,23 @@ export default function ComplaintsTable({ complaints }) {
   const [statusFilter, setStatusFilter] = useState("All Statuses");
   const [typeFilter, setTypeFilter] = useState("All Types");
 
+  /* Update status (optimistic UI) */
   const handleStatusChange = async (id, newStatus) => {
     setLocalComplaints((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, status: newStatus } : c))
+      prev.map((c) => (c.id === id ? { ...c, status: newStatus } : c)),
     );
 
     const { error } = await updateComplaintStatus(id, newStatus);
     if (error) {
       alert("Failed to update status: " + error.message);
       setLocalComplaints((prev) =>
-        prev.map((c) => (c.id === id ? { ...c, status: "New" } : c))
+        prev.map((c) => (c.id === id ? { ...c, status: "New" } : c)),
       );
     }
   };
 
-  // Filtered complaints
+  /* -------------------- FILTERING -------------------- */
+
   const filteredComplaints = localComplaints.filter((c) => {
     const matchesSearch =
       search === "" ||
@@ -46,6 +48,7 @@ export default function ComplaintsTable({ complaints }) {
 
     const matchesStatus =
       statusFilter === "All Statuses" || c.status === statusFilter;
+
     const matchesType =
       typeFilter === "All Types" || c.complaint_type === typeFilter;
 
@@ -54,7 +57,7 @@ export default function ComplaintsTable({ complaints }) {
 
   return (
     <div className="space-y-4">
-      {/* Search and filters */}
+      {/* Search & Filters */}
       <div className="bg-white p-4 rounded-xl shadow-sm flex flex-col md:flex-row md:items-center md:gap-4">
         <div className="flex items-center gap-2 flex-1">
           <MagnifyingGlassIcon className="w-5 h-5 text-gray-400" />
@@ -78,6 +81,7 @@ export default function ComplaintsTable({ complaints }) {
             <option>In Progress</option>
             <option>Resolved</option>
           </select>
+
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
@@ -85,7 +89,9 @@ export default function ComplaintsTable({ complaints }) {
           >
             <option>All Types</option>
             {Array.from(
-              new Set(localComplaints.map((c) => c.complaint_type))
+              new Set(
+                localComplaints.map((c) => c.complaint_type).filter(Boolean),
+              ),
             ).map((type) => (
               <option key={type}>{type}</option>
             ))}
@@ -143,6 +149,7 @@ export default function ComplaintsTable({ complaints }) {
                 </td>
               </tr>
             ))}
+
             {filteredComplaints.length === 0 && (
               <tr>
                 <td colSpan={8} className="text-center py-4 text-gray-500">
@@ -152,6 +159,7 @@ export default function ComplaintsTable({ complaints }) {
             )}
           </tbody>
         </table>
+
         <div className="p-3 text-sm text-gray-500">
           Showing {filteredComplaints.length} of {localComplaints.length}{" "}
           complaints
@@ -160,7 +168,7 @@ export default function ComplaintsTable({ complaints }) {
 
       {/* Modal */}
       {selectedComplaintId && (
-        <ComplaintDetailsModal
+        <ComplaintDetails
           id={selectedComplaintId}
           onClose={() => setSelectedComplaintId(null)}
         />
