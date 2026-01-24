@@ -5,7 +5,7 @@ function Team() {
   const people = [
     {
       name: "Rakindu Niwunhella",
-      role: "Front-end Developer",
+      role: "Full-Stack Developer",
       imageUrl:
         "/images/rakindu.webp",
       github: "https://github.com/RakinduNiwunhella",
@@ -29,7 +29,7 @@ function Team() {
     },
     {
       name: "Binada Matara Arachchige",
-      role: "AI and backend engineer",
+      role: "Backend engineer",
       imageUrl:
         "/images/binada.webp",
       github: "https://github.com/binadacode",
@@ -37,7 +37,7 @@ function Team() {
     },
     {
       name: "Pavithma Fernando",
-      role: "UI/UX designer",
+      role: "Frontend engineer",
       imageUrl:
         "/images/pavithma.webp",
       github: "https://github.com/pavithma",

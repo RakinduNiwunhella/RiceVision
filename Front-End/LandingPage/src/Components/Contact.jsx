@@ -22,7 +22,7 @@ const handleSubmit = async (e) => {
   e.preventDefault();
   try {
     const { error } = await supabase
-      .from("contact_messages")
+      .from("contact_forum_messages")
       .insert([
         {
           first_name: formData.firstName,

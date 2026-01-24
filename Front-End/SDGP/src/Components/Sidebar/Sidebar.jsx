@@ -13,7 +13,7 @@ const navItems = [
 const bottomItems = [
   { id: 'profile', label: 'My Profile', icon: 'person', active: false },
   { id: 'help', label: 'Help & FAQ', icon: 'help_outline' , active: false},
-  { id: 'logout', label: 'Logout', icon: 'logout' },
+  { id: '#', label: 'Logout', icon: 'logout' },
 ]
 
 const Sidebar = () => {
