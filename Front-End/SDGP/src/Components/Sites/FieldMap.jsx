@@ -11,8 +11,8 @@ export default function FieldMap() {
   });
 
   const [layers, setLayers] = useState({
-    paddyExtent: false,
-    showCircles: false,   // ✅ NEW
+      paddyExtent: false,
+
     ndvi: false,
     evi: false,
     vv: false,
