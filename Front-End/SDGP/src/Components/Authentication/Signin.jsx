@@ -4,7 +4,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { FaSun, FaMoon, FaLock, FaExclamationTriangle } from 'react-icons/fa'; 
 
 export default function LoginPage() {
-    const [theme, setTheme] = useState('dark');
+    // 1. Changed initial state to 'light'
+    const [theme, setTheme] = useState('light');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
@@ -14,13 +15,17 @@ export default function LoginPage() {
     // Theme Logic
     useEffect(() => {
         const root = window.document.documentElement;
-        theme === 'dark' ? root.classList.add('dark') : root.classList.remove('dark');
+        if (theme === 'dark') {
+            root.classList.add('dark');
+        } else {
+            root.classList.remove('dark');
+        }
     }, [theme]);
 
     const handleLogin = async (e) => {
         e.preventDefault();
         setLoading(true);
-        setErrorMessage(''); // Clear previous errors
+        setErrorMessage(''); 
 
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         
@@ -28,7 +33,6 @@ export default function LoginPage() {
             setErrorMessage(error.message);
             setLoading(false);
         } else {
-            // Success: Move into the App layout
             navigate("/dashboard");
         }
     };
@@ -54,10 +58,14 @@ export default function LoginPage() {
                     
                     {/* Logo */}
                     <div className="flex items-center mb-10 space-x-3">
-                        <div className="p-2.5 bg-indigo-600 rounded-xl shadow-lg shadow-indigo-500/40">
-                            <FaLock size={20} className="text-white" />
+                        <div className="items-center group">
+                            <img
+                            src="/logoSDGP.webp"
+                            alt="SDGP Logo"
+                            className="h-18 w-auto"
+                            />
                         </div>
-                        <span className="text-2xl font-black tracking-tight italic">RiceVision</span>
+                        
                     </div>
 
                     <h2 className="text-4xl font-extrabold mb-3 tracking-tight">Welcome Back</h2>
@@ -84,7 +92,6 @@ export default function LoginPage() {
                         <div>
                             <div className="flex justify-between mb-2">
                                 <label className="text-sm font-semibold">Password</label>
-                                
                             </div>
                             <input 
                                 type="password" 
@@ -99,7 +106,7 @@ export default function LoginPage() {
                             />
                         </div>
 
-                        {/* Error Message Box (Polished) */}
+                        {/* Error Message Box */}
                         {errorMessage && (
                             <div className="flex items-center gap-3 rounded-xl border border-red-300/40 bg-red-50 dark:bg-red-900/20 px-4 py-3 text-sm text-red-700 dark:text-red-300 animate-in fade-in slide-in-from-top-1">
                                 <FaExclamationTriangle className="flex-shrink-0 text-red-500" />
@@ -112,7 +119,7 @@ export default function LoginPage() {
                             <label htmlFor="remember" className="text-sm text-slate-500 dark:text-slate-400 cursor-pointer">Keep me logged in</label>
                         </div>
 
-                        {/* Submit Button with Loading State */}
+                        {/* Submit Button */}
                         <button 
                             type="submit"
                             disabled={loading}
@@ -139,7 +146,7 @@ export default function LoginPage() {
                 </div>
             </div>
 
-            {/* Right Side: Clear Visuals */}
+            {/* Right Side: Visuals */}
             <div className="hidden lg:block lg:w-1/2 relative">
                 <img 
                     src="/paddy_signin.png" 
