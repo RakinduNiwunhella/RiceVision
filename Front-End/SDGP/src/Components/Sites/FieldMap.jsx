@@ -20,7 +20,7 @@ export default function FieldMap() {
   });
 
   return (
-    <div className="relative flex gap-4 p-4 h-screen bg-gray-100">
+    <div className="relative flex gap-4 p-4 h-screen bg-gray-100 dark:bg-gray-900">
       <FiltersPanel filters={filters} setFilters={setFilters} />
 
       <div className="flex-1 bg-gray-200 rounded-xl overflow-hidden">
