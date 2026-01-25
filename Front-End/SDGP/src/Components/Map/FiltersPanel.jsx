@@ -1,9 +1,31 @@
 export default function FiltersPanel({ filters, setFilters }) {
+  // Alphabetically sorted district list
   const districts = [
-    "Kurunegala",
+    "Ampara",
     "Anuradhapura",
+    "Badulla",
+    "Batticaloa",
+    "Colombo",
+    "Galle",
+    "Gampaha",
+    "Hambantota",
+    "Jaffna",
+    "Kalutara",
+    "Kandy",
+    "Kegalle",
+    "Kilinochchi",
+    "Kurunegala",
+    "Mannar",
+    "Matale",
+    "Matara",
+    "Moneragala",
+    "Mullaitivu",
+    "NuwaraEliya",
     "Polonnaruwa",
-    "Dambulla",
+    "Puttalam",
+    "Ratnapura",
+    "Trincomalee",
+    "Vavuniya",
   ];
 
   const healthStatuses = ["Healthy", "Stressed", "Damaged"];
@@ -24,20 +46,39 @@ export default function FiltersPanel({ filters, setFilters }) {
     <div className="w-72 bg-white rounded-xl shadow-sm p-4">
       <h2 className="font-semibold text-gray-800 mb-4">Filters</h2>
 
-      {/* Districts */}
+      {/* District (Single Selection) */}
       <div className="mb-5">
-        <p className="text-sm font-medium text-gray-600 mb-2">Districts</p>
-        <div className="space-y-2 text-sm">
+        <p className="text-sm font-medium text-gray-600 mb-2">District</p>
+        <div className="space-y-2 text-sm max-h-64 overflow-y-auto">
           {districts.map((d) => (
             <label key={d} className="flex items-center gap-2">
               <input
-                type="checkbox"
-                checked={filters.districts.includes(d)}
-                onChange={() => toggleArrayValue("districts", d)}
+                type="radio"
+                name="district"
+                checked={filters.districts[0] === d}
+                onChange={() =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    districts: [d], // enforce single district
+                  }))
+                }
               />
               {d}
             </label>
           ))}
+
+          {/* Clear district */}
+          <button
+            className="text-xs text-blue-600 mt-2"
+            onClick={() =>
+              setFilters((prev) => ({
+                ...prev,
+                districts: [],
+              }))
+            }
+          >
+            Clear district
+          </button>
         </div>
       </div>
 

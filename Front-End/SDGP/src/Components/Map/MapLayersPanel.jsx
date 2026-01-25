@@ -8,6 +8,7 @@ export default function MapLayersPanel({ layers, setLayers }) {
 
   const layerList = [
     { key: "paddyExtent", label: "Paddy Extent" },
+    { key: "showCircles", label: "Show Circles" }, // ✅ NEW
     { key: "ndvi", label: "NDVI" },
     { key: "evi", label: "EVI" },
     { key: "vv", label: "VV" },
