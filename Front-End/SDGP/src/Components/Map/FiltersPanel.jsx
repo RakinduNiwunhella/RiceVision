@@ -47,7 +47,7 @@ export default function FiltersPanel({ filters, setFilters }) {
       <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">Filters</h2>
 
       {/* District (Single Selection) */}
-      <div className="mb-5">
+      <div className="mb-9">
         <p className="text-base font-medium text-gray-600 dark:text-gray-300 mb-2">District</p>
         <div className="space-y-2 text-base max-h-64 overflow-y-auto">
           {districts.map((d) => (
@@ -83,7 +83,7 @@ export default function FiltersPanel({ filters, setFilters }) {
       </div>
 
       {/* Season */}
-      <div className="mb-5">
+      <div className="mb-9">
         <p className="text-base font-medium text-gray-600 mb-2">Season</p>
         <select
           className="w-full border rounded-md px-2 py-1 text-base bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
@@ -99,7 +99,7 @@ export default function FiltersPanel({ filters, setFilters }) {
       </div>
 
       {/* Health Status */}
-      <div>
+      <div className="mb-9">
         <p className="text-base font-medium text-gray-600 mb-2">Health Status</p>
         <div className="space-y-2 text-base">
           {healthStatuses.map((s) => (
