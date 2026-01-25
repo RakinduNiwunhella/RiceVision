@@ -258,7 +258,7 @@ const ReportPage = () => {
             { align: "center" }
           );
 
-          doc.save(`RiceVision_Full_Report_Month_${month}.pdf`);
+          doc.save(`RiceVision_Report_Month_${month}.pdf`);
         };
         reader.readAsDataURL(blob);
       });
@@ -305,32 +305,46 @@ const ReportPage = () => {
 
     return (
       <div className="grid md:grid-cols-3 gap-6">
-        <div className="p-4 bg-white rounded shadow">
-          <h2 className="font-semibold mb-2 text-black">Yield (tons)</h2>
-          <Line data={yieldData} options={{responsive:true}}/>
+        <div className="p-5 bg-white rounded-xl shadow-sm border border-gray-100">
+          <h2 className="font-semibold mb-2 text-black text-center">Yield (tons)</h2>
+          <div className="flex justify-center">
+            <Line data={yieldData} options={{ responsive: true }} />
+          </div>
+          <p className="mt-2 text-sm text-gray-500 text-center">
+            Monthly Yield (tons)
+          </p>
         </div>
-        <div className="p-4 bg-white rounded shadow flex flex-col items-center">
+        <div className="p-5 bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col items-center">
           <h2 className="font-semibold mb-2 text-black">Health Percentage</h2>
-          <div className="flex justify-center items-center" style={{ height: "220px", width: "220px" }}>
+          <div className="relative flex justify-center items-center" style={{ height: "240px", width: "240px" }}>
             <Doughnut
               data={healthData}
               options={{
+                cutout: "70%",
                 plugins: {
                   legend: {
                     position: "bottom",
-                    labels: {
-                      boxWidth: 14,
-                      padding: 12
-                    }
+                    labels: { boxWidth: 12, padding: 10 }
                   }
                 }
               }}
             />
+            <div className="absolute text-center">
+              <p className="text-xs text-gray-500">Health</p>
+              <p className="text-xl font-bold text-emerald-600">
+                {(healthData.datasets[0].data[0]).toFixed(1)}%
+              </p>
+            </div>
           </div>
         </div>
-        <div className="p-4 bg-white rounded shadow">
-          <h2 className="font-semibold mb-2 text-black">Mean NDVI</h2>
-          <Line data={ndviData} options={{responsive:true}}/>
+        <div className="p-5 bg-white rounded-xl shadow-sm border border-gray-100">
+          <h2 className="font-semibold mb-2 text-black text-center">Mean NDVI</h2>
+          <div className="flex justify-center">
+            <Line data={ndviData} options={{ responsive: true }} />
+          </div>
+          <p className="mt-2 text-sm text-gray-500 text-center">
+            Mean NDVI Trend
+          </p>
         </div>
       </div>
     );
@@ -401,9 +415,8 @@ const ReportPage = () => {
               }]
             };
             return (
-              <div key={d} className="p-4 bg-white rounded shadow">
-                <h2 className="font-semibold text-black mb-1">{d}</h2>
-                <p className="text-sm text-gray-500 mb-2">Health Percentage</p>
+              <div key={d} className="p-5 bg-white rounded-xl shadow-sm border border-gray-100">
+                <h2 className="font-semibold text-black mb-1 text-center">{d}</h2>
                 <Line data={yieldData} />
                 <div className="my-4 flex justify-center items-center">
                   <div style={{ height: "220px", width: "220px" }}>
@@ -430,7 +443,7 @@ const ReportPage = () => {
         </div>
 
         {/* Comparison Table */}
-        <div className="mt-6 p-4 bg-white rounded shadow overflow-x-auto">
+        <div className="mt-6 p-5 bg-white rounded-xl shadow-sm border border-gray-100 overflow-x-auto">
           <table className="w-full border-collapse text-sm">
             <thead className="bg-gray-200 dark:bg-gray-800 text-left">
               <tr>
@@ -446,7 +459,7 @@ const ReportPage = () => {
                 <td className="px-3 py-2">{districtData[district2].yield}</td>
               </tr>
               <tr className="border-t dark:border-gray-700">
-                <td className="px-3 py-2">Healthy %</td>
+                <td className="px-3 py-2">Health Percentage</td>
                 <td className="px-3 py-2">{districtData[district1].healthy}</td>
                 <td className="px-3 py-2">{districtData[district2].healthy}</td>
               </tr>
@@ -463,8 +476,8 @@ const ReportPage = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-50 dark:bg-[#050810] dark:text-slate-200">
-      <h1 className="text-3xl font-bold mb-2 text-black">RiceVision Monthly Report</h1>
+    <div className="p-6 bg-white dark:bg-[#050810] dark:text-slate-200">
+      <h1 className="text-3xl font-bold mb-1 text-black">RiceVision Monthly Report</h1>
       <p className="mb-4 text-gray-600 dark:text-gray-400">
         View the yield, healthy percentage, mean NDVI, and risk level for selected districts for the month.
       </p>
@@ -472,15 +485,23 @@ const ReportPage = () => {
       {/* Filter Type */}
       <div className="flex gap-4 mb-4">
         <button
-          className={`px-4 py-2 rounded ${filterType==="single"?"bg-emerald-600 text-white":"bg-gray-200 dark:bg-gray-800"}`}
+          className={`px-5 py-2 rounded-lg font-medium transition ${
+            filterType==="single"
+              ? "bg-emerald-600 text-white shadow"
+              : "bg-white border border-gray-300 text-gray-600 hover:bg-gray-100"
+          }`}
           onClick={()=>setFilterType("single")}>Single View</button>
         <button
-          className={`px-4 py-2 rounded ${filterType==="comparison"?"bg-emerald-600 text-white":"bg-gray-200 dark:bg-gray-800"}`}
+          className={`px-5 py-2 rounded-lg font-medium transition ${
+            filterType==="comparison"
+              ? "bg-emerald-600 text-white shadow"
+              : "bg-white border border-gray-300 text-gray-600 hover:bg-gray-100"
+          }`}
           onClick={()=>setFilterType("comparison")}>District Comparison</button>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap gap-4 mb-6 p-4 bg-white rounded shadow">
+      <div className="flex flex-wrap gap-4 mb-6 p-5 bg-white rounded-xl shadow-sm border border-gray-100">
         <select value={month} onChange={e=>setMonth(Number(e.target.value))} className="px-3 py-2 rounded border">
           {monthsList.map(m=><option key={m.value} value={m.value}>{m.label}</option>)}
         </select>
@@ -502,9 +523,9 @@ const ReportPage = () => {
 
       {/* Table & Export */}
       {reports.length > 0 &&
-        <div className="mt-6 p-4 bg-white rounded shadow">
+        <div className="mt-6 p-5 bg-white rounded-xl shadow-sm border border-gray-100">
           <div className="flex gap-4 mb-4">
-            <button onClick={downloadPDF} className="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700">Download PDF</button>
+            <button onClick={downloadPDF} className="px-5 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">Download PDF</button>
             <CSVLink
               data={reports}
               headers={[
@@ -516,7 +537,7 @@ const ReportPage = () => {
                 {label:"Mean NDVI", key:"mean_ndvi"}
               ]}
               filename={`RiceVision_Full_Report_${month}.csv`}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
             >
               Download CSV
             </CSVLink>
