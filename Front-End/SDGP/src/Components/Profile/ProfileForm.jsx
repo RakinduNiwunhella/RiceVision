@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../supabaseClient';
-import { FaCamera, FaUserCircle } from 'react-icons/fa';
+import { FaCamera } from 'react-icons/fa';
 
 export default function ProfilForm() {
     const [loading, setLoading] = useState(true);
@@ -26,7 +26,6 @@ export default function ProfilForm() {
             const { data: { user } } = await supabase.auth.getUser();
 
             if (user) {
-                // Split full_name from metadata into First and Last names
                 const fullName = user.user_metadata?.full_name || '';
                 const nameParts = fullName.split(' ');
                 
@@ -51,41 +50,30 @@ export default function ProfilForm() {
     const uploadAvatar = async (event) => {
         try {
             setUploading(true);
-
             if (!event.target.files || event.target.files.length === 0) {
                 throw new Error('You must select an image to upload.');
             }
-
             const { data: { user } } = await supabase.auth.getUser();
             const file = event.target.files[0];
             const fileExt = file.name.split('.').pop();
-            // Path structure: userId/timestamp.extension for unique identifiers
             const filePath = `${user.id}/${Math.random()}.${fileExt}`;
 
-            // 1. Upload to Supabase Storage
             const { error: uploadError } = await supabase.storage
                 .from('avatars')
                 .upload(filePath, file);
 
             if (uploadError) throw uploadError;
 
-            // 2. Get Public URL
-            const { data } = supabase.storage
-                .from('avatars')
-                .getPublicUrl(filePath);
-
+            const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
             const publicUrl = data.publicUrl;
 
-            // 3. Update Auth Metadata so the photo persists on next login
             const { error: updateError } = await supabase.auth.updateUser({
                 data: { avatar_url: publicUrl }
             });
 
             if (updateError) throw updateError;
-
             setFormData(prev => ({ ...prev, avatarUrl: publicUrl }));
             alert('Profile photo updated successfully!');
-
         } catch (error) {
             alert(`Upload failed: ${error.message}`);
         } finally {
@@ -96,8 +84,6 @@ export default function ProfilForm() {
     const handleUpdate = async (e) => {
         e.preventDefault();
         setLoading(true);
-
-        // Save all form data back to user_metadata
         const { error } = await supabase.auth.updateUser({
             data: { 
                 full_name: `${formData.firstName} ${formData.lastName}`,
@@ -119,16 +105,22 @@ export default function ProfilForm() {
 
     if (loading && !formData.email) {
         return (
-            <div className="flex items-center justify-center min-h-screen">
+            <div className="flex items-center justify-center min-h-screen bg-slate-50 dark:bg-slate-950">
                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
             </div>
         );
     }
 
     return (
-        <div className="p-8 bg-slate-50 dark:bg-slate-950 min-h-screen font-sans">
+        <div className="p-8 bg-slate-50 dark:bg-slate-950 min-h-screen font-sans transition-colors duration-300">
             <div className="max-w-4xl mx-auto bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-8">
                 
+                {/* Header Section */}
+                <div className="mb-8">
+                    <h2 className="text-2xl font-bold text-slate-800 dark:text-white">User Profile</h2>
+                    <p className="text-slate-500 dark:text-slate-400">Update your information and how you appear to others.</p>
+                </div>
+
                 {/* Avatar Upload Section */}
                 <div className="flex flex-col items-center mb-10">
                     <div className="relative group">
@@ -136,7 +128,7 @@ export default function ProfilForm() {
                             {formData.avatarUrl ? (
                                 <img src={formData.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                             ) : (
-                                <span className="text-4xl font-bold text-green-600 uppercase">
+                                <span className="text-4xl font-bold text-green-600 dark:text-green-400 uppercase">
                                     {formData.firstName.charAt(0)}{formData.lastName.charAt(0)}
                                 </span>
                             )}
@@ -149,93 +141,52 @@ export default function ProfilForm() {
                             <FaCamera size={24} className="transform group-hover:scale-110 transition-transform" />
                         </label>
                         <input 
-                            type="file" 
-                            id="avatar-upload" 
-                            accept="image/*" 
-                            onChange={uploadAvatar} 
-                            disabled={uploading}
-                            className="hidden" 
+                            type="file" id="avatar-upload" accept="image/*" 
+                            onChange={uploadAvatar} disabled={uploading} className="hidden" 
                         />
                     </div>
-                    {uploading && <p className="text-xs text-green-600 mt-3 font-semibold animate-pulse">Uploading Image...</p>}
+                    {uploading && <p className="text-xs text-green-600 dark:text-green-400 mt-3 font-semibold animate-pulse">Uploading Image...</p>}
                 </div>
 
                 <form onSubmit={handleUpdate} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">First Name</label>
-                            <input 
-                                type="text"
-                                value={formData.firstName}
-                                onChange={(e) => setFormData({...formData, firstName: e.target.value})}
-                                placeholder="Enter your first name"
-                                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-green-500 outline-none transition-all"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Last Name</label>
-                            <input 
-                                type="text"
-                                value={formData.lastName}
-                                onChange={(e) => setFormData({...formData, lastName: e.target.value})}
-                                placeholder="Enter your last name"
-                                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-green-500 outline-none transition-all"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Email Address</label>
-                            <input 
-                                type="email"
-                                disabled
-                                value={formData.email}
-                                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 text-slate-500 cursor-not-allowed"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Phone Number</label>
-                            <input 
-                                type="text"
-                                value={formData.phone}
-                                onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                                placeholder="07XXXXXXXX"
-                                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-green-500 outline-none transition-all"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">NIC Number</label>
-                            <input 
-                                type="text"
-                                value={formData.nic}
-                                onChange={(e) => setFormData({...formData, nic: e.target.value})}
-                                placeholder="200012345678"
-                                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-green-500 outline-none transition-all"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">District</label>
-                            <input 
-                                type="text"
-                                value={formData.district}
-                                onChange={(e) => setFormData({...formData, district: e.target.value})}
-                                placeholder="Enter your district"
-                                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-green-500 outline-none transition-all"
-                            />
-                        </div>
+                        {/* Input Component Wrapper for easier reading */}
+                        {[
+                            { label: 'First Name', key: 'firstName', type: 'text', placeholder: 'Enter your first name' },
+                            { label: 'Last Name', key: 'lastName', type: 'text', placeholder: 'Enter your last name' },
+                            { label: 'Email Address', key: 'email', type: 'email', disabled: true },
+                            { label: 'Phone Number', key: 'phone', type: 'text', placeholder: '07XXXXXXXX' },
+                            { label: 'NIC Number', key: 'nic', type: 'text', placeholder: '200012345678' },
+                            { label: 'District', key: 'district', type: 'text', placeholder: 'Enter your district' },
+                        ].map((field) => (
+                            <div key={field.key}>
+                                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
+                                    {field.label}
+                                </label>
+                                <input 
+                                    type={field.type}
+                                    value={formData[field.key]}
+                                    disabled={field.disabled}
+                                    onChange={(e) => setFormData({...formData, [field.key]: e.target.value})}
+                                    placeholder={field.placeholder}
+                                    className={`w-full px-4 py-3 rounded-xl border outline-none transition-all 
+                                        ${field.disabled 
+                                            ? 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-500 cursor-not-allowed' 
+                                            : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-green-500 dark:focus:ring-green-600'
+                                        }`}
+                                />
+                            </div>
+                        ))}
                     </div>
 
                     <div>
-                        <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Address</label>
+                        <label className="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">Address</label>
                         <textarea 
                             rows="3"
                             value={formData.address}
                             onChange={(e) => setFormData({...formData, address: e.target.value})}
                             placeholder="Enter your permanent address"
-                            className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-green-500 outline-none transition-all"
+                            className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-green-500 dark:focus:ring-green-600 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
                         ></textarea>
                     </div>
 
@@ -243,7 +194,7 @@ export default function ProfilForm() {
                         <button 
                             type="submit"
                             disabled={loading || uploading}
-                            className="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-10 rounded-xl transition-all shadow-xl shadow-green-500/20 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 text-white font-bold py-4 px-10 rounded-xl transition-all shadow-xl shadow-green-500/20 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {loading ? 'Processing...' : 'Save Changes'}
                         </button>

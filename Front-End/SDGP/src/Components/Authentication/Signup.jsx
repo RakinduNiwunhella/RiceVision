@@ -4,7 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { FaSun, FaMoon, FaUserPlus } from 'react-icons/fa'; 
 
 export default function SignupPage() {
-    const [theme, setTheme] = useState('dark');
+    const [theme, setTheme] = useState('light');
     const [fullName, setFullName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -86,14 +86,18 @@ export default function SignupPage() {
             <div className="flex flex-col justify-center w-full px-8 py-12 lg:w-1/2 md:px-24 lg:px-32">
                 <div className="w-full max-w-md mx-auto">
                     <div className="flex items-center mb-8 space-x-3">
-                        <div className="p-2.5 bg-indigo-600 rounded-xl shadow-lg shadow-indigo-500/40">
-                            <FaUserPlus size={20} className="text-white" />
+                        <div className="items-center group ">
+                            <img
+                            src="/logoSDGP.webp"
+                            alt="SDGP Logo"
+                            className="h-18 w-auto"
+                            />
                         </div>
-                        <span className="text-2xl font-black tracking-tight italic">TECHBASE</span>
+                        
                     </div>
 
                     <h2 className="text-4xl font-extrabold mb-2 tracking-tight">Create Account</h2>
-                    <p className="text-slate-500 dark:text-slate-400 mb-8">Join us to start managing your data today.</p>
+                    <p className="text-slate-500 dark:text-slate-400 mb-8">Join us and monitor your paddy fields using satellite intelligence.</p>
 
                     <form onSubmit={handleSignup} className="space-y-4">
                         {/* Full Name */}
