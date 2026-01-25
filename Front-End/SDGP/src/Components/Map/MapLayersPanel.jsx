@@ -17,12 +17,12 @@ export default function MapLayersPanel({ layers, setLayers }) {
 
   return (
     <div className="w-72 bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
-      <h2 className="font-semibold text-gray-800 dark:text-gray-100 mb-4">Map Layers</h2>
+      <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">Map Layers</h2>
 
       {layerList.map(({ key, label }) => (
         <div
           key={key}
-          className="flex items-center justify-between text-sm mb-2 text-gray-700 dark:text-gray-200"
+          className="flex items-center justify-between text-base mb-2 text-gray-700 dark:text-gray-200"
         >
           <span className="text-gray-700 dark:text-gray-200">{label}</span>
           <input

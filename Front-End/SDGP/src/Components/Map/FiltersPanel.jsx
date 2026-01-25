@@ -44,12 +44,12 @@ export default function FiltersPanel({ filters, setFilters }) {
 
   return (
     <div className="w-72 bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
-      <h2 className="font-semibold text-gray-800 dark:text-gray-100 mb-4">Filters</h2>
+      <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">Filters</h2>
 
       {/* District (Single Selection) */}
       <div className="mb-5">
-        <p className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">District</p>
-        <div className="space-y-2 text-sm max-h-64 overflow-y-auto">
+        <p className="text-base font-medium text-gray-600 dark:text-gray-300 mb-2">District</p>
+        <div className="space-y-2 text-base max-h-64 overflow-y-auto">
           {districts.map((d) => (
             <label key={d} className="flex items-center gap-2 text-gray-700 dark:text-gray-200">
               <input
@@ -69,7 +69,7 @@ export default function FiltersPanel({ filters, setFilters }) {
 
           {/* Clear district */}
           <button
-            className="text-xs text-blue-600 dark:text-blue-400 mt-2"
+            className="text-sm text-blue-600 dark:text-blue-400 mt-2"
             onClick={() =>
               setFilters((prev) => ({
                 ...prev,
@@ -84,9 +84,9 @@ export default function FiltersPanel({ filters, setFilters }) {
 
       {/* Season */}
       <div className="mb-5">
-        <p className="text-sm font-medium text-gray-600 mb-2">Season</p>
+        <p className="text-base font-medium text-gray-600 mb-2">Season</p>
         <select
-          className="w-full border rounded-md px-2 py-1 text-sm bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
+          className="w-full border rounded-md px-2 py-1 text-base bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
           value={filters.season}
           onChange={(e) =>
             setFilters((prev) => ({ ...prev, season: e.target.value }))
@@ -100,8 +100,8 @@ export default function FiltersPanel({ filters, setFilters }) {
 
       {/* Health Status */}
       <div>
-        <p className="text-sm font-medium text-gray-600 mb-2">Health Status</p>
-        <div className="space-y-2 text-sm">
+        <p className="text-base font-medium text-gray-600 mb-2">Health Status</p>
+        <div className="space-y-2 text-base">
           {healthStatuses.map((s) => (
             <label key={s} className="flex items-center gap-2 text-gray-700 dark:text-gray-200">
               <input
