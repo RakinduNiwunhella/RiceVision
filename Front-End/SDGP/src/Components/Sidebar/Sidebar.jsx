@@ -29,7 +29,7 @@ const Sidebar = () => {
               className={({ isActive }) =>
                 `flex items-center gap-3 py-3 px-3 rounded-md transition-all duration-150 ${
                      (isActive || (location.pathname === '/' && item.id === 'dashboard'))
-                    ? 'text-white bg-linear-to-r from-blue-400 to-teal-400 shadow-md dark:from-blue-700 dark:to-teal-700'
+                    ? 'text-white bg-linear-to-r from-green-600 to-emerald-700 shadow-md dark:bg-linear-to-r dark:from-green-800 dark:to-emerald-900'
                     : 'text-gray-700 hover:text-black dark:text-slate-300 dark:hover:text-white'
                 }`
               }
@@ -54,7 +54,7 @@ const Sidebar = () => {
               className={({ isActive }) =>
                 `flex items-center gap-3 py-1 px-3 rounded-md transition-all duration-150 ${
                   isActive
-                    ? 'text-white bg-linear-to-r from-blue-400 to-teal-400 shadow-md dark:from-blue-700 dark:to-teal-700'
+                    ? 'text-white bg-linear-to-r from-green-600 to-emerald-700 shadow-md dark:bg-linear-to-r dark:from-green-800 dark:to-emerald-900'
                     : 'text-gray-700 hover:text-black dark:text-slate-300 dark:hover:text-white'
                 }`
               }

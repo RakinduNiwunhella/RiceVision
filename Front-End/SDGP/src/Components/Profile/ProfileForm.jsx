@@ -112,15 +112,9 @@ export default function ProfilForm() {
     }
 
     return (
-        <div className="p-8 bg-slate-50 dark:bg-slate-950 min-h-screen font-sans transition-colors duration-300">
-            <div className="max-w-4xl mx-auto bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-8">
+        <div className="font-sans transition-colors duration-300">
+            <div className="max-w-4xl mx-auto">
                 
-                {/* Header Section */}
-                <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-slate-800 dark:text-white">User Profile</h2>
-                    <p className="text-slate-500 dark:text-slate-400">Update your information and how you appear to others.</p>
-                </div>
-
                 {/* Avatar Upload Section */}
                 <div className="flex flex-col items-center mb-10">
                     <div className="relative group">
@@ -194,7 +188,7 @@ export default function ProfilForm() {
                         <button 
                             type="submit"
                             disabled={loading || uploading}
-                            className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 text-white font-bold py-4 px-10 rounded-xl transition-all shadow-xl shadow-green-500/20 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 text-white font-bold py-4 px-10 rounded-xl transition-all shadow-xl  active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {loading ? 'Processing...' : 'Save Changes'}
                         </button>

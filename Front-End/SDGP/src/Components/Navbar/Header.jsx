@@ -23,7 +23,7 @@ const Header = () => {
             <img
               src="/logoSDGP.webp"
               alt="SDGP Logo"
-              className="h-12 w-auto"
+              className="h-12 w-auto transition-all duration-300 dark:brightness-110 dark:contrast-110"
             />
           </div>
 
