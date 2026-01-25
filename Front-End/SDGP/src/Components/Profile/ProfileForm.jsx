@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../../supabaseClient';
 import { FaCamera } from 'react-icons/fa';
 
-export default function ProfilForm() {
+export default function ProfileForm() {
     const [loading, setLoading] = useState(true);
     const [uploading, setUploading] = useState(false);
     const [formData, setFormData] = useState({
