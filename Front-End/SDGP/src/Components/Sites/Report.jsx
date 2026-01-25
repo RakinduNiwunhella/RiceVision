@@ -25,14 +25,21 @@ ChartJS.register(
 );
 
 const Report = () => {
-  const [reports, setReports] = useState([]);
-
-  // Filters
   const [selectedMonth, setSelectedMonth] = useState("");
-  const [selectedDistrict, setSelectedDistrict] = useState("All Sri Lanka");
+  const [selectedMonth2, setSelectedMonth2] = useState("");
+  const [selectedDistrict, setSelectedDistrict] = useState("");
+  const [selectedDistrict2, setSelectedDistrict2] = useState("");
   const [comparisonMode, setComparisonMode] = useState("single");
   const [generated, setGenerated] = useState(false);
 
+  useEffect(() => {
+    setSelectedMonth2("");
+    setSelectedDistrict2("");
+  }, [comparisonMode]);
+
+  const [reports, setReports] = useState([]);
+
+  // Filters
   const monthNames = [
     "January",
     "February",
@@ -48,38 +55,126 @@ const Report = () => {
     "December"
   ];
 
-  useEffect(() => {
-    loadReports();
-  }, []);
+  const sriLankaDistricts = [
+    "Ampara",
+    "Anuradhapura",
+    "Badulla",
+    "Batticaloa",
+    "Colombo",
+    "Galle",
+    "Gampaha",
+    "Hambantota",
+    "Jaffna",
+    "Kalutara",
+    "Kandy",
+    "Kegalle",
+    "Kilinochchi",
+    "Kurunegala",
+    "Mannar",
+    "Matale",
+    "Matara",
+    "Moneragala",
+    "Mullaitivu",
+    "Nuwara Eliya",
+    "Polonnaruwa",
+    "Puttalam",
+    "Ratnapura",
+    "Trincomalee",
+    "Vavuniya"
+  ];
 
-  // SUPABASE FETCH (UNCHANGED SOURCE)
+  // Removed initial loadReports useEffect
+
   const loadReports = async () => {
-    const { data, error } = await supabase
-      .from("reports_analytics")
-      .select("*")
-      .limit(200);
+    // ---- BASIC VALIDATION ----
+    if (!selectedMonth || !selectedDistrict) return;
 
-    if (!error) setReports(data || []);
-    else console.error(error);
+    let query = supabase
+      .from("reports_analytics")
+      .select("*");
+
+    // ---------- DISTRICT FILTERING (SERVER-SIDE) ----------
+    if (comparisonMode === "single") {
+      query = query.eq("district", selectedDistrict);
+    }
+
+    if (comparisonMode === "district") {
+      if (!selectedDistrict2) return;
+      query = query.in("district", [selectedDistrict, selectedDistrict2]);
+    }
+
+    if (comparisonMode === "month") {
+      query = query.eq("district", selectedDistrict);
+    }
+
+    // ---------- MONTH FILTERING (SERVER-SIDE) ----------
+    const year = new Date().getFullYear();
+
+    if (comparisonMode === "single" || comparisonMode === "district") {
+      const startDate = `${year}-${String(selectedMonth).padStart(2, "0")}-01`;
+      const endDate   = `${year}-${String(selectedMonth).padStart(2, "0")}-31`;
+
+      query = query
+        .gte("date", startDate)
+        .lte("date", endDate);
+    }
+
+    if (comparisonMode === "month") {
+      if (!selectedMonth2) return;
+
+      const m1Start = `${year}-${String(selectedMonth).padStart(2, "0")}-01`;
+      const m1End   = `${year}-${String(selectedMonth).padStart(2, "0")}-31`;
+
+      const m2Start = `${year}-${String(selectedMonth2).padStart(2, "0")}-01`;
+      const m2End   = `${year}-${String(selectedMonth2).padStart(2, "0")}-31`;
+
+      query = query.or(
+        `and(date.gte.${m1Start},date.lte.${m1End}),and(date.gte.${m2Start},date.lte.${m2End})`
+      );
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error("Supabase fetch error:", error);
+      return;
+    }
+
+    setReports(data || []);
+    setGenerated(true);
   };
 
-  // FILTERED DATA (CLIENT-SIDE)
+  // Updated filteredReports to only handle month logic
   const filteredReports = useMemo(() => {
     if (!generated) return [];
 
     return reports.filter(r => {
-      const monthMatch = selectedMonth
-        ? new Date(r.date).getMonth() + 1 === Number(selectedMonth)
-        : true;
+      const recordDate = r.date || r.created_at;
+      const month = new Date(recordDate).getMonth() + 1;
 
-      const districtMatch =
-        selectedDistrict === "All Sri Lanka"
-          ? true
-          : r.district === selectedDistrict;
+      if (comparisonMode === "single") {
+        return month === Number(selectedMonth);
+      }
 
-      return monthMatch && districtMatch;
+      if (comparisonMode === "district") {
+        return month === Number(selectedMonth);
+      }
+
+      if (comparisonMode === "month") {
+        return month === Number(selectedMonth) || month === Number(selectedMonth2);
+      }
+
+      return false;
     });
-  }, [reports, selectedMonth, selectedDistrict, generated]);
+  }, [
+    reports,
+    selectedMonth,
+    selectedMonth2,
+    selectedDistrict,
+    selectedDistrict2,
+    comparisonMode,
+    generated
+  ]);
 
   const totalYield = filteredReports.reduce(
     (sum, r) => sum + Number(r.estimated_yield || 0),
@@ -93,11 +188,20 @@ const Report = () => {
     doc.setFontSize(18);
     doc.text("RiceVision - Prediction Report", 14, 15);
     doc.setFontSize(11);
-    doc.text(
-      `Month: ${selectedMonth || "All"} | District: ${selectedDistrict}`,
-      14,
-      25
-    );
+
+    let subtitle = "";
+
+    if (comparisonMode === "single") {
+      subtitle = `Month: ${monthNames[selectedMonth - 1]} | District: ${selectedDistrict}`;
+    }
+    if (comparisonMode === "district") {
+      subtitle = `Month: ${monthNames[selectedMonth - 1]} | Districts: ${selectedDistrict} vs ${selectedDistrict2}`;
+    }
+    if (comparisonMode === "month") {
+      subtitle = `District: ${selectedDistrict} | Months: ${monthNames[selectedMonth - 1]} vs ${monthNames[selectedMonth2 - 1]}`;
+    }
+
+    doc.text(subtitle, 14, 25);
 
     autoTable(doc, {
       startY: 35,
@@ -149,68 +253,81 @@ const Report = () => {
         </header>
 
         {/* FILTERS */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 rounded shadow-sm bg-white dark:bg-slate-800">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 p-4 rounded shadow-sm bg-white dark:bg-slate-800">
+
           <select
-            className="border rounded p-2 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-700 dark:text-slate-300"
+            className="border rounded p-2 dark:bg-slate-900"
+            value={comparisonMode}
+            onChange={e => {
+              setComparisonMode(e.target.value);
+              setGenerated(false);
+            }}
+          >
+            <option value="single">Single View</option>
+            <option value="district">District Comparison</option>
+            <option value="month">Month Comparison</option>
+          </select>
+
+          {/* MONTH SELECT 1 */}
+          <select
+            className="border rounded p-2 dark:bg-slate-900"
             value={selectedMonth}
             onChange={e => setSelectedMonth(e.target.value)}
           >
-            <option value="" className="text-slate-700 dark:text-slate-300">All</option>
-            {monthNames.map((month, index) => (
-              <option key={month} value={index + 1} className="text-slate-700 dark:text-slate-300">
-                {month}
-              </option>
+            <option value="">Select Month</option>
+            {monthNames.map((m, i) => (
+              <option key={m} value={i + 1}>{m}</option>
             ))}
           </select>
 
+          {/* MONTH SELECT 2 (only for month comparison) */}
+          {comparisonMode === "month" && (
+            <select
+              className="border rounded p-2 dark:bg-slate-900"
+              value={selectedMonth2}
+              onChange={e => setSelectedMonth2(e.target.value)}
+            >
+              <option value="">Select Month 2</option>
+              {monthNames.map((m, i) => (
+                <option key={m} value={i + 1}>{m}</option>
+              ))}
+            </select>
+          )}
+
+          {/* DISTRICT SELECT 1 */}
           <select
-            className="border rounded p-2 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-700 dark:text-slate-300"
+            className="border rounded p-2 dark:bg-slate-900"
             value={selectedDistrict}
             onChange={e => setSelectedDistrict(e.target.value)}
           >
-            <option className="text-slate-700 dark:text-slate-300">All Sri Lanka</option>
-            <option className="text-slate-700 dark:text-slate-300">Colombo</option>
-            <option className="text-slate-700 dark:text-slate-300">Gampaha</option>
-            <option className="text-slate-700 dark:text-slate-300">Kalutara</option>
-            <option className="text-slate-700 dark:text-slate-300">Kandy</option>
-            <option className="text-slate-700 dark:text-slate-300">Matale</option>
-            <option className="text-slate-700 dark:text-slate-300">Nuwara Eliya</option>
-            <option className="text-slate-700 dark:text-slate-300">Galle</option>
-            <option className="text-slate-700 dark:text-slate-300">Matara</option>
-            <option className="text-slate-700 dark:text-slate-300">Hambantota</option>
-            <option className="text-slate-700 dark:text-slate-300">Jaffna</option>
-            <option className="text-slate-700 dark:text-slate-300">Kilinochchi</option>
-            <option className="text-slate-700 dark:text-slate-300">Mannar</option>
-            <option className="text-slate-700 dark:text-slate-300">Mullaitivu</option>
-            <option className="text-slate-700 dark:text-slate-300">Vavuniya</option>
-            <option className="text-slate-700 dark:text-slate-300">Trincomalee</option>
-            <option className="text-slate-700 dark:text-slate-300">Batticaloa</option>
-            <option className="text-slate-700 dark:text-slate-300">Ampara</option>
-            <option className="text-slate-700 dark:text-slate-300">Kurunegala</option>
-            <option className="text-slate-700 dark:text-slate-300">Puttalam</option>
-            <option className="text-slate-700 dark:text-slate-300">Anuradhapura</option>
-            <option className="text-slate-700 dark:text-slate-300">Polonnaruwa</option>
-            <option className="text-slate-700 dark:text-slate-300">Badulla</option>
-            <option className="text-slate-700 dark:text-slate-300">Monaragala</option>
-            <option className="text-slate-700 dark:text-slate-300">Ratnapura</option>
-            <option className="text-slate-700 dark:text-slate-300">Kegalle</option>
+            <option value="">Select District</option>
+            {sriLankaDistricts.map(d => (
+              <option key={d} value={d}>{d}</option>
+            ))}
           </select>
 
-          <select
-            className="border rounded p-2 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-700 dark:text-slate-300"
-            value={comparisonMode}
-            onChange={e => setComparisonMode(e.target.value)}
-          >
-            <option value="single" className="text-slate-700 dark:text-slate-300">Single View</option>
-            <option value="month" className="text-slate-700 dark:text-slate-300">Month Comparison</option>
-            <option value="district" className="text-slate-700 dark:text-slate-300">District Comparison</option>
-          </select>
+          {/* DISTRICT SELECT 2 (only for district comparison) */}
+          {comparisonMode === "district" && (
+            <select
+              className="border rounded p-2 dark:bg-slate-900"
+              value={selectedDistrict2}
+              onChange={e => setSelectedDistrict2(e.target.value)}
+            >
+              <option value="">Select District 2</option>
+              {sriLankaDistricts.map(d => (
+                <option key={d} value={d}>{d}</option>
+              ))}
+            </select>
+          )}
 
           <button
-            onClick={() => setGenerated(true)}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white rounded px-4 py-2 transition"
+            onClick={() => {
+              if (!selectedMonth || !selectedDistrict) return;
+              loadReports();
+            }}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white rounded px-4 py-2"
           >
-            Generate Report
+            Generate
           </button>
         </div>
 
@@ -240,9 +357,9 @@ const Report = () => {
             <div className="p-4 rounded shadow-sm bg-white dark:bg-slate-800">
               <Line
                 data={{
-                  labels: filteredReports.map(r => r.date),
+                  labels: filteredReports.map(r => r.date || r.created_at),
                   datasets: [{
-                    label: "Monthly Yield Trend",
+                    label: "Predicted Yield",
                     data: filteredReports.map(r => r.estimated_yield)
                   }]
                 }}
@@ -252,9 +369,13 @@ const Report = () => {
             <div className="p-4 rounded shadow-sm bg-white dark:bg-slate-800">
               <Bar
                 data={{
-                  labels: filteredReports.map(r => r.district),
+                  labels: filteredReports.map(r =>
+                    comparisonMode === "month"
+                      ? monthNames[new Date(r.date || r.created_at).getMonth()]
+                      : r.district
+                  ),
                   datasets: [{
-                    label: "District Comparison",
+                    label: "Predicted Yield",
                     data: filteredReports.map(r => r.estimated_yield)
                   }]
                 }}
