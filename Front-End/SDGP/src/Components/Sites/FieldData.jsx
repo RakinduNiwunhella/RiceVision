@@ -1,38 +1,5 @@
-import React from "react";
-
-const stats = [
-  { label: "Total Fields", value: "128" },
-  { label: "Healthy Fields", value: "96" },
-  { label: "Stressed Fields", value: "24" },
-  { label: "Critical Alerts", value: "8" },
-];
-
-const tableData = [
-  {
-    id: "FD-001",
-    district: "Ampara",
-    stage: "Tillering",
-    ndvi: "0.72",
-    health: "Healthy",
-    updated: "2 hours ago",
-  },
-  {
-    id: "FD-002",
-    district: "Gampaha",
-    stage: "Vegetative",
-    ndvi: "0.48",
-    health: "Moderate",
-    updated: "5 hours ago",
-  },
-  {
-    id: "FD-003",
-    district: "Polonnaruwa",
-    stage: "Reproductive",
-    ndvi: "0.31",
-    health: "Critical",
-    updated: "1 day ago",
-  },
-];
+import React, { useEffect, useState } from "react";
+import { supabase } from "../../supabaseClient"; // adjust path if needed
 
 const healthColor = (health) => {
   switch (health) {
@@ -48,6 +15,62 @@ const healthColor = (health) => {
 };
 
 const FieldData = () => {
+  const [stats, setStats] = useState([]);
+  const [districtData, setDistrictData] = useState([]);
+
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+
+      // 1️⃣ Fetch summary stats
+      const { data: summary, error: summaryError } = await supabase
+        .from("field_summary_view")
+        .select("*")
+        .single();
+
+      if (summaryError) {
+        console.error("Summary error:", summaryError);
+        setLoading(false);
+        return;
+      }
+
+      setStats([
+        { label: "Total Fields", value: summary.total_fields },
+        { label: "Healthy Fields", value: summary.healthy_fields },
+        { label: "Stressed Fields", value: summary.stressed_fields },
+        { label: "Critical Alerts", value: summary.critical_alerts },
+      ]);
+
+      // 2️⃣ Fetch table data
+      const { data: districts, error: districtError } = await supabase
+        .from("district_health_summary")
+        .select("*")
+        .order("total_yield_tons", { ascending: false });
+
+      if (districtError) {
+        console.error("District error:", districtError);
+        setLoading(false);
+        return;
+      }
+
+      setDistrictData(districts);
+
+      setLoading(false);
+    };
+
+    fetchData();
+  }, []);
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-900">
+        <p className="text-slate-500 dark:text-slate-400">
+          Loading field data...
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-white dark:bg-slate-900 p-6">
       <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6 space-y-6">
@@ -82,7 +105,7 @@ const FieldData = () => {
         <div className="rounded-xl bg-white dark:bg-slate-800 shadow-sm overflow-hidden">
           <div className="p-4 border-b border-gray-200 dark:border-gray-700">
             <h2 className="text-lg font-medium text-slate-900 dark:text-white">
-              Field Health Records
+              District-wise Paddy Health & Yield Summary
             </h2>
           </div>
 
@@ -90,43 +113,40 @@ const FieldData = () => {
             <table className="w-full text-sm">
               <thead className="bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400">
                 <tr>
-                  <th className="px-4 py-3 text-left">Field ID</th>
                   <th className="px-4 py-3 text-left">District</th>
-                  <th className="px-4 py-3 text-left">Growth Stage</th>
-                  <th className="px-4 py-3 text-left">NDVI</th>
-                  <th className="px-4 py-3 text-left">Health Status</th>
-                  <th className="px-4 py-3 text-left">Last Updated</th>
+                  <th className="px-4 py-3 text-left">Total Fields</th>
+                  <th className="px-4 py-3 text-left">Healthy</th>
+                  <th className="px-4 py-3 text-left">Stressed</th>
+                  <th className="px-4 py-3 text-left">Critical</th>
+                  <th className="px-4 py-3 text-left">Avg NDVI</th>
+                  <th className="px-4 py-3 text-left">Avg Yield (t/ha)</th>
+                  <th className="px-4 py-3 text-left">Total Yield (tons)</th>
                 </tr>
               </thead>
+
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {tableData.map((row) => (
+                {districtData.map((d) => (
                   <tr
-                    key={row.id}
+                    key={d.district}
                     className="hover:bg-gray-50 dark:hover:bg-slate-700 transition"
                   >
-                    <td className="px-4 py-3 font-medium text-slate-900 dark:text-white">
-                      {row.id}
+                    <td className="px-4 py-3 font-medium">{d.district}</td>
+                    <td className="px-4 py-3">{d.total_fields}</td>
+
+                    <td className="px-4 py-3 text-green-600">
+                      {d.healthy_fields}
                     </td>
-                    <td className="px-4 py-3 text-slate-700 dark:text-slate-300">
-                      {row.district}
+                    <td className="px-4 py-3 text-yellow-600">
+                      {d.stressed_fields}
                     </td>
-                    <td className="px-4 py-3 text-slate-700 dark:text-slate-300">
-                      {row.stage}
+                    <td className="px-4 py-3 text-red-600">
+                      {d.critical_fields}
                     </td>
-                    <td className="px-4 py-3 text-slate-700 dark:text-slate-300">
-                      {row.ndvi}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${healthColor(
-                          row.health
-                        )}`}
-                      >
-                        {row.health}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-slate-500 dark:text-slate-400">
-                      {row.updated}
+
+                    <td className="px-4 py-3">{d.avg_ndvi}</td>
+                    <td className="px-4 py-3">{d.avg_yield_ton_ha}</td>
+                    <td className="px-4 py-3 font-medium">
+                      {d.total_yield_tons}
                     </td>
                   </tr>
                 ))}
