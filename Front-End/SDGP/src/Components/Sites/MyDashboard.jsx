@@ -62,7 +62,7 @@ const MyDashboard = () => {
   const [districtHealth, setDistrictHealth] = useState([]);
   const [showAllDistricts, setShowAllDistricts] = useState(false);
 
-  const pieColors = ["#10b981", "#f59e0b", "#ef4444"];
+  const pieColors = ["#15803d", "#f59e0b", "#ef4444"];
 
   const healthPieData = healthSummary
     ? [
@@ -261,7 +261,7 @@ const MyDashboard = () => {
                     <span className="text-slate-700 dark:text-slate-300">
                       {i + 1}. {d.District}
                     </span>
-                    <span className="font-medium text-emerald-600">
+                    <span className="font-medium text-emerald-700">
                       {formatMT(d.total_yield_ton_ha)}
                     </span>
                   </li>
@@ -301,7 +301,7 @@ const MyDashboard = () => {
                 </div>
               </div>
 
-              <button className="text-sm rounded-md bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 transition">
+              <button className="text-sm rounded-md bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1 transition">
                 View
               </button>
             </div>
@@ -311,7 +311,7 @@ const MyDashboard = () => {
             <div className="px-6 py-4 text-center border-t border-gray-200 dark:border-gray-700">
               <button
                 onClick={() => setShowAllOutbreaks(!showAllOutbreaks)}
-                className="text-sm rounded-md bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 transition"
+                className="text-sm rounded-md bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1 transition"
               >
                 {showAllOutbreaks ? "View Less" : "View More"}
               </button>
@@ -344,7 +344,7 @@ const MyDashboard = () => {
                 itemStyle={{ color: "#10b981", fontSize: "13px", fontWeight: 500 }}
                 formatter={(value) => [`${value.toFixed(3)} NDVI`, "Index"]}
               />
-              <Line dataKey="value" stroke="#10b981" />
+              <Line dataKey="value" stroke="#059669" />
             </LineChart>
           </ResponsiveContainer>
 
@@ -389,7 +389,7 @@ const MyDashboard = () => {
             <div className="px-4 py-4 text-center border-t border-gray-200 dark:border-gray-700">
               <button
                 onClick={() => setShowAllDistricts(!showAllDistricts)}
-                className="text-sm rounded-md bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-1.5 transition"
+                className="text-sm rounded-md bg-emerald-700 hover:bg-emerald-800 text-white px-4 py-1.5 transition"
               >
                 {showAllDistricts ? "Show Less" : "Show More"}
               </button>
