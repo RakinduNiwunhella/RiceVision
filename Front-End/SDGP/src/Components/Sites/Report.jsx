@@ -122,50 +122,146 @@ const ReportPage = () => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
 
-    // Placeholder for RiceVision logo (rectangle box)
-    doc.setDrawColor(150);
-    doc.setFillColor(230);
-    doc.rect((pageWidth - 50) / 2, 10, 50, 20, 'F');
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text("RiceVision Logo", pageWidth / 2, 22, { align: "center" });
+    // Use logo directly from public folder
+    fetch("/logoSDGP.webp")
+      .then(res => res.blob())
+      .then(blob => {
+        const reader = new window.FileReader();
+        reader.onloadend = function() {
+          const base64data = reader.result;
+          // Add image to PDF
+          doc.addImage(base64data, 'PNG', (pageWidth - 40) / 2, 10, 40, 20);
 
-    // Title
-    doc.setFontSize(18);
-    doc.setTextColor(40);
-    doc.text("RiceVision Monthly Report", pageWidth / 2, 40, { align: "center" });
+          // Title
+          doc.setFontSize(18);
+          doc.setTextColor(40);
+          doc.text("RiceVision Monthly Report", pageWidth / 2, 40, { align: "center" });
 
-    // Description
-    doc.setFontSize(11);
-    doc.setTextColor(80);
-    doc.text("This report presents yield, healthy percentage, mean NDVI, and risk level per district for the selected month.", pageWidth / 2, 50, { align: "center", maxWidth: pageWidth - 40 });
+          // Description
+          doc.setFontSize(11);
+          doc.setTextColor(80);
+          doc.text(
+            "This report presents yield, healthy percentage, mean NDVI, and risk level per district for the selected month.",
+            pageWidth / 2,
+            50,
+            { align: "center", maxWidth: pageWidth - 40 }
+          );
 
-    // District(s) and Month info
-    const districtsText = filterType === "comparison" && district2 ? `${district1} & ${district2}` : district1;
-    const monthName = monthsList.find(m => m.value === month)?.label || month;
-    doc.setFontSize(12);
-    doc.setTextColor(60);
-    doc.text(`District(s): ${districtsText}`, 14, 60);
-    doc.text(`Month: ${monthName}`, 14, 68);
+          // District(s) and Month info
+          const districtsText =
+            filterType === "comparison" && district2
+              ? `${district1} & ${district2}`
+              : district1;
+          const monthName = monthsList.find((m) => m.value === month)?.label || month;
+          doc.setFontSize(12);
+          doc.setTextColor(60);
+          doc.text(`District(s): ${districtsText}`, 14, 60);
+          doc.text(`Month: ${monthName}`, 14, 68);
 
-    // Table
-    autoTable(doc, {
-      startY: 75,
-      headStyles: { fillColor: [200, 200, 200], textColor: 50 },
-      bodyStyles: { textColor: 40 },
-      alternateRowStyles: { fillColor: [245, 245, 245] },
-      head:[["Date","District","Yield (tons)","Healthy %","Risk Level","Mean NDVI"]],
-      body: reports.map(r=>[r.Date,r.District,r.total_yield_tons,r.healthy_percentage,r.risk_level,r.mean_ndvi]),
-      margin: { left: 14, right: 14 }
-    });
+          if (filterType === "comparison" && district2) {
+            // Prepare comparison table data
+            // Aggregate data per district for the month (average or total)
+            const districtData = {};
+            [district1, district2].forEach((d) => {
+              const filtered = reports.filter((r) => r.District === d);
+              if (filtered.length === 0) {
+                districtData[d] = {
+                  yield: "N/A",
+                  healthy: "N/A",
+                  mean_ndvi: "N/A",
+                };
+              } else {
+                const totalYield = filtered.reduce(
+                  (acc, r) => acc + parseFloat(r.total_yield_tons),
+                  0
+                );
+                const avgHealthy =
+                  filtered.reduce(
+                    (acc, r) => acc + parseFloat(r.healthy_percentage),
+                    0
+                  ) / filtered.length;
+                const avgNdvi =
+                  filtered.reduce(
+                    (acc, r) => acc + parseFloat(r.mean_ndvi),
+                    0
+                  ) / filtered.length;
+                districtData[d] = {
+                  yield: totalYield.toFixed(2),
+                  healthy: avgHealthy.toFixed(1),
+                  mean_ndvi: avgNdvi.toFixed(3),
+                };
+              }
+            });
 
-    // Footer - copyright line
-    const pageHeight = doc.internal.pageSize.getHeight();
-    doc.setFontSize(9);
-    doc.setTextColor(120);
-    doc.text("© 2025 RiceVision. All rights reserved.", pageWidth / 2, pageHeight - 10, { align: "center" });
+            autoTable(doc, {
+              startY: 75,
+              headStyles: { fillColor: [200, 200, 200], textColor: 50 },
+              bodyStyles: { textColor: 40 },
+              alternateRowStyles: { fillColor: [245, 245, 245] },
+              head: [["Metric", district1, district2]],
+              body: [
+                [
+                  "Total Yield (tons)",
+                  districtData[district1].yield,
+                  districtData[district2].yield,
+                ],
+                [
+                  "Healthy %",
+                  districtData[district1].healthy,
+                  districtData[district2].healthy,
+                ],
+                [
+                  "Mean NDVI",
+                  districtData[district1].mean_ndvi,
+                  districtData[district2].mean_ndvi,
+                ],
+              ],
+              margin: { left: 14, right: 14 },
+            });
+          } else {
+            // Table
+            autoTable(doc, {
+              startY: 75,
+              headStyles: { fillColor: [200, 200, 200], textColor: 50 },
+              bodyStyles: { textColor: 40 },
+              alternateRowStyles: { fillColor: [245, 245, 245] },
+              head: [
+                [
+                  "Date",
+                  "District",
+                  "Yield (tons)",
+                  "Healthy %",
+                  "Risk Level",
+                  "Mean NDVI",
+                ],
+              ],
+              body: reports.map((r) => [
+                r.Date,
+                r.District,
+                r.total_yield_tons,
+                r.healthy_percentage,
+                r.risk_level,
+                r.mean_ndvi,
+              ]),
+              margin: { left: 14, right: 14 },
+            });
+          }
 
-    doc.save(`RiceVision_Full_Report_Month_${month}.pdf`);
+          // Footer - copyright line
+          const pageHeight = doc.internal.pageSize.getHeight();
+          doc.setFontSize(9);
+          doc.setTextColor(120);
+          doc.text(
+            "© 2025 RiceVision. All rights reserved.",
+            pageWidth / 2,
+            pageHeight - 10,
+            { align: "center" }
+          );
+
+          doc.save(`RiceVision_Full_Report_Month_${month}.pdf`);
+        };
+        reader.readAsDataURL(blob);
+      });
   };
 
   const renderSingleView = () => {
@@ -184,7 +280,7 @@ const ReportPage = () => {
     };
 
     const healthData = {
-      labels: ["Healthy", "Not Healthy"],
+      labels: ["Healthy", "Not healthy"],
       datasets: [{
         data: [
           filtered.reduce((acc,r) => acc + parseFloat(r.healthy_percentage),0)/filtered.length,
@@ -213,10 +309,23 @@ const ReportPage = () => {
           <h2 className="font-semibold mb-2 text-black">Yield (tons)</h2>
           <Line data={yieldData} options={{responsive:true}}/>
         </div>
-        <div className="p-4 bg-white rounded shadow">
-          <h2 className="font-semibold mb-2 text-black">Healthy %</h2>
-          <div style={{height: "200px", width: "200px"}}>
-            <Doughnut data={healthData} />
+        <div className="p-4 bg-white rounded shadow flex flex-col items-center">
+          <h2 className="font-semibold mb-2 text-black">Health Percentage</h2>
+          <div className="flex justify-center items-center" style={{ height: "220px", width: "220px" }}>
+            <Doughnut
+              data={healthData}
+              options={{
+                plugins: {
+                  legend: {
+                    position: "bottom",
+                    labels: {
+                      boxWidth: 14,
+                      padding: 12
+                    }
+                  }
+                }
+              }}
+            />
           </div>
         </div>
         <div className="p-4 bg-white rounded shadow">
@@ -232,53 +341,124 @@ const ReportPage = () => {
 
     const districts = [district1,district2];
 
+    // Prepare comparison table data
+    // Aggregate data per district for the month (average or total)
+    const districtData = {};
+    districts.forEach(d => {
+      const filtered = reports.filter(r => r.District === d);
+      if (filtered.length === 0) {
+        districtData[d] = {
+          yield: "N/A",
+          healthy: "N/A",
+          mean_ndvi: "N/A"
+        };
+      } else {
+        const totalYield = filtered.reduce((acc, r) => acc + parseFloat(r.total_yield_tons), 0);
+        const avgHealthy = filtered.reduce((acc, r) => acc + parseFloat(r.healthy_percentage), 0) / filtered.length;
+        const avgNdvi = filtered.reduce((acc, r) => acc + parseFloat(r.mean_ndvi), 0) / filtered.length;
+        districtData[d] = {
+          yield: totalYield.toFixed(2),
+          healthy: avgHealthy.toFixed(1),
+          mean_ndvi: avgNdvi.toFixed(3)
+        };
+      }
+    });
+
     return (
-      <div className="grid md:grid-cols-2 gap-6">
-        {districts.map((d,idx)=>{
-          const filtered = reports.filter(r=>r.District===d);
-          const yieldData = {
-            labels: filtered.map(r=>r.Date),
-            datasets:[{
-              label:`Yield (tons) - ${d}`,
-              data: filtered.map(r=>r.total_yield_tons),
-              borderColor: idx===0 ? "rgba(34,197,94,1)" : "rgba(37,99,235,1)",
-              backgroundColor: idx===0 ? "rgba(34,197,94,0.2)" : "rgba(37,99,235,0.2)",
-              tension:0.3
-            }]
-          };
-          const healthData = {
-            labels:["Healthy","Not Healthy"],
-            datasets:[{
-              data:[
-                filtered.reduce((acc,r)=>acc+parseFloat(r.healthy_percentage),0)/filtered.length,
-                100 - filtered.reduce((acc,r)=>acc+parseFloat(r.healthy_percentage),0)/filtered.length
-              ],
-              backgroundColor:[idx===0 ? "rgba(34,197,94,0.8)":"rgba(37,99,235,0.8)", "rgba(200,200,200,0.3)"]
-            }]
-          };
-          const ndviData = {
-            labels: filtered.map(r=>r.Date),
-            datasets:[{
-              label:`Mean NDVI - ${d}`,
-              data: filtered.map(r=>r.mean_ndvi),
-              borderColor: idx===0 ? "rgba(34,197,94,1)" : "rgba(59,130,246,1)",
-              backgroundColor: idx===0 ? "rgba(34,197,94,0.2)" : "rgba(59,130,246,0.2)",
-              tension:0.3,
-              fill:true
-            }]
-          };
-          return (
-            <div key={d} className="p-4 bg-white rounded shadow">
-              <h2 className="font-semibold text-black mb-4">{d}</h2>
-              <Line data={yieldData} />
-              <div className="my-4" style={{height: "200px", width: "200px"}}>
-                <Doughnut data={healthData} />
+      <>
+        <div className="grid md:grid-cols-2 gap-6">
+          {districts.map((d,idx)=>{
+            const filtered = reports.filter(r=>r.District===d);
+            const yieldData = {
+              labels: filtered.map(r=>r.Date),
+              datasets:[{
+                label:`Yield (tons) - ${d}`,
+                data: filtered.map(r=>r.total_yield_tons),
+                borderColor: idx===0 ? "rgba(34,197,94,1)" : "rgba(37,99,235,1)",
+                backgroundColor: idx===0 ? "rgba(34,197,94,0.2)" : "rgba(37,99,235,0.2)",
+                tension:0.3
+              }]
+            };
+            const healthData = {
+              labels:["Healthy","Not Healthy"],
+              datasets:[{
+                data:[
+                  filtered.reduce((acc,r)=>acc+parseFloat(r.healthy_percentage),0)/filtered.length,
+                  100 - filtered.reduce((acc,r)=>acc+parseFloat(r.healthy_percentage),0)/filtered.length
+                ],
+                backgroundColor:[idx===0 ? "rgba(34,197,94,0.8)":"rgba(37,99,235,0.8)", "rgba(200,200,200,0.3)"]
+              }]
+            };
+            const ndviData = {
+              labels: filtered.map(r=>r.Date),
+              datasets:[{
+                label:`Mean NDVI - ${d}`,
+                data: filtered.map(r=>r.mean_ndvi),
+                borderColor: idx===0 ? "rgba(34,197,94,1)" : "rgba(59,130,246,1)",
+                backgroundColor: idx===0 ? "rgba(34,197,94,0.2)" : "rgba(59,130,246,0.2)",
+                tension:0.3,
+                fill:true
+              }]
+            };
+            return (
+              <div key={d} className="p-4 bg-white rounded shadow">
+                <h2 className="font-semibold text-black mb-1">{d}</h2>
+                <p className="text-sm text-gray-500 mb-2">Health Percentage</p>
+                <Line data={yieldData} />
+                <div className="my-4 flex justify-center items-center">
+                  <div style={{ height: "220px", width: "220px" }}>
+                    <Doughnut
+                      data={healthData}
+                      options={{
+                        plugins: {
+                          legend: {
+                            position: "bottom",
+                            labels: {
+                              boxWidth: 14,
+                              padding: 12
+                            }
+                          }
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+                <Line data={ndviData} options={{responsive:true}}/>
               </div>
-              <Line data={ndviData} options={{responsive:true}}/>
-            </div>
-          )
-        })}
-      </div>
+            )
+          })}
+        </div>
+
+        {/* Comparison Table */}
+        <div className="mt-6 p-4 bg-white rounded shadow overflow-x-auto">
+          <table className="w-full border-collapse text-sm">
+            <thead className="bg-gray-200 dark:bg-gray-800 text-left">
+              <tr>
+                <th className="px-3 py-2">Metric</th>
+                <th className="px-3 py-2">{district1}</th>
+                <th className="px-3 py-2">{district2}</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white dark:bg-gray-900">
+              <tr className="border-t dark:border-gray-700">
+                <td className="px-3 py-2">Total Yield (tons)</td>
+                <td className="px-3 py-2">{districtData[district1].yield}</td>
+                <td className="px-3 py-2">{districtData[district2].yield}</td>
+              </tr>
+              <tr className="border-t dark:border-gray-700">
+                <td className="px-3 py-2">Healthy %</td>
+                <td className="px-3 py-2">{districtData[district1].healthy}</td>
+                <td className="px-3 py-2">{districtData[district2].healthy}</td>
+              </tr>
+              <tr className="border-t dark:border-gray-700">
+                <td className="px-3 py-2">Mean NDVI</td>
+                <td className="px-3 py-2">{districtData[district1].mean_ndvi}</td>
+                <td className="px-3 py-2">{districtData[district2].mean_ndvi}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </>
     )
   };
 
