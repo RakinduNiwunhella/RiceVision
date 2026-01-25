@@ -1,147 +1,10 @@
-import React, { useState, useMemo } from "react";
-
-const alertsData = [
-  {
-    id: 1,
-    title: "Drought",
-    description: "Soil moisture dropped below 30% in Field A. Irrigation recommended.",
-    status: "Open",
-    priority: "High",
-    field: "Field A",
-    timestamp: "2026-01-09T06:30:00Z",
-  },
-  {
-    id: 2,
-    title: "Heat Stress",
-    description: "Temperature exceeded 35°C in Field B. Risk of crop heat stress.",
-    status: "Open",
-    priority: "Medium",
-    field: "Field B",
-    timestamp: "2026-01-09T07:00:00Z",
-  },
-  {
-    id: 3,
-    title: "Not Applicable",
-    description: "Signs of pest infestation detected in Field C. Field inspection advised.",
-    status: "Open",
-    priority: "High",
-    field: "Field C",
-    timestamp: "2026-01-09T08:15:00Z",
-  },
-  {
-    id: 4,
-    title: "Drought",
-    description: "Irrigation system malfunction detected in Field D.",
-    status: "Open",
-    priority: "High",
-    field: "Field D",
-    timestamp: "2026-01-09T09:00:00Z",
-  },
-  {
-    id: 5,
-    title: "Not Applicable",
-    description: "Nitrogen levels are below the recommended threshold in Field E.",
-    status: "Open",
-    priority: "Medium",
-    field: "Field E",
-    timestamp: "2026-01-09T09:30:00Z",
-  },
-  {
-    id: 6,
-    title: "Flood",
-    description: "Heavy rainfall predicted. Flood risk detected in Field F.",
-    status: "Open",
-    priority: "High",
-    field: "Field F",
-    timestamp: "2026-01-09T10:00:00Z",
-  },
-  {
-    id: 7,
-    title: "Not Applicable",
-    description: "Excessive weed growth detected in Field G.",
-    status: "Open",
-    priority: "Medium",
-    field: "Field G",
-    timestamp: "2026-01-09T10:45:00Z",
-  },
-  {
-    id: 8,
-    title: "Heat Stress",
-    description: "Unusual temperature fluctuations detected in Field H.",
-    status: "Open",
-    priority: "Medium",
-    field: "Field H",
-    timestamp: "2026-01-09T11:15:00Z",
-  },
-  {
-    id: 9,
-    title: "Not Applicable",
-    description: "Crop flowering stage slightly delayed in Field A.",
-    status: "Resolved",
-    priority: "Low",
-    field: "Field A",
-    timestamp: "2026-01-08T14:00:00Z",
-  },
-  {
-    id: 10,
-    title: "Not Applicable",
-    description: "Early warning signs detected during crop health scan in Field B.",
-    status: "Open",
-    priority: "High",
-    field: "Field B",
-    timestamp: "2026-01-09T12:00:00Z",
-  },
-  {
-    id: 11,
-    title: "Not Applicable",
-    description: "Sensor connectivity issue reported in Field C.",
-    status: "Denied",
-    priority: "High",
-    field: "Field C",
-    timestamp: "2026-01-09T12:30:00Z",
-  },
-  {
-    id: 12,
-    title: "Heat Stress",
-    description: "High wind and temperature conditions detected in Field D.",
-    status: "Open",
-    priority: "Medium",
-    field: "Field D",
-    timestamp: "2026-01-09T13:00:00Z",
-  },
-  {
-    id: 13,
-    title: "Drought",
-    description: "Predicted yield is below expected levels due to water stress in Field E.",
-    status: "Open",
-    priority: "Medium",
-    field: "Field E",
-    timestamp: "2026-01-09T13:30:00Z",
-  },
-  {
-    id: 14,
-    title: "Flood",
-    description: "Waterlogging detected. Drainage required in Field F.",
-    status: "Open",
-    priority: "High",
-    field: "Field F",
-    timestamp: "2026-01-09T14:00:00Z",
-  },
-  {
-    id: 15,
-    title: "Salinity Stress",
-    description: "Soil salinity levels are high in Field G. Crop stress likely.",
-    status: "Resolved",
-    priority: "Medium",
-    field: "Field G",
-    timestamp: "2026-01-08T15:00:00Z",
-  },
-];
+import React, { useState, useMemo, useEffect } from "react";
+import { supabase } from "../../supabaseClient";
 
 const tabOptions = ["Open", "Resolved", "Denied", "All"];
 
 const Alerts = () => {
-  const [alerts, setAlerts] = useState(alertsData);
+  const [alerts, setAlerts] = useState([]);
   const [activeTab, setActiveTab] = useState("Open");
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -154,6 +17,35 @@ const Alerts = () => {
       return matchesTab && matchesSearch;
     });
   }, [alerts, activeTab, searchTerm]);
+
+  useEffect(() => {
+    const fetchAlerts = async () => {
+      const { data, error } = await supabase
+        .from("alerts_overview_view")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Alerts fetch error:", error);
+        return;
+      }
+
+      // Map DB → existing UI shape
+      setAlerts(
+        data.map((a) => ({
+          id: a.id,
+          title: a.title,
+          description: a.description,
+          status: a.status, // always "Open" (Option A)
+          priority: a.priority,
+          field: a.district, // reuse field label as district
+          timestamp: a.created_at,
+        })),
+      );
+    };
+
+    fetchAlerts();
+  }, []);
 
   const counts = useMemo(() => {
     const countObj = { Open: 0, Resolved: 0, Denied: 0 };
@@ -168,13 +60,13 @@ const Alerts = () => {
 
   const handleResolve = (id) => {
     setAlerts((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, status: "Resolved" } : a))
+      prev.map((a) => (a.id === id ? { ...a, status: "Resolved" } : a)),
     );
   };
 
   const handleDeny = (id) => {
     setAlerts((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, status: "Denied" } : a))
+      prev.map((a) => (a.id === id ? { ...a, status: "Denied" } : a)),
     );
   };
 
@@ -183,7 +75,9 @@ const Alerts = () => {
   return (
     <div className="min-h-screen bg-white dark:bg-slate-900 p-6">
       <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6 max-w-6xl mx-auto text-slate-900 dark:text-white">
-        <h1 className="text-3xl font-bold mb-6 text-slate-900 dark:text-white">Paddy Field Risk Alerts</h1>
+        <h1 className="text-3xl font-bold mb-6 text-slate-900 dark:text-white">
+          Paddy Field Risk Alerts
+        </h1>
 
         {/* Tabs */}
         <div className="flex gap-4 mb-6 border-b border-slate-200 dark:border-slate-700">
@@ -214,7 +108,9 @@ const Alerts = () => {
         {/* Alerts */}
         <div className="space-y-5 max-h-[70vh] overflow-y-auto">
           {filteredAlerts.length === 0 && (
-            <p className="text-center text-slate-500 dark:text-slate-400">No alerts found</p>
+            <p className="text-center text-slate-500 dark:text-slate-400">
+              No alerts found
+            </p>
           )}
 
           {filteredAlerts.map((alert) => (
@@ -224,8 +120,8 @@ const Alerts = () => {
                 alert.status === "Open"
                   ? "border-red-500"
                   : alert.status === "Resolved"
-                  ? "border-emerald-500"
-                  : "border-gray-500"
+                    ? "border-emerald-500"
+                    : "border-gray-500"
               }`}
             >
               <h2 className="text-xl font-bold text-slate-900 dark:text-white">
@@ -235,7 +131,9 @@ const Alerts = () => {
                 </span>
               </h2>
 
-              <p className="mt-2 text-slate-700 dark:text-slate-300">{alert.description}</p>
+              <p className="mt-2 text-slate-700 dark:text-slate-300">
+                {alert.description}
+              </p>
 
               <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
                 Priority: {alert.priority} | {formatTimestamp(alert.timestamp)}
