@@ -1,15 +1,17 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import useComplaints from "./hooks/useComplaints";
-import ComplaintsTable from "./components/admin/ComplaintsTable";
 import AdminLayout from "./components/admin/AdminLayout";
-import ComplaintDetails from "./components/pages/ComplaintDetails";
+import ComplaintsTable from "./components/admin/ComplaintsTable";
+import useComplaints from "./hooks/useComplaints";
+import Dashboard from "./components/admin/Dashboard";
+import AnalyticsPage from "./components/pages/AnalyticsPage";
+import SettingsPage from "./components/pages/SettingsPage";
+import LoginPage from "./components/pages/LoginPage";
+import AdminRoute from "./components/auth/AdminRoute";
 
 function ComplaintsPage() {
   const { complaints, loading } = useComplaints();
 
-  if (loading) {
-    return <p className="p-8">Loading complaints...</p>;
-  }
+  if (loading) return <p className="p-8">Loading complaints...</p>;
 
   return (
     <>
@@ -21,17 +23,30 @@ function ComplaintsPage() {
 
 export default function App() {
   return (
-    <AdminLayout>
-      <Routes>
-        {/* Default route */}
-        <Route path="/" element={<Navigate to="/complaints" replace />} />
+    <Routes>
+      {/* Public */}
+      <Route path="/login" element={<LoginPage />} />
 
-        {/* Complaints list */}
-        <Route path="/complaints" element={<ComplaintsPage />} />
+      {/* Root redirect */}
+      <Route path="/" element={<Navigate to="/admin" replace />} />
 
-        {/* Complaint details */}
-        <Route path="/complaints/:id" element={<ComplaintDetails />} />
-      </Routes>
-    </AdminLayout>
+      {/* 🔐 Admin only */}
+      <Route
+        path="/admin"
+        element={
+          <AdminRoute>
+            <AdminLayout />
+          </AdminRoute>
+        }
+      >
+        <Route index element={<Dashboard />} />
+        <Route path="complaints" element={<ComplaintsPage />} />
+        <Route path="analytics" element={<AnalyticsPage />} />
+        <Route path="settings" element={<SettingsPage />} />
+      </Route>
+
+      {/* Fallback */}
+      <Route path="*" element={<Navigate to="/admin" replace />} />
+    </Routes>
   );
 }

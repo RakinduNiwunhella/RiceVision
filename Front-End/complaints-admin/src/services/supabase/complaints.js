@@ -1,4 +1,4 @@
-import { supabase } from "./client";
+import { supabase } from "../client";
 
 // Fetch all complaints
 export const fetchComplaints = async () => {
