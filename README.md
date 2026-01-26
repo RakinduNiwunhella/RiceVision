@@ -87,35 +87,6 @@ graph TD
 
 ---
 
-## 📂 Repository Structure
-
-```
-RiceVision/
-│
-├── backend/
-│   ├── main.py              # FastAPI Entry Point
-│   ├── model_inference.py   # LSTM Inference Logic
-│   └── services/            # Database & Weather Integrations
-│
-├── kaggle/
-│   ├── preprocessing.ipynb  # Data Cleaning & Normalization
-│   └── lstm_training.ipynb  # Model Architecture & Training
-│
-├── gee/
-│   ├── data_export.js       # GEE Scripts for ImageCollection
-│   └── climate_fusion.py    # Merging CHIRPS/ERA5 with Sentinel-2
-│
-├── frontend/
-│   ├── src/
-│   │   ├── components/      # Map & Chart Components
-│   │   └── pages/           # Dashboard & Analytics Views
-│
-└── README.md
-
-```
-
----
-
 ## 📊 Use Cases
 
 * 🧑‍🌾 **Farmers:** Receive alerts on pest risks and stage-specific health advice.
