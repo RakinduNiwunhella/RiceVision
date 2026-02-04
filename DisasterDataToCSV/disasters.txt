@@ -1,0 +1,18 @@
+Flood
+Heavy Rain
+Heavy Rain / Flood
+Havy Rain
+High Wind
+Drought
+Crop Damage
+Paddy Damage
+Water Logging
+Overflow
+Canal Breach
+Tank Breach
+Bund Breach
+Rock Fallen Risk
+Tree Fallen
+Drowning
+Landslide
+Soil Erosion
