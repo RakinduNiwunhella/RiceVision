@@ -1,3 +1,6 @@
 .DS_Store
 DisasterDataToCSV/pdfs
 DisasterDataToCSV/csv_output
+AddingDSDivisionsToCSV/anuradhapura_sl_paddy.csv
+AddingDSDivisionsToCSV/points_with_ds.csv
+AddingDSDivisionsToCSV/DSdevisions.geojson
