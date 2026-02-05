@@ -3,7 +3,7 @@ import geopandas as gpd
 from shapely.geometry import Point
 
 # FILES
-csv_file = "anuradhapura_sl_paddy.csv"
+csv_file = "ampara_sl_paddy.csv"
 geojson_file = "DSdevisions.geojson"
 
 # Load CSV
@@ -29,6 +29,6 @@ joined["DS Division"] = joined["adm3_name"]
 joined = joined[ list(df.columns) + ["DS Division"] ]
 
 # Save
-joined.to_csv("points_with_ds.csv", index=False)
+joined.to_csv("Ampara_points_with_ds.csv", index=False)
 
 print("Finished ✔ — check points_with_ds.csv")

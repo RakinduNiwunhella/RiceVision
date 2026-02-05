@@ -13,3 +13,10 @@ AddingDisasters/MergingData/paddy_with_disasters.csv
 AddingDisasters/MergingData/clean_disaster_dataset.csv
 AddingDisasters/CleaningSatDataCSV/sorted_anuradhapura_sl_paddy.csv
 AddingDisasters/CleaningSatDataCSV/points_with_ds.csv
+AddingDisasters/CleaningSatDataCSV/Ampara_points_with_ds.csv
+AddingDisasters/CleaningSatDataCSV/sorted_Ampara_sl_paddy.csv
+AddingDisasters/MergingData/Ampara_paddy_with_disasters.csv
+AddingDisasters/MergingData/sorted_Ampara_sl_paddy.csv
+AddingDSDivisionsToCSV/Ampara_points_with_ds.csv
+AddingDSDivisionsToCSV/ampara_sl_paddy.csv
+AddingDSDivisionsToCSV/.venv

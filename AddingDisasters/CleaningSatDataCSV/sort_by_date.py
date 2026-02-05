@@ -1,10 +1,10 @@
 import pandas as pd
 
 # input file
-input_file = "points_with_ds.csv"
+input_file = "Ampara_points_with_ds.csv"
 
 # output file
-output_file = "sorted_anuradhapura_sl_paddy.csv"
+output_file = "sorted_Ampara_sl_paddy.csv"
 
 # read csv
 df = pd.read_csv(input_file)
