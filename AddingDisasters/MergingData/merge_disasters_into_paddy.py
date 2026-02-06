@@ -2,7 +2,7 @@ import pandas as pd
 from tqdm import tqdm
 
 # load
-paddy = pd.read_csv("sorted_Ampara_sl_paddy.csv")
+paddy = pd.read_csv("sorted_badulla_sl_paddy.csv")
 disaster = pd.read_csv("clean_disaster_dataset.csv")
 
 # clean columns
@@ -63,6 +63,6 @@ final_df = pd.DataFrame(merged_rows)
 for col in hazard_cols:
     final_df[col] = final_df[col].fillna(False)
 
-final_df.to_csv("Ampara_paddy_with_disasters.csv", index=False)
+final_df.to_csv("badulla_paddy_with_disasters.csv", index=False)
 
 print("\nDONE ✅ Created paddy_with_disasters.csv")
