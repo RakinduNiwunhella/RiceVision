@@ -9,7 +9,7 @@ GEOJSON_FILE = "DSdevisions.geojson"
 DISASTER_FILE = "clean_disaster_dataset.csv"
 LAT_COL = "lat"
 LON_COL = "lon"
-DATE_COLUMN = "ten_day"
+DATE_COLUMN = "date"
 # ==========================================
 
 # ---------- STEP 1 : ADD DS DIVISION ----------
@@ -92,7 +92,7 @@ def process_folder(folder_path):
     output_folder = base_folder / "Done"
     output_folder.mkdir(parents=True, exist_ok=True)
 
-    csv_files = list(input_folder.glob("*.csv"))
+    csv_files = list(input_folder.rglob("*.csv"))
     if len(csv_files) == 0:
         print("No CSV files found in ToBeAdded folder")
         return
@@ -108,7 +108,7 @@ def process_folder(folder_path):
 
     for csv_file in tqdm(csv_files, desc="Processing files", unit="file"):
         print(f"\n==============================")
-        print(f"Processing: {csv_file.name}")
+        print(f"Processing: {csv_file}")
 
         df = add_ds_division(csv_file, ds_gdf)
         if df is None:
@@ -117,7 +117,10 @@ def process_folder(folder_path):
         df = sort_by_date(df)
         final_df = merge_disasters(df, disaster_df)
 
-        out_file = output_folder / f"{csv_file.stem}_FINAL.csv"
+        relative_path = csv_file.relative_to(input_folder)
+        out_file = output_folder / relative_path
+        out_file.parent.mkdir(parents=True, exist_ok=True)
+
         final_df.to_csv(out_file, index=False)
         print(f"Saved → {out_file}")
 
