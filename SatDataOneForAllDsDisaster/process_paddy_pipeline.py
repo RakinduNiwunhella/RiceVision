@@ -81,8 +81,14 @@ def merge_disasters(paddy_df, disaster_df):
         merged_rows.append(new_row)
 
     final_df = pd.DataFrame(merged_rows)
+
+    # ensure all hazard columns exist and are boolean
     for col in hazard_cols:
-        final_df[col] = final_df[col].fillna(False)
+        if col not in final_df.columns:
+            final_df[col] = False
+        else:
+            final_df[col] = final_df[col].fillna(False).astype(bool)
+
     return final_df
 
 # ---------- MAIN PIPELINE ----------
