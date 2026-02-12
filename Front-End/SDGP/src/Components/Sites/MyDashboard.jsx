@@ -87,16 +87,15 @@ const MyDashboard = () => {
     fetchHealthSummary();
   }, []);
 
-  /* ------------------ FETCH YIELD ------------------ */
+  /* ------------------ FETCH YIELD (via FastAPI) ------------------ */
   useEffect(() => {
     const fetchYieldForecast = async () => {
-      const { data, error } = await supabase
-        .from("yield_forecast_view")
-        .select("total_yield_tons")
-        .single();
-
-      if (!error) {
+      try {
+        const res = await fetch("http://127.0.0.1:8000/yield");
+        const data = await res.json();
         setYieldForecast(data);
+      } catch (e) {
+        console.error("Failed to fetch yield from API", e);
       }
     };
 
@@ -241,11 +240,6 @@ const MyDashboard = () => {
                 : "Loading..."}
             </p>
 
-            {yieldForecast && (
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                Confidence: {yieldForecast.confidence}%
-              </p>
-            )}
 
             <div className="mt-4 border-t border-gray-200 dark:border-gray-700 pt-3">
               <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">
