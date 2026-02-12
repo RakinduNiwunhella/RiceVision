@@ -9,7 +9,7 @@ const App = () => {
       {/* Fixed Header */}
       <Header />
 
-      {/* Layout below header */}
+      {/* Layout below header & */}
       <div className="flex pt-14 h-full overflow-hidden">
         {/* Sidebar (no scroll) */}
         <aside className="h-[calc(100vh-3.5rem)] overflow-hidden flex-shrink-0">
