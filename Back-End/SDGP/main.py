@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routes.dashboard import router as yield_router
+from routes.reportPage import router as report_router
 
 app = FastAPI()
 
@@ -14,3 +15,4 @@ app.add_middleware(
 )
 
 app.include_router(yield_router)
+app.include_router(report_router, prefix="/api")

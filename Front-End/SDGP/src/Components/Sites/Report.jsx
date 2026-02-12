@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { supabase } from "../../supabaseClient";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { CSVLink } from "react-csv";
@@ -99,41 +98,30 @@ const ReportPage = () => {
   const labelColor = isDark ? "#e5e7eb" : "#111827"; // slate-200 / slate-900
   const gridColor = isDark ? "#334155" : "#e5e7eb"; // slate-700 / slate-200
 
-  // Fetch data from Supabase
   const fetchData = async () => {
     if (!district1) return;
+
     setLoading(true);
+
     try {
       const districts =
         filterType === "comparison" && district2
           ? [district1, district2]
           : [district1];
-      const startDate = `2025-${month.toString().padStart(2, "0")}-01`;
-      const endDate = `2025-${month.toString().padStart(2, "0")}-31`;
 
-      const { data, error } = await supabase
-        .from("reports_analytics_table")
-        .select(
-          `
-          District,
-          Date,
-          total_yield_tons,
-          healthy_percentage,
-          risk_level,
-          mean_ndvi,
-          stage_name,
-          pest_risk
-        `,
-        )
-        .in("District", districts)
-        .gte("Date", startDate)
-        .lte("Date", endDate);
+      const response = await fetch(
+        `http://localhost:8000/api/report-data?districts=${districts.join(",")}&month=${month}`
+      );
 
-      if (error) throw error;
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
 
       setReports(data);
     } catch (err) {
-      console.error(err);
+      console.error("Error fetching report data:", err);
     } finally {
       setLoading(false);
     }
