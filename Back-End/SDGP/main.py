@@ -1,6 +1,8 @@
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routes.dashboard import router as yield_router
+from routes.fieldData import router as field_data_router
 
 app = FastAPI()
 
@@ -14,3 +16,4 @@ app.add_middleware(
 )
 
 app.include_router(yield_router)
+app.include_router(field_data_router)
