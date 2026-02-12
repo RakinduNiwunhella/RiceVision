@@ -1,7 +1,7 @@
 import pandas as pd
 
 # load csv
-filename = "Monaragala_2025_m12.csv"
+filename = "Anuradhapura_2025_Dec_p1.csv"
 df = pd.read_csv(filename)
 district_name = filename.split("_")[0]
 
@@ -14,7 +14,7 @@ df["stage_name"] = "Reproductive Stage"
 import numpy as np
 
 health_labels = ["Normal", "Severe Stress", "Mild Stress"]
-health_weights = [0.78, 0.05, 0.17]
+health_weights = [0.85, 0.05, 0.10]
 
 df["paddy_health"] = np.random.choice(
     health_labels,
@@ -24,7 +24,7 @@ df["paddy_health"] = np.random.choice(
 
 # generate random yield values that sum to 112
 
-yields = np.random.dirichlet(np.ones(len(df))) * 112
+yields = np.random.dirichlet(np.ones(len(df))) * 217994
 df["yield_ton_ha"] = yields
 
 # create disaster_risk column with fixed counts
@@ -63,7 +63,11 @@ cols_to_drop = [
     "SCL", "cloud_pct", "elevation",
     "rain_14d", "rain_1d", "rain_30d", "rain_3d", "rain_7d",
     "random", "rh_mean", "slope", "t_day", "t_night",
-    "tmax", "tmean", "tmin", ".geo"
+    "tmax", "tmean", "tmin", ".geo",
+    "month",
+    "period",
+    "period_end",
+    "period_start",
 ]
 
 df = df.drop(columns=cols_to_drop, errors="ignore")
