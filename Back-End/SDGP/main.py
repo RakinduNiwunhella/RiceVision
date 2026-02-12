@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routes.yield_routes import router as yield_router
+from routes.dashboard import router as yield_router
 
 app = FastAPI()
 
