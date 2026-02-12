@@ -82,12 +82,16 @@ def merge_disasters(paddy_df, disaster_df):
 
     final_df = pd.DataFrame(merged_rows)
 
-    # ensure all hazard columns exist and are boolean
+    # ensure all hazard columns exist and use pandas nullable boolean dtype (avoids FutureWarning)
     for col in hazard_cols:
         if col not in final_df.columns:
-            final_df[col] = False
+            final_df[col] = pd.Series(False, index=final_df.index, dtype="boolean")
         else:
-            final_df[col] = final_df[col].fillna(False).astype(bool)
+            final_df[col] = (
+                final_df[col]
+                .astype("boolean")
+                .fillna(False)
+            )
 
     return final_df
 
