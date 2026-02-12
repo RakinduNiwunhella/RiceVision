@@ -12,7 +12,6 @@ import {
   Cell,
   Legend,
 } from "recharts";
-import { supabase } from "../../supabaseClient";
 import { AlertTriangle, CloudRain, Bug } from "lucide-react";
 
 /* ------------------ Components ------------------ */
@@ -72,16 +71,16 @@ const MyDashboard = () => {
       ]
     : [];
 
-  /* ------------------ FETCH HEALTH ------------------ */
+  /* ------------------ FETCH HEALTH (via FastAPI) ------------------ */
   useEffect(() => {
     const fetchHealthSummary = async () => {
-      const { data } = await supabase
-        .from("paddy_health_summary_view")
-        .select("normal_pct, mild_stress_pct, severe_stress_pct")
-        .eq("district", "kurunegala")
-        .single();
-
-      setHealthSummary(data);
+      try {
+        const res = await fetch("http://127.0.0.1:8000/health-summary");
+        const data = await res.json();
+        setHealthSummary(data);
+      } catch (e) {
+        console.error("Failed to fetch health summary", e);
+      }
     };
 
     fetchHealthSummary();
@@ -102,67 +101,60 @@ const MyDashboard = () => {
     fetchYieldForecast();
   }, []);
 
-  /* ------------------ FETCH BEST YIELD DISTRICTS ------------------ */
+  /* ------------------ FETCH BEST YIELD DISTRICTS (via FastAPI) ------------------ */
   useEffect(() => {
     const fetchBestYieldDistricts = async () => {
-      const { data, error } = await supabase
-        .from("best_yield_districts_view")
-        .select("District, total_yield_ton_ha")
-        .limit(5);
-
-      if (!error && data) {
-        setBestYieldDistricts(data);
+      try {
+        const res = await fetch("http://127.0.0.1:8000/best-districts");
+        const data = await res.json();
+        setBestYieldDistricts(data || []);
+      } catch (e) {
+        console.error("Failed to fetch best districts", e);
       }
     };
 
     fetchBestYieldDistricts();
   }, []);
 
-  /* ------------------ FETCH OUTBREAKS ------------------ */
+  /* ------------------ FETCH OUTBREAKS (via FastAPI) ------------------ */
   useEffect(() => {
     const fetchOutbreaks = async () => {
-      const { data } = await supabase
-        .from("disaster_risk_overview_view")
-        .select("id, title, district, event_date")
-        .order("event_date", { ascending: false });
-
-      setOutbreaks(data || []);
+      try {
+        const res = await fetch("http://127.0.0.1:8000/outbreaks");
+        const data = await res.json();
+        setOutbreaks(data || []);
+      } catch (e) {
+        console.error("Failed to fetch outbreaks", e);
+      }
     };
 
     fetchOutbreaks();
   }, []);
 
-  /* ------------------ FETCH NATIONAL NDVI TREND ------------------ */
+  /* ------------------ FETCH NATIONAL NDVI TREND (via FastAPI) ------------------ */
   useEffect(() => {
     const fetchNdviTrend = async () => {
-      const { data, error } = await supabase
-        .from("national_ndvi_trend_view")
-        .select("date, mean_ndvi")
-        .order("date", { ascending: true });
-
-      if (!error && data) {
-        setNdviTrend(
-          data.map((row) => ({
-            day: row.date,
-            value: row.mean_ndvi,
-          }))
-        );
+      try {
+        const res = await fetch("http://127.0.0.1:8000/ndvi-trend");
+        const data = await res.json();
+        setNdviTrend(data || []);
+      } catch (e) {
+        console.error("Failed to fetch NDVI trend", e);
       }
     };
 
     fetchNdviTrend();
   }, []);
 
-  /* ------------------ FETCH DISTRICT HEALTH OVERVIEW ------------------ */
+  /* ------------------ FETCH DISTRICT HEALTH OVERVIEW (via FastAPI) ------------------ */
   useEffect(() => {
     const fetchDistrictHealth = async () => {
-      const { data, error } = await supabase
-        .from("paddy_health_summary_view")
-        .select("district, normal_pct")
-        .order("normal_pct", { ascending: false });
-
-      if (!error && data) {
-        setDistrictHealth(data);
+      try {
+        const res = await fetch("http://127.0.0.1:8000/district-health");
+        const data = await res.json();
+        setDistrictHealth(data || []);
+      } catch (e) {
+        console.error("Failed to fetch district health", e);
       }
     };
 
