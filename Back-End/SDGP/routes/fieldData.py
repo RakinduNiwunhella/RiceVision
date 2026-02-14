@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from db import supabase  # make sure db.py exports supabase client
+from ..db import supabase  # make sure db.py exports supabase client
 
 router = APIRouter(prefix="/field-data", tags=["Field Data"])
 
