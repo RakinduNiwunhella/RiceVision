@@ -1,8 +1,18 @@
-# gee_pipeline/auth.py
 import ee
-import os
 
 def initialize_gee():
-    # For production use service account
-    # For local testing you can temporarily keep ee.Authenticate()
-    ee.Initialize(project="ricevision")
+    print("Starting EE initialization...")
+
+    SERVICE_ACCOUNT = "gee-worker@ricevision-487310.iam.gserviceaccount.com"
+    KEY_PATH = r"C:\Users\ASUS\.gcp\gee-worker.json"
+
+    credentials = ee.ServiceAccountCredentials(
+        SERVICE_ACCOUNT,
+        KEY_PATH
+    )
+
+    print("Credentials created")
+
+    ee.Initialize(credentials, project="ricevision-487310")
+
+    print("Initialized with SERVICE ACCOUNT:", SERVICE_ACCOUNT)

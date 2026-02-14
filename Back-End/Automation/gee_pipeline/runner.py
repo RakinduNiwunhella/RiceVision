@@ -1,8 +1,10 @@
-# gee_pipeline/runner.py
+# Automation/gee_pipeline/runner.py
 
 import ee
 import calendar
+import time
 from .auth import initialize_gee
+
 
 def run_weekly_exports(years, roi_asset, district_name):
 
@@ -12,7 +14,9 @@ def run_weekly_exports(years, roi_asset, district_name):
     print("Total polygons:", roi.size().getInfo())
 
     for year in years:
-        print(f"\nProcessing {year}")
+        print("\n==============================")
+        print(f"Processing Year: {year}")
+        print("==============================")
 
         base_images = (
             ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
@@ -32,6 +36,8 @@ def run_weekly_exports(years, roi_asset, district_name):
                 (22, last_day)
             ]
 
+            print(f"\n📆 {year}-{month:02d}")
+
             for w_idx, (start_day, end_day) in enumerate(week_ranges, start=1):
 
                 w_start = ee.Date.fromYMD(year, month, start_day)
@@ -44,10 +50,36 @@ def run_weekly_exports(years, roi_asset, district_name):
                 weekly = base_images.filterDate(w_start, w_end)
 
                 if weekly.size().getInfo() == 0:
+                    print(f"  → Week {w_idx}: no valid image")
                     continue
 
                 img = ee.Image(weekly.first())
 
-                print(f"Exporting {district_name} {year}-{month} W{w_idx}")
+                description = f"{district_name}_{year}_{month:02d}_W{w_idx}"
 
-                # you can call export function here
+                print(f"  → Week {w_idx}: submitting export")
+
+                table = img.select(["B4", "B8"]).sample(
+                    region=roi.geometry(),
+                    scale=10,
+                    numPixels=1000,
+                    geometries=True
+                )
+
+                task = ee.batch.Export.table.toDrive(
+                    collection=table,
+                    description=description,
+                    folder="ricevision_exports",   # must be shared
+                    fileNamePrefix=description,
+                    fileFormat="CSV"
+                )
+
+                task.start()
+
+                print("     Submitted:", description)
+                print("     Task ID:", task.id)
+
+                time.sleep(3)
+                print("     Status:", task.status()["state"])
+
+    print("\n✅ ALL EXPORT TASKS SUBMITTED")
