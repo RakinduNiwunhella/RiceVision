@@ -1,4 +1,3 @@
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .routes.dashboard import router as yield_router
@@ -11,7 +10,11 @@ app = FastAPI()
 # Allow frontend to call backend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # React dev server
+    allow_origins=[
+        "http://localhost:5173",           # local React dev
+        "https://ricevision-frontend.onrender.com",  # deployed frontend (change to your real frontend URL)
+        "*"                                # temporary: allow all during testing
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
