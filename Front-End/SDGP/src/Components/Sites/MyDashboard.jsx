@@ -14,6 +14,17 @@ import {
 } from "recharts";
 import { AlertTriangle, CloudRain, Bug } from "lucide-react";
 
+import {
+  fetchHealthSummary,
+  fetchYield,
+  fetchBestDistricts,
+  fetchOutbreaks,
+  fetchNDVITrend,
+  fetchDistrictHealth
+} from "../../api/api";
+
+
+
 /* ------------------ Components ------------------ */
 
 const StatWidget = ({ title, value, subtitle }) => (
@@ -72,94 +83,88 @@ const MyDashboard = () => {
     : [];
 
   /* ------------------ FETCH HEALTH (via FastAPI) ------------------ */
-  useEffect(() => {
-    const fetchHealthSummary = async () => {
-      try {
-        const res = await fetch("http://127.0.0.1:8000/health-summary");
-        const data = await res.json();
-        setHealthSummary(data);
-      } catch (e) {
-        console.error("Failed to fetch health summary", e);
-      }
-    };
+useEffect(() => {
+  const loadHealth = async () => {
+    try {
+      const data = await fetchHealthSummary();
+      setHealth(data);
+    } catch (err) {
+      console.error("Failed to load health summary:", err);
+    }
+  };
 
-    fetchHealthSummary();
-  }, []);
+  loadHealth();
+}, []);
 
   /* ------------------ FETCH YIELD (via FastAPI) ------------------ */
-  useEffect(() => {
-    const fetchYieldForecast = async () => {
-      try {
-        const res = await fetch("http://127.0.0.1:8000/yield");
-        const data = await res.json();
-        setYieldForecast(data);
-      } catch (e) {
-        console.error("Failed to fetch yield from API", e);
-      }
-    };
+useEffect(() => {
+  const loadYield = async () => {
+    try {
+      const data = await fetchYield();
+      setYield(data);
+    } catch (err) {
+      console.error("Failed to load yield:", err);
+    }
+  };
 
-    fetchYieldForecast();
-  }, []);
+  loadYield();
+}, []);
 
   /* ------------------ FETCH BEST YIELD DISTRICTS (via FastAPI) ------------------ */
-  useEffect(() => {
-    const fetchBestYieldDistricts = async () => {
-      try {
-        const res = await fetch("http://127.0.0.1:8000/best-districts");
-        const data = await res.json();
-        setBestYieldDistricts(data || []);
-      } catch (e) {
-        console.error("Failed to fetch best districts", e);
-      }
-    };
+useEffect(() => {
+  const loadBestDistricts = async () => {
+    try {
+      const data = await fetchBestDistricts();
+      setBestDistricts(data);
+    } catch (err) {
+      console.error("Failed to load best districts:", err);
+    }
+  };
 
-    fetchBestYieldDistricts();
-  }, []);
+  loadBestDistricts();
+}, []);
 
   /* ------------------ FETCH OUTBREAKS (via FastAPI) ------------------ */
-  useEffect(() => {
-    const fetchOutbreaks = async () => {
-      try {
-        const res = await fetch("http://127.0.0.1:8000/outbreaks");
-        const data = await res.json();
-        setOutbreaks(data || []);
-      } catch (e) {
-        console.error("Failed to fetch outbreaks", e);
-      }
-    };
+useEffect(() => {
+  const loadOutbreaks = async () => {
+    try {
+      const data = await fetchOutbreaks();
+      setOutbreaks(data);
+    } catch (err) {
+      console.error("Failed to load outbreaks:", err);
+    }
+  };
 
-    fetchOutbreaks();
-  }, []);
+  loadOutbreaks();
+}, []);
 
   /* ------------------ FETCH NATIONAL NDVI TREND (via FastAPI) ------------------ */
-  useEffect(() => {
-    const fetchNdviTrend = async () => {
-      try {
-        const res = await fetch("http://127.0.0.1:8000/ndvi-trend");
-        const data = await res.json();
-        setNdviTrend(data || []);
-      } catch (e) {
-        console.error("Failed to fetch NDVI trend", e);
-      }
-    };
+useEffect(() => {
+  const loadNDVI = async () => {
+    try {
+      const data = await fetchNDVITrend();
+      setNdvi(data);
+    } catch (err) {
+      console.error("Failed to load NDVI trend:", err);
+    }
+  };
 
-    fetchNdviTrend();
-  }, []);
+  loadNDVI();
+}, []);
 
   /* ------------------ FETCH DISTRICT HEALTH OVERVIEW (via FastAPI) ------------------ */
-  useEffect(() => {
-    const fetchDistrictHealth = async () => {
-      try {
-        const res = await fetch("http://127.0.0.1:8000/district-health");
-        const data = await res.json();
-        setDistrictHealth(data || []);
-      } catch (e) {
-        console.error("Failed to fetch district health", e);
-      }
-    };
+useEffect(() => {
+  const loadDistrictHealth = async () => {
+    try {
+      const data = await fetchDistrictHealth();
+      setDistrictHealth(data);
+    } catch (err) {
+      console.error("Failed to load district health:", err);
+    }
+  };
 
-    fetchDistrictHealth();
-  }, []);
+  loadDistrictHealth();
+}, []);
 
   const formatMT = (value) => {
     if (!value) return "-";
