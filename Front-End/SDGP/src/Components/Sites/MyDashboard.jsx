@@ -87,7 +87,7 @@ useEffect(() => {
   const loadHealth = async () => {
     try {
       const data = await fetchHealthSummary();
-      setHealth(data);
+      setHealthSummary(data);
     } catch (err) {
       console.error("Failed to load health summary:", err);
     }
@@ -101,7 +101,7 @@ useEffect(() => {
   const loadYield = async () => {
     try {
       const data = await fetchYield();
-      setYield(data);
+      setYieldForecast(data);
     } catch (err) {
       console.error("Failed to load yield:", err);
     }
@@ -115,7 +115,7 @@ useEffect(() => {
   const loadBestDistricts = async () => {
     try {
       const data = await fetchBestDistricts();
-      setBestDistricts(data);
+      setBestYieldDistricts(data);
     } catch (err) {
       console.error("Failed to load best districts:", err);
     }
@@ -123,7 +123,6 @@ useEffect(() => {
 
   loadBestDistricts();
 }, []);
-
   /* ------------------ FETCH OUTBREAKS (via FastAPI) ------------------ */
 useEffect(() => {
   const loadOutbreaks = async () => {
@@ -143,7 +142,7 @@ useEffect(() => {
   const loadNDVI = async () => {
     try {
       const data = await fetchNDVITrend();
-      setNdvi(data);
+      setNdviTrend(data);
     } catch (err) {
       console.error("Failed to load NDVI trend:", err);
     }
