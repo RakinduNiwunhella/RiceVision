@@ -1,85 +1,224 @@
-# Automation/gee_pipeline/runner.py
-
 import ee
-import calendar
-import time
+from datetime import datetime
+from Automation.utils.task_monitor import wait_for_task
+from Automation.utils.ee_downloader import download_ee_csv
 from .auth import initialize_gee
 
 
-def run_weekly_exports(years, roi_asset, district_name):
+def run_national_10_timesteps():
 
     initialize_gee()
 
-    roi = ee.FeatureCollection(roi_asset)
-    print("Total polygons:", roi.size().getInfo())
+    run_id = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+    grid_scale = 500
 
-    for year in years:
-        print("\n==============================")
-        print(f"Processing Year: {year}")
-        print("==============================")
+    print("\n==============================")
+    print("NATIONAL 10-TIMESTEP CSV PIPELINE")
+    print("Run ID:", run_id)
+    print("==============================\n")
 
-        base_images = (
-            ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
-            .filterBounds(roi)
-            .filterDate(f"{year}-01-01", f"{year}-12-31")
-            .filter(ee.Filter.lt("CLOUDY_PIXEL_PERCENTAGE", 50))
+    # -----------------------------------------
+    # Sri Lanka Boundary
+    # -----------------------------------------
+    country = (
+        ee.FeatureCollection("FAO/GAUL/2015/level0")
+        .filter(ee.Filter.eq("ADM0_NAME", "Sri Lanka"))
+    )
+
+    region = country.geometry()
+
+    # -----------------------------------------
+    # Sentinel-2 Collection
+    # -----------------------------------------
+    s2 = (
+        ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
+        .filterBounds(region)
+        .filter(ee.Filter.lt("CLOUDY_PIXEL_PERCENTAGE", 20))
+        .sort("system:time_start", False)
+        .limit(10)
+    )
+
+    image_list = s2.toList(10)
+
+    dem = ee.Image("USGS/SRTMGL1_003")
+
+    terrain = ee.Image([
+        dem.rename("elevation"),
+        ee.Terrain.slope(dem).rename("slope")
+    ])
+
+    chirps = ee.ImageCollection("UCSB-CHG/CHIRPS/DAILY")
+    era5 = ee.ImageCollection("ECMWF/ERA5_LAND/HOURLY")
+
+    for i in range(10):
+
+        print(f"Processing timestep {i+1}/10")
+
+        img = ee.Image(image_list.get(i))
+        date_start = ee.Date(img.get("system:time_start"))
+        date_str = date_start.format("YYYY-MM-dd")
+
+        # -----------------------------------------
+        # Sentinel-2 Bands
+        # -----------------------------------------
+        base = img.select([
+            "B1","B2","B3","B4","B5","B6",
+            "B7","B8","B8A","B9","B11","B12","SCL"
+        ])
+
+        # -----------------------------------------
+        # Safe Rainfall
+        # -----------------------------------------
+        def safe_rain(days):
+            rain_coll = chirps.filterDate(
+                date_start.advance(-days, "day"),
+                date_start
+            )
+            return ee.Image(
+                ee.Algorithms.If(
+                    rain_coll.size().gt(0),
+                    rain_coll.sum(),
+                    ee.Image.constant(-9999)
+                )
+            ).rename(f"rain_{days}d")
+
+        rain_stack = ee.Image.cat([
+            safe_rain(1),
+            safe_rain(3),
+            safe_rain(7),
+            safe_rain(14),
+            safe_rain(30)
+        ])
+
+        # -----------------------------------------
+        # Safe Climate (ERA5)
+        # -----------------------------------------
+        era_day = era5.filterDate(
+            date_start,
+            date_start.advance(1, "day")
         )
 
-        for month in range(1, 13):
-
-            last_day = calendar.monthrange(year, month)[1]
-
-            week_ranges = [
-                (1, 7),
-                (8, 14),
-                (15, 21),
-                (22, last_day)
-            ]
-
-            print(f"\n📆 {year}-{month:02d}")
-
-            for w_idx, (start_day, end_day) in enumerate(week_ranges, start=1):
-
-                w_start = ee.Date.fromYMD(year, month, start_day)
-
-                if end_day == last_day:
-                    w_end = ee.Date.fromYMD(year, month, 1).advance(1, "month")
-                else:
-                    w_end = ee.Date.fromYMD(year, month, end_day + 1)
-
-                weekly = base_images.filterDate(w_start, w_end)
-
-                if weekly.size().getInfo() == 0:
-                    print(f"  → Week {w_idx}: no valid image")
-                    continue
-
-                img = ee.Image(weekly.first())
-
-                description = f"{district_name}_{year}_{month:02d}_W{w_idx}"
-
-                print(f"  → Week {w_idx}: submitting export")
-
-                table = img.select(["B4", "B8"]).sample(
-                    region=roi.geometry(),
-                    scale=10,
-                    numPixels=1000,
-                    geometries=True
+        def safe_stat(collection, band, reducer, name):
+            return ee.Image(
+                ee.Algorithms.If(
+                    collection.size().gt(0),
+                    collection.select(band).reduce(reducer),
+                    ee.Image.constant(-9999)
                 )
+            ).rename(name)
 
-                task = ee.batch.Export.table.toDrive(
-                    collection=table,
-                    description=description,
-                    folder="ricevision_exports",   # must be shared
-                    fileNamePrefix=description,
-                    fileFormat="CSV"
-                )
+        tmean = safe_stat(era_day, "temperature_2m",
+                          ee.Reducer.mean(), "tmean").subtract(273.15)
 
-                task.start()
+        tmin = safe_stat(era_day, "temperature_2m",
+                         ee.Reducer.min(), "tmin").subtract(273.15)
 
-                print("     Submitted:", description)
-                print("     Task ID:", task.id)
+        tmax = safe_stat(era_day, "temperature_2m",
+                         ee.Reducer.max(), "tmax").subtract(273.15)
 
-                time.sleep(3)
-                print("     Status:", task.status()["state"])
+        day = era_day.filter(
+            ee.Filter.calendarRange(6, 18, "hour")
+        )
 
-    print("\n✅ ALL EXPORT TASKS SUBMITTED")
+        night = era_day.filter(
+            ee.Filter.Or(
+                ee.Filter.calendarRange(18, 23, "hour"),
+                ee.Filter.calendarRange(0, 6, "hour")
+            )
+        )
+
+        t_day = safe_stat(day, "temperature_2m",
+                          ee.Reducer.mean(), "t_day").subtract(273.15)
+
+        t_night = safe_stat(night, "temperature_2m",
+                            ee.Reducer.mean(), "t_night").subtract(273.15)
+
+        td = safe_stat(era_day, "dewpoint_temperature_2m",
+                       ee.Reducer.mean(), "Td")
+
+        rh_mean = ee.Image(
+            ee.Algorithms.If(
+                era_day.size().gt(0),
+                ee.Image(100).multiply(
+                    td.expression(
+                        "exp((17.625*Td)/(243.04+Td)) / exp((17.625*T)/(243.04+T))",
+                        {"Td": td, "T": tmean}
+                    )
+                ),
+                ee.Image.constant(-9999)
+            )
+        ).rename("rh_mean")
+
+        climate_stack = ee.Image.cat([
+            t_day, t_night, tmax, tmean, tmin, rh_mean
+        ])
+
+        # -----------------------------------------
+        # Final Stack
+        # -----------------------------------------
+        final_stack = (
+            base
+            .addBands(terrain)
+            .addBands(rain_stack)
+            .addBands(climate_stack)
+            .toFloat()
+            .clip(region)
+        )
+
+        # -----------------------------------------
+        # Sample to Table
+        # -----------------------------------------
+        points = final_stack.sample(
+            region=region,
+            scale=grid_scale,
+            geometries=True
+        )
+
+        points = points.map(lambda f: f.set({
+            "cloud_pct": img.get("CLOUDY_PIXEL_PERCENTAGE"),
+            "date": date_str,
+            "lat": f.geometry().coordinates().get(1),
+            "lon": f.geometry().coordinates().get(0)
+        }))
+
+        # -----------------------------------------
+        # Column Order
+        # -----------------------------------------
+        columns = [
+            "system:index",
+            "B1","B11","B12","B2","B3","B4","B5","B6",
+            "B7","B8","B8A","B9",
+            "SCL",
+            "cloud_pct",
+            "date",
+            "elevation",
+            "lat","lon",
+            "rain_14d","rain_1d","rain_30d","rain_3d","rain_7d",
+            "rh_mean",
+            "slope",
+            "t_day","t_night","tmax","tmean","tmin",
+            ".geo"
+        ]
+
+        points = points.select(columns)
+
+        export_name = f"national_csv_t{i+1}_{run_id}"
+        asset_id = f"projects/ricevision-487310/assets/national_exports/{export_name}"
+
+        task = ee.batch.Export.table.toAsset(
+            collection=points,
+            description=export_name,
+            assetId=asset_id
+        )
+
+        task.start()
+        wait_for_task(task)
+
+        table = ee.FeatureCollection(asset_id)
+        url = table.getDownloadURL(filetype="CSV")
+        output_path = f"downloads/{export_name}.csv"
+        download_ee_csv(url, output_path)
+
+        print("-----------------------------------")
+
+    print("\nAll 10 timesteps completed successfully.\n")
