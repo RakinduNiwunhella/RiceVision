@@ -8,6 +8,9 @@ import {
 } from "@heroicons/react/24/outline";
 import { supabase } from "../../supabaseClient";
 
+// Define your FastAPI base URL
+const BASE_URL = "http://127.0.0.1:8000/api";
+
 const Help = () => {
   const [form, setForm] = useState({
     full_name: "",
@@ -25,19 +28,20 @@ const Help = () => {
   const [faqLoading, setFaqLoading] = useState(true);
   const [openFaq, setOpenFaq] = useState(null);
 
-  // Fetch FAQs from DB
+  // Fetch FAQs from FastAPI Backend
   useEffect(() => {
     const fetchFaqs = async () => {
-      const { data, error } = await supabase
-        .from("faq")
-        .select("id, question, answer")
-        .order("created_at", { ascending: true });
-
-      if (!error) {
+      try {
+        const response = await fetch(`${BASE_URL}/help/faqs`);
+        if (!response.ok) throw new Error("Failed to fetch FAQs");
+        
+        const data = await response.json();
         setFaqs(data || []);
+      } catch (error) {
+        console.error("Error fetching FAQs:", error);
+      } finally {
+        setFaqLoading(false);
       }
-
-      setFaqLoading(false);
     };
 
     fetchFaqs();
@@ -55,9 +59,8 @@ const Help = () => {
 
     setLoading(true);
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    // Get the user ID from Supabase Auth for the payload
+    const { data: { user } } = await supabase.auth.getUser();
 
     const payload = {
       user_id: user?.id || null,
@@ -70,26 +73,41 @@ const Help = () => {
       is_anonymous: !user,
     };
 
-    const { error } = await supabase.from("complains").insert([payload]);
-
-    setLoading(false);
-
-    if (error) {
-      alert(error.message);
-    } else {
-      alert(
-        user
-          ? "Complaint submitted successfully"
-          : "Complaint submitted anonymously"
-      );
-      setForm({
-        full_name: "",
-        position: "",
-        province: "",
-        district: "",
-        complaint_type: "",
-        message: "",
+    try {
+      // Send the request to your FastAPI backend
+      const response = await fetch(`${BASE_URL}/help/complaints`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
       });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert(
+          user
+            ? "Complaint submitted successfully"
+            : "Complaint submitted anonymously"
+        );
+        // Clear form
+        setForm({
+          full_name: "",
+          position: "",
+          province: "",
+          district: "",
+          complaint_type: "",
+          message: "",
+        });
+      } else {
+        // Handle backend errors (like the user_id constraint)
+        alert(`Error: ${result.detail || "Something went wrong"}`);
+      }
+    } catch (error) {
+      alert("Network error: Could not connect to the server.");
+    } finally {
+      setLoading(false);
     }
   };
 
