@@ -1,5 +1,4 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { supabase } from "../../supabaseClient";
 
 const tabOptions = ["Open", "Resolved", "Denied", "All"];
 
@@ -20,28 +19,13 @@ const Alerts = () => {
 
   useEffect(() => {
     const fetchAlerts = async () => {
-      const { data, error } = await supabase
-        .from("alerts_overview_view")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        console.error("Alerts fetch error:", error);
-        return;
+      try {
+        const res = await fetch("http://localhost:8000/api/alerts/all");
+        const data = await res.json();
+        setAlerts(data);
+      } catch (err) {
+        console.error("Error fetching alerts from backend:", err);
       }
-
-      // Map DB → existing UI shape
-      setAlerts(
-        data.map((a) => ({
-          id: a.id,
-          title: a.title,
-          description: a.description,
-          status: a.status, // always "Open" (Option A)
-          priority: a.priority,
-          field: a.district, // reuse field label as district
-          timestamp: a.created_at,
-        })),
-      );
     };
 
     fetchAlerts();
@@ -120,8 +104,8 @@ const Alerts = () => {
                 alert.status === "Open"
                   ? "border-red-500"
                   : alert.status === "Resolved"
-                    ? "border-emerald-500"
-                    : "border-gray-500"
+                  ? "border-emerald-500"
+                  : "border-gray-500"
               }`}
             >
               <h2 className="text-xl font-bold text-slate-900 dark:text-white">
