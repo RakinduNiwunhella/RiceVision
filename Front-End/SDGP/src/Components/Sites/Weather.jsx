@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { fetchWeather } from "../../api/api";
 
 const RiceVisionWeather = () => {
   const [weather, setWeather] = useState(null);
@@ -11,10 +12,7 @@ const RiceVisionWeather = () => {
     try {
       setLoading(true);
       setError(null);
-      const url = "http://127.0.0.1:8000/api/weather";
-      const response = await fetch(url);
-      if (!response.ok) throw new Error("Connection failed.");
-      const data = await response.json();
+      const data = await fetchWeather();
       setWeather(data);
     } catch (err) {
       setError(err.message);
