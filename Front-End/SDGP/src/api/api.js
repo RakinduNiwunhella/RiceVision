@@ -14,3 +14,4 @@ export const fetchBestDistricts = () => get("/best-districts");
 export const fetchOutbreaks = () => get("/outbreaks");
 export const fetchNDVITrend = () => get("/ndvi-trend");
 export const fetchDistrictHealth = () => get("/district-health");
+export const fetchReportData = (districts, month) => get(`/api/report-data?districts=${districts}&month=${month}`);
