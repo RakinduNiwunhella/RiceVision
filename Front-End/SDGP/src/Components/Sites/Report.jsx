@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { CSVLink } from "react-csv";
+import { fetchReportData } from "../../api/api";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -27,6 +28,7 @@ ChartJS.register(
   Tooltip,
   Legend,
 );
+
 
 const monthsList = [
   { label: "January", value: 1 },
@@ -109,16 +111,7 @@ const ReportPage = () => {
           ? [district1, district2]
           : [district1];
 
-      const response = await fetch(
-        `http://localhost:8000/api/report-data?districts=${districts.join(",")}&month=${month}`
-      );
-
-      const data = await response.json();
-
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
+      const data = await fetchReportData(districts.join(","), month);
       setReports(data);
     } catch (err) {
       console.error("Error fetching report data:", err);
