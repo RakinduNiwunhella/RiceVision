@@ -6,10 +6,7 @@ import {
   ExclamationTriangleIcon,
   ChevronDownIcon,
 } from "@heroicons/react/24/outline";
-import { supabase } from "../../supabaseClient";
-
-// Define your FastAPI base URL
-const BASE_URL = "http://127.0.0.1:8000/api";
+import { fetchFaqs, submitComplaint } from "../../api/api";
 
 const Help = () => {
   const [form, setForm] = useState({
@@ -28,23 +25,19 @@ const Help = () => {
   const [faqLoading, setFaqLoading] = useState(true);
   const [openFaq, setOpenFaq] = useState(null);
 
-  // Fetch FAQs from FastAPI Backend
+  // Fetch FAQs from DB
   useEffect(() => {
-    const fetchFaqs = async () => {
+    const loadFaqs = async () => {
       try {
-        const response = await fetch(`${BASE_URL}/help/faqs`);
-        if (!response.ok) throw new Error("Failed to fetch FAQs");
-        
-        const data = await response.json();
+        const data = await fetchFaqs();
         setFaqs(data || []);
-      } catch (error) {
-        console.error("Error fetching FAQs:", error);
-      } finally {
-        setFaqLoading(false);
+      } catch (err) {
+        console.error("Failed to load FAQs:", err);
       }
+      setFaqLoading(false);
     };
 
-    fetchFaqs();
+    loadFaqs();
   }, []);
 
   const handleChange = (e) => {
@@ -59,55 +52,36 @@ const Help = () => {
 
     setLoading(true);
 
-    // Get the user ID from Supabase Auth for the payload
-    const { data: { user } } = await supabase.auth.getUser();
-
     const payload = {
-      user_id: user?.id || null,
       full_name: form.full_name,
       position: form.position || null,
       province: form.province || null,
       district: form.district || null,
       complaint_type: form.complaint_type,
       message: form.message,
-      is_anonymous: !user,
     };
 
+    let error = null;
     try {
-      // Send the request to your FastAPI backend
-      const response = await fetch(`${BASE_URL}/help/complaints`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
+      await submitComplaint(payload);
+    } catch (err) {
+      error = err;
+    }
+
+    setLoading(false);
+
+    if (error) {
+      alert(error.message || String(error));
+    } else {
+      alert("Complaint submitted successfully");
+      setForm({
+        full_name: "",
+        position: "",
+        province: "",
+        district: "",
+        complaint_type: "",
+        message: "",
       });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        alert(
-          user
-            ? "Complaint submitted successfully"
-            : "Complaint submitted anonymously"
-        );
-        // Clear form
-        setForm({
-          full_name: "",
-          position: "",
-          province: "",
-          district: "",
-          complaint_type: "",
-          message: "",
-        });
-      } else {
-        // Handle backend errors (like the user_id constraint)
-        alert(`Error: ${result.detail || "Something went wrong"}`);
-      }
-    } catch (error) {
-      alert("Network error: Could not connect to the server.");
-    } finally {
-      setLoading(false);
     }
   };
 

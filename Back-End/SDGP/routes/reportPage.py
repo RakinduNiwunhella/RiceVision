@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Query
 from typing import List
-from db import supabase
+from ..db import supabase
 
 router = APIRouter()
 
