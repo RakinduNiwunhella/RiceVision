@@ -6,7 +6,7 @@ import {
   ExclamationTriangleIcon,
   ChevronDownIcon,
 } from "@heroicons/react/24/outline";
-import { supabase } from "../../supabaseClient";
+import { fetchFaqs, submitComplaint } from "../../api/api";
 
 const Help = () => {
   const [form, setForm] = useState({
@@ -27,20 +27,17 @@ const Help = () => {
 
   // Fetch FAQs from DB
   useEffect(() => {
-    const fetchFaqs = async () => {
-      const { data, error } = await supabase
-        .from("faq")
-        .select("id, question, answer")
-        .order("created_at", { ascending: true });
-
-      if (!error) {
+    const loadFaqs = async () => {
+      try {
+        const data = await fetchFaqs();
         setFaqs(data || []);
+      } catch (err) {
+        console.error("Failed to load FAQs:", err);
       }
-
       setFaqLoading(false);
     };
 
-    fetchFaqs();
+    loadFaqs();
   }, []);
 
   const handleChange = (e) => {
@@ -55,33 +52,28 @@ const Help = () => {
 
     setLoading(true);
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
     const payload = {
-      user_id: user?.id || null,
       full_name: form.full_name,
       position: form.position || null,
       province: form.province || null,
       district: form.district || null,
       complaint_type: form.complaint_type,
       message: form.message,
-      is_anonymous: !user,
     };
 
-    const { error } = await supabase.from("complains").insert([payload]);
+    let error = null;
+    try {
+      await submitComplaint(payload);
+    } catch (err) {
+      error = err;
+    }
 
     setLoading(false);
 
     if (error) {
-      alert(error.message);
+      alert(error.message || String(error));
     } else {
-      alert(
-        user
-          ? "Complaint submitted successfully"
-          : "Complaint submitted anonymously"
-      );
+      alert("Complaint submitted successfully");
       setForm({
         full_name: "",
         position: "",
