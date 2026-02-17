@@ -1,83 +1,71 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Header
 from pydantic import BaseModel
 from typing import Optional
 from db import supabase
 
-router = APIRouter(prefix="/profile", tags=["Profile"])
+router = APIRouter()
 
+# ------------------ Helper ------------------
+def get_current_user(authorization: Optional[str] = Header(None)):
+    if not authorization:
+        raise HTTPException(status_code=401, detail="Authorization header missing")
+    
+    token = authorization.replace("Bearer ", "")
+    user_response = supabase.auth.get_user(token)
+    user = user_response.user
+    
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+    
+    return user
+
+# ------------------ Models ------------------
 class ProfileUpdate(BaseModel):
-    full_name: str
-    email: str
+    firstName: str
+    lastName: str
     phone: Optional[str] = None
+    nic: Optional[str] = None
     district: Optional[str] = None
+    address: Optional[str] = None
+    avatarUrl: Optional[str] = None
 
-# -----------------------------
-# 1️⃣ Get User Profile
-# -----------------------------
-@router.get("/{user_id}")
-async def get_profile(user_id: str):
-    try:
-        response = (
-            supabase
-            .table("profiles")
-            .select("*")
-            .eq("id", user_id)
-            .single()
-            .execute()
-        )
+# ------------------ Endpoints ------------------
+@router.get("/profile")
+def fetch_profile(user=Depends(get_current_user)):
+    user_metadata = user.user_metadata or {}
+    full_name = user_metadata.get("full_name", "")
+    name_parts = full_name.split(" ", 1)
 
-        if not response.data:
-            raise HTTPException(status_code=404, detail="Profile not found")
+    return {
+        "firstName": name_parts[0] if name_parts else "",
+        "lastName": name_parts[1] if len(name_parts) > 1 else "",
+        "email": user.email,
+        "phone": user_metadata.get("phone", ""),
+        "nic": user_metadata.get("nic", ""),
+        "district": user_metadata.get("district", ""),
+        "address": user_metadata.get("address", ""),
+        "avatarUrl": user_metadata.get("avatar_url", "")
+    }
 
-        return response.data
+@router.put("/profile")
+def update_profile(data: ProfileUpdate, user=Depends(get_current_user)):
+    full_name = f"{data.firstName} {data.lastName}".strip()
+    update_data = {
+        "full_name": full_name,
+        "phone": data.phone,
+        "nic": data.nic,
+        "district": data.district,
+        "address": data.address,
+        "avatar_url": data.avatarUrl
+    }
+    update_data = {k: v for k, v in update_data.items() if v is not None}
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    response = supabase.auth.update_user({
+        "id": user.id,
+        "data": update_data
+    })
 
-
-# -----------------------------
-# 2️⃣ Update User Profile
-# -----------------------------
-@router.put("/{user_id}")
-async def update_profile(user_id: str, profile: ProfileUpdate):
-    try:
-        response = (
-            supabase
-            .table("profiles")
-            .update(profile.dict())
-            .eq("id", user_id)
-            .execute()
-        )
-
-        if not response.data:
-            raise HTTPException(status_code=404, detail="Profile not found or not updated")
-
-        return {
-            "message": "Profile updated successfully",
-            "data": response.data
-        }
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-# -----------------------------
-# 3️⃣ Create Profile (Optional)
-# -----------------------------
-@router.post("/")
-async def create_profile(profile: ProfileUpdate):
-    try:
-        response = (
-            supabase
-            .table("profiles")
-            .insert(profile.dict())
-            .execute()
-        )
-
-        return {
-            "message": "Profile created successfully",
-            "data": response.data
-        }
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    if response.error:
+        raise HTTPException(status_code=400, detail=response.error.message)
+    
+    return {"message": "Profile updated successfully"}
