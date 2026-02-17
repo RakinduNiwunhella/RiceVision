@@ -42,11 +42,11 @@ export default function RiceMap({ filters, layers }) {
 
   const mapRef = useRef(null);
 
-  const selectedDistrict = filters.districts[0];
   const selectedHealth = filters.health;
 
   /* ---------- LOAD PADDY EXTENT ---------- */
   useEffect(() => {
+    const selectedDistrict = filters.districts[0];
     if (!selectedDistrict || !layers.paddyExtent) {
       setPaddyGeo(null);
       return;
@@ -59,10 +59,11 @@ export default function RiceMap({ filters, layers }) {
       })
       .then(setPaddyGeo)
       .catch(console.error);
-  }, [selectedDistrict, layers.paddyExtent]);
+  }, [filters.districts, layers.paddyExtent]);
 
   /* ---------- LOAD DISTRICT BOUNDARY (DYNAMIC) ---------- */
   useEffect(() => {
+    const selectedDistrict = filters.districts[0];
     // Clear old boundary immediately
     setDistrictBoundary(null);
 
@@ -79,7 +80,7 @@ export default function RiceMap({ filters, layers }) {
       })
       .then(setDistrictBoundary)
       .catch(console.error);
-  }, [selectedDistrict]);
+  }, [filters.districts]);
 
   /* ---------- AUTO ZOOM ---------- */
   useEffect(() => {
@@ -89,37 +90,37 @@ export default function RiceMap({ filters, layers }) {
     }
   }, [districtBoundary]);
 
-  /* ---------- FETCH ML POINTS ---------- */
+  /* ---------- FETCH ML POINTS (HEALTH ONLY) ---------- */
   useEffect(() => {
-    if (!selectedDistrict) {
-      setPoints([]);
-      return;
-    }
+    const fetchPoints = async () => {
+      try {
+        const params = new URLSearchParams();
 
-    const fetchAllPoints = async () => {
-      const pageSize = 1000;
-      let from = 0;
-      let allData = [];
+        if (selectedHealth.length > 0) {
+          selectedHealth.forEach((h) => {
+            params.append("health", h);
+          });
+        }
 
-      while (true) {
-        const { data, error } = await supabase
-          .from("final_ml_predictions")
-          .select("lat, lng, paddy_health")
-          .eq("District", selectedDistrict)
-          .neq("paddy_health", "Not Applicable")
-          .range(from, from + pageSize - 1);
+        const response = await fetch(
+          `http://localhost:8000/map-fields?${params.toString()}`
+        );
 
-        if (error || !data || data.length === 0) break;
+        const result = await response.json();
 
-        allData = allData.concat(data);
-        from += pageSize;
+        if (result.status === "success") {
+          setPoints(result.data);
+        } else {
+          setPoints([]);
+        }
+      } catch (err) {
+        console.error("Error fetching ML points:", err);
+        setPoints([]);
       }
-
-      setPoints(allData);
     };
 
-    fetchAllPoints();
-  }, [selectedDistrict]);
+    fetchPoints();
+  }, [selectedHealth]);
 
   /* ---------- HEALTH FILTER ---------- */
   let visiblePoints = points;
@@ -157,13 +158,12 @@ export default function RiceMap({ filters, layers }) {
       )}
 
       {/* Paddy Extent */}
-      {selectedDistrict && layers.paddyExtent && paddyGeo && (
+      {filters.districts[0] && layers.paddyExtent && paddyGeo && (
         <GeoJSON data={paddyGeo} style={paddyStyle} />
       )}
 
       {/* ML Health Points */}
-      {selectedDistrict &&
-        layers.showCircles &&
+      {layers.showCircles &&
         visiblePoints.map((p, idx) => (
           <CircleMarker
             key={idx}
