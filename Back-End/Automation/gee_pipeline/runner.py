@@ -174,17 +174,34 @@ def run_national_10_timesteps():
             geometries=True
         )
 
-        points = points.map(lambda f: f.set({
-            "cloud_pct": img.get("CLOUDY_PIXEL_PERCENTAGE"),
-            "date": date_str,
-            "lat": f.geometry().coordinates().get(1),
-            "lon": f.geometry().coordinates().get(0)
-        }))
+        # -----------------------------------------
+        # Add Pixel ID + Metadata (ONLY NEW ADDITION)
+        # -----------------------------------------
+        def add_metadata(f):
+            coords = f.geometry().coordinates()
+            lon = coords.get(0)
+            lat = coords.get(1)
+
+            lon_r = ee.Number(lon).format('%.6f')
+            lat_r = ee.Number(lat).format('%.6f')
+
+            pixel_id = ee.String(lat_r).cat("_").cat(lon_r)
+
+            return f.set({
+                "pixel_id": pixel_id,
+                "cloud_pct": img.get("CLOUDY_PIXEL_PERCENTAGE"),
+                "date": date_str,
+                "lat": lat,
+                "lon": lon
+            })
+
+        points = points.map(add_metadata)
 
         # -----------------------------------------
         # Column Order
         # -----------------------------------------
         columns = [
+            "pixel_id",
             "system:index",
             "B1","B11","B12","B2","B3","B4","B5","B6",
             "B7","B8","B8A","B9",
