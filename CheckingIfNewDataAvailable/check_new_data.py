@@ -10,12 +10,17 @@ PROJECT_ID = "stable-being-427214-c6"
 BUCKET_NAME = "gee-sentinel-memory-ricevision"
 OBJECT_KEY = "last_date.txt"
 
+# ---- Google Earth Engine Service Account ----
+SERVICE_ACCOUNT = "gee-lambda@stable-being-427214-c6.iam.gserviceaccount.com"
+KEY_FILE = "gee-key.json"  # make sure this file exists in same folder
+
 # ==============================
 # INITIALIZE SERVICES
 # ==============================
 
-# Initialize Earth Engine
-ee.Initialize(project=PROJECT_ID)
+# Initialize Earth Engine using service account (NO browser login needed)
+credentials = ee.ServiceAccountCredentials(SERVICE_ACCOUNT, KEY_FILE)
+ee.Initialize(credentials, project=PROJECT_ID)
 
 # Initialize S3 client
 s3 = boto3.client("s3")
