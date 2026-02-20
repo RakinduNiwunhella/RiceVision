@@ -1,4 +1,4 @@
-#!/Users/rakinduniwunhella/Desktop/IIT Study Meterias/SDGP/GITHUB/CheckingIfNewDataAvailable/gee_env/bin/python3.11
+#!/var/lang/bin/python3.11
 
 import sys
 import json
