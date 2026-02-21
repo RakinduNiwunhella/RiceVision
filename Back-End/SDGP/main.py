@@ -6,6 +6,9 @@ from routes.reportPage import router as report_router
 from routes.mapPage import router as map_router
 from routes.profile import router as profile_router
 from routes.alerts import router as alerts_router  # added alerts router
+from fastapi.middleware.cors import CORSMiddleware
+from routes import alerts
+
 
 app = FastAPI()
 

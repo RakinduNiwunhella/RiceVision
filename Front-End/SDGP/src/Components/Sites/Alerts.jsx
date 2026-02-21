@@ -42,16 +42,30 @@ const Alerts = () => {
     return countObj;
   }, [alerts]);
 
+  const updateStatus = async (id, newStatus) => {
+    try {
+      await fetch(`http://localhost:8000/api/alerts/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      const res = await fetch("http://localhost:8000/api/alerts/all");
+      const data = await res.json();
+      setAlerts(data);
+    } catch (err) {
+      console.error("Error updating alert:", err);
+    }
+  };
+
   const handleResolve = (id) => {
-    setAlerts((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, status: "Resolved" } : a)),
-    );
+    updateStatus(id, "Resolved");
   };
 
   const handleDeny = (id) => {
-    setAlerts((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, status: "Denied" } : a)),
-    );
+    updateStatus(id, "Denied");
   };
 
   const formatTimestamp = (iso) => new Date(iso).toLocaleString();

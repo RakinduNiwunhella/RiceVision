@@ -14,6 +14,7 @@ HEALTH_MAP = {
 @router.get("/map-fields")
 async def get_map_fields(
     health: Optional[List[str]] = Query(None),
+    districts: Optional[List[str]] = Query(None),
 ):
     try:
         # Query correct ML table
@@ -23,6 +24,10 @@ async def get_map_fields(
 
         # Always remove Not Applicable
         query = query.neq("paddy_health", "Not Applicable")
+
+        # Filter by district (from frontend)
+        if districts:
+            query = query.in_("District", districts)
 
         # Filter by health (convert UI → DB values)
         if health:
