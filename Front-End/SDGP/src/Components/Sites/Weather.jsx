@@ -5,15 +5,13 @@ const RiceVisionWeather = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const LAT = 6.9271; 
-  const LON = 79.8612;
 
 
   const fetchAgroWeather = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,precipitation,cloud_cover&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max&past_days=7&timezone=auto`;
+      const url = "http://127.0.0.1:8000/api/weather";
       const response = await fetch(url);
       if (!response.ok) throw new Error("Connection failed.");
       const data = await response.json();
@@ -23,7 +21,7 @@ const RiceVisionWeather = () => {
     } finally {
       setLoading(false);
     }
-  }, [LAT, LON]);
+  }, []);
 
   useEffect(() => { fetchAgroWeather(); }, [fetchAgroWeather]);
 
