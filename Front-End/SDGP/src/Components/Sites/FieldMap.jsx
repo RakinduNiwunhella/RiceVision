@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import FiltersPanel from "../Map/FiltersPanel";
 import MapLayersPanel from "../Map/MapLayersPanel";
 import RiceMap from "../Map/RiceMap";

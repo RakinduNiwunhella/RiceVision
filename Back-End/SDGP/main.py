@@ -21,6 +21,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Include all routers
 app.include_router(yield_router)
 app.include_router(field_data_router)
 app.include_router(report_router, prefix="/api")

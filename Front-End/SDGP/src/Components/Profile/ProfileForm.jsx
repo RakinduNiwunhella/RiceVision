@@ -16,6 +16,7 @@ export default function ProfileForm() {
         avatarUrl: ''
     });
 
+    // ------------------- Fetch profile from FastAPI -------------------
     useEffect(() => {
         getProfile();
     }, []);
@@ -23,57 +24,75 @@ export default function ProfileForm() {
     async function getProfile() {
         try {
             setLoading(true);
-            const { data: { user } } = await supabase.auth.getUser();
 
-            if (user) {
-                const fullName = user.user_metadata?.full_name || '';
-                const nameParts = fullName.split(' ');
-                
-                setFormData({
-                    firstName: nameParts[0] || '',
-                    lastName: nameParts.slice(1).join(' ') || '',
-                    email: user.email || '',
-                    phone: user.user_metadata?.phone || '',
-                    nic: user.user_metadata?.nic || '',
-                    district: user.user_metadata?.district || '',
-                    address: user.user_metadata?.address || '',
-                    avatarUrl: user.user_metadata?.avatar_url || ''
-                });
-            }
+            // Get Supabase access token
+            const session = await supabase.auth.getSession();
+            const token = session.data.session?.access_token;
+            if (!token) throw new Error("User not logged in");
+
+            const res = await fetch("http://localhost:8000/api/user/profile", {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            if (!res.ok) throw new Error("Failed to fetch profile");
+            const data = await res.json();
+            setFormData({
+                firstName: data.firstName || '',
+                lastName: data.lastName || '',
+                email: data.email || '',
+                phone: data.phone || '',
+                nic: data.nic || '',
+                district: data.district || '',
+                address: data.address || '',
+                avatarUrl: data.avatarUrl || ''
+            });
         } catch (error) {
-            console.error('Error loading user data:', error.message);
+            console.error("Error loading user data:", error.message);
         } finally {
             setLoading(false);
         }
     }
 
+    // ------------------- Upload avatar -------------------
     const uploadAvatar = async (event) => {
         try {
             setUploading(true);
             if (!event.target.files || event.target.files.length === 0) {
-                throw new Error('You must select an image to upload.');
+                throw new Error("You must select an image to upload.");
             }
-            const { data: { user } } = await supabase.auth.getUser();
+
             const file = event.target.files[0];
             const fileExt = file.name.split('.').pop();
+
+            // Get current user from Supabase to create file path
+            const { data: { user } } = await supabase.auth.getUser();
             const filePath = `${user.id}/${Math.random()}.${fileExt}`;
 
             const { error: uploadError } = await supabase.storage
                 .from('avatars')
                 .upload(filePath, file);
-
             if (uploadError) throw uploadError;
 
             const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
             const publicUrl = data.publicUrl;
 
-            const { error: updateError } = await supabase.auth.updateUser({
-                data: { avatar_url: publicUrl }
+            // Update profile via FastAPI
+            const session = await supabase.auth.getSession();
+            const token = session.data.session?.access_token;
+
+            const updateRes = await fetch("http://localhost:8000/api/user/profile", {
+                method: "PUT",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ ...formData, avatarUrl: publicUrl })
             });
 
-            if (updateError) throw updateError;
+            if (!updateRes.ok) throw new Error("Failed to update avatar");
+
             setFormData(prev => ({ ...prev, avatarUrl: publicUrl }));
-            alert('Profile photo updated successfully!');
+            alert("Profile photo updated successfully!");
         } catch (error) {
             alert(`Upload failed: ${error.message}`);
         } finally {
@@ -81,28 +100,38 @@ export default function ProfileForm() {
         }
     };
 
+    // ------------------- Update profile -------------------
     const handleUpdate = async (e) => {
         e.preventDefault();
         setLoading(true);
-        const { error } = await supabase.auth.updateUser({
-            data: { 
-                full_name: `${formData.firstName} ${formData.lastName}`,
-                phone: formData.phone,
-                nic: formData.nic,
-                district: formData.district,
-                address: formData.address,
-                avatar_url: formData.avatarUrl 
-            }
-        });
 
-        if (error) {
+        try {
+            const session = await supabase.auth.getSession();
+            const token = session.data.session?.access_token;
+
+            const res = await fetch("http://localhost:8000/api/user/profile", {
+                method: "PUT",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(formData)
+            });
+
+            if (!res.ok) {
+                const errData = await res.json();
+                throw new Error(errData.detail || "Failed to update profile");
+            }
+
+            alert("Profile updated successfully!");
+        } catch (error) {
             alert(error.message);
-        } else {
-            alert('Profile updated successfully!');
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
+    // ------------------- Loading state -------------------
     if (loading && !formData.email) {
         return (
             <div className="flex items-center justify-center min-h-screen bg-slate-50 dark:bg-slate-950">
@@ -111,6 +140,7 @@ export default function ProfileForm() {
         );
     }
 
+    // ------------------- Render -------------------
     return (
         <div className="font-sans transition-colors duration-300">
             <div className="max-w-4xl mx-auto">
@@ -144,7 +174,6 @@ export default function ProfileForm() {
 
                 <form onSubmit={handleUpdate} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Input Component Wrapper for easier reading */}
                         {[
                             { label: 'First Name', key: 'firstName', type: 'text', placeholder: 'Enter your first name' },
                             { label: 'Last Name', key: 'lastName', type: 'text', placeholder: 'Enter your last name' },

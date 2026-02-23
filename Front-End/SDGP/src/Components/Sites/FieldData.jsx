@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { supabase } from "../../supabaseClient"; // adjust path if needed
 
 const healthColor = (health) => {
   switch (health) {
@@ -22,30 +23,40 @@ const FieldData = () => {
     const fetchData = async () => {
       setLoading(true);
 
-      try {
-        // 1️⃣ Fetch summary stats from FastAPI
-        const summaryRes = await fetch("http://127.0.0.1:8000/field-data/summary");
-        if (!summaryRes.ok) throw new Error("Failed to fetch summary");
-        const summary = await summaryRes.json();
+      // 1️⃣ Fetch summary stats
+      const { data: summary, error: summaryError } = await supabase
+        .from("field_summary_view")
+        .select("*")
+        .single();
 
-        setStats([
-          { label: "Total Fields", value: summary.total_fields },
-          { label: "Healthy Fields", value: summary.healthy_fields },
-          { label: "Stressed Fields", value: summary.stressed_fields },
-          { label: "Critical Alerts", value: summary.critical_alerts },
-        ]);
-
-        // 2️⃣ Fetch district table data from FastAPI
-        const districtRes = await fetch("http://127.0.0.1:8000/field-data/districts");
-        if (!districtRes.ok) throw new Error("Failed to fetch districts");
-        const districts = await districtRes.json();
-
-        setDistrictData(districts);
-      } catch (error) {
-        console.error("API Error:", error);
-      } finally {
+      if (summaryError) {
+        console.error("Summary error:", summaryError);
         setLoading(false);
+        return;
       }
+
+      setStats([
+        { label: "Total Fields", value: summary.total_fields },
+        { label: "Healthy Fields", value: summary.healthy_fields },
+        { label: "Stressed Fields", value: summary.stressed_fields },
+        { label: "Critical Alerts", value: summary.critical_alerts },
+      ]);
+
+      // 2️⃣ Fetch table data
+      const { data: districts, error: districtError } = await supabase
+        .from("district_health_summary")
+        .select("*")
+        .order("total_yield_tons", { ascending: false });
+
+      if (districtError) {
+        console.error("District error:", districtError);
+        setLoading(false);
+        return;
+      }
+
+      setDistrictData(districts);
+
+      setLoading(false);
     };
 
     fetchData();
