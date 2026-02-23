@@ -24,6 +24,3 @@ yarn-error.log*
 # CSV / data files (keep if intentional)
 GeoData/kurunegala_supabase_final.csv
 *.csv
-
-CheckingIfNewDataAvailable/gee-key.json
-CheckingIfNewDataAvailable/lambda/gee_auth.json
