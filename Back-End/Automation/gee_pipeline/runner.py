@@ -4,7 +4,7 @@ from datetime import datetime
 from Automation.gee_pipeline.auth import initialize_gee
 from Automation.utils.task_monitor import wait_for_task
 
-# Initialize GEE using your custom authentication module
+# Initialize GEE using your authentication module
 initialize_gee()
 
 def run_national_inference_pipeline():
