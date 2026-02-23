@@ -128,8 +128,7 @@ def run_national_inference_pipeline():
 
     print("\n🏁 All 10 timesteps exported successfully to GCS.\n")
 
-def run_national_10_timesteps():
-    return run_national_inference_pipeline()
+
 
 if __name__ == "__main__":
     run_national_inference_pipeline()
