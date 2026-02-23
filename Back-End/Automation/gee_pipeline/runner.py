@@ -4,7 +4,7 @@ from datetime import datetime
 from Automation.gee_pipeline.auth import initialize_gee
 from Automation.utils.task_monitor import wait_for_task
 
-# Initialize GEE using your authentication module
+# Initialize GEE using your custom authentication module
 initialize_gee()
 
 def run_national_inference_pipeline():
@@ -128,7 +128,8 @@ def run_national_inference_pipeline():
 
     print("\n🏁 All 10 timesteps exported successfully to GCS.\n")
 
-
+def run_national_10_timesteps():
+    return run_national_inference_pipeline()
 
 if __name__ == "__main__":
     run_national_inference_pipeline()
