@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Optional
-from db import supabase  # Ensure this points to your Supabase client
+from ..db import supabase  # Ensure this points to your Supabase client
 
 # Define the router with the /help prefix
 router = APIRouter(prefix="/help", tags=["Help"])
