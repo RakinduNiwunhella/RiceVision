@@ -20,22 +20,27 @@ def run_national_inference_pipeline():
     # Points: Your fixed 5000 paddy points asset
     points_asset = ee.FeatureCollection("projects/ricevision-487918/assets/fixed_5000_paddy_points_sl_2")
 
-    # ===================== 2. UNIQUE PIXEL ID ASSIGNMENT ===================== #
-    # Uses a hard limit of 5000 for the list to ensure server stability
-    pts_list = points_asset.toList(5000)
-    
-    def assign_id(idx):
-        idx = ee.Number(idx)
-        f = ee.Feature(pts_list.get(idx))
-        coords = f.geometry().coordinates()
-        return f.set({
-            "pixel_id": idx.toInt(),
-            "lat": coords.get(1),
-            "lon": coords.get(0)
+    # ===================== 2. FIXED SEEDED 500m GRID (TIME-SERIES SAFE) ===================== #
+    # Generate 5000 spatial points ONCE and reuse across all timesteps
+    base_points = (
+        ee.Image.random(1234)  # Seed ensures reproducibility
+        .multiply(1e9)
+        .toInt()
+        .sample(
+            region=roi,
+            scale=grid_scale,
+            numPixels=5000,
+            geometries=True
+        )
+    )
+
+    # Attach stable pixel_id, lat, lon
+    indexed_points = base_points.map(
+        lambda f: f.set({
+            "pixel_id": ee.Number.parse(f.id()),
+            "lat": f.geometry().coordinates().get(1),
+            "lon": f.geometry().coordinates().get(0)
         })
-    
-    indexed_points = ee.FeatureCollection(
-        ee.List.sequence(0, 4999).map(assign_id)
     )
 
     # ===================== 3. BASE DATASETS ===================== #
@@ -88,12 +93,16 @@ def run_national_inference_pipeline():
         # Combine all features into one stack
         final_stack = ee.Image.cat([s2_img, terrain, rain_stack, tmin, tmax, tmean, tday, tnight, rh]).toFloat()
 
-        # Sample data at the 5000 points
+        # Sample data at the 5000 points (preserving pixel_id, lat, lon)
         points = final_stack.sampleRegions(
             collection=indexed_points,
             scale=grid_scale,
             geometries=False
         ).map(lambda f: f.set({
+            "pixel_id": f.get("pixel_id"),
+            "lat": f.get("lat"),
+            "lon": f.get("lon")
+        })).map(lambda f: f.set({
             "timestep": i + 1,
             "date": t_end.format("YYYY-MM-dd"),
             "cloud_pct": cloud_pct,
