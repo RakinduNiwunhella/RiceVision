@@ -1,8 +1,25 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import Notifications from '../Notifications/Notifications'
 
 const Header = () => {
   const [isDark, setIsDark] = useState(false)
+  const [showNotifications, setShowNotifications] = useState(false)
+
+  const [notifications, setNotifications] = useState([
+    { id: 1, message: "New complaint submitted", time: "2 minutes ago", read: false },
+    { id: 2, message: "Flood risk detected in area", time: "10 minutes ago", read: false },
+    { id: 3, message: "Weather warning issued", time: "20 minutes ago", read: true },
+    { id: 4, message: "Seasonal report ready", time: "1 hour ago", read: true },
+  ])
+
+  const markAsRead = (id) => {
+    setNotifications(prev =>
+      prev.map(n =>
+        n.id === id ? { ...n, read: true } : n
+      )
+    )
+  }
 
   useEffect(() => {
     const html = document.documentElement
@@ -64,7 +81,7 @@ const Header = () => {
               language
             </span>
 
-            {/* ✅ Dark mode toggle (WORKING) */}
+            {/* Dark mode toggle */}
             <button
               onClick={() => setIsDark(prev => !prev)}
               aria-label="Toggle dark mode"
@@ -76,9 +93,20 @@ const Header = () => {
             </button>
 
             {/* Notifications */}
-            <span className="material-symbols-outlined text-gray-800 dark:text-slate-300">
-              notifications
-            </span>
+            <button
+              onClick={() => setShowNotifications(prev => !prev)}
+              className="relative flex items-center"
+            >
+              <span className="material-symbols-outlined text-gray-800 dark:text-slate-300">
+                notifications
+              </span>
+
+              {notifications.filter(n => !n.read).length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">
+                  {notifications.filter(n => !n.read).length}
+                </span>
+              )}
+            </button>
 
             {/* Profile */}
             <span className="material-symbols-outlined text-gray-800 dark:text-slate-300">
@@ -87,6 +115,12 @@ const Header = () => {
           </div>
         </div>
       </div>
+      {showNotifications && (
+        <Notifications
+          notifications={notifications}
+          markAsRead={markAsRead}
+        />
+      )}
     </nav>
   )
 }
