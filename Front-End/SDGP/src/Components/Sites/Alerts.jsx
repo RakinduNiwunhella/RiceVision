@@ -20,7 +20,7 @@ const Alerts = () => {
   useEffect(() => {
     const fetchAlerts = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/alerts/all");
+        const res = await fetch("https://ricevision-backend.onrender.com/api/alerts/all");
         const data = await res.json();
         setAlerts(data);
       } catch (err) {
@@ -44,7 +44,7 @@ const Alerts = () => {
 
   const updateStatus = async (id, newStatus) => {
     try {
-      await fetch(`http://localhost:8000/api/alerts/${id}`, {
+      await fetch(`https://ricevision-backend.onrender.com/api/alerts/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -52,7 +52,7 @@ const Alerts = () => {
         body: JSON.stringify({ status: newStatus }),
       });
 
-      const res = await fetch("http://localhost:8000/api/alerts/all");
+      const res = await fetch("https://ricevision-backend.onrender.com/api/alerts/all");
       const data = await res.json();
       setAlerts(data);
     } catch (err) {
