@@ -25,10 +25,9 @@ async def get_map_fields(
         # Always remove Not Applicable
         query = query.neq("paddy_health", "Not Applicable")
 
-        # Filter by district (normalize to lowercase to match DB values)
+        # Filter by district (match DB column name exactly: "District")
         if districts:
-            normalized_districts = [d.lower() for d in districts]
-            query = query.in_("district", normalized_districts)
+            query = query.in_("District", districts)
 
         # Filter by health (convert UI values → DB values)
         if health:
