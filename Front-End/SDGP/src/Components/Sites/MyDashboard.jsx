@@ -12,8 +12,18 @@ import {
   Cell,
   Legend,
 } from "recharts";
-import { supabase } from "../../supabaseClient";
 import { AlertTriangle, CloudRain, Bug } from "lucide-react";
+
+import {
+  fetchHealthSummary,
+  fetchYield,
+  fetchBestDistricts,
+  fetchOutbreaks,
+  fetchNDVITrend,
+  fetchDistrictHealth
+} from "../../api/api";
+
+
 
 /* ------------------ Components ------------------ */
 
@@ -72,103 +82,88 @@ const MyDashboard = () => {
       ]
     : [];
 
-  /* ------------------ FETCH HEALTH ------------------ */
-  useEffect(() => {
-    const fetchHealthSummary = async () => {
-      const { data } = await supabase
-        .from("paddy_health_summary_view")
-        .select("normal_pct, mild_stress_pct, severe_stress_pct")
-        .eq("district", "kurunegala")
-        .single();
-
+  /* ------------------ FETCH HEALTH (via FastAPI) ------------------ */
+useEffect(() => {
+  const loadHealth = async () => {
+    try {
+      const data = await fetchHealthSummary();
       setHealthSummary(data);
-    };
+    } catch (err) {
+      console.error("Failed to load health summary:", err);
+    }
+  };
 
-    fetchHealthSummary();
-  }, []);
+  loadHealth();
+}, []);
 
-  /* ------------------ FETCH YIELD ------------------ */
-  useEffect(() => {
-    const fetchYieldForecast = async () => {
-      const { data, error } = await supabase
-        .from("yield_forecast_view")
-        .select("total_yield_tons")
-        .single();
+  /* ------------------ FETCH YIELD (via FastAPI) ------------------ */
+useEffect(() => {
+  const loadYield = async () => {
+    try {
+      const data = await fetchYield();
+      setYieldForecast(data);
+    } catch (err) {
+      console.error("Failed to load yield:", err);
+    }
+  };
 
-      if (!error) {
-        setYieldForecast(data);
-      }
-    };
+  loadYield();
+}, []);
 
-    fetchYieldForecast();
-  }, []);
+  /* ------------------ FETCH BEST YIELD DISTRICTS (via FastAPI) ------------------ */
+useEffect(() => {
+  const loadBestDistricts = async () => {
+    try {
+      const data = await fetchBestDistricts();
+      setBestYieldDistricts(data);
+    } catch (err) {
+      console.error("Failed to load best districts:", err);
+    }
+  };
 
-  /* ------------------ FETCH BEST YIELD DISTRICTS ------------------ */
-  useEffect(() => {
-    const fetchBestYieldDistricts = async () => {
-      const { data, error } = await supabase
-        .from("best_yield_districts_view")
-        .select("District, total_yield_ton_ha")
-        .limit(5);
+  loadBestDistricts();
+}, []);
+  /* ------------------ FETCH OUTBREAKS (via FastAPI) ------------------ */
+useEffect(() => {
+  const loadOutbreaks = async () => {
+    try {
+      const data = await fetchOutbreaks();
+      setOutbreaks(data);
+    } catch (err) {
+      console.error("Failed to load outbreaks:", err);
+    }
+  };
 
-      if (!error && data) {
-        setBestYieldDistricts(data);
-      }
-    };
+  loadOutbreaks();
+}, []);
 
-    fetchBestYieldDistricts();
-  }, []);
+  /* ------------------ FETCH NATIONAL NDVI TREND (via FastAPI) ------------------ */
+useEffect(() => {
+  const loadNDVI = async () => {
+    try {
+      const data = await fetchNDVITrend();
+      setNdviTrend(data);
+    } catch (err) {
+      console.error("Failed to load NDVI trend:", err);
+    }
+  };
 
-  /* ------------------ FETCH OUTBREAKS ------------------ */
-  useEffect(() => {
-    const fetchOutbreaks = async () => {
-      const { data } = await supabase
-        .from("disaster_risk_overview_view")
-        .select("id, title, district, event_date")
-        .order("event_date", { ascending: false });
+  loadNDVI();
+}, []);
 
-      setOutbreaks(data || []);
-    };
+  /* ------------------ FETCH DISTRICT HEALTH OVERVIEW (via FastAPI) ------------------ */
+useEffect(() => {
+  const loadDistrictHealth = async () => {
+    try {
+      const data = await fetchDistrictHealth();
+      setDistrictHealth(data);
+    } catch (err) {
+      console.error("Failed to load district health:", err);
+    }
+  };
 
-    fetchOutbreaks();
-  }, []);
-
-  /* ------------------ FETCH NATIONAL NDVI TREND ------------------ */
-  useEffect(() => {
-    const fetchNdviTrend = async () => {
-      const { data, error } = await supabase
-        .from("national_ndvi_trend_view")
-        .select("date, mean_ndvi")
-        .order("date", { ascending: true });
-
-      if (!error && data) {
-        setNdviTrend(
-          data.map((row) => ({
-            day: row.date,
-            value: row.mean_ndvi,
-          }))
-        );
-      }
-    };
-
-    fetchNdviTrend();
-  }, []);
-
-  /* ------------------ FETCH DISTRICT HEALTH OVERVIEW ------------------ */
-  useEffect(() => {
-    const fetchDistrictHealth = async () => {
-      const { data, error } = await supabase
-        .from("paddy_health_summary_view")
-        .select("district, normal_pct")
-        .order("normal_pct", { ascending: false });
-
-      if (!error && data) {
-        setDistrictHealth(data);
-      }
-    };
-
-    fetchDistrictHealth();
-  }, []);
+  loadDistrictHealth();
+}, []);
 
   const formatMT = (value) => {
     if (!value) return "-";
@@ -241,11 +236,6 @@ const MyDashboard = () => {
                 : "Loading..."}
             </p>
 
-            {yieldForecast && (
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                Confidence: {yieldForecast.confidence}%
-              </p>
-            )}
 
             <div className="mt-4 border-t border-gray-200 dark:border-gray-700 pt-3">
               <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">

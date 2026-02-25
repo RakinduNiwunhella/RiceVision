@@ -2,17 +2,12 @@ import { MapContainer, TileLayer, CircleMarker, GeoJSON } from "react-leaflet";
 import { useEffect, useState, useRef } from "react";
 import { latLngBounds } from "leaflet";
 import L from "leaflet";
-import { supabase } from "../../supabaseClient";
+import { fetchMapFields } from "../../api/api";
 
-/* ---------- CONSTANTS ---------- */
+/* ---------- CONFIG ---------- */
+
 const SRI_LANKA_CENTER = [7.8731, 80.7718];
 const SRI_LANKA_ZOOM = 7;
-
-const HEALTH_MAP = {
-  Healthy: "Normal",
-  Stressed: "Mild Stress",
-  Damaged: "Severe Stress",
-};
 
 function getHealthColor(health) {
   if (health === "Normal") return "#16a34a";
@@ -22,6 +17,7 @@ function getHealthColor(health) {
 }
 
 /* ---------- STYLES ---------- */
+
 const paddyStyle = {
   fillColor: "#f59e0b",
   fillOpacity: 0.7,
@@ -61,9 +57,8 @@ export default function RiceMap({ filters, layers }) {
       .catch(console.error);
   }, [selectedDistrict, layers.paddyExtent]);
 
-  /* ---------- LOAD DISTRICT BOUNDARY (DYNAMIC) ---------- */
+  /* ---------- LOAD DISTRICT BOUNDARY ---------- */
   useEffect(() => {
-    // Clear old boundary immediately
     setDistrictBoundary(null);
 
     if (!selectedDistrict) return;
@@ -81,7 +76,7 @@ export default function RiceMap({ filters, layers }) {
       .catch(console.error);
   }, [selectedDistrict]);
 
-  /* ---------- AUTO ZOOM ---------- */
+  /* ---------- AUTO ZOOM TO DISTRICT ---------- */
   useEffect(() => {
     if (districtBoundary && mapRef.current) {
       const layer = L.geoJSON(districtBoundary);
@@ -89,52 +84,34 @@ export default function RiceMap({ filters, layers }) {
     }
   }, [districtBoundary]);
 
-  /* ---------- FETCH ML POINTS ---------- */
+  /* ---------- FETCH ML POINTS FROM FASTAPI (via api.js like Dashboard) ---------- */
   useEffect(() => {
-    if (!selectedDistrict) {
+    if (!selectedDistrict || !layers.showCircles) {
       setPoints([]);
       return;
     }
 
-    const fetchAllPoints = async () => {
-      const pageSize = 1000;
-      let from = 0;
-      let allData = [];
+    const loadPoints = async () => {
+      try {
+        const data = await fetchMapFields({
+          districts: [selectedDistrict],
+          health: selectedHealth,
+        });
 
-      while (true) {
-        const { data, error } = await supabase
-          .from("final_ml_predictions")
-          .select("lat, lng, paddy_health")
-          .eq("District", selectedDistrict)
-          .neq("paddy_health", "Not Applicable")
-          .range(from, from + pageSize - 1);
-
-        if (error || !data || data.length === 0) break;
-
-        allData = allData.concat(data);
-        from += pageSize;
+        setPoints(data);
+      } catch (err) {
+        console.error("Map fetch error:", err);
+        setPoints([]);
       }
-
-      setPoints(allData);
     };
 
-    fetchAllPoints();
-  }, [selectedDistrict]);
-
-  /* ---------- HEALTH FILTER ---------- */
-  let visiblePoints = points;
-
-  if (selectedHealth.length > 0) {
-    const dbHealthValues = selectedHealth.map((ui) => HEALTH_MAP[ui]);
-    visiblePoints = points.filter((p) =>
-      dbHealthValues.includes(p.paddy_health)
-    );
-  }
+    loadPoints();
+  }, [selectedDistrict, selectedHealth, layers.showCircles]);
 
   /* ---------- FALLBACK BOUNDS ---------- */
   const bounds =
-    visiblePoints.length > 0
-      ? latLngBounds(visiblePoints.map((p) => [p.lat, p.lng]))
+    points.length > 0
+      ? latLngBounds(points.map((p) => [p.lat, p.lng]))
       : null;
 
   return (
@@ -145,7 +122,7 @@ export default function RiceMap({ filters, layers }) {
       bounds={!districtBoundary ? bounds : null}
       className="h-full w-full rounded-xl"
     >
-      {/* Base map */}
+      {/* Base Map */}
       <TileLayer
         attribution="© OpenStreetMap"
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -164,20 +141,14 @@ export default function RiceMap({ filters, layers }) {
       {/* ML Health Points */}
       {selectedDistrict &&
         layers.showCircles &&
-        visiblePoints.map((p, idx) => (
+        points.map((p, idx) => (
           <CircleMarker
             key={idx}
             center={[p.lat, p.lng]}
             radius={4}
             pathOptions={{
-              color:
-                selectedHealth.length === 0
-                  ? "#2563eb"
-                  : getHealthColor(p.paddy_health),
-              fillColor:
-                selectedHealth.length === 0
-                  ? "#2563eb"
-                  : getHealthColor(p.paddy_health),
+              color: getHealthColor(p.paddy_health),
+              fillColor: getHealthColor(p.paddy_health),
               fillOpacity: 0.75,
               weight: 1,
             }}
