@@ -7,6 +7,7 @@ from .routes.weather import router as weather_router
 from .routes.help import router as help_router
 from .routes.profile import router as profile_router
 from .routes.mapPage import router as map_router
+from .routes.alerts import router as alerts_router
 
 app = FastAPI()
 
@@ -31,3 +32,4 @@ app.include_router(weather_router)
 app.include_router(help_router, prefix="/api")
 app.include_router(profile_router)
 app.include_router(map_router)
+app.include_router(alerts_router, prefix="/api")
