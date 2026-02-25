@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Query
-from typing import List, Optional
-from db import supabase
+from typing import List
+from ..db import supabase
 
 router = APIRouter()
 
@@ -13,23 +13,24 @@ HEALTH_MAP = {
 
 @router.get("/map-fields")
 async def get_map_fields(
-    health: Optional[List[str]] = Query(None),
-    districts: Optional[List[str]] = Query(None),
+    health: List[str] = Query(default=[]),
+    districts: List[str] = Query(default=[]),
 ):
     try:
-        # Query correct ML table
+        # Query ML predictions table
         query = supabase.table("final_ml_predictions").select(
-            "lat, lng, paddy_health, District"
+            "lat, lng, paddy_health, district"
         )
 
         # Always remove Not Applicable
         query = query.neq("paddy_health", "Not Applicable")
 
-        # Filter by district (from frontend)
+        # Filter by district (normalize to lowercase to match DB values)
         if districts:
-            query = query.in_("District", districts)
+            normalized_districts = [d.lower() for d in districts]
+            query = query.in_("district", normalized_districts)
 
-        # Filter by health (convert UI → DB values)
+        # Filter by health (convert UI values → DB values)
         if health:
             db_health_values = [
                 HEALTH_MAP[h] for h in health if h in HEALTH_MAP

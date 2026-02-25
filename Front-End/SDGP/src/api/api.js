@@ -37,3 +37,25 @@ export const submitComplaint = async (payload) => {
 
   return res.json();
 };
+
+/* ------------------ MAP PAGE ------------------ */
+export const fetchMapFields = async ({ districts = [], health = [] }) => {
+  const params = new URLSearchParams();
+
+  districts.forEach((d) => params.append("districts", d));
+  health.forEach((h) => params.append("health", h));
+
+  const res = await fetch(`${API_BASE}/map-fields?${params.toString()}`);
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch map fields");
+  }
+
+  const result = await res.json();
+
+  if (result.status !== "success") {
+    throw new Error(result.message || "Map fetch failed");
+  }
+
+  return result.data;
+};
