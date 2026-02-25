@@ -19,29 +19,39 @@ def scrape_dmc_reports():
 
     os.makedirs(PDF_DIR, exist_ok=True)
 
-    # 🔹 Calculate last 10 days dynamically
-    today = datetime.today()
-    ten_days_ago = today - timedelta(days=10)
+    # ===================== MATCH GEE TIMESTEPS ===================== #
+    today = datetime.utcnow()
 
-    from_date = ten_days_ago.strftime("%Y-%m-%d")
-    to_date = today.strftime("%Y-%m-%d")
+    timestep_dates = []
+    for i in range(10):
+        t_end = today - timedelta(days=15 * i)
+        timestep_dates.append(t_end)
 
+    newest_date = max(timestep_dates)
+    oldest_date = min(timestep_dates)
+
+    from_date = oldest_date.strftime("%Y-%m-%d")
+    to_date = newest_date.strftime("%Y-%m-%d")
+
+    print(f"Matching GEE timesteps:")
+    print(f"Oldest timestep: {from_date}")
+    print(f"Newest timestep: {to_date}")
+
+    # ===================== BUILD URL ===================== #
     url = (
         "https://www.dmc.gov.lk/index.php?"
         f"option=com_dmcreports&view=reports&Itemid=273&limit=0"
-        f"&search=&report_type_id=1&fromdate={from_date}"
+        f"&search=&report_type_id=1"
+        f"&fromdate={from_date}"
         f"&todate={to_date}&lang=en"
     )
 
-    print(f"Scraping reports from {from_date} to {to_date}")
-
-    # 🔹 Chrome options (Fix crash issue)
+    # ===================== CHROME SETUP ===================== #
     chrome_options = Options()
-    chrome_options.add_argument("--start-maximized")
-    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--headless=new")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.add_argument("--remote-debugging-port=9222")
+    chrome_options.add_argument("--disable-gpu")
 
     driver = webdriver.Chrome(
         service=Service(ChromeDriverManager().install()),
@@ -60,7 +70,6 @@ def scrape_dmc_reports():
         try:
             wait.until(EC.presence_of_element_located((By.TAG_NAME, "table")))
         except:
-            print("No table found.")
             break
 
         links = driver.find_elements(By.TAG_NAME, "a")
@@ -76,20 +85,18 @@ def scrape_dmc_reports():
             time.sleep(2)
             page += 1
         except:
-            print("No more pages.")
             break
 
     driver.quit()
 
     print(f"Found {len(pdf_links)} PDF files.")
 
-    # 🔹 Download PDFs
+    # ===================== DOWNLOAD ===================== #
     for pdf_url in pdf_links:
         filename = pdf_url.split("/")[-1]
         filepath = os.path.join(PDF_DIR, filename)
 
         if os.path.exists(filepath):
-            print(f"Skipping existing file: {filename}")
             continue
 
         try:
@@ -100,8 +107,6 @@ def scrape_dmc_reports():
                 f.write(response.content)
 
             print(f"Downloaded: {filename}")
-            time.sleep(1)
-
         except Exception as e:
             print(f"Failed to download {filename}: {e}")
 

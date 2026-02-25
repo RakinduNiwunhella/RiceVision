@@ -24,6 +24,9 @@ yarn-error.log*
 # CSV / data files (keep if intentional)
 GeoData/kurunegala_supabase_final.csv
 *.csv
+data
 
 # service account key
 **/gee-service-account.json
+
+
