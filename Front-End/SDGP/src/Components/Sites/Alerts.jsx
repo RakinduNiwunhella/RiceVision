@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
+import { fetchAlerts, updateAlertStatus } from "../../api/api";
 
 const tabOptions = ["Open", "Resolved", "Denied", "All"];
 
@@ -18,17 +19,16 @@ const Alerts = () => {
   }, [alerts, activeTab, searchTerm]);
 
   useEffect(() => {
-    const fetchAlerts = async () => {
+    const loadAlerts = async () => {
       try {
-        const res = await fetch("https://ricevision-backend.onrender.com/api/alerts/all");
-        const data = await res.json();
+        const data = await fetchAlerts();
         setAlerts(data);
       } catch (err) {
-        console.error("Error fetching alerts from backend:", err);
+        console.error("Error fetching alerts:", err);
       }
     };
 
-    fetchAlerts();
+    loadAlerts();
   }, []);
 
   const counts = useMemo(() => {
@@ -44,16 +44,8 @@ const Alerts = () => {
 
   const updateStatus = async (id, newStatus) => {
     try {
-      await fetch(`https://ricevision-backend.onrender.com/api/alerts/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ status: newStatus }),
-      });
-
-      const res = await fetch("https://ricevision-backend.onrender.com/api/alerts/all");
-      const data = await res.json();
+      await updateAlertStatus(id, newStatus);
+      const data = await fetchAlerts();
       setAlerts(data);
     } catch (err) {
       console.error("Error updating alert:", err);

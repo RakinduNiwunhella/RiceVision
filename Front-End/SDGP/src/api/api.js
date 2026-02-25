@@ -19,6 +19,21 @@ export const fetchWeather = () => get("/api/weather");
 
 export const fetchFaqs = () => get("/api/help/faqs");
 
+/* ------------------ ALERTS ------------------ */
+export const fetchAlerts = () => get("/api/alerts/all");
+
+export const updateAlertStatus = async (id, status) => {
+  const res = await fetch(`${API_BASE}/api/alerts/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ status }),
+  });
+
+  if (!res.ok) throw new Error("Failed to update alert");
+
+  return res.json();
+};
+
 export const submitComplaint = async (payload) => {
   const res = await fetch(`${API_BASE}/api/help/complaints`, {
     method: "POST",
