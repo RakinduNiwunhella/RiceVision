@@ -19,7 +19,7 @@ async def get_map_fields(
     try:
         # Query ML predictions table
         query = supabase.table("final_ml_predictions").select(
-            "lat, lng, paddy_health, district"
+            "lat, lng, paddy_health, District"
         )
 
         # Always remove Not Applicable
