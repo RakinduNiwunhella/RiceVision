@@ -3,6 +3,10 @@ from io import StringIO
 from google.cloud import storage
 from google.oauth2 import service_account
 import boto3
+import os
+import geopandas as gpd
+from shapely.geometry import Point
+from tqdm import tqdm
 
 
 def combine_timestep_csvs():
@@ -79,6 +83,55 @@ def combine_timestep_csvs():
         return
 
     final_df = pd.concat(dfs, ignore_index=True)
+
+    # ===================== ADD DISTRICT & DS DIVISION ===================== #
+    print("\nAdding district and ds_division columns using spatial join...")
+
+    # Remove old columns if they exist
+    final_df = final_df.drop(columns=["district", "ds_division"], errors="ignore")
+
+    # Load GeoJSON from same directory as this script
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    ds_geo_path = os.path.join(base_dir, "DSdevisions.geojson")
+
+    ds_gdf = gpd.read_file(ds_geo_path)
+
+    print("Available GeoJSON columns:", list(ds_gdf.columns))
+
+    # Create GeoDataFrame with progress bar
+    print("Creating point geometries...")
+    geometry = [
+        Point(xy) for xy in tqdm(
+            zip(final_df["lon"], final_df["lat"]),
+            total=len(final_df),
+            desc="Building geometries"
+        )
+    ]
+
+    points_gdf = gpd.GeoDataFrame(final_df.copy(), geometry=geometry, crs="EPSG:4326")
+
+    # Ensure CRS matches
+    if ds_gdf.crs != points_gdf.crs:
+        ds_gdf = ds_gdf.to_crs(points_gdf.crs)
+
+    print("Performing spatial join...")
+    joined = gpd.sjoin(points_gdf, ds_gdf, how="left", predicate="within")
+
+    # Use known GeoJSON property names
+    # adm2_name = District
+    # adm3_name = DS Division
+
+    if "adm2_name" in joined.columns:
+        final_df["district"] = joined["adm2_name"].values
+    else:
+        final_df["district"] = None
+
+    if "adm3_name" in joined.columns:
+        final_df["ds_division"] = joined["adm3_name"].values
+    else:
+        final_df["ds_division"] = None
+
+    print("Spatial join complete.")
 
     print("\nFinal combined shape:", final_df.shape)
     print("Total rows:", len(final_df))
