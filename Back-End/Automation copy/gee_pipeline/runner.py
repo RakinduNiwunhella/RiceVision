@@ -22,7 +22,7 @@ def run_national_inference_pipeline():
 
     # ===================== 2. UNIQUE PIXEL ID ASSIGNMENT ===================== #
     # Uses a hard limit of 5000 for the list to ensure server stability
-    pts_list = points_asset.toList(5000)
+    pts_list = points_asset.toList(50000)
     
     def assign_id(idx):
         idx = ee.Number(idx)

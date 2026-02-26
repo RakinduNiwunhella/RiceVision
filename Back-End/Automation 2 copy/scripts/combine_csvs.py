@@ -2,7 +2,6 @@ import pandas as pd
 from io import StringIO
 from google.cloud import storage
 from google.oauth2 import service_account
-import boto3
 
 
 def combine_timestep_csvs():
@@ -37,12 +36,6 @@ def combine_timestep_csvs():
     if not csv_files:
         print("❌ No CSV files found.")
         return
-
-    # Sort by blob updated time (newest first)
-    csv_files = sorted(csv_files, key=lambda b: b.updated, reverse=True)
-
-    # Keep only the 10 most recent files
-    csv_files = csv_files[:10]
 
     print(f"Found {len(csv_files)} timestep CSV files.\n")
 
@@ -88,23 +81,15 @@ def combine_timestep_csvs():
             by=["pixel_id", "date"]
         ).reset_index(drop=True)
 
-    print("\nUploading final CSV to S3...")
+    output_blob = bucket.blob(OUTPUT_NAME)
 
-    s3 = boto3.client("s3")
-
-    bucket_name = "ricevision-original-sat-data"
-    file_key = f"national_runs/run_{pd.Timestamp.utcnow().strftime('%Y%m%d_%H%M%S')}.csv"
-
-    csv_data = final_df.to_csv(index=False)
-
-    s3.put_object(
-        Bucket=bucket_name,
-        Key=file_key,
-        Body=csv_data,
-        ContentType="text/csv"
+    output_blob.upload_from_string(
+        final_df.to_csv(index=False),
+        content_type="text/csv"
     )
 
-    print(f"\n✅ Uploaded to s3://{bucket_name}/{file_key}\n")
+    print("\n✅ Combined CSV uploaded to:")
+    print(f"gs://{BUCKET_NAME}/{OUTPUT_NAME}\n")
 
 
 if __name__ == "__main__":

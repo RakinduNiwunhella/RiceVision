@@ -17,20 +17,19 @@ def run_national_inference_pipeline():
     roi = ee.FeatureCollection("FAO/GAUL/2015/level0") \
             .filter(ee.Filter.eq("ADM0_NAME", "Sri Lanka")).geometry()
             
-    # Points: Use all points from uploaded asset (no random sampling)
-    points_asset = ee.FeatureCollection("projects/ricevision-487918/assets/fixed_all_points")
+    # Points: Your fixed 5000 paddy points asset
+    points_asset = ee.FeatureCollection("projects/ricevision-487918/assets/fixed_5000_paddy_points_sl_2")
 
-    # ===================== 2. USE PRE-UPLOADED POINT SHAPEFILE ===================== #
-    # Use all points from uploaded asset (no random sampling)
-
-    indexed_points = points_asset.map(
-        lambda f: f.set({
-            # Use string ID directly (do NOT parse to number)
+    # ===================== 2. UNIQUE PIXEL ID ASSIGNMENT ===================== #
+    def add_ids(f):
+        coords = f.geometry().coordinates()
+        return f.set({
             "pixel_id": f.id(),
-            "lat": f.geometry().coordinates().get(1),
-            "lon": f.geometry().coordinates().get(0)
+            "lat": coords.get(1),
+            "lon": coords.get(0)
         })
-    )
+
+    indexed_points = points_asset.map(add_ids)
 
     # ===================== 3. BASE DATASETS ===================== #
     s2_col = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED').filterBounds(roi)
@@ -82,16 +81,12 @@ def run_national_inference_pipeline():
         # Combine all features into one stack
         final_stack = ee.Image.cat([s2_img, terrain, rain_stack, tmin, tmax, tmean, tday, tnight, rh]).toFloat()
 
-        # Sample data at the 5000 points (preserving pixel_id, lat, lon)
+        # Sample data at the 5000 points
         points = final_stack.sampleRegions(
             collection=indexed_points,
             scale=grid_scale,
             geometries=False
         ).map(lambda f: f.set({
-            "pixel_id": f.get("pixel_id"),
-            "lat": f.get("lat"),
-            "lon": f.get("lon")
-        })).map(lambda f: f.set({
             "timestep": i + 1,
             "date": t_end.format("YYYY-MM-dd"),
             "cloud_pct": cloud_pct,
