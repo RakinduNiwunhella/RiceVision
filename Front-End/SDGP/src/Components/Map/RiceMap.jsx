@@ -9,9 +9,9 @@ const SRI_LANKA_ZOOM = 7;
 
 /* ---------- HEALTH COLORS ---------- */
 function getHealthColor(health) {
-  if (health === "Healthy") return "#16a34a";
-  if (health === "Stressed") return "#facc15";
-  if (health === "Damaged") return "#dc2626";
+  if (health === "Normal") return "#16a34a";
+  if (health === "Mild Stress") return "#facc15";
+  if (health === "Severe Stress") return "#dc2626";
   return "#2563eb";
 }
 
