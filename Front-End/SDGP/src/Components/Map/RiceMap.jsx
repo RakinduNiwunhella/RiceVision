@@ -4,34 +4,32 @@ import { latLngBounds } from "leaflet";
 import L from "leaflet";
 import { fetchMapFields } from "../../api/api";
 
-/* ---------- CONFIG ---------- */
-
 const SRI_LANKA_CENTER = [7.8731, 80.7718];
 const SRI_LANKA_ZOOM = 7;
 
+/* ---------- HEALTH COLORS ---------- */
 function getHealthColor(health) {
-  if (health === "Normal") return "#16a34a";
-  if (health === "Mild Stress") return "#facc15";
-  if (health === "Severe Stress") return "#dc2626";
+  if (health === "Healthy") return "#16a34a";
+  if (health === "Stressed") return "#facc15";
+  if (health === "Damaged") return "#dc2626";
   return "#2563eb";
 }
 
 /* ---------- STYLES ---------- */
-
 const paddyStyle = {
   fillColor: "#f59e0b",
-  fillOpacity: 0.7,
+  fillOpacity: 0.6,
   color: "#b45309",
   weight: 1,
 };
 
 const districtBoundaryStyle = {
-  color: "#1e3a8a",
+  color: "#3b82f6",
   weight: 3,
   fillOpacity: 0,
 };
 
-export default function RiceMap({ filters, layers }) {
+export default function RiceMap({ filters, layers, isDark }) {
   const [points, setPoints] = useState([]);
   const [paddyGeo, setPaddyGeo] = useState(null);
   const [districtBoundary, setDistrictBoundary] = useState(null);
@@ -41,7 +39,25 @@ export default function RiceMap({ filters, layers }) {
   const selectedDistrict = filters.districts[0];
   const selectedHealth = filters.health;
 
-  /* ---------- LOAD PADDY EXTENT ---------- */
+  /* =========================================================
+     BASE MAP LOGIC
+     ========================================================= */
+
+  let tileUrl = "";
+
+  if (layers.showRoads) {
+    // Full OpenStreetMap (Google-like roads + green areas)
+    tileUrl = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+  } else {
+    // Styled dashboard map (WITH labels)
+    tileUrl = isDark
+      ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+      : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
+  }
+
+  /* =========================================================
+     LOAD PADDY EXTENT
+     ========================================================= */
   useEffect(() => {
     if (!selectedDistrict || !layers.paddyExtent) {
       setPaddyGeo(null);
@@ -57,26 +73,26 @@ export default function RiceMap({ filters, layers }) {
       .catch(console.error);
   }, [selectedDistrict, layers.paddyExtent]);
 
-  /* ---------- LOAD DISTRICT BOUNDARY ---------- */
+  /* =========================================================
+     LOAD DISTRICT BOUNDARY
+     ========================================================= */
   useEffect(() => {
     setDistrictBoundary(null);
 
     if (!selectedDistrict) return;
 
-    const boundaryFile = `/${selectedDistrict}_District_Boundary.geojson`;
-
-    fetch(boundaryFile)
+    fetch(`/${selectedDistrict}_District_Boundary.geojson`)
       .then((res) => {
-        if (!res.ok) {
-          throw new Error(`Boundary not found for ${selectedDistrict}`);
-        }
+        if (!res.ok) throw new Error("Boundary not found");
         return res.json();
       })
       .then(setDistrictBoundary)
       .catch(console.error);
   }, [selectedDistrict]);
 
-  /* ---------- AUTO ZOOM TO DISTRICT ---------- */
+  /* =========================================================
+     AUTO ZOOM TO DISTRICT
+     ========================================================= */
   useEffect(() => {
     if (districtBoundary && mapRef.current) {
       const layer = L.geoJSON(districtBoundary);
@@ -84,7 +100,9 @@ export default function RiceMap({ filters, layers }) {
     }
   }, [districtBoundary]);
 
-  /* ---------- FETCH ML POINTS FROM FASTAPI (via api.js like Dashboard) ---------- */
+  /* =========================================================
+     LOAD ML HEALTH POINTS
+     ========================================================= */
   useEffect(() => {
     if (!selectedDistrict || !layers.showCircles) {
       setPoints([]);
@@ -108,24 +126,22 @@ export default function RiceMap({ filters, layers }) {
     loadPoints();
   }, [selectedDistrict, selectedHealth, layers.showCircles]);
 
-  /* ---------- FALLBACK BOUNDS ---------- */
-  const bounds =
-    points.length > 0
-      ? latLngBounds(points.map((p) => [p.lat, p.lng]))
-      : null;
+  /* =========================================================
+     RENDER
+     ========================================================= */
 
   return (
     <MapContainer
       ref={mapRef}
       center={SRI_LANKA_CENTER}
       zoom={SRI_LANKA_ZOOM}
-      bounds={!districtBoundary ? bounds : null}
       className="h-full w-full rounded-xl"
     >
       {/* Base Map */}
       <TileLayer
-        attribution="© OpenStreetMap"
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        key={`${isDark}-${layers.showRoads}`}
+        attribution="© OpenStreetMap contributors"
+        url={tileUrl}
       />
 
       {/* District Boundary */}
@@ -145,11 +161,11 @@ export default function RiceMap({ filters, layers }) {
           <CircleMarker
             key={idx}
             center={[p.lat, p.lng]}
-            radius={4}
+            radius={5}
             pathOptions={{
               color: getHealthColor(p.paddy_health),
               fillColor: getHealthColor(p.paddy_health),
-              fillOpacity: 0.75,
+              fillOpacity: 0.8,
               weight: 1,
             }}
           />
