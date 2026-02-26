@@ -48,8 +48,8 @@ geometry = [
 
 gdf = gpd.GeoDataFrame(combined_df, geometry=geometry, crs="EPSG:4326")
 
-# 🔹 Save as GeoJSON
-output_file = "all_points.geojson"
-gdf.to_file(output_file, driver="GeoJSON")
+# 🔹 Save as Shapefile
+output_file = "all_points.shp"
+gdf.to_file(output_file, driver="ESRI Shapefile")
 
-print("✅ GeoJSON created:", output_file)
+print("✅ Shapefile created:", output_file)
