@@ -1,29 +1,25 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { fetchWeather } from "../../api/api";
 
 const RiceVisionWeather = () => {
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const LAT = 6.9271; 
-  const LON = 79.8612;
 
 
   const fetchAgroWeather = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,precipitation,cloud_cover&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max&past_days=7&timezone=auto`;
-      const response = await fetch(url);
-      if (!response.ok) throw new Error("Connection failed.");
-      const data = await response.json();
+      const data = await fetchWeather();
       setWeather(data);
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
-  }, [LAT, LON]);
+  }, []);
 
   useEffect(() => { fetchAgroWeather(); }, [fetchAgroWeather]);
 
