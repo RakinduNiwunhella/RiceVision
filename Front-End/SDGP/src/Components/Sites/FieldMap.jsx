@@ -19,7 +19,7 @@ export default function FieldMap() {
   });
 
   return (
-    <div className="relative flex gap-4 p-4 h-screen">
+    <div className="relative flex gap-4 p-4 h-full">
 
       <FiltersPanel filters={filters} setFilters={setFilters} />
 
