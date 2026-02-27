@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Header
 from pydantic import BaseModel
 from typing import Optional
-from db import supabase
+from ..db import supabase
 
 router = APIRouter()
 

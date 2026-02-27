@@ -3,7 +3,7 @@ name: Backend CI (RV-38)
 on:
   pull_request:
     branches:
-      - RV-38*
+      - main
 
 jobs:
   test-build:

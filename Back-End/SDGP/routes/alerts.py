@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from db import supabase
+from ..db import supabase
 
 router = APIRouter(prefix="/alerts", tags=["Alerts"])
 

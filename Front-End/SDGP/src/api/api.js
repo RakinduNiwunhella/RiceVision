@@ -19,6 +19,21 @@ export const fetchWeather = () => get("/api/weather");
 
 export const fetchFaqs = () => get("/api/help/faqs");
 
+/* ------------------ ALERTS ------------------ */
+export const fetchAlerts = () => get("/api/alerts/all");
+
+export const updateAlertStatus = async (id, status) => {
+  const res = await fetch(`${API_BASE}/api/alerts/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ status }),
+  });
+
+  if (!res.ok) throw new Error("Failed to update alert");
+
+  return res.json();
+};
+
 export const submitComplaint = async (payload) => {
   const res = await fetch(`${API_BASE}/api/help/complaints`, {
     method: "POST",
@@ -36,4 +51,26 @@ export const submitComplaint = async (payload) => {
   }
 
   return res.json();
+};
+
+/* ------------------ MAP PAGE ------------------ */
+export const fetchMapFields = async ({ districts = [], health = [] }) => {
+  const params = new URLSearchParams();
+
+  districts.forEach((d) => params.append("districts", d));
+  health.forEach((h) => params.append("health", h));
+
+  const res = await fetch(`${API_BASE}/map-fields?${params.toString()}`);
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch map fields");
+  }
+
+  const result = await res.json();
+
+  if (result.status !== "success") {
+    throw new Error(result.message || "Map fetch failed");
+  }
+
+  return result.data;
 };
