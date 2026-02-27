@@ -142,9 +142,14 @@ def combine_timestep_csvs():
 
 
     # ================= SAVE LOCALLY =================
-    SATELLITE_CSV_DIR.mkdir(parents=True, exist_ok=True)
+    from config.settings import BASE_DIR
+    from pathlib import Path
 
-    output_path = SATELLITE_CSV_DIR / "combined_satellite.csv"
+    # Force save to: ricevision-pipeline/data/sat_csv
+    output_dir = BASE_DIR / "data" / "sat_csv"
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    output_path = output_dir / "combined_satellite.csv"
 
     final_df.to_csv(output_path, index=False)
 

@@ -1,12 +1,17 @@
-from merge.merge_pipeline import run_merge
+from satellite.gee_pipeline.runner import run_national_inference_pipeline
+from satellite.scripts.combine_csvs import combine_timestep_csvs
 
 
 def run_pipeline():
-    print("=== MERGE PIPELINE STARTED ===")
+    print("=== SATELLITE PIPELINE STARTED ===")
 
-    run_merge()
+    # Step 1: Run GEE export pipeline
+    run_national_inference_pipeline()
 
-    print("=== MERGE PIPELINE COMPLETED ===")
+    # Step 2: Combine exported CSVs and add districts
+    combine_timestep_csvs()
+
+    print("=== SATELLITE PIPELINE COMPLETED ===")
 
 
 if __name__ == "__main__":
