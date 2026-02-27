@@ -76,8 +76,30 @@ def clean_disaster_data():
         print("No disaster rows found.")
         return None
 
+    # one-hot encode hazards
     final_df = pd.get_dummies(clean_df, columns=["hazard"])
-    final_df = final_df.groupby(["ds_division", "date"]).max().reset_index()
+
+    required_hazards = [
+        "hazard_FLOOD",
+        "hazard_HEAVY_RAIN",
+        "hazard_LANDSLIDE",
+        "hazard_LIGHTNING",
+        "hazard_WIND",
+        "hazard_DROUGHT"
+    ]
+
+    # ensure all hazard columns exist
+    for col in required_hazards:
+        if col not in final_df.columns:
+            final_df[col] = 0
+
+    # group by DS division and date, keep max (if any hazard occurred)
+    final_df = (
+        final_df
+        .groupby(["ds_division", "date"])[required_hazards]
+        .max()
+        .reset_index()
+    )
 
     output_path = os.path.join(CSV_DIR, "clean_disaster_dataset.csv")
     final_df.to_csv(output_path, index=False)

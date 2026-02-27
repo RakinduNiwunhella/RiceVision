@@ -1,4 +1,3 @@
-
 import pandas as pd
 from config.settings import DISASTER_CSV_DIR
 
@@ -15,7 +14,14 @@ def classify_disaster(text):
         return "HEAVY_RAIN"
 
     # WATER DEFICIT
-    if any(k in t for k in ["drought", "dry", "water scarcity"]):
+    if any(k in t for k in [
+        "drought",
+        "dry spell",
+        "prolonged dry",
+        "water scarcity",
+        "lack of rain",
+        "rainfall deficit"
+    ]):
         return "DROUGHT"
 
     # WIND DAMAGE
@@ -78,6 +84,7 @@ def clean_disaster_data():
         except Exception as e:
             print(f"Skipping {file.name}: {e}")
 
+
     # --- create dataframe ---
     clean_df = pd.DataFrame(clean_rows)
 
@@ -99,7 +106,11 @@ def clean_disaster_data():
 
     for col in required_hazards:
         if col not in final_df.columns:
-            final_df[col] = 0
+            final_df[col] = False
+
+    # ensure all hazard columns are boolean (True/False)
+    for col in required_hazards:
+        final_df[col] = final_df[col].astype(bool)
 
     # group same day same DS division
     final_df = (
