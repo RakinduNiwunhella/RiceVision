@@ -15,7 +15,7 @@ function getHealthColor(health) {
   return "#2563eb";
 }
 
-/* ---------- STYLES ---------- */
+/* ---------- STYLES ------- */
 const paddyStyle = {
   fillColor: "#f59e0b",
   fillOpacity: 0.6,
