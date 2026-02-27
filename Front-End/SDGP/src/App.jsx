@@ -21,7 +21,7 @@ const App = () => {
       <Header isDark={isDark} setIsDark={setIsDark} />
 
       <div className="flex pt-14 h-full overflow-hidden">
-        <aside className="h-[calc(100vh-3.5rem)] overflow-hidden flex-shrink-0">
+        <aside className="h-[calc(100vh-3.5rem)] overflow-hidden flex-shrink-0" >
           <Sidebar />
         </aside>
 

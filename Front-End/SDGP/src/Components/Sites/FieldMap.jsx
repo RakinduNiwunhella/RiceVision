@@ -38,7 +38,7 @@ export default function FieldMap() {
         />
       </div>
 
-      <MapLayersPanel layers={layers} setLayers={setLayers} />
+      <MapLayersPanel layers={layers} setLayers={setLayers}  />
     </div>
   );
 }

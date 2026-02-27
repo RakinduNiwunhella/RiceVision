@@ -58,7 +58,7 @@ const Header = ({ isDark, setIsDark }) => {
               language
             </span>
 
-            {/* Dark mode toggle */}
+            {/* Dark mode toggle  */}
             <button
               onClick={() => setIsDark(prev => !prev)}
               aria-label="Toggle dark mode"

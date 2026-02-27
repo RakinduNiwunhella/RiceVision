@@ -27,7 +27,7 @@ export default function FiltersPanel({ filters, setFilters }) {
         Filters
       </h2>
 
-      {/* District */}
+      {/* District  */}
       <div className="mb-8">
         <p className="text-base font-medium text-gray-600 dark:text-gray-300 mb-2">
           District

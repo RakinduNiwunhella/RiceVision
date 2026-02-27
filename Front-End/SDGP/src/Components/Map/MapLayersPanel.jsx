@@ -32,7 +32,7 @@ export default function MapLayersPanel({ layers, setLayers }) {
             <div
               className={`bg-white w-4 h-4 rounded-full shadow-md transform transition ${
                 layers[key] ? "translate-x-5" : ""
-              }`}
+              }` }
             />
           </button>
         </div>
