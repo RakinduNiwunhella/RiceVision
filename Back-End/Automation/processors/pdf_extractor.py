@@ -1,8 +1,12 @@
 import pdfplumber
 import pandas as pd
 import re
-import os
+from pathlib import Path
 from Automation.config.settings import PDF_DIR, CSV_DIR
+
+PDF_DIR = Path(PDF_DIR)
+OUT_DIR = Path(CSV_DIR)
+OUT_DIR.mkdir(exist_ok=True)
 
 DATE_REGEX = re.compile(r"\d{4}\.\d{2}\.\d{2}")
 ENGLISH_ONLY = re.compile(r"^[A-Za-z][A-Za-z &/.\-]*$")
@@ -31,14 +35,18 @@ def extract_rows(pdf_path):
                     continue
 
                 date = date_match.group()
+
                 english_cells = [cell.strip() for cell in row if cell and is_english(cell)]
 
                 if len(english_cells) < 2:
                     continue
 
+                ds_division = english_cells[0]
+                disaster = english_cells[1]
+
                 rows.append({
-                    "DS Division": english_cells[0],
-                    "Disaster": english_cells[1],
+                    "DS Division": ds_division,
+                    "Disaster": disaster,
                     "Date of commenced": date
                 })
 
@@ -46,14 +54,14 @@ def extract_rows(pdf_path):
 
 
 def process_all_pdfs():
-    os.makedirs(CSV_DIR, exist_ok=True)
+    print("Extracting PDF tables...")
 
-    for file in os.listdir(PDF_DIR):
-        if file.endswith(".pdf"):
-            pdf_path = os.path.join(PDF_DIR, file)
-            df = extract_rows(pdf_path)
+    for pdf in PDF_DIR.glob("*.pdf"):
+        df = extract_rows(pdf)
 
-            if not df.empty:
-                output_path = os.path.join(CSV_DIR, f"{file.replace('.pdf', '.csv')}")
-                df.to_csv(output_path, index=False)
-                print(f"Processed {file}")
+        if not df.empty:
+            out = OUT_DIR / f"{pdf.stem}.csv"
+            df.to_csv(out, index=False)
+            print(f"Processed {pdf.name} → {len(df)} rows")
+        else:
+            print(f"No English rows found in {pdf.name}")

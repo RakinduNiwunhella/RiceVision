@@ -14,6 +14,34 @@ def run_pipeline():
     clean_disaster_data()
     add_district_column()
 
+    # ================= CLEANUP INTERMEDIATE FILES =================
+    import os
+    from Automation.config.settings import PDF_DIR, CSV_DIR, FINAL_DIR
+
+    print("Cleaning up intermediate files...")
+
+    # Delete all PDFs
+    if os.path.exists(PDF_DIR):
+        for file in os.listdir(PDF_DIR):
+            if file.endswith(".pdf"):
+                try:
+                    os.remove(os.path.join(PDF_DIR, file))
+                except:
+                    pass
+
+    # Delete all CSVs except final output
+    final_file = os.path.join(FINAL_DIR, "clean_disaster_dataset_with_district.csv")
+
+    if os.path.exists(CSV_DIR):
+        for file in os.listdir(CSV_DIR):
+            if file.endswith(".csv"):
+                try:
+                    os.remove(os.path.join(CSV_DIR, file))
+                except:
+                    pass
+
+    print("Intermediate files deleted. Only final dataset remains.")
+
     print("=== Pipeline Completed Successfully ===")
 
 

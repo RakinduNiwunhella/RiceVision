@@ -2,6 +2,7 @@ import pandas as pd
 import os
 from difflib import get_close_matches
 from Automation.config.settings import CSV_DIR, FINAL_DIR
+import boto3
 
 DS_TO_DISTRICT = {
     "colombo": "Colombo",
@@ -51,6 +52,20 @@ def add_district_column():
     df.drop(columns=["ds_clean"], inplace=True)
 
     output_path = os.path.join(FINAL_DIR, "clean_disaster_dataset_with_district.csv")
+    os.makedirs(FINAL_DIR, exist_ok=True)
     df.to_csv(output_path, index=False)
 
     print("Final dataset saved to FINAL folder.")
+
+    # ================= UPLOAD TO S3 =================
+    try:
+        s3 = boto3.client("s3")
+
+        bucket_name = "ricevision-original-sat-data"
+        s3_key = "disaster_outputs/clean_disaster_dataset_with_district.csv"
+
+        s3.upload_file(output_path, bucket_name, s3_key)
+
+        print("Uploaded final dataset to S3 → disaster_outputs folder.")
+    except Exception as e:
+        print(f"S3 upload failed: {e}")

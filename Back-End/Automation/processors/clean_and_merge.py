@@ -38,16 +38,26 @@ def clean_disaster_data():
 
     clean_rows = []
 
+    print(f"Processing {len(files)} files...")
+
     for file in files:
         try:
-            df = pd.read_csv(file)
-            df.columns = df.columns.str.strip().str.lower()
+            try:
+                df = pd.read_csv(file, encoding="utf-8")
+            except:
+                try:
+                    df = pd.read_csv(file, encoding="utf-8-sig")
+                except:
+                    df = pd.read_csv(file, encoding="latin1")
+
+            df.columns = df.columns.str.replace('\ufeff', '', regex=False).str.strip().str.lower()
 
             if "disaster" not in df.columns:
                 continue
 
             for _, row in df.iterrows():
                 hazard = classify_disaster(row["disaster"])
+
                 if hazard is None:
                     continue
 
@@ -57,8 +67,8 @@ def clean_disaster_data():
                     "hazard": hazard
                 })
 
-        except Exception:
-            continue
+        except:
+            pass
 
     clean_df = pd.DataFrame(clean_rows)
 
@@ -72,5 +82,7 @@ def clean_disaster_data():
     output_path = os.path.join(CSV_DIR, "clean_disaster_dataset.csv")
     final_df.to_csv(output_path, index=False)
 
-    print("Created clean_disaster_dataset.csv")
+    print("DONE Created: clean_disaster_dataset.csv")
+    print(f"Rows: {len(final_df)}")
+
     return output_path
