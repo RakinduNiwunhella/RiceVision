@@ -8,7 +8,7 @@ def classify_disaster(text):
         return "FLOOD"
     if "rain" in t:
         return "HEAVY_RAIN"
-    if "drought" in t:
+    if "drought" in t or "dry" in t:
         return "DROUGHT"
     if "wind" in t or "cyclone" in t:
         return "WIND"
@@ -41,7 +41,22 @@ def clean_disaster_data():
     clean_df = pd.DataFrame(clean_rows)
 
     final_df = pd.get_dummies(clean_df, columns=["hazard"])
-    final_df = final_df.groupby(["ds_division", "date"]).max().reset_index()
+
+    # Ensure all hazard columns always exist
+    required_hazards = [
+        "hazard_FLOOD",
+        "hazard_HEAVY_RAIN",
+        "hazard_LANDSLIDE",
+        "hazard_LIGHTNING",
+        "hazard_WIND",
+        "hazard_DROUGHT"
+    ]
+
+    for col in required_hazards:
+        if col not in final_df.columns:
+            final_df[col] = 0
+
+    final_df = final_df.groupby(["ds_division", "date"])[required_hazards].max().reset_index()
 
     output_path = DISASTER_CSV_DIR / "clean_disaster_dataset.csv"
     final_df.to_csv(output_path, index=False)

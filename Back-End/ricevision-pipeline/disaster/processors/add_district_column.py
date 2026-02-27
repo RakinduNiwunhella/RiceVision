@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 from difflib import get_close_matches
-from config.settings import DISASTER_CSV_DIR
+from Automation.config.settings import CSV_DIR, FINAL_DIR
 import boto3
 
 DS_TO_DISTRICT = {
@@ -24,7 +24,8 @@ DS_TO_DISTRICT = {
 
 def add_district_column():
     print("Adding district column...")
-    input_file = DISASTER_CSV_DIR / "clean_disaster_dataset.csv"
+
+    input_file = os.path.join(CSV_DIR, "clean_disaster_dataset.csv")
 
     if not os.path.exists(input_file):
         print("Clean dataset not found.")
@@ -50,8 +51,8 @@ def add_district_column():
 
     df.drop(columns=["ds_clean"], inplace=True)
 
-    output_path = DISASTER_CSV_DIR / "clean_disaster_dataset_with_district.csv"
-    DISASTER_CSV_DIR.mkdir(parents=True, exist_ok=True)
+    output_path = os.path.join(FINAL_DIR, "clean_disaster_dataset_with_district.csv")
+    os.makedirs(FINAL_DIR, exist_ok=True)
     df.to_csv(output_path, index=False)
 
     print("Final dataset saved to FINAL folder.")

@@ -11,7 +11,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 
-from config.settings import PDF_DIR
+from Automation.config.settings import PDF_DIR
 
 
 def scrape_dmc_reports():
