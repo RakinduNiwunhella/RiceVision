@@ -7,6 +7,7 @@ const Alerts = () => {
   const [alerts, setAlerts] = useState([]);
   const [activeTab, setActiveTab] = useState("Open");
   const [searchTerm, setSearchTerm] = useState("");
+  const [updatingId, setUpdatingId] = useState(null);
 
   const filteredAlerts = useMemo(() => {
     return alerts.filter((alert) => {
@@ -44,11 +45,20 @@ const Alerts = () => {
 
   const updateStatus = async (id, newStatus) => {
     try {
+      setUpdatingId(id);
+
+      // Optimistic update (instant UI update)
+      setAlerts((prev) =>
+        prev.map((alert) =>
+          alert.id === id ? { ...alert, status: newStatus } : alert,
+        ),
+      );
+
       await updateAlertStatus(id, newStatus);
-      const data = await fetchAlerts();
-      setAlerts(data);
     } catch (err) {
       console.error("Error updating alert:", err);
+    } finally {
+      setUpdatingId(null);
     }
   };
 
@@ -110,8 +120,8 @@ const Alerts = () => {
                 alert.status === "Open"
                   ? "border-red-500"
                   : alert.status === "Resolved"
-                  ? "border-emerald-500"
-                  : "border-gray-500"
+                    ? "border-emerald-500"
+                    : "border-gray-500"
               }`}
             >
               <h2 className="text-xl font-bold text-slate-900 dark:text-white">
@@ -133,15 +143,17 @@ const Alerts = () => {
                 <div className="flex gap-3 mt-4">
                   <button
                     onClick={() => handleResolve(alert.id)}
+                    disabled={updatingId === alert.id}
                     className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 dark:hover:bg-emerald-500 transition"
                   >
-                    Resolve
+                    {updatingId === alert.id ? "Updating..." : "Resolve"}
                   </button>
                   <button
                     onClick={() => handleDeny(alert.id)}
+                    disabled={updatingId === alert.id}
                     className="px-4 py-2 bg-gray-700 dark:bg-gray-600 text-white rounded-lg hover:bg-gray-800 dark:hover:bg-gray-500 transition"
                   >
-                    Deny
+                    {updatingId === alert.id ? "Updating..." : "Deny"}
                   </button>
                 </div>
               )}
