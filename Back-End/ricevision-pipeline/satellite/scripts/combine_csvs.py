@@ -83,6 +83,20 @@ def combine_timestep_csvs():
 
     final_df = pd.concat(dfs, ignore_index=True)
 
+    # ================= REBUILD PIXEL_ID BASED ON LAT/LON =================
+    print("\nRebuilding pixel_id based on unique lat/lon pairs...")
+
+    # Remove old pixel_id if it exists
+    final_df = final_df.drop(columns=["pixel_id"], errors="ignore")
+
+    # Create new pixel_id where identical lat/lon share the same ID
+    final_df["pixel_id"] = (
+        final_df.groupby(["lat", "lon"], sort=False)
+        .ngroup()
+    )
+
+    print("New pixel_id column created.")
+
     # ===================== ADD DISTRICT & DS DIVISION ===================== #
     print("\nAdding district and ds_division columns using spatial join...")
 
