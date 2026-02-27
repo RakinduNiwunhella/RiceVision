@@ -141,23 +141,7 @@ def combine_timestep_csvs():
             by=["pixel_id", "date"]
         ).reset_index(drop=True)
 
-    print("\nUploading final CSV to S3...")
-
-    s3 = boto3.client("s3")
-
-    bucket_name = "ricevision-original-sat-data"
-    file_key = f"national_runs/run_{pd.Timestamp.utcnow().strftime('%Y%m%d_%H%M%S')}.csv"
-
-    csv_data = final_df.to_csv(index=False)
-
-    s3.put_object(
-        Bucket=bucket_name,
-        Key=file_key,
-        Body=csv_data,
-        ContentType="text/csv"
-    )
-
-    print(f"\n✅ Uploaded to s3://{bucket_name}/{file_key}\n")
+    # S3 upload removed. The final combined CSV is only saved locally.
 
 
 if __name__ == "__main__":

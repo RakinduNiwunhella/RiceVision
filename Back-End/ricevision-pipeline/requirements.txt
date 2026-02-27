@@ -1,0 +1,12 @@
+pandas
+pdfplumber
+selenium
+webdriver-manager
+google-cloud-storage
+google-auth
+earthengine-api
+geopandas
+shapely
+tqdm
+boto3
+requests
