@@ -5,25 +5,43 @@ import Notifications from '../Notifications/Notifications'
 const Header = () => {
   const [isDark, setIsDark] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
+  const [notifications, setNotifications] = useState([])
 
-  const [notifications, setNotifications] = useState([
-    { id: 1, message: "New complaint submitted", time: "2 minutes ago", read: false },
-    { id: 2, message: "Flood risk detected in area", time: "10 minutes ago", read: false },
-    { id: 3, message: "Weather warning issued", time: "20 minutes ago", read: true },
-    { id: 4, message: "Seasonal report ready", time: "1 hour ago", read: true },
-  ])
+  // Fetch notifications from FastAPI backend
+  const fetchNotifications = async () => {
+    try {
+      const BASE_URL = import.meta.env.VITE_API_BASE || "https://ricevision-backend.onrender.com"
+      const response = await fetch(`${BASE_URL}/notifications`)
+      const data = await response.json()
+      setNotifications(data)
+    } catch (error) {
+      console.error("Error fetching notifications:", error)
+    }
+  }
 
-  const markAsRead = (id) => {
-    setNotifications(prev =>
-      prev.map(n =>
-        n.id === id ? { ...n, read: true } : n
+  // Mark a notification as read in backend and update state
+  const markAsRead = async (id) => {
+    try {
+      const BASE_URL = import.meta.env.VITE_API_BASE || "https://ricevision-backend.onrender.com"
+      await fetch(`${BASE_URL}/notifications/${id}/read`, {
+        method: "PUT",
+      })
+      setNotifications(prev =>
+        prev.map(n =>
+          n.id === id ? { ...n, is_read: true } : n
+        )
       )
-    )
+    } catch (error) {
+      console.error("Error updating notification:", error)
+    }
   }
 
   useEffect(() => {
-    const html = document.documentElement
+    fetchNotifications()
+  }, [])
 
+  useEffect(() => {
+    const html = document.documentElement
     if (isDark) {
       html.classList.add('dark')
     } else {
@@ -101,9 +119,9 @@ const Header = () => {
                 notifications
               </span>
 
-              {notifications.filter(n => !n.read).length > 0 && (
+              {notifications.filter(n => !n.is_read).length > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">
-                  {notifications.filter(n => !n.read).length}
+                  {notifications.filter(n => !n.is_read).length}
                 </span>
               )}
             </button>
