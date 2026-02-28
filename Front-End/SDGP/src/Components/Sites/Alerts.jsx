@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { fetchAlerts, updateAlertStatus } from "../../api/api";
 
-const tabOptions = ["Open", "Resolved", "Denied", "All"];
+const tabOptions = ["Open", "Resolved", "Ignored", "All"];
 
 const Alerts = () => {
   const [alerts, setAlerts] = useState([]);
@@ -33,7 +33,7 @@ const Alerts = () => {
   }, []);
 
   const counts = useMemo(() => {
-    const countObj = { Open: 0, Resolved: 0, Denied: 0 };
+    const countObj = { Open: 0, Resolved: 0, Ignored: 0 };
     alerts.forEach((alert) => {
       if (countObj[alert.status] !== undefined) {
         countObj[alert.status]++;
@@ -66,8 +66,8 @@ const Alerts = () => {
     updateStatus(id, "Resolved");
   };
 
-  const handleDeny = (id) => {
-    updateStatus(id, "Denied");
+  const handleIgnore = (id) => {
+    updateStatus(id, "Ignored");
   };
 
   const formatTimestamp = (iso) => new Date(iso).toLocaleString();
@@ -121,14 +121,13 @@ const Alerts = () => {
                   ? "border-red-500"
                   : alert.status === "Resolved"
                     ? "border-emerald-500"
-                    : "border-gray-500"
+                    : alert.status === "Ignored"
+                      ? "border-gray-400"
+                      : "border-gray-500"
               }`}
             >
               <h2 className="text-xl font-bold text-slate-900 dark:text-white">
                 {alert.title}
-                <span className="text-sm text-slate-500 dark:text-slate-400 ml-2">
-                  ({alert.field})
-                </span>
               </h2>
 
               <p className="mt-2 text-slate-700 dark:text-slate-300">
@@ -149,11 +148,11 @@ const Alerts = () => {
                     {updatingId === alert.id ? "Updating..." : "Resolve"}
                   </button>
                   <button
-                    onClick={() => handleDeny(alert.id)}
+                    onClick={() => handleIgnore(alert.id)}
                     disabled={updatingId === alert.id}
                     className="px-4 py-2 bg-gray-700 dark:bg-gray-600 text-white rounded-lg hover:bg-gray-800 dark:hover:bg-gray-500 transition"
                   >
-                    {updatingId === alert.id ? "Updating..." : "Deny"}
+                    {updatingId === alert.id ? "Updating..." : "Ignore"}
                   </button>
                 </div>
               )}
