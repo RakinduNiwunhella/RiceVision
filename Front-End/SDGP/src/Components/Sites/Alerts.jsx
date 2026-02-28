@@ -47,18 +47,29 @@ const Alerts = () => {
     try {
       setUpdatingId(id);
 
-      // Optimistic update (instant UI update)
+      // Trigger animation first
       setAlerts((prev) =>
         prev.map((alert) =>
-          alert.id === id ? { ...alert, status: newStatus } : alert,
+          alert.id === id ? { ...alert, _justUpdated: true } : alert,
         ),
       );
 
-      await updateAlertStatus(id, newStatus);
+      // Wait 300ms before changing status
+      setTimeout(async () => {
+        setAlerts((prev) =>
+          prev.map((alert) =>
+            alert.id === id
+              ? { ...alert, status: newStatus, _justUpdated: false }
+              : alert,
+          ),
+        );
+
+        await updateAlertStatus(id, newStatus);
+      }, 300);
     } catch (err) {
       console.error("Error updating alert:", err);
     } finally {
-      setUpdatingId(null);
+      setTimeout(() => setUpdatingId(null), 300);
     }
   };
 
@@ -116,19 +127,42 @@ const Alerts = () => {
           {filteredAlerts.map((alert) => (
             <div
               key={alert.id}
-              className={`p-6 rounded-xl border-l-8 shadow-sm transition bg-white dark:bg-slate-800 ${
-                alert.status === "Open"
-                  ? "border-red-500"
-                  : alert.status === "Resolved"
-                    ? "border-emerald-500"
-                    : alert.status === "Ignored"
-                      ? "border-gray-400"
-                      : "border-gray-500"
-              }`}
+              className={`p-6 rounded-xl border-l-8 shadow-sm 
+                transition-all duration-300 ease-in-out transform
+                ${alert._justUpdated ? "scale-105 shadow-lg" : "scale-100"}
+                ${
+                  alert.status === "Ignored"
+                    ? "bg-gray-100 dark:bg-slate-700 opacity-70"
+                    : "bg-white dark:bg-slate-800"
+                }
+                ${
+                  alert.status === "Open"
+                    ? "border-red-500"
+                    : alert.status === "Resolved"
+                      ? "border-emerald-500"
+                      : "border-gray-400"
+                }
+              `}
             >
               <h2 className="text-xl font-bold text-slate-900 dark:text-white">
                 {alert.title}
               </h2>
+
+              <span
+                className={`px-3 py-1 text-xs font-semibold rounded-full
+                  transition-all duration-300 ease-in-out
+                  ${
+                    alert.status === "Open"
+                      ? "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300"
+                      : alert.status === "Resolved"
+                        ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300"
+                        : alert.status === "Ignored"
+                          ? "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
+                          : ""
+                  }`}
+              >
+                {alert.status}
+              </span>
 
               <p className="mt-2 text-slate-700 dark:text-slate-300">
                 {alert.description}
