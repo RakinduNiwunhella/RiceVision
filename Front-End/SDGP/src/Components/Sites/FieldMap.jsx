@@ -18,10 +18,17 @@ export default function FieldMap() {
     showRoads: false,
   });
 
+  // 🔥 Reset trigger for zoom
+  const [resetViewKey, setResetViewKey] = useState(0);
+
   return (
     <div className="relative flex gap-4 p-4 h-full">
 
-      <FiltersPanel filters={filters} setFilters={setFilters} />
+      <FiltersPanel
+        filters={filters}
+        setFilters={setFilters}
+        onResetView={() => setResetViewKey(prev => prev + 1)}
+      />
 
       <div className="relative flex-1 bg-gray-200 dark:bg-gray-800 rounded-xl overflow-hidden shadow-md">
         
@@ -35,10 +42,11 @@ export default function FieldMap() {
           filters={filters}
           layers={layers}
           isDark={isDark}
+          resetViewKey={resetViewKey}
         />
       </div>
 
-      <MapLayersPanel layers={layers} setLayers={setLayers}  />
+      <MapLayersPanel layers={layers} setLayers={setLayers} />
     </div>
   );
 }

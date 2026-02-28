@@ -54,7 +54,7 @@ const districtBoundaryStyle = {
   fillOpacity: 0,
 };
 
-export default function RiceMap({ filters, layers, isDark }) {
+export default function RiceMap({ filters, layers, isDark, resetViewKey }) {
   const [points, setPoints] = useState([]);
   const [paddyGeo, setPaddyGeo] = useState(null);
   const [districtBoundary, setDistrictBoundary] = useState(null);
@@ -118,12 +118,25 @@ export default function RiceMap({ filters, layers, isDark }) {
   /* =========================================================
      AUTO ZOOM TO DISTRICT
   ========================================================= */
-  useEffect(() => {
-    if (districtBoundary && mapRef.current) {
-      const layer = L.geoJSON(districtBoundary);
-      mapRef.current.fitBounds(layer.getBounds());
-    }
-  }, [districtBoundary]);
+useEffect(() => {
+  if (!mapRef.current) return;
+
+  if (districtBoundary) {
+    // Zoom to selected district
+    const layer = L.geoJSON(districtBoundary);
+    mapRef.current.fitBounds(layer.getBounds());
+  } else {
+    // No district selected → zoom back to Sri Lanka
+    mapRef.current.fitBounds(SRI_LANKA_BOUNDS);
+  }
+}, [districtBoundary]);
+
+
+// 🔥 Manual Reset View (without clearing district)
+useEffect(() => {
+  if (!mapRef.current) return;
+  mapRef.current.fitBounds(SRI_LANKA_BOUNDS);
+}, [resetViewKey]);
 
   /* =========================================================
      LOAD ML HEALTH POINTS
