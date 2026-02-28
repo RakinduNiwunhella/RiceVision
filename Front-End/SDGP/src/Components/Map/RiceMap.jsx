@@ -1,21 +1,46 @@
 import { MapContainer, TileLayer, CircleMarker, GeoJSON } from "react-leaflet";
 import { useEffect, useState, useRef } from "react";
-import { latLngBounds } from "leaflet";
 import L from "leaflet";
 import { fetchMapFields } from "../../api/api";
 
-const SRI_LANKA_CENTER = [7.8731, 80.7718];
-const SRI_LANKA_ZOOM = 7;
+/* =========================================================
+   MAP CONSTANTS
+========================================================= */
 
-/* ---------- HEALTH COLORS ---------- */
+const SRI_LANKA_CENTER = [7.8731, 80.7718];
+const SRI_LANKA_ZOOM = 8;
+
+// 🇱🇰 Lock map to Sri Lanka
+const SRI_LANKA_BOUNDS = [
+  [5.8, 79.5],   // Southwest
+  [10.1, 82.1],  // Northeast
+];
+
+/* =========================================================
+   HEALTH COLORS (ROBUST VERSION)
+========================================================= */
+
 function getHealthColor(health) {
-  if (health === "Normal") return "#16a34a";
-  if (health === "Mild Stress") return "#facc15";
-  if (health === "Severe Stress") return "#dc2626";
+  if (!health) return "#2563eb";
+
+  const value = health.toLowerCase();
+
+  if (value.includes("normal") || value.includes("healthy"))
+    return "#16a34a"; // green
+
+  if (value.includes("mild") || value.includes("stress"))
+    return "#facc15"; // yellow
+
+  if (value.includes("severe") || value.includes("damage"))
+    return "#dc2626"; // red
+
   return "#2563eb";
 }
 
-/* ---------- STYLES ------ */
+/* =========================================================
+   STYLES
+========================================================= */
+
 const paddyStyle = {
   fillColor: "#f59e0b",
   fillOpacity: 0.6,
@@ -41,15 +66,15 @@ export default function RiceMap({ filters, layers, isDark }) {
 
   /* =========================================================
      BASE MAP LOGIC
-     ========================================================= */
+  ========================================================= */
 
   let tileUrl = "";
 
   if (layers.showRoads) {
-    // Full OpenStreetMap (Google-like roads + green areas)
+    // Full OpenStreetMap
     tileUrl = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
   } else {
-    // Styled dashboard map (WITH labels)
+    // Styled dashboard map
     tileUrl = isDark
       ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
       : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
@@ -57,7 +82,7 @@ export default function RiceMap({ filters, layers, isDark }) {
 
   /* =========================================================
      LOAD PADDY EXTENT
-     ========================================================= */
+  ========================================================= */
   useEffect(() => {
     if (!selectedDistrict || !layers.paddyExtent) {
       setPaddyGeo(null);
@@ -75,7 +100,7 @@ export default function RiceMap({ filters, layers, isDark }) {
 
   /* =========================================================
      LOAD DISTRICT BOUNDARY
-     ========================================================= */
+  ========================================================= */
   useEffect(() => {
     setDistrictBoundary(null);
 
@@ -92,7 +117,7 @@ export default function RiceMap({ filters, layers, isDark }) {
 
   /* =========================================================
      AUTO ZOOM TO DISTRICT
-     ========================================================= */
+  ========================================================= */
   useEffect(() => {
     if (districtBoundary && mapRef.current) {
       const layer = L.geoJSON(districtBoundary);
@@ -102,7 +127,7 @@ export default function RiceMap({ filters, layers, isDark }) {
 
   /* =========================================================
      LOAD ML HEALTH POINTS
-     ========================================================= */
+  ========================================================= */
   useEffect(() => {
     if (!selectedDistrict || !layers.showCircles) {
       setPoints([]);
@@ -128,13 +153,17 @@ export default function RiceMap({ filters, layers, isDark }) {
 
   /* =========================================================
      RENDER
-     ========================================================= */
+  ========================================================= */
 
   return (
     <MapContainer
       ref={mapRef}
       center={SRI_LANKA_CENTER}
       zoom={SRI_LANKA_ZOOM}
+      minZoom={7}
+      maxZoom={18}
+      maxBounds={SRI_LANKA_BOUNDS}
+      maxBoundsViscosity={1.0}
       className="h-full w-full rounded-xl"
     >
       {/* Base Map */}
