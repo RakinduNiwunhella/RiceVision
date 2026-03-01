@@ -7,7 +7,6 @@ import joblib
 import pandas as pd
 
 from src.inference_steps import (
-    DISTRICT_CENTERS,
     STAGE_MAPPING,
     add_cpi,
     add_ndvi_zscore,
@@ -19,7 +18,7 @@ from src.inference_steps import (
     finalize_schema,
     handle_missing_values,
     infer_stage,
-    map_districts,
+    map_pixels,
     mask_and_fill_spectral,
     smooth_features,
 )
@@ -46,8 +45,11 @@ def run_preprocessing_pipeline(
     terrain_cols = ['elevation', 'slope']
 
     df = drop_unnecessary_columns(df)
-    # Check if there are missing slots and if not add logic for that
+    # Has to check 10 sequences per each pixel is there after this.
+    df = map_pixels(df, artifacts_dir=artifacts_dir, coords_filename='unique_coordinates.csv')
+
     df = handle_missing_values(df, bands=bands, weather_cols=weather_cols, terrain_cols=terrain_cols)
+
     df = mask_and_fill_spectral(df, bands=bands)
     df = engineer_features(df)
     df.to_csv(artifacts_dir / 'inference_preprocess_engineered.csv', index=False)
@@ -55,7 +57,6 @@ def run_preprocessing_pipeline(
     df = aggregate_10day(df)
     df.to_csv(artifacts_dir / 'inference_preprocess_10day.csv', index=False)
 
-    df = map_districts(df, DISTRICT_CENTERS)
     df = smooth_features(df)
     df = add_velocities(df)
     df = infer_stage(df, baseline_df)
