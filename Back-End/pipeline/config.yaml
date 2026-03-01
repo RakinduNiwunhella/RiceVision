@@ -99,8 +99,8 @@ models:
   yield_model: models/rice_yield_model_final.pkl
 
 baselines:
-  district_baseline: artifacts/sri_lanka_district_baselines.csv
-  yield_baseline: artifacts/yield_baselines.csv
+  district_baseline: data/baselines/sri_lanka_district_baselines.csv
+  yield_baseline: data/baselines/yield_baselines.csv
 
 preprocessing:
   bands: [B1, B2, B3, B4, B5, B6, B7, B8, B8A, B9, B11, B12]

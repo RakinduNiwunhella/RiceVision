@@ -13,8 +13,8 @@ help:
 	@echo "  make install              - create venv and install dependencies"
 	@echo "  make clean                - remove generated artifacts"
 	@echo "  make preprocess-pipeline  - run inference preprocessing pipeline"
-	@echo "  make lstm-pipeline        - run BiLSTM inference pipeline"
-	@echo "  make yield-pipeline       - run yield inference pipeline"
+	@echo "  make lstm-pipeline        - run preprocess then BiLSTM inference pipeline"
+	@echo "  make yield-pipeline       - run preprocess -> BiLSTM -> yield pipeline"
 	@echo "  make run-all              - run preprocess -> lstm -> yield"
 
 install:
@@ -32,7 +32,7 @@ install:
 
 clean:
 	@echo "Cleaning generated artifacts..."
-	@rm -rf artifacts/*.csv artifacts/*.png artifacts/*.joblib artifacts/*.keras artifacts/*.pkl artifacts/predictions || true
+	@rm -rf artifacts/* || true
 	@echo "✅ Clean completed"
 
 preprocess-pipeline:
@@ -40,14 +40,14 @@ preprocess-pipeline:
 	@$(VENV_PY) -m pipelines.inference_preprocessing
 	@echo "✅ Preprocessing pipeline completed"
 
-lstm-pipeline:
+lstm-pipeline: preprocess-pipeline
 	@echo "🚀 Running BiLSTM inference pipeline..."
 	@$(VENV_PY) -m pipelines.BiLSTM_inference
 	@echo "✅ BiLSTM inference pipeline completed"
 
-yield-pipeline:
+yield-pipeline: lstm-pipeline
 	@echo "🚀 Running yield inference pipeline..."
 	@$(VENV_PY) -m pipelines.yield_inference
 	@echo "✅ Yield inference pipeline completed"
 
-run-all: preprocess-pipeline lstm-pipeline yield-pipeline
+run-all: yield-pipeline

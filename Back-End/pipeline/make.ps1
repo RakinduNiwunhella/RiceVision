@@ -35,8 +35,8 @@ function Help {
     Write-Host "  ./make.ps1 install             - create venv and install dependencies"
     Write-Host "  ./make.ps1 clean               - remove generated artifacts"
     Write-Host "  ./make.ps1 preprocess-pipeline - run inference preprocessing pipeline"
-    Write-Host "  ./make.ps1 lstm-pipeline       - run BiLSTM inference pipeline"
-    Write-Host "  ./make.ps1 yield-pipeline      - run yield inference pipeline"
+    Write-Host "  ./make.ps1 lstm-pipeline       - run preprocess then BiLSTM inference pipeline"
+    Write-Host "  ./make.ps1 yield-pipeline      - run preprocess -> BiLSTM -> yield pipeline"
     Write-Host "  ./make.ps1 run-all             - run preprocess -> lstm -> yield"
 }
 
@@ -62,12 +62,9 @@ function Install {
 
 function Clean {
     Write-Host "Cleaning generated artifacts..." -ForegroundColor Yellow
-    Remove-Item -Path "artifacts\*.csv" -Force -ErrorAction SilentlyContinue
-    Remove-Item -Path "artifacts\*.png" -Force -ErrorAction SilentlyContinue
-    Remove-Item -Path "artifacts\*.joblib" -Force -ErrorAction SilentlyContinue
-    Remove-Item -Path "artifacts\*.keras" -Force -ErrorAction SilentlyContinue
-    Remove-Item -Path "artifacts\*.pkl" -Force -ErrorAction SilentlyContinue
-    Remove-Item -Path "artifacts\predictions" -Recurse -Force -ErrorAction SilentlyContinue
+    if (Test-Path "artifacts") {
+        Get-ChildItem -Path "artifacts" -Force | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+    }
     Write-Host "✅ Clean completed"
 }
 
@@ -79,6 +76,7 @@ function PreprocessPipeline {
 }
 
 function LstmPipeline {
+    PreprocessPipeline
     Write-Host "🚀 Running BiLSTM inference pipeline..."
     $py = Use-Venv
     & $py -m pipelines.BiLSTM_inference
@@ -86,6 +84,7 @@ function LstmPipeline {
 }
 
 function YieldPipeline {
+    LstmPipeline
     Write-Host "🚀 Running yield inference pipeline..."
     $py = Use-Venv
     & $py -m pipelines.yield_inference
@@ -94,8 +93,6 @@ function YieldPipeline {
 
 function RunAll {
     Write-Host "Running all pipelines: preprocess -> lstm -> yield" -ForegroundColor Cyan
-    PreprocessPipeline
-    LstmPipeline
     YieldPipeline
     Write-Host "✅ All pipelines completed"
 }

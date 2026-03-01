@@ -100,6 +100,12 @@ Pipeline paths, model paths, stage mapping, and final schema columns are control
 - `config.yaml`
 - `utils/config.py`
 
+Baseline reference datasets are stored in:
+- `data/baselines/sri_lanka_district_baselines.csv`
+- `data/baselines/yield_baselines.csv`
+
+The `clean` targets remove only generated outputs and do not remove these baseline files.
+
 ## Notes
 
 - MLflow/streaming pipeline flow is not part of this inference-only setup.
