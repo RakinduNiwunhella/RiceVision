@@ -2,14 +2,19 @@ from .constants import DISTRICT_CENTERS, STAGE_MAPPING
 from .drop_unnecessary_columns import drop_unnecessary_columns
 from .handle_missing_values import handle_missing_values
 from .mask_and_fill_spectral import mask_and_fill_spectral
+from .rescaling_and_masking import rescaling_and_masking
+from .filling_nans import filling_nans
+from .date_extraction import extract_date_parts
+from .disaster_vectorization import vectorize_disasters
+from .visualize_points import visualize_unique_points
 from .engineer_features import engineer_features
 from .aggregate_10day import aggregate_10day
-from .map_districts import map_districts
+from .map_districts import map_districts, map_pixels
 from .smooth_features import smooth_features
 from .add_velocities import add_velocities
 from .infer_stage import infer_stage
 from .add_ndvi_zscore import add_ndvi_zscore
-from .add_cpi import add_cpi
+from .add_cpi_zvel import add_cpi_zvel
 from .add_season import add_season
 from .finalize_schema import finalize_schema
 from .bilstm_prepare import (
@@ -44,14 +49,20 @@ __all__ = [
     'drop_unnecessary_columns',
     'handle_missing_values',
     'mask_and_fill_spectral',
+    'rescaling_and_masking',
+    'filling_nans',
+    'extract_date_parts',
+    'vectorize_disasters',
+    'visualize_unique_points',
     'engineer_features',
     'aggregate_10day',
+    'map_pixels',
     'map_districts',
     'smooth_features',
     'add_velocities',
     'infer_stage',
     'add_ndvi_zscore',
-    'add_cpi',
+    'add_cpi_zvel',
     'add_season',
     'finalize_schema',
     'BILSTM_HAZARD_COLS',

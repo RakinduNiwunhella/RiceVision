@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 
-def add_cpi(df: pd.DataFrame) -> pd.DataFrame:
+def add_cpi_zvel(df: pd.DataFrame) -> pd.DataFrame:
     if df['pixel_id'].nunique() > 10:
         def safe_robust_z(series: pd.Series):
             if len(series) < 5:

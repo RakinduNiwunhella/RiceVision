@@ -9,6 +9,7 @@ DISTRICT_CENTERS = {
     'Puttalam': (8.03, 79.82), 'Ratnapura': (6.68, 80.40), 'Trincomalee': (8.57, 81.23),
     'Vavuniya': (8.75, 80.50),
 }
+# No need district centers
 
 STAGE_MAPPING = {'Transplant': 0, 'Vegetative': 1, 'Reproductive': 2, 'Ripening': 3, 'Harvest': 4}
 

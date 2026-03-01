@@ -3,69 +3,81 @@ import pandas as pd
 from scipy.spatial import KDTree
 
 
-def handle_missing_values(df: pd.DataFrame, bands, weather_cols, terrain_cols) -> pd.DataFrame:
+def handle_missing_values(df: pd.DataFrame) -> pd.DataFrame:
+    print('🚀 Starting Refined Production Data Cleaning Pipeline...')
+
+    df = df.replace(['nan', 'NaN', 'None', 'null'], np.nan)
+
+    initial_count = len(df)
+    df = df.dropna(subset=['district']).copy()
+    df = df.reset_index(drop=True)
+    dropped_districts = initial_count - len(df)
+    print(f'📍 Step -1: Dropped {dropped_districts} rows with missing districts. New count: {len(df)}')
+
+    bands = ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B9', 'B11', 'B12']
+    weather_cols = ['rain_1d', 'rain_3d', 'rain_7d', 'rain_14d', 'rain_30d', 'tmean', 'tmin', 'tmax', 't_day', 't_night', 'rh_mean']
+    terrain_cols = ['elevation', 'slope']
+    hazard_cols = [c for c in df.columns if c.lower().startswith('hazard')]
+
+    if hazard_cols:
+        df[hazard_cols] = df[hazard_cols].fillna(0).astype('int8')
+        print('🛡️ Step 0: Hazards filled with 0.')
+
+    if 'SCL' in df.columns:
+        df['SCL'] = pd.to_numeric(df['SCL'], errors='coerce').round().fillna(0).astype('int8')
+        print('🏷️ Step 0: SCL rounded and cast to Int8.')
+
     for col in bands:
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors='coerce').astype('float32')
 
-    if 'SCL' in df.columns:
-        df['SCL'] = pd.to_numeric(df['SCL'], errors='coerce')
+    if 'date' in df.columns:
+        df['date'] = pd.to_datetime(df['date'], errors='coerce')
+        print('📅 Step 0: Date converted to datetime objects.')
 
-    df = df.sort_values(by=['pixel_id', 'timestep'], ascending=[True, False]).copy()
+    df = df.sort_values(by=['pixel_id', 'timestep'], ascending=[True, False])
 
-    existing_weather = [col for col in weather_cols if col in df.columns]
+    existing_weather = [c for c in weather_cols if c in df.columns]
     if existing_weather:
         for ts in df['timestep'].dropna().unique():
-            ts_mask = df['timestep'] == ts
+            ts_mask = (df['timestep'] == ts)
             for col in existing_weather:
-                if not df.loc[ts_mask, col].isnull().any():
-                    continue
-                valid = df[ts_mask & df[col].notnull()]
-                missing = df[ts_mask & df[col].isnull()]
-                if valid.empty or missing.empty:
-                    continue
-                tree = KDTree(valid[['lat', 'lon']].values)
-                _, idx = tree.query(missing[['lat', 'lon']].values)
-                df.loc[missing.index, col] = valid.iloc[idx][col].values
+                if df.loc[ts_mask, col].isnull().any():
+                    valid = df[ts_mask & df[col].notnull()]
+                    missing = df[ts_mask & df[col].isnull()]
+                    if not valid.empty and not missing.empty:
+                        tree = KDTree(valid[['lat', 'lon']].values)
+                        _, idx = tree.query(missing[['lat', 'lon']].values)
+                        df.loc[missing.index, col] = valid.iloc[idx][col].values
 
-    existing_terrain = [col for col in terrain_cols if col in df.columns]
-    if existing_terrain:
-        df[existing_terrain] = df.groupby('pixel_id')[existing_terrain].ffill().bfill()
-
-    if 'SCL' in df.columns:
-        def get_mode(series):
-            modes = series.mode(dropna=True)
-            return modes.iloc[0] if not modes.empty else np.nan
-        df['SCL'] = df.groupby('pixel_id')['SCL'].transform(lambda x: x.fillna(get_mode(x)))
-
-    if 'cloud_pct' in df.columns:
-        df['cloud_pct'] = df.groupby('pixel_id')['cloud_pct'].transform(lambda x: x.fillna(x.mean()))
-
-    existing_bands = [col for col in bands if col in df.columns]
+    existing_bands = [c for c in bands if c in df.columns]
     if existing_bands:
         df[existing_bands] = df.groupby('pixel_id', group_keys=False)[existing_bands].apply(
-            lambda g: g.interpolate(method='linear', limit_direction='both')
+            lambda group: group.interpolate(method='linear', limit_direction='both')
         )
 
     if existing_weather:
-        df[existing_weather] = df.groupby('pixel_id')[existing_weather].ffill()
+        df[existing_weather] = df.groupby('pixel_id')[existing_weather].ffill().bfill()
+
+    existing_terrain = [c for c in terrain_cols if c in df.columns]
+    if existing_terrain:
+        df[existing_terrain] = df.groupby('pixel_id')[existing_terrain].ffill().bfill()
+
+    print('🛡️ Step H: Applying Global Median Fallback...')
+    final_nulls = df.isnull().sum().sum()
+    if final_nulls > 0:
+        num_cols = df.select_dtypes(include=[np.number]).columns
+        df[num_cols] = df[num_cols].fillna(df[num_cols].median())
+
+        obj_cols = df.select_dtypes(include=['object']).columns
+        df[obj_cols] = df[obj_cols].fillna('Unknown')
+
+        df = df.fillna(0)
+
+    print(f'🏁 Cleaning finished. Final NaN count: {df.isnull().sum().sum()}')
 
     if 'date' in df.columns:
-        df['date'] = pd.to_datetime(df['date'], errors='coerce')
-
-        def fix_dates(group):
-            if group['date'].isnull().any() and group['date'].notnull().any():
-                anchor = group[group['date'].notnull()].iloc[0]
-                group['date'] = group.apply(
-                    lambda row: anchor['date'] + pd.Timedelta(days=(anchor['timestep'] - row['timestep']) * 15)
-                    if pd.isna(row['date']) else row['date'],
-                    axis=1,
-                )
-            return group
-
-        df = df.groupby('pixel_id', group_keys=False).apply(fix_dates)
-
-    if df.isnull().sum().sum() > 0:
-        df = df.fillna(df.median(numeric_only=True)).fillna(0)
+        print('\n--- Rows per Year ---')
+        print(df.groupby(df['date'].dt.year).size())
 
     return df

@@ -8,19 +8,26 @@ import pandas as pd
 
 from src.inference_steps import (
     STAGE_MAPPING,
-    add_cpi,
+    add_cpi_zvel,
     add_ndvi_zscore,
     add_season,
     add_velocities,
     aggregate_10day,
     drop_unnecessary_columns,
     engineer_features,
+    extract_date_parts,
+    extract_lstm_frame,
+    filling_nans,
     finalize_schema,
     handle_missing_values,
     infer_stage,
     map_pixels,
-    mask_and_fill_spectral,
+    prepare_inference_physics,
+    rescaling_and_masking,
+    scale_lstm_features,
     smooth_features,
+    vectorize_disasters,
+    visualize_unique_points,
 )
 
 
@@ -29,6 +36,7 @@ def run_preprocessing_pipeline(
     output_csv: Path,
     baseline_csv: Path,
     district_encoder_path: Path,
+    scaler_path: Path,
     artifacts_dir: Path,
 ) -> pd.DataFrame:
     if not input_csv.exists():
@@ -40,17 +48,16 @@ def run_preprocessing_pipeline(
     baseline_df = pd.read_csv(baseline_csv) if baseline_csv.exists() else None
     df = pd.read_csv(input_csv)
 
-    bands = ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B9', 'B11', 'B12']
-    weather_cols = ['rain_1d', 'rain_3d', 'rain_7d', 'rain_14d', 'rain_30d', 'tmean', 'tmin', 'tmax', 't_day', 't_night', 'rh_mean']
-    terrain_cols = ['elevation', 'slope']
-
     df = drop_unnecessary_columns(df)
-    # Has to check 10 sequences per each pixel is there after this.
     df = map_pixels(df, artifacts_dir=artifacts_dir, coords_filename='unique_coordinates.csv')
+    df = vectorize_disasters(df)
+    df = handle_missing_values(df)
+    df = extract_date_parts(df)
 
-    df = handle_missing_values(df, bands=bands, weather_cols=weather_cols, terrain_cols=terrain_cols)
+    visualize_unique_points(df, artifacts_dir=artifacts_dir, image_name='paddy_points_distribution.png')
 
-    df = mask_and_fill_spectral(df, bands=bands)
+    df = rescaling_and_masking(df)
+    df = filling_nans(df)
     df = engineer_features(df)
     df.to_csv(artifacts_dir / 'inference_preprocess_engineered.csv', index=False)
 
@@ -61,10 +68,22 @@ def run_preprocessing_pipeline(
     df = add_velocities(df)
     df = infer_stage(df, baseline_df)
     df = add_ndvi_zscore(df, baseline_df)
-    df = add_cpi(df)
-    df = add_season(df)
+    df = add_cpi_zvel(df)
+    df = add_season(df, district_encoder_path=str(district_encoder_path) if district_encoder_path.exists() else None)
     df = finalize_schema(df, stage_mapping=STAGE_MAPPING)
 
+    df_lstm = extract_lstm_frame(df)
+    df_lstm.to_csv(artifacts_dir / 'bilstm_lstm_frame.csv', index=False)
+
+    if scaler_path.exists():
+        df_scaled = scale_lstm_features(df_lstm, scaler_path=str(scaler_path))
+    else:
+        df_scaled = df_lstm.copy()
+    df_scaled.to_csv(artifacts_dir / 'bilstm_scaled_frame.csv', index=False)
+
+    df_prepared = prepare_inference_physics(df_scaled)
+    df_prepared.to_csv(artifacts_dir / 'Inference_preprocessed.csv', index=False)
+    
     if district_encoder_path.exists() and 'district' in df.columns and 'district_id' not in df.columns:
         encoder = joblib.load(district_encoder_path)
         df['district_id'] = encoder.transform(df['district']).astype('int32')
@@ -108,6 +127,12 @@ def parse_args() -> argparse.Namespace:
         help='District encoder path',
     )
     parser.add_argument(
+        '--scaler',
+        type=Path,
+        default=project_root / 'scalers' / 'lstm_scaler.joblib',
+        help='Path to LSTM scaler for preprocessing handoff artifacts',
+    )
+    parser.add_argument(
         '--artifacts-dir',
         type=Path,
         default=project_root / 'artifacts',
@@ -123,6 +148,7 @@ if __name__ == '__main__':
         output_csv=args.output,
         baseline_csv=args.baseline,
         district_encoder_path=args.district_encoder,
+        scaler_path=args.scaler,
         artifacts_dir=args.artifacts_dir,
     )
     print(f"Saved preprocessing output: {args.output}")
