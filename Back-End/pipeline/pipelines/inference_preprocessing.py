@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from io import StringIO
 from pathlib import Path
 
 import joblib
@@ -34,6 +35,12 @@ def _log_step(step_no: int, total_steps: int, title: str) -> None:
     logger.info('▶️  [%d/%d] %s', step_no, total_steps, title)
 
 
+def _log_df_info(df: pd.DataFrame, context: str) -> None:
+    buffer = StringIO()
+    df.info(buf=buffer, show_counts=True)
+    logger.info('%s\n%s', context, buffer.getvalue())
+
+
 def run_preprocessing_pipeline(
     input_csv: Path,
     output_csv: Path,
@@ -56,63 +63,102 @@ def run_preprocessing_pipeline(
     baseline_df = pd.read_csv(baseline_csv) if baseline_csv.exists() else None
     df = pd.read_csv(input_csv)
     logger.info('Loaded rows=%d, cols=%d', len(df), len(df.columns))
+    _log_df_info(df, 'After Step 1 - Loaded input dataset')
 
     _log_step(2, total_steps, 'Dropping unnecessary columns')
+    _log_df_info(df, 'Before Step 2 - drop_unnecessary_columns')
     df = drop_unnecessary_columns(df)
-    logger.info('After drop: rows=%d, cols=%d', len(df), len(df.columns))
+    _log_df_info(df, 'After Step 2 - drop_unnecessary_columns')
 
     _log_step(3, total_steps, 'Mapping pixels and exporting coordinate lookup')
+    _log_df_info(df, 'Before Step 3 - map_pixels')
     df = map_pixels(df, artifacts_dir=artifacts_dir, coords_filename='unique_coordinates.csv')
+    _log_df_info(df, 'After Step 3 - map_pixels')
 
     _log_step(4, total_steps, 'Vectorizing disaster hazard flags')
+    _log_df_info(df, 'Before Step 4 - vectorize_disasters')
     df = vectorize_disasters(df)
+    _log_df_info(df, 'After Step 4 - vectorize_disasters')
 
     _log_step(5, total_steps, 'Handling missing values and cleaning data')
+    _log_df_info(df, 'Before Step 5 - handle_missing_values')
     df = handle_missing_values(df)
+    _log_df_info(df, 'After Step 5 - handle_missing_values')
 
     _log_step(6, total_steps, 'Extracting date components')
+    _log_df_info(df, 'Before Step 6 - extract_date_parts')
     df = extract_date_parts(df)
+    _log_df_info(df, 'After Step 6 - extract_date_parts')
 
     _log_step(7, total_steps, 'Generating paddy point distribution plot')
+    _log_df_info(df, 'Before Step 7 - visualize_unique_points')
     visualize_unique_points(df, artifacts_dir=artifacts_dir, image_name='paddy_points_distribution.png')
+    _log_df_info(df, 'After Step 7 - visualize_unique_points')
 
     _log_step(8, total_steps, 'Rescaling and masking unclean pixels')
+    _log_df_info(df, 'Before Step 8 - rescaling_and_masking')
     df = rescaling_and_masking(df)
+    _log_df_info(df, 'After Step 8 - rescaling_and_masking')
 
     _log_step(9, total_steps, 'Filling spectral NaN values')
+    _log_df_info(df, 'Before Step 9 - filling_nans')
     df = filling_nans(df)
+    _log_df_info(df, 'After Step 9 - filling_nans')
 
     _log_step(10, total_steps, 'Engineering spectral and environmental features')
+    _log_df_info(df, 'Before Step 10 - engineer_features')
     df = engineer_features(df)
+    _log_df_info(df, 'After Step 10 - engineer_features')
     df.to_csv(artifacts_dir / 'inference_preprocess_engineered.csv', index=False)
     logger.info('Saved engineered artifact: %s', artifacts_dir / 'inference_preprocess_engineered.csv')
 
     _log_step(11, total_steps, 'Aggregating to 10-day windows')
+    _log_df_info(df, 'Before Step 11 - aggregate_10day')
     df = aggregate_10day(df)
+    _log_df_info(df, 'After Step 11 - aggregate_10day')
     df.to_csv(artifacts_dir / 'inference_preprocess_10day.csv', index=False)
     logger.info('Saved 10-day artifact: %s', artifacts_dir / 'inference_preprocess_10day.csv')
 
     _log_step(12, total_steps, 'Smoothing temporal features')
+    _log_df_info(df, 'Before Step 12 - smooth_features')
     df = smooth_features(df)
+    _log_df_info(df, 'After Step 12 - smooth_features')
+
     _log_step(13, total_steps, 'Computing temporal velocities')
+    _log_df_info(df, 'Before Step 13 - add_velocities')
     df = add_velocities(df)
+    _log_df_info(df, 'After Step 13 - add_velocities')
 
     _log_step(14, total_steps, 'Inferring crop growth stage statistically')
+    _log_df_info(df, 'Before Step 14 - infer_stage')
     df = infer_stage(df, baseline_df)
+    _log_df_info(df, 'After Step 14 - infer_stage')
 
     _log_step(15, total_steps, 'Computing NDVI z-score')
+    _log_df_info(df, 'Before Step 15 - add_ndvi_zscore')
     df = add_ndvi_zscore(df, baseline_df)
+    _log_df_info(df, 'After Step 15 - add_ndvi_zscore')
+
     _log_step(16, total_steps, 'Computing CPI and related z-velocity metrics')
+    _log_df_info(df, 'Before Step 16 - add_cpi_zvel')
     df = add_cpi_zvel(df)
+    _log_df_info(df, 'After Step 16 - add_cpi_zvel')
 
     _log_step(17, total_steps, 'Adding season, cycle, and district encoding')
+    _log_df_info(df, 'Before Step 17 - add_season')
     df = add_season(df, district_encoder_path=str(district_encoder_path) if district_encoder_path.exists() else None)
+    _log_df_info(df, 'After Step 17 - add_season')
+
     stage_mapping = get_stage_mapping()
     _log_step(18, total_steps, 'Finalizing schema for BiLSTM handoff')
+    _log_df_info(df, 'Before Step 18 - finalize_schema')
     df = finalize_schema(df, stage_mapping=stage_mapping)
+    _log_df_info(df, 'After Step 18 - finalize_schema')
 
     _log_step(19, total_steps, 'Creating BiLSTM handoff artifacts')
+    _log_df_info(df, 'Before Step 19 - extract_lstm_frame')
     df_lstm = extract_lstm_frame(df) 
+    _log_df_info(df_lstm, 'After Step 19a - extract_lstm_frame')
     df_lstm.to_csv(artifacts_dir / 'bilstm_lstm_frame.csv', index=False)
     logger.info('Saved BiLSTM frame: %s', artifacts_dir / 'bilstm_lstm_frame.csv')
 
@@ -120,10 +166,12 @@ def run_preprocessing_pipeline(
         df_scaled = scale_lstm_features(df_lstm, scaler_path=str(scaler_path)) 
     else:
         df_scaled = df_lstm.copy()
+    _log_df_info(df_scaled, 'After Step 19b - scale_lstm_features')
     df_scaled.to_csv(artifacts_dir / 'bilstm_scaled_frame.csv', index=False)
     logger.info('Saved scaled BiLSTM frame: %s', artifacts_dir / 'bilstm_scaled_frame.csv')
 
     df_prepared = prepare_inference_physics(df_scaled) 
+    _log_df_info(df_prepared, 'After Step 19c - prepare_inference_physics')
     df_prepared.to_csv(artifacts_dir / 'Inference_preprocessed.csv', index=False)
     logger.info('Saved final BiLSTM input file: %s', artifacts_dir / 'Inference_preprocessed.csv')
     
@@ -138,6 +186,7 @@ def run_preprocessing_pipeline(
     if 'date' in df.columns:
         df['date'] = pd.to_datetime(df['date'], errors='coerce').dt.strftime('%Y-%m-%d')
 
+    _log_df_info(df, 'Final output dataframe before save')
     df.to_csv(output_csv, index=False)
     logger.info('✅ Preprocessing pipeline completed successfully. Output: %s (rows=%d, cols=%d)', output_csv, len(df), len(df.columns))
     return df

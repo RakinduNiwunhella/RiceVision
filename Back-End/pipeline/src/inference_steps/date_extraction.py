@@ -7,4 +7,5 @@ def extract_date_parts(full_dataset: pd.DataFrame) -> pd.DataFrame:
     full_dataset['month'] = full_dataset['date'].dt.month
     full_dataset['day'] = full_dataset['date'].dt.day
     full_dataset['month_day'] = full_dataset['date'].dt.strftime('%m-%d')
+    
     return full_dataset

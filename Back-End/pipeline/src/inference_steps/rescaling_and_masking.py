@@ -14,4 +14,5 @@ def rescaling_and_masking(full_dataset: pd.DataFrame) -> pd.DataFrame:
 
     full_dataset.loc[~clean_mask, existing_bands] = np.nan
     full_dataset['is_clean'] = clean_mask
+    full_dataset.info()
     return full_dataset
