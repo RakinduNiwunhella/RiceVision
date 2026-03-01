@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import logging
 from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
 import tensorflow as tf
+
+logger = logging.getLogger(__name__)
 
 
 BASE_TS: List[str] = [
@@ -24,16 +27,21 @@ STATIC_FEATURES: List[str] = ['lat', 'lon', 'elevation', 'slope', 'season_id', '
 
 
 def standardize_live(df: pd.DataFrame, feature_names: List[str]) -> pd.DataFrame:
+    logger.info('Standardizing live frame using %d candidate features...', len(feature_names))
     scaled = df.copy()
+    transformed_count = 0
     for col in feature_names:
         if col in scaled.columns:
             col_mean = scaled[col].mean()
             col_std = scaled[col].std() + 1e-6
             scaled[col] = (scaled[col] - col_mean) / col_std
+            transformed_count += 1
+    logger.info('Standardization complete. Transformed %d features.', transformed_count)
     return scaled
 
 
 def create_lstm_inputs(df: pd.DataFrame, window_size: int = 10) -> Tuple[Dict[str, np.ndarray], np.ndarray]:
+    logger.info('Creating LSTM inputs with window_size=%d...', window_size)
     ordered = df.sort_values(['pixel_id', 'date']).reset_index(drop=True).copy()
     ordered['group_id'] = ordered.groupby(['pixel_id', 'cycle_id']).ngroup()
 
@@ -54,11 +62,15 @@ def create_lstm_inputs(df: pd.DataFrame, window_size: int = 10) -> Tuple[Dict[st
         'static_input': st_data[valid_ends],
         'district_input': di_data[valid_ends],
     }
+    logger.info('LSTM inputs ready. Valid windows=%d', len(valid_ends))
     return inputs, valid_ends
 
 
 def extract_latents(feature_extractor: tf.keras.Model, x_input: Dict[str, np.ndarray], batch_size: int = 1024) -> np.ndarray:
-    return feature_extractor.predict(x_input, batch_size=batch_size, verbose=0)
+    logger.info('Extracting latent vectors with batch_size=%d...', batch_size)
+    latents = feature_extractor.predict(x_input, batch_size=batch_size, verbose=0)
+    logger.info('Latent extraction complete. Shape=%s', latents.shape)
+    return latents
 
 
 def build_master_z(
@@ -68,6 +80,7 @@ def build_master_z(
     pca,
     lstm_results: pd.DataFrame,
 ) -> pd.DataFrame:
+    logger.info('Building master latent table and applying PCA transform...')
     pc_features = pca.transform(latents)
     pc_features = np.clip(pc_features, -5, 5)
 
@@ -79,6 +92,7 @@ def build_master_z(
     available_merge = [col for col in merge_cols if col in lstm_results.columns]
     if set(['pixel_id', 'date']).issubset(set(available_merge)):
         master = master.merge(lstm_results[available_merge], on=['pixel_id', 'date'], how='left')
+    logger.info('Master table ready. Rows=%d, Cols=%d', len(master), len(master.columns))
     return master
 
 
@@ -119,13 +133,16 @@ def summarize_z_blended(group: pd.DataFrame, padding_lookup_z: Dict[int, Dict[st
 
 
 def build_district_summary(df_master_z: pd.DataFrame, yield_baselines: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    logger.info('Summarizing pixel and district statistics for yield estimation...')
     padding_lookup_z = yield_baselines.groupby('District_ID').mean(numeric_only=True).to_dict('index')
     pixel_stats = df_master_z.groupby('pixel_id').apply(summarize_z_blended, padding_lookup_z=padding_lookup_z).reset_index()
     district_summary = pixel_stats.groupby(['District_ID', 'Season_ID']).mean(numeric_only=True).reset_index()
+    logger.info('Summary ready. pixel_stats=%d rows, district_summary=%d rows', len(pixel_stats), len(district_summary))
     return pixel_stats, district_summary
 
 
 def engineer_yield_features(district_summary: pd.DataFrame, yield_baselines: pd.DataFrame) -> pd.DataFrame:
+    logger.info('Engineering yield feature set for district-level prediction...')
     out = district_summary.copy()
     district_lookup = yield_baselines.groupby('District_ID')['Average_yield_kg_per_ha'].mean().to_dict()
     global_avg = yield_baselines['Average_yield_kg_per_ha'].mean()
@@ -138,10 +155,12 @@ def engineer_yield_features(district_summary: pd.DataFrame, yield_baselines: pd.
     out['heat_rain_ratio'] = out['temp_flowering'] / (out['rain_flowering'] + 2)
     out['repro_efficiency'] = out['avg_health'] * out['repro_days']
     out['crisis_year'] = 0
+    logger.info('Yield feature engineering complete. Rows=%d, Cols=%d', len(out), len(out.columns))
     return out
 
 
 def predict_yield(district_summary: pd.DataFrame, yield_scaler, lasso_model) -> Tuple[pd.DataFrame, np.ndarray]:
+    logger.info('Predicting district yield with calibrated blend...')
     out = district_summary.copy()
     lasso_features = lasso_model.feature_names_in_.tolist()
 
@@ -154,10 +173,12 @@ def predict_yield(district_summary: pd.DataFrame, yield_scaler, lasso_model) -> 
     calibrated_yield = (0.4 * raw_preds) + (0.6 * out['district_historical_avg']) + health_boost
 
     out['predicted_yield_kg_ha'] = np.clip(calibrated_yield, 1500, 6500)
+    logger.info('Yield prediction complete. Predicted rows=%d', len(out))
     return out, x_final_scaled
 
 
 def build_final_report(district_summary: pd.DataFrame, lstm_results: pd.DataFrame) -> pd.DataFrame:
+    logger.info('Building user-facing final yield report...')
     mapping = lstm_results[['district_id', 'district']].drop_duplicates() if {'district_id', 'district'}.issubset(lstm_results.columns) else pd.DataFrame(columns=['district_id', 'district'])
 
     report_df = district_summary.copy()
@@ -180,4 +201,5 @@ def build_final_report(district_summary: pd.DataFrame, lstm_results: pd.DataFram
     final_report = report_df[list(report_columns.keys())].rename(columns=report_columns)
     final_report = final_report.round(2)
     final_report = final_report.sort_values(by='Predicted Yield (kg/ha)', ascending=True)
+    logger.info('Final report ready. District rows=%d', len(final_report))
     return final_report

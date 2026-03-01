@@ -1,10 +1,14 @@
+import logging
+
 import numpy as np
 import pandas as pd
 from scipy.spatial import KDTree
 
+logger = logging.getLogger(__name__)
+
 
 def handle_missing_values(df: pd.DataFrame) -> pd.DataFrame:
-    print('🚀 Starting Refined Production Data Cleaning Pipeline...')
+    logger.info('Starting refined production data cleaning pipeline...')
 
     df = df.replace(['nan', 'NaN', 'None', 'null'], np.nan)
 
@@ -12,7 +16,7 @@ def handle_missing_values(df: pd.DataFrame) -> pd.DataFrame:
     df = df.dropna(subset=['district']).copy()
     df = df.reset_index(drop=True)
     dropped_districts = initial_count - len(df)
-    print(f'📍 Step -1: Dropped {dropped_districts} rows with missing districts. New count: {len(df)}')
+    logger.info('Step -1: dropped %d rows with missing districts. New count: %d', dropped_districts, len(df))
 
     bands = ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B9', 'B11', 'B12']
     weather_cols = ['rain_1d', 'rain_3d', 'rain_7d', 'rain_14d', 'rain_30d', 'tmean', 'tmin', 'tmax', 't_day', 't_night', 'rh_mean']
@@ -21,11 +25,11 @@ def handle_missing_values(df: pd.DataFrame) -> pd.DataFrame:
 
     if hazard_cols:
         df[hazard_cols] = df[hazard_cols].fillna(0).astype('int8')
-        print('🛡️ Step 0: Hazards filled with 0.')
+        logger.info('Step 0: hazards filled with 0.')
 
     if 'SCL' in df.columns:
         df['SCL'] = pd.to_numeric(df['SCL'], errors='coerce').round().fillna(0).astype('int8')
-        print('🏷️ Step 0: SCL rounded and cast to Int8.')
+        logger.info('Step 0: SCL rounded and cast to Int8.')
 
     for col in bands:
         if col in df.columns:
@@ -33,7 +37,7 @@ def handle_missing_values(df: pd.DataFrame) -> pd.DataFrame:
 
     if 'date' in df.columns:
         df['date'] = pd.to_datetime(df['date'], errors='coerce')
-        print('📅 Step 0: Date converted to datetime objects.')
+        logger.info('Step 0: date converted to datetime objects.')
 
     df = df.sort_values(by=['pixel_id', 'timestep'], ascending=[True, False])
 
@@ -63,7 +67,7 @@ def handle_missing_values(df: pd.DataFrame) -> pd.DataFrame:
     if existing_terrain:
         df[existing_terrain] = df.groupby('pixel_id')[existing_terrain].ffill().bfill()
 
-    print('🛡️ Step H: Applying Global Median Fallback...')
+    logger.info('Step H: applying global median fallback...')
     final_nulls = df.isnull().sum().sum()
     if final_nulls > 0:
         num_cols = df.select_dtypes(include=[np.number]).columns
@@ -74,10 +78,10 @@ def handle_missing_values(df: pd.DataFrame) -> pd.DataFrame:
 
         df = df.fillna(0)
 
-    print(f'🏁 Cleaning finished. Final NaN count: {df.isnull().sum().sum()}')
+    logger.info('Cleaning finished. Final NaN count: %d', int(df.isnull().sum().sum()))
 
     if 'date' in df.columns:
-        print('\n--- Rows per Year ---')
-        print(df.groupby(df['date'].dt.year).size())
+        yearly_counts = df.groupby(df['date'].dt.year).size()
+        logger.info('Rows per year:\n%s', yearly_counts.to_string())
 
     return df

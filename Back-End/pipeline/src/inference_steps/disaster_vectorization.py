@@ -1,4 +1,8 @@
+import logging
+
 import pandas as pd
+
+logger = logging.getLogger(__name__)
 
 
 def vectorize_disasters(df: pd.DataFrame) -> pd.DataFrame:
@@ -23,5 +27,5 @@ def vectorize_disasters(df: pd.DataFrame) -> pd.DataFrame:
         if upper_col in df.columns and lower_col not in df.columns:
             df[lower_col] = df[upper_col].astype(int)
 
-    df.info()
+    logger.info('Disaster vectorization complete for columns: %s', existing)
     return df
