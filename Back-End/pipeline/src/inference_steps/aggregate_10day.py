@@ -11,6 +11,7 @@ def aggregate_10day(df: pd.DataFrame) -> pd.DataFrame:
     spectral_indices = ['NDVI', 'EVI', 'EVI2', 'LSWI', 'NDWI', 'GLI', 'GCI', 'CVI', 'SIPI', 'RENDVI', 'RECI', 'CCCI', 'S2REP', 'BSI', 'NPCRI', 'NDSMI']
     raw_bands = ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B9', 'B11', 'B12']
     env_cols = ['rain_1d', 'rain_3d', 'rain_7d', 'rain_14d', 'rain_30d', 'tmean', 'tmax', 'tmin', 't_day', 't_night', 'rh_mean']
+    hazard_cols = [col for col in df.columns if col.lower().startswith('hazard_')]
     static_meta = ['lat', 'lon', 'elevation', 'slope', 'pixel_id', 'year', 'month', 'day', 'month_day', 'is_clean', 'timestep', 'SCL', 'cloud_pct', 'date']
 
     agg_dict: Dict[str, str] = {}
@@ -20,6 +21,8 @@ def aggregate_10day(df: pd.DataFrame) -> pd.DataFrame:
     for col in env_cols:
         if col in df.columns:
             agg_dict[col] = 'mean'
+    for col in hazard_cols:
+        agg_dict[col] = 'max'
     for col in static_meta:
         if col in df.columns:
             agg_dict[col] = 'first'

@@ -323,6 +323,34 @@ The system is configured through `config.yaml`:
 - **Batch Processing**: Configurable batch sizes for inference tracking
 - **Error Recovery**: Graceful fallbacks when artifact logging fails
 
+## 🌾 RiceVision Inference Commands
+
+Run from the `Back-End/pipeline` directory:
+
+1. Preprocessing pipeline (Notebook 1 flow)
+
+```bash
+python pipelines/inference_preprocessing.py \
+    --input data/raw/merged_combined_satellite.csv
+```
+
+2. BiLSTM inference pipeline (Notebook 2 flow)
+
+```bash
+python pipelines/BiLSTM_inference.py \
+    --input artifacts/inference_p1.csv
+```
+
+3. Yield inference pipeline (Notebook 3 flow)
+
+```bash
+python pipelines/yield_inference.py \
+    --preprocessed artifacts/Inference_preprocessed.csv \
+    --lstm-results artifacts/lstm_results.csv
+```
+
+Generated intermediate and final dataframes are saved into `artifacts/` and reused across the three stages.
+
 ## 🎯 Future Enhancements
 
 - **Data Drift Detection**: Monitor for data drift in production
