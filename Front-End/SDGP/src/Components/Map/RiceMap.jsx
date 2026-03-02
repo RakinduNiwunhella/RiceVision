@@ -57,18 +57,17 @@ const districtBoundaryStyle = {
 };
 
 export default function RiceMap({ filters, layers, isDark, resetViewKey }) {
+
   const [points, setPoints] = useState([]);
   const [paddyGeo, setPaddyGeo] = useState(null);
   const [districtBoundary, setDistrictBoundary] = useState(null);
-  const [zoom, setZoom] = useState(SRI_LANKA_ZOOM);
 
   const mapRef = useRef(null);
 
   const selectedDistrict = filters.districts[0];
-  const selectedHealth = filters.health;
 
   /* =========================================================
-     BASE MAP LOGIC
+     BASE MAP
   ========================================================= */
 
   const tileUrl = layers.showRoads
@@ -81,77 +80,63 @@ export default function RiceMap({ filters, layers, isDark, resetViewKey }) {
      LOAD PADDY EXTENT
   ========================================================= */
 
-useEffect(() => {
-  let isMounted = true;
+  useEffect(() => {
 
-  if (!layers.paddyExtent) {
-    setPaddyGeo(null);
-    return;
-  }
+    if (!layers.paddyExtent) {
+      setPaddyGeo(null);
+      return;
+    }
 
-  // Clear previous data immediately
-  setPaddyGeo(null);
+    // 🔹 District selected → load single
+    if (selectedDistrict) {
+      fetch(`/${selectedDistrict}.geojson`)
+        .then(res => res.json())
+        .then(setPaddyGeo)
+        .catch(console.error);
+    }
 
-  const loadPaddy = async () => {
-    try {
-      // DISTRICT SELECTED → load only that district
-      if (selectedDistrict) {
-        const res = await fetch(`/${selectedDistrict}.geojson`);
-        const data = await res.json();
+    // 🔹 No district → load national merged
+    else {
 
-        if (isMounted) {
-          setPaddyGeo(data);
-        }
-      } 
-      // NO DISTRICT → load merged Sri Lanka
-      else {
-        const districtFiles = [
-          "Ampara","Anuradhapura","Badulla","Batticaloa","Colombo",
-          "Galle","Gampaha","Hambantota","Jaffna","Kalutara",
-          "Kandy","Kegalle","Kilinochchi","Kurunegala","Mannar",
-          "Matale","Matara","Moneragala","Mullaitivu","NuwaraEliya",
-          "Polonnaruwa","Puttalam","Ratnapura","Trincomalee","Vavuniya",
-        ];
+      const districtFiles = [
+        "Ampara","Anuradhapura","Badulla","Batticaloa","Colombo",
+        "Galle","Gampaha","Hambantota","Jaffna","Kalutara",
+        "Kandy","Kegalle","Kilinochchi","Kurunegala","Mannar",
+        "Matale","Matara","Moneragala","Mullaitivu","NuwaraEliya",
+        "Polonnaruwa","Puttalam","Ratnapura","Trincomalee","Vavuniya",
+      ];
 
-        const allGeo = await Promise.all(
-          districtFiles.map(name =>
-            fetch(`/${name}.geojson`).then(res => res.json())
-          )
-        );
-
-        if (isMounted) {
+      Promise.all(
+        districtFiles.map((name) =>
+          fetch(`/${name}.geojson`).then(res => res.json())
+        )
+      )
+        .then((allGeo) => {
           setPaddyGeo({
             type: "FeatureCollection",
             features: allGeo.flatMap(g => g.features),
           });
-        }
-      }
-    } catch (err) {
-      console.error("Paddy load error:", err);
+        })
+        .catch(console.error);
     }
-  };
 
-  loadPaddy();
-
-  return () => {
-    isMounted = false;
-  };
-
-}, [selectedDistrict, layers.paddyExtent]);
+  }, [selectedDistrict, layers.paddyExtent]);
 
   /* =========================================================
      LOAD DISTRICT BOUNDARY
   ========================================================= */
 
   useEffect(() => {
+
     setDistrictBoundary(null);
 
     if (!selectedDistrict) return;
 
     fetch(`/${selectedDistrict}_District_Boundary.geojson`)
-      .then((res) => res.json())
+      .then(res => res.json())
       .then(setDistrictBoundary)
       .catch(console.error);
+
   }, [selectedDistrict]);
 
   /* =========================================================
@@ -175,31 +160,41 @@ useEffect(() => {
   }, [resetViewKey]);
 
   /* =========================================================
-     LOAD ML HEALTH POINTS
+     LOAD FIELD HEALTH MARKERS
   ========================================================= */
 
   useEffect(() => {
+
     if (!layers.showCircles) {
       setPoints([]);
       return;
     }
 
+    const allDistricts = [
+      "Ampara","Anuradhapura","Badulla","Batticaloa","Colombo",
+      "Galle","Gampaha","Hambantota","Jaffna","Kalutara",
+      "Kandy","Kegalle","Kilinochchi","Kurunegala","Mannar",
+      "Matale","Matara","Moneragala","Mullaitivu","NuwaraEliya",
+      "Polonnaruwa","Puttalam","Ratnapura","Trincomalee","Vavuniya",
+    ];
+
     const loadPoints = async () => {
       try {
         const data = await fetchMapFields({
-          districts: selectedDistrict ? [selectedDistrict] : [],
-          health: selectedHealth,
+          districts: selectedDistrict ? [selectedDistrict] : allDistricts,
+          health: filters.health,
         });
 
         setPoints(data);
       } catch (err) {
-        console.error("Map fetch error:", err);
+        console.error(err);
         setPoints([]);
       }
     };
 
     loadPoints();
-  }, [selectedDistrict, selectedHealth, layers.showCircles]);
+
+  }, [selectedDistrict, filters.health, layers.showCircles]);
 
   /* =========================================================
      RENDER
@@ -215,11 +210,6 @@ useEffect(() => {
       maxBounds={SRI_LANKA_BOUNDS}
       maxBoundsViscosity={1.0}
       preferCanvas={true}
-      whenCreated={(map) => {
-        map.on("zoomend", () => {
-          setZoom(map.getZoom());
-        });
-      }}
       className="h-full w-full rounded-xl"
     >
       <TileLayer
@@ -232,8 +222,7 @@ useEffect(() => {
         <GeoJSON data={districtBoundary} style={districtBoundaryStyle} />
       )}
 
-      {/* 🔥 Only render heavy paddy polygons when zoomed in OR district selected */}
-      {layers.paddyExtent && paddyGeo && (selectedDistrict || zoom >= 9) && (
+      {layers.paddyExtent && paddyGeo && (
         <GeoJSON data={paddyGeo} style={paddyStyle} />
       )}
 
@@ -254,6 +243,7 @@ useEffect(() => {
           ))}
         </MarkerClusterGroup>
       )}
+
     </MapContainer>
   );
 }

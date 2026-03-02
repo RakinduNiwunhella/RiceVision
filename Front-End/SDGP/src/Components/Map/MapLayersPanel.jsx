@@ -1,6 +1,7 @@
-export default function MapLayersPanel({ layers, setLayers }) {
+export default function MapLayersPanel({ layers, setLayers, districtSelected }) {
 
   const toggleLayer = (layer) => {
+    if (!districtSelected) return; // 🔒 prevent toggle
     setLayers((prev) => ({
       ...prev,
       [layer]: !prev[layer],
@@ -13,18 +14,30 @@ export default function MapLayersPanel({ layers, setLayers }) {
         View Options
       </h2>
 
+      {!districtSelected && (
+        <div className="mb-4 text-sm text-gray-500 dark:text-gray-400">
+          🔒 Select a district to enable view options
+        </div>
+      )}
+
       {[
         { key: "paddyExtent", label: "🌾 Paddy Extent" },
         { key: "showCircles", label: "📍 Field Health Markers" },
         { key: "showRoads", label: "🛣 Show Roads & Labels" },
       ].map(({ key, label }) => (
-        <div key={key} className="flex items-center justify-between mb-3">
+        <div
+          key={key}
+          className={`flex items-center justify-between mb-3 ${
+            !districtSelected ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+        >
           <span className="text-gray-700 dark:text-gray-200">
             {label}
           </span>
 
           <button
             onClick={() => toggleLayer(key)}
+            disabled={!districtSelected}
             className={`w-10 h-5 flex items-center rounded-full p-1 transition ${
               layers[key] ? "bg-green-500" : "bg-gray-300"
             }`}
@@ -32,7 +45,7 @@ export default function MapLayersPanel({ layers, setLayers }) {
             <div
               className={`bg-white w-4 h-4 rounded-full shadow-md transform transition ${
                 layers[key] ? "translate-x-5" : ""
-              }` }
+              }`}
             />
           </button>
         </div>

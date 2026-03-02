@@ -1,4 +1,4 @@
-export default function FiltersPanel({ filters, setFilters, onResetView }) {
+export default function FiltersPanel({ filters, setFilters, onResetView, onNationalView }) {
   const districts = [
     "Ampara","Anuradhapura","Badulla","Batticaloa","Colombo",
     "Galle","Gampaha","Hambantota","Jaffna","Kalutara",
@@ -74,7 +74,14 @@ export default function FiltersPanel({ filters, setFilters, onResetView }) {
         {/* View Full Sri Lanka Button */}
 {/* View Full Sri Lanka Button */}
 <button
-  onClick={onResetView}
+  onClick={() => {
+    setFilters({ districts: [], health: [] });
+    onResetView();
+    setTimeout(() => {
+      // enable all layers after clearing district
+      window.dispatchEvent(new CustomEvent("national-view"));
+    }, 0);
+  }}
   className="mt-4 w-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition py-2 rounded-lg text-sm text-gray-700 dark:text-gray-200"
 >
   🌏 View Full Sri Lanka
