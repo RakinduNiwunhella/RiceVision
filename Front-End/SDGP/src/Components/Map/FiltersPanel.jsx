@@ -1,4 +1,10 @@
-export default function FiltersPanel({ filters, setFilters, onResetView, onNationalView }) {
+export default function FiltersPanel({
+  filters,
+  setFilters,
+  onNationalView,
+  nationalView,
+  onClearAll
+}){
   const districts = [
     "Ampara","Anuradhapura","Badulla","Batticaloa","Colombo",
     "Galle","Gampaha","Hambantota","Jaffna","Kalutara",
@@ -44,11 +50,11 @@ export default function FiltersPanel({ filters, setFilters, onResetView, onNatio
           {/* Clear Button */}
           {filters.districts.length > 0 && (
             <button
-              onClick={clearDistrict}
-              className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition"
-            >
-              ✖ Clear
-            </button>
+  onClick={onClearAll}
+  className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition"
+>
+  ✖ Clear
+</button>
           )}
         </div>
 
@@ -74,14 +80,7 @@ export default function FiltersPanel({ filters, setFilters, onResetView, onNatio
         {/* View Full Sri Lanka Button */}
 {/* View Full Sri Lanka Button */}
 <button
-  onClick={() => {
-    setFilters({ districts: [], health: [] });
-    onResetView();
-    setTimeout(() => {
-      // enable all layers after clearing district
-      window.dispatchEvent(new CustomEvent("national-view"));
-    }, 0);
-  }}
+  onClick={onNationalView}
   className="mt-4 w-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition py-2 rounded-lg text-sm text-gray-700 dark:text-gray-200"
 >
   🌏 View Full Sri Lanka

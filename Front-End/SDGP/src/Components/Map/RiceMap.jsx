@@ -82,45 +82,49 @@ export default function RiceMap({ filters, layers, isDark, resetViewKey }) {
 
   useEffect(() => {
 
-    if (!layers.paddyExtent) {
-      setPaddyGeo(null);
-      return;
-    }
+  if (!layers.paddyExtent) {
+    setPaddyGeo(null);
+    return;
+  }
 
-    // 🔹 District selected → load single
-    if (selectedDistrict) {
-      fetch(`/${selectedDistrict}.geojson`)
-        .then(res => res.json())
-        .then(setPaddyGeo)
-        .catch(console.error);
-    }
+  // 🔥 Always clear previous geo first
+  setPaddyGeo(null);
 
-    // 🔹 No district → load national merged
-    else {
+  // District mode
+  if (selectedDistrict) {
+    fetch(`/${selectedDistrict}.geojson`)
+      .then(res => res.json())
+      .then(data => {
+        setPaddyGeo(data);
+      })
+      .catch(console.error);
+  }
 
-      const districtFiles = [
-        "Ampara","Anuradhapura","Badulla","Batticaloa","Colombo",
-        "Galle","Gampaha","Hambantota","Jaffna","Kalutara",
-        "Kandy","Kegalle","Kilinochchi","Kurunegala","Mannar",
-        "Matale","Matara","Moneragala","Mullaitivu","NuwaraEliya",
-        "Polonnaruwa","Puttalam","Ratnapura","Trincomalee","Vavuniya",
-      ];
+  // National mode
+  else {
+    const districtFiles = [
+      "Ampara","Anuradhapura","Badulla","Batticaloa","Colombo",
+      "Galle","Gampaha","Hambantota","Jaffna","Kalutara",
+      "Kandy","Kegalle","Kilinochchi","Kurunegala","Mannar",
+      "Matale","Matara","Moneragala","Mullaitivu","NuwaraEliya",
+      "Polonnaruwa","Puttalam","Ratnapura","Trincomalee","Vavuniya",
+    ];
 
-      Promise.all(
-        districtFiles.map((name) =>
-          fetch(`/${name}.geojson`).then(res => res.json())
-        )
+    Promise.all(
+      districtFiles.map((name) =>
+        fetch(`/${name}.geojson`).then(res => res.json())
       )
-        .then((allGeo) => {
-          setPaddyGeo({
-            type: "FeatureCollection",
-            features: allGeo.flatMap(g => g.features),
-          });
-        })
-        .catch(console.error);
-    }
+    )
+      .then((allGeo) => {
+        setPaddyGeo({
+          type: "FeatureCollection",
+          features: allGeo.flatMap(g => g.features),
+        });
+      })
+      .catch(console.error);
+  }
 
-  }, [selectedDistrict, layers.paddyExtent]);
+}, [selectedDistrict, layers.paddyExtent]);
 
   /* =========================================================
      LOAD DISTRICT BOUNDARY

@@ -19,36 +19,57 @@ export default function FieldMap() {
   });
 
   const [nationalView, setNationalView] = useState(false);
-  // 🔥 Reset trigger for zoom
   const [resetViewKey, setResetViewKey] = useState(0);
 
   /* =========================================================
-     🔒 AUTO RESET LAYERS WHEN DISTRICT CLEARED
+     Auto disable layers ONLY if not national view
   ========================================================= */
 
   useEffect(() => {
-    if (filters.districts.length === 0) {
+    if (filters.districts.length === 0 && !nationalView) {
       setLayers({
         paddyExtent: false,
         showCircles: false,
         showRoads: false,
       });
     }
+  }, [filters.districts, nationalView]);
+
+  /* =========================================================
+     If user selects district → exit national mode
+  ========================================================= */
+
+  useEffect(() => {
+    if (filters.districts.length > 0) {
+      setNationalView(false);
+    }
   }, [filters.districts]);
 
   return (
     <div className="relative flex gap-4 p-4 h-full">
 
-<FiltersPanel
+      <FiltersPanel
   filters={filters}
   setFilters={setFilters}
-  onResetView={() => {
+  nationalView={nationalView}
+  onNationalView={() => {
     setFilters({ districts: [], health: [] });
     setLayers({
       paddyExtent: true,
       showCircles: true,
       showRoads: false,
     });
+    setNationalView(true);
+    setResetViewKey(prev => prev + 1);
+  }}
+  onClearAll={() => {
+    setFilters({ districts: [], health: [] });
+    setLayers({
+      paddyExtent: false,
+      showCircles: false,
+      showRoads: false,
+    });
+    setNationalView(false);
     setResetViewKey(prev => prev + 1);
   }}
 />
@@ -61,19 +82,20 @@ export default function FieldMap() {
           </p>
         </div>
 
-<RiceMap
-  filters={filters}
-  layers={layers}
-  isDark={isDark}
-  resetViewKey={resetViewKey}
-  nationalView={nationalView}
-/>
+        <RiceMap
+          filters={filters}
+          layers={layers}
+          isDark={isDark}
+          resetViewKey={resetViewKey}
+        />
       </div>
 
       <MapLayersPanel
         layers={layers}
         setLayers={setLayers}
-        districtSelected={filters.districts.length > 0}
+        districtSelected={
+          filters.districts.length > 0 || nationalView
+        }
       />
     </div>
   );
