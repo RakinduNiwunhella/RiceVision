@@ -2,6 +2,9 @@ import { MapContainer, TileLayer, CircleMarker, GeoJSON } from "react-leaflet";
 import { useEffect, useState, useRef } from "react";
 import L from "leaflet";
 import { fetchMapFields } from "../../api/api";
+import MarkerClusterGroup from "react-leaflet-cluster";
+import "react-leaflet-cluster/dist/assets/MarkerCluster.css";
+import "react-leaflet-cluster/dist/assets/MarkerCluster.Default.css";
 
 /* =========================================================
    MAP CONSTANTS
@@ -10,14 +13,13 @@ import { fetchMapFields } from "../../api/api";
 const SRI_LANKA_CENTER = [7.8731, 80.7718];
 const SRI_LANKA_ZOOM = 8;
 
-// 🇱🇰 Lock map to Sri Lanka
 const SRI_LANKA_BOUNDS = [
-  [5.8, 79.5],   // Southwest
-  [10.1, 82.1],  // Northeast
+  [5.8, 79.5],
+  [10.1, 82.1],
 ];
 
 /* =========================================================
-   HEALTH COLORS (ROBUST VERSION)
+   HEALTH COLORS
 ========================================================= */
 
 function getHealthColor(health) {
@@ -26,13 +28,13 @@ function getHealthColor(health) {
   const value = health.toLowerCase();
 
   if (value.includes("normal") || value.includes("healthy"))
-    return "#16a34a"; // green
+    return "#16a34a";
 
   if (value.includes("mild") || value.includes("stress"))
-    return "#facc15"; // yellow
+    return "#facc15";
 
   if (value.includes("severe") || value.includes("damage"))
-    return "#dc2626"; // red
+    return "#dc2626";
 
   return "#2563eb";
 }
@@ -58,6 +60,7 @@ export default function RiceMap({ filters, layers, isDark, resetViewKey }) {
   const [points, setPoints] = useState([]);
   const [paddyGeo, setPaddyGeo] = useState(null);
   const [districtBoundary, setDistrictBoundary] = useState(null);
+  const [zoom, setZoom] = useState(SRI_LANKA_ZOOM);
 
   const mapRef = useRef(null);
 
@@ -68,81 +71,115 @@ export default function RiceMap({ filters, layers, isDark, resetViewKey }) {
      BASE MAP LOGIC
   ========================================================= */
 
-  let tileUrl = "";
-
-  if (layers.showRoads) {
-    // Full OpenStreetMap
-    tileUrl = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
-  } else {
-    // Styled dashboard map
-    tileUrl = isDark
+  const tileUrl = layers.showRoads
+    ? "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+    : isDark
       ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
       : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
-  }
 
   /* =========================================================
      LOAD PADDY EXTENT
   ========================================================= */
-  useEffect(() => {
-    if (!selectedDistrict || !layers.paddyExtent) {
-      setPaddyGeo(null);
-      return;
-    }
 
-    fetch(`/${selectedDistrict}.geojson`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to load paddy extent");
-        return res.json();
-      })
-      .then(setPaddyGeo)
-      .catch(console.error);
-  }, [selectedDistrict, layers.paddyExtent]);
+useEffect(() => {
+  let isMounted = true;
+
+  if (!layers.paddyExtent) {
+    setPaddyGeo(null);
+    return;
+  }
+
+  // Clear previous data immediately
+  setPaddyGeo(null);
+
+  const loadPaddy = async () => {
+    try {
+      // DISTRICT SELECTED → load only that district
+      if (selectedDistrict) {
+        const res = await fetch(`/${selectedDistrict}.geojson`);
+        const data = await res.json();
+
+        if (isMounted) {
+          setPaddyGeo(data);
+        }
+      } 
+      // NO DISTRICT → load merged Sri Lanka
+      else {
+        const districtFiles = [
+          "Ampara","Anuradhapura","Badulla","Batticaloa","Colombo",
+          "Galle","Gampaha","Hambantota","Jaffna","Kalutara",
+          "Kandy","Kegalle","Kilinochchi","Kurunegala","Mannar",
+          "Matale","Matara","Moneragala","Mullaitivu","NuwaraEliya",
+          "Polonnaruwa","Puttalam","Ratnapura","Trincomalee","Vavuniya",
+        ];
+
+        const allGeo = await Promise.all(
+          districtFiles.map(name =>
+            fetch(`/${name}.geojson`).then(res => res.json())
+          )
+        );
+
+        if (isMounted) {
+          setPaddyGeo({
+            type: "FeatureCollection",
+            features: allGeo.flatMap(g => g.features),
+          });
+        }
+      }
+    } catch (err) {
+      console.error("Paddy load error:", err);
+    }
+  };
+
+  loadPaddy();
+
+  return () => {
+    isMounted = false;
+  };
+
+}, [selectedDistrict, layers.paddyExtent]);
 
   /* =========================================================
      LOAD DISTRICT BOUNDARY
   ========================================================= */
+
   useEffect(() => {
     setDistrictBoundary(null);
 
     if (!selectedDistrict) return;
 
     fetch(`/${selectedDistrict}_District_Boundary.geojson`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Boundary not found");
-        return res.json();
-      })
+      .then((res) => res.json())
       .then(setDistrictBoundary)
       .catch(console.error);
   }, [selectedDistrict]);
 
   /* =========================================================
-     AUTO ZOOM TO DISTRICT
+     AUTO ZOOM
   ========================================================= */
-useEffect(() => {
-  if (!mapRef.current) return;
 
-  if (districtBoundary) {
-    // Zoom to selected district
-    const layer = L.geoJSON(districtBoundary);
-    mapRef.current.fitBounds(layer.getBounds());
-  } else {
-    // No district selected → zoom back to Sri Lanka
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    if (districtBoundary) {
+      const layer = L.geoJSON(districtBoundary);
+      mapRef.current.fitBounds(layer.getBounds());
+    } else {
+      mapRef.current.fitBounds(SRI_LANKA_BOUNDS);
+    }
+  }, [districtBoundary]);
+
+  useEffect(() => {
+    if (!mapRef.current) return;
     mapRef.current.fitBounds(SRI_LANKA_BOUNDS);
-  }
-}, [districtBoundary]);
-
-
-// 🔥 Manual Reset View (without clearing district)
-useEffect(() => {
-  if (!mapRef.current) return;
-  mapRef.current.fitBounds(SRI_LANKA_BOUNDS);
-}, [resetViewKey]);
+  }, [resetViewKey]);
 
   /* =========================================================
      LOAD ML HEALTH POINTS
   ========================================================= */
+
   useEffect(() => {
-    if (!selectedDistrict || !layers.showCircles) {
+    if (!layers.showCircles) {
       setPoints([]);
       return;
     }
@@ -150,7 +187,7 @@ useEffect(() => {
     const loadPoints = async () => {
       try {
         const data = await fetchMapFields({
-          districts: [selectedDistrict],
+          districts: selectedDistrict ? [selectedDistrict] : [],
           health: selectedHealth,
         });
 
@@ -177,41 +214,46 @@ useEffect(() => {
       maxZoom={18}
       maxBounds={SRI_LANKA_BOUNDS}
       maxBoundsViscosity={1.0}
+      preferCanvas={true}
+      whenCreated={(map) => {
+        map.on("zoomend", () => {
+          setZoom(map.getZoom());
+        });
+      }}
       className="h-full w-full rounded-xl"
     >
-      {/* Base Map */}
       <TileLayer
         key={`${isDark}-${layers.showRoads}`}
         attribution="© OpenStreetMap contributors"
         url={tileUrl}
       />
 
-      {/* District Boundary */}
       {districtBoundary && (
         <GeoJSON data={districtBoundary} style={districtBoundaryStyle} />
       )}
 
-      {/* Paddy Extent */}
-      {selectedDistrict && layers.paddyExtent && paddyGeo && (
+      {/* 🔥 Only render heavy paddy polygons when zoomed in OR district selected */}
+      {layers.paddyExtent && paddyGeo && (selectedDistrict || zoom >= 9) && (
         <GeoJSON data={paddyGeo} style={paddyStyle} />
       )}
 
-      {/* ML Health Points */}
-      {selectedDistrict &&
-        layers.showCircles &&
-        points.map((p, idx) => (
-          <CircleMarker
-            key={idx}
-            center={[p.lat, p.lng]}
-            radius={5}
-            pathOptions={{
-              color: getHealthColor(p.paddy_health),
-              fillColor: getHealthColor(p.paddy_health),
-              fillOpacity: 0.8,
-              weight: 1,
-            }}
-          />
-        ))}
+      {layers.showCircles && points.length > 0 && (
+        <MarkerClusterGroup>
+          {points.map((p, idx) => (
+            <CircleMarker
+              key={idx}
+              center={[p.lat, p.lng]}
+              radius={5}
+              pathOptions={{
+                color: getHealthColor(p.paddy_health),
+                fillColor: getHealthColor(p.paddy_health),
+                fillOpacity: 0.8,
+                weight: 1,
+              }}
+            />
+          ))}
+        </MarkerClusterGroup>
+      )}
     </MapContainer>
   );
 }
