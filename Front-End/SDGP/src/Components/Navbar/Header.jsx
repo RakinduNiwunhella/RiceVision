@@ -1,12 +1,47 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import Notifications from '../Notifications/Notifications'
 
 const Header = () => {
   const [isDark, setIsDark] = useState(false)
+  const [showNotifications, setShowNotifications] = useState(false)
+  const [notifications, setNotifications] = useState([])
+
+  // Fetch notifications from FastAPI backend
+  const fetchNotifications = async () => {
+    try {
+      const BASE_URL = import.meta.env.VITE_API_BASE || "https://ricevision-backend.onrender.com"
+      const response = await fetch(`${BASE_URL}/notifications`)
+      const data = await response.json()
+      setNotifications(data)
+    } catch (error) {
+      console.error("Error fetching notifications:", error)
+    }
+  }
+
+  // Mark a notification as read in backend and update state
+  const markAsRead = async (id) => {
+    try {
+      const BASE_URL = import.meta.env.VITE_API_BASE || "https://ricevision-backend.onrender.com"
+      await fetch(`${BASE_URL}/notifications/${id}/read`, {
+        method: "PUT",
+      })
+      setNotifications(prev =>
+        prev.map(n =>
+          n.id === id ? { ...n, is_read: true } : n
+        )
+      )
+    } catch (error) {
+      console.error("Error updating notification:", error)
+    }
+  }
+
+  useEffect(() => {
+    fetchNotifications()
+  }, [])
 
   useEffect(() => {
     const html = document.documentElement
-
     if (isDark) {
       html.classList.add('dark')
     } else {
@@ -64,7 +99,7 @@ const Header = () => {
               language
             </span>
 
-            {/* ✅ Dark mode toggle (WORKING) */}
+            {/* Dark mode toggle */}
             <button
               onClick={() => setIsDark(prev => !prev)}
               aria-label="Toggle dark mode"
@@ -76,9 +111,20 @@ const Header = () => {
             </button>
 
             {/* Notifications */}
-            <span className="material-symbols-outlined text-gray-800 dark:text-slate-300">
-              notifications
-            </span>
+            <button
+              onClick={() => setShowNotifications(prev => !prev)}
+              className="relative flex items-center"
+            >
+              <span className="material-symbols-outlined text-gray-800 dark:text-slate-300">
+                notifications
+              </span>
+
+              {notifications.filter(n => !n.is_read).length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">
+                  {notifications.filter(n => !n.is_read).length}
+                </span>
+              )}
+            </button>
 
             {/* Profile */}
             <span className="material-symbols-outlined text-gray-800 dark:text-slate-300">
@@ -87,6 +133,12 @@ const Header = () => {
           </div>
         </div>
       </div>
+      {showNotifications && (
+        <Notifications
+          notifications={notifications}
+          markAsRead={markAsRead}
+        />
+      )}
     </nav>
   )
 }
