@@ -158,11 +158,10 @@ def run_bilstm_inference_pipeline(
     visualize_stage_map(results_df, artifacts_dir=artifacts_dir, filename='growth_stage_snapshot.png')
 
     _log_step(9, total_steps, 'Generating district/trend/forecast reports and saving outputs')
-    district_report, trend_report, forecast_report = generate_ricevision_report(results_df)
+    district_report, _, forecast_report = generate_ricevision_report(results_df)
 
     results_df.to_csv(artifacts_dir / 'lstm_results.csv', index=False)
     district_report.to_csv(artifacts_dir / 'district_report.csv', index=False)
-    trend_report.to_csv(artifacts_dir / 'trend_report.csv', index=False)
     forecast_report.to_csv(artifacts_dir / 'forecast_report.csv', index=False)
 
     logger.info('✅ BiLSTM inference completed successfully. Output rows=%d', len(results_df))

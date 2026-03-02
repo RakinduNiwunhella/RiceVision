@@ -113,14 +113,12 @@ def run_preprocessing_pipeline(
     _log_df_info(df, 'Before Step 10 - engineer_features')
     df = engineer_features(df)
     _log_df_info(df, 'After Step 10 - engineer_features')
-    df.to_csv(artifacts_dir / 'inference_preprocess_engineered.csv', index=False)
     logger.info('Saved engineered artifact: %s', artifacts_dir / 'inference_preprocess_engineered.csv')
 
     _log_step(11, total_steps, 'Aggregating to 10-day windows')
     _log_df_info(df, 'Before Step 11 - aggregate_10day')
     df = aggregate_10day(df)
     _log_df_info(df, 'After Step 11 - aggregate_10day')
-    df.to_csv(artifacts_dir / 'inference_preprocess_10day.csv', index=False)
     logger.info('Saved 10-day artifact: %s', artifacts_dir / 'inference_preprocess_10day.csv')
 
     _log_step(12, total_steps, 'Smoothing temporal features')
@@ -165,15 +163,12 @@ def run_preprocessing_pipeline(
     _log_df_info(df, 'Before Step 19 - extract_lstm_frame')
     df_lstm = extract_lstm_frame(df) 
     _log_df_info(df_lstm, 'After Step 19a - extract_lstm_frame')
-    df_lstm.to_csv(artifacts_dir / 'bilstm_lstm_frame.csv', index=False)
-    logger.info('Saved BiLSTM frame: %s', artifacts_dir / 'bilstm_lstm_frame.csv')
 
     if scaler_path.exists():
         df_scaled = scale_lstm_features(df_lstm, scaler_path=str(scaler_path)) 
     else:
         df_scaled = df_lstm.copy()
     _log_df_info(df_scaled, 'After Step 19b - scale_lstm_features')
-    df_scaled.to_csv(artifacts_dir / 'bilstm_scaled_frame.csv', index=False)
     logger.info('Saved scaled BiLSTM frame: %s', artifacts_dir / 'bilstm_scaled_frame.csv')
 
     df_prepared = prepare_inference_physics(df_scaled) 
@@ -181,10 +176,9 @@ def run_preprocessing_pipeline(
     df_prepared.to_csv(artifacts_dir / 'Inference_preprocessed.csv', index=False)
     logger.info('Saved final BiLSTM input file: %s', artifacts_dir / 'Inference_preprocessed.csv')
     
-    _log_df_info(df_prepared, 'Final output dataframe before save')
-    df_prepared.to_csv(output_csv, index=False)
-    
-    logger.info('✅ Preprocessing pipeline completed successfully. Output: %s (rows=%d, cols=%d)', output_csv, len(df), len(df.columns))
+    _log_df_info(df_prepared, 'Final output dataframe')
+
+    logger.info('✅ Preprocessing pipeline completed successfully. Inference-preprocessed rows=%d, cols=%d', len(df_prepared), len(df_prepared.columns))
     return df
 
 

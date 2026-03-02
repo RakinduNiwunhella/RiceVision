@@ -85,7 +85,6 @@ def run_yield_inference_pipeline(
     _log_step(5, total_steps, 'Standardizing live input features for yield flow')
     all_features_to_scale = list(set(TS_FEATURES + STATIC_FEATURES + main_scaler.feature_names_in_.tolist()))
     df_z = standardize_live(df_preprocessed.copy(), feature_names=all_features_to_scale)
-    df_z.to_csv(artifacts_dir / 'yield_df_z.csv', index=False)
     logger.info('Saved standardized frame: %s', artifacts_dir / 'yield_df_z.csv')
 
     _log_step(6, total_steps, 'Creating LSTM input windows for latent extraction')
@@ -96,7 +95,6 @@ def run_yield_inference_pipeline(
 
     _log_step(8, total_steps, 'Building master latent feature table and applying PCA')
     df_master_z = build_master_z(df_z, valid_indices, latents, pca, df_lstm_results)
-    df_master_z.to_csv(artifacts_dir / 'yield_master_z.csv', index=False)
     logger.info('Saved master latent table: %s', artifacts_dir / 'yield_master_z.csv')
 
     _log_step(9, total_steps, 'Summarizing pixel-level and district-level yield statistics')
