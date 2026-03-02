@@ -74,21 +74,21 @@ final_target_columns:
 
 paths:
   input_csv: ../data/merged/merged_combined_satellite.csv
-  artifacts_dir: ../data/final
-  preprocessed_output: ../data/final/inference_p1.csv
-  coords_lookup_csv: ../data/final/unique_coordinates.csv
-  paddy_points_plot: ../data/final/paddy_points_distribution.png
-  engineered_csv: ../data/final/inference_preprocess_engineered.csv
-  aggregate_10day_csv: ../data/final/inference_preprocess_10day.csv
-  bilstm_lstm_frame_csv: ../data/final/bilstm_lstm_frame.csv
-  bilstm_scaled_frame_csv: ../data/final/bilstm_scaled_frame.csv
-  bilstm_prepared_csv: ../data/final/Inference_preprocessed.csv
-  bilstm_results_csv: ../data/final/lstm_results.csv
-  district_report_csv: ../data/final/district_report.csv
-  trend_report_csv: ../data/final/trend_report.csv
-  forecast_report_csv: ../data/final/forecast_report.csv
-  yield_master_csv: ../data/final/yield_master_z.csv
-  final_yield_report_csv: ../data/final/Sri_Lanka_2026_Final_Report.csv
+  artifacts_dir: ../data/final/modelPredictions
+  preprocessed_output: ../data/final/modelPredictions/inference_p1.csv
+  coords_lookup_csv: ../data/final/modelPredictions/unique_coordinates.csv
+  paddy_points_plot: ../data/final/modelPredictions/paddy_points_distribution.png
+  engineered_csv: ../data/final/modelPredictions/inference_preprocess_engineered.csv
+  aggregate_10day_csv: ../data/final/modelPredictions/inference_preprocess_10day.csv
+  bilstm_lstm_frame_csv: ../data/final/modelPredictions/bilstm_lstm_frame.csv
+  bilstm_scaled_frame_csv: ../data/final/modelPredictions/bilstm_scaled_frame.csv
+  bilstm_prepared_csv: ../data/final/modelPredictions/Inference_preprocessed.csv
+  bilstm_results_csv: ../data/final/modelPredictions/lstm_results.csv
+  district_report_csv: ../data/final/modelPredictions/district_report.csv
+  trend_report_csv: ../data/final/modelPredictions/trend_report.csv
+  forecast_report_csv: ../data/final/modelPredictions/forecast_report.csv
+  yield_master_csv: ../data/final/modelPredictions/yield_master_z.csv
+  final_yield_report_csv: ../data/final/modelPredictions/Sri_Lanka_2026_Final_Report.csv
 
 models:
   district_encoder: pipelines/encoders/district_encoder.joblib
