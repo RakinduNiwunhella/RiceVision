@@ -40,6 +40,10 @@ def _log_df_info(df: pd.DataFrame, context: str) -> None:
     df.info(buf=buffer, show_counts=True)
     logger.info('%s\n%s', context, buffer.getvalue())
 
+    null_buffer = StringIO()
+    df.isnull().sum().to_string(buf=null_buffer)
+    logger.info('%s - df.isnull().sum()\n%s', context, null_buffer.getvalue())
+
 
 def run_preprocessing_pipeline(
     input_csv: Path,
@@ -134,6 +138,7 @@ def run_preprocessing_pipeline(
     df = infer_stage(df, baseline_df)
     _log_df_info(df, 'After Step 14 - infer_stage')
 
+    
     _log_step(15, total_steps, 'Computing NDVI z-score')
     _log_df_info(df, 'Before Step 15 - add_ndvi_zscore')
     df = add_ndvi_zscore(df, baseline_df)
@@ -144,6 +149,7 @@ def run_preprocessing_pipeline(
     df = add_cpi_zvel(df)
     _log_df_info(df, 'After Step 16 - add_cpi_zvel')
 
+    
     _log_step(17, total_steps, 'Adding season, cycle, and district encoding')
     _log_df_info(df, 'Before Step 17 - add_season')
     df = add_season(df, district_encoder_path=str(district_encoder_path) if district_encoder_path.exists() else None)
@@ -175,19 +181,9 @@ def run_preprocessing_pipeline(
     df_prepared.to_csv(artifacts_dir / 'Inference_preprocessed.csv', index=False)
     logger.info('Saved final BiLSTM input file: %s', artifacts_dir / 'Inference_preprocessed.csv')
     
-    if district_encoder_path.exists() and 'district' in df.columns and 'district_id' not in df.columns:
-        encoder = joblib.load(district_encoder_path)
-        df['district_id'] = encoder.transform(df['district']).astype('int32')
-
-    hazard_cols = [col for col in df.columns if col.startswith('hazard_')]
-    for col in hazard_cols:
-        df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0).astype('int32')
-
-    if 'date' in df.columns:
-        df['date'] = pd.to_datetime(df['date'], errors='coerce').dt.strftime('%Y-%m-%d')
-
-    _log_df_info(df, 'Final output dataframe before save')
-    df.to_csv(output_csv, index=False)
+    _log_df_info(df_prepared, 'Final output dataframe before save')
+    df_prepared.to_csv(output_csv, index=False)
+    
     logger.info('✅ Preprocessing pipeline completed successfully. Output: %s (rows=%d, cols=%d)', output_csv, len(df), len(df.columns))
     return df
 
@@ -202,7 +198,8 @@ def run_preprocessing_from_config() -> pd.DataFrame:
     _ = config
     return run_preprocessing_pipeline(
         input_csv=project_root / paths['input_csv'],
-        output_csv=project_root / paths['preprocessed_output'],
+        output_csv=project_root / paths['prepr' \
+        'ocessed_output'],
         baseline_csv=project_root / baselines['district_baseline'],
         district_encoder_path=project_root / models['district_encoder'],
         scaler_path=project_root / models['lstm_scaler'],

@@ -50,7 +50,8 @@ def get_lstm_feature_groups() -> LSTMFeatureGroups:
 
 
 def extract_lstm_frame(df: pd.DataFrame) -> pd.DataFrame:
-    required_cols = [
+    # 1. Base required columns
+    base_cols = [
         'pixel_id', 'date', 'year', 'stage_name', 'month', 'season', 'season_id', 'cycle_id',
         'ndvi_median_smooth', 'lswi_median_smooth', 'evi_median_smooth',
         'ndwi_median_smooth', 'bsi_median_smooth', 'ndvi_vel_z', 'lswi_vel_z',
@@ -58,26 +59,42 @@ def extract_lstm_frame(df: pd.DataFrame) -> pd.DataFrame:
         'delta_days', 'doy_sin', 'doy_cos',
         'lat', 'lon', 'elevation', 'slope', 'district_id',
         'stage', 'ndvi_zscore', 'cpi',
-    ] + HAZARD_COLS
+    ]
+    
+    # 2. UNIQUE-IFY the list (removes duplicates if HAZARD_COLS overlaps with base_cols)
+    all_cols = base_cols + HAZARD_COLS
+    required_cols = list(dict.fromkeys(all_cols)) 
 
+    # 3. Check for missing
     missing = [col for col in required_cols if col not in df.columns]
     if missing:
         raise ValueError(f"Missing required columns for BiLSTM preprocessing: {missing}")
 
+    # 4. SELECT & FORCE UNIQUE COLUMNS 
+    # This specifically removes duplicate column names from the resulting dataframe
     df_lstm = df[required_cols].copy()
+    df_lstm = df_lstm.loc[:, ~df_lstm.columns.duplicated()].copy()
 
+    # 5. Convert Floats
     float_cols = df_lstm.select_dtypes(include=['float64']).columns
     if len(float_cols) > 0:
         df_lstm[float_cols] = df_lstm[float_cols].astype('float32')
 
+    # 6. Convert Integers SAFELY
     int_cols = ['stage', 'pixel_id', 'district_id'] + HAZARD_COLS
     for col in int_cols:
-        df_lstm[col] = pd.to_numeric(df_lstm[col], errors='coerce').fillna(0).astype('int32')
+        if col in df_lstm.columns:
+            # We use .iloc[:, 0] just in case a duplicate slipped through
+            # and wrap it to ensure pd.to_numeric sees a Series
+            target_series = df_lstm[col]
+            if isinstance(target_series, pd.DataFrame):
+                target_series = target_series.iloc[:, 0]
+                
+            df_lstm[col] = pd.to_numeric(target_series, errors='coerce').fillna(0).astype('int32')
 
-    df_lstm['stage'] = df_lstm['stage'].astype('int32')
+    # 7. Final explicit casts
     df_lstm['ndvi_zscore'] = pd.to_numeric(df_lstm['ndvi_zscore'], errors='coerce').fillna(0).astype('float32')
     df_lstm['cpi'] = pd.to_numeric(df_lstm['cpi'], errors='coerce').fillna(0).astype('float32')
-
     return df_lstm
 
 
