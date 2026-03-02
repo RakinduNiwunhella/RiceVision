@@ -63,75 +63,54 @@ export default function RiceMap({ filters, layers, isDark, resetViewKey }) {
   const [districtBoundary, setDistrictBoundary] = useState(null);
 
   const mapRef = useRef(null);
-
   const selectedDistrict = filters.districts[0];
-
-  /* =========================================================
-     BASE MAP
-  ========================================================= */
-
-  const tileUrl = layers.showRoads
-    ? "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-    : isDark
-      ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-      : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
 
   /* =========================================================
      LOAD PADDY EXTENT
   ========================================================= */
 
   useEffect(() => {
+    if (!layers.paddyExtent) {
+      setPaddyGeo(null);
+      return;
+    }
 
-  if (!layers.paddyExtent) {
     setPaddyGeo(null);
-    return;
-  }
 
-  // 🔥 Always clear previous geo first
-  setPaddyGeo(null);
+    if (selectedDistrict) {
+      fetch(`/${selectedDistrict}.geojson`)
+        .then(res => res.json())
+        .then(setPaddyGeo)
+        .catch(console.error);
+    } else {
+      const districtFiles = [
+        "Ampara","Anuradhapura","Badulla","Batticaloa","Colombo",
+        "Galle","Gampaha","Hambantota","Jaffna","Kalutara",
+        "Kandy","Kegalle","Kilinochchi","Kurunegala","Mannar",
+        "Matale","Matara","Moneragala","Mullaitivu","NuwaraEliya",
+        "Polonnaruwa","Puttalam","Ratnapura","Trincomalee","Vavuniya",
+      ];
 
-  // District mode
-  if (selectedDistrict) {
-    fetch(`/${selectedDistrict}.geojson`)
-      .then(res => res.json())
-      .then(data => {
-        setPaddyGeo(data);
-      })
-      .catch(console.error);
-  }
-
-  // National mode
-  else {
-    const districtFiles = [
-      "Ampara","Anuradhapura","Badulla","Batticaloa","Colombo",
-      "Galle","Gampaha","Hambantota","Jaffna","Kalutara",
-      "Kandy","Kegalle","Kilinochchi","Kurunegala","Mannar",
-      "Matale","Matara","Moneragala","Mullaitivu","NuwaraEliya",
-      "Polonnaruwa","Puttalam","Ratnapura","Trincomalee","Vavuniya",
-    ];
-
-    Promise.all(
-      districtFiles.map((name) =>
-        fetch(`/${name}.geojson`).then(res => res.json())
+      Promise.all(
+        districtFiles.map(name =>
+          fetch(`/${name}.geojson`).then(res => res.json())
+        )
       )
-    )
-      .then((allGeo) => {
-        setPaddyGeo({
-          type: "FeatureCollection",
-          features: allGeo.flatMap(g => g.features),
-        });
-      })
-      .catch(console.error);
-  }
-
-}, [selectedDistrict, layers.paddyExtent]);
+        .then(allGeo => {
+          setPaddyGeo({
+            type: "FeatureCollection",
+            features: allGeo.flatMap(g => g.features),
+          });
+        })
+        .catch(console.error);
+    }
+  }, [selectedDistrict, layers.paddyExtent]);
 
   /* =========================================================
      LOAD DISTRICT BOUNDARY
   ========================================================= */
 
   useEffect(() => {
-
     setDistrictBoundary(null);
 
     if (!selectedDistrict) return;
@@ -140,7 +119,6 @@ export default function RiceMap({ filters, layers, isDark, resetViewKey }) {
       .then(res => res.json())
       .then(setDistrictBoundary)
       .catch(console.error);
-
   }, [selectedDistrict]);
 
   /* =========================================================
@@ -168,7 +146,6 @@ export default function RiceMap({ filters, layers, isDark, resetViewKey }) {
   ========================================================= */
 
   useEffect(() => {
-
     if (!layers.showCircles) {
       setPoints([]);
       return;
@@ -197,7 +174,6 @@ export default function RiceMap({ filters, layers, isDark, resetViewKey }) {
     };
 
     loadPoints();
-
   }, [selectedDistrict, filters.health, layers.showCircles]);
 
   /* =========================================================
@@ -216,11 +192,38 @@ export default function RiceMap({ filters, layers, isDark, resetViewKey }) {
       preferCanvas={true}
       className="h-full w-full rounded-xl"
     >
-      <TileLayer
-        key={`${isDark}-${layers.showRoads}`}
-        attribution="© OpenStreetMap contributors"
-        url={tileUrl}
-      />
+
+      {/* ================= BASE MAP ================= */}
+
+      {/* 🛰 Satellite */}
+      {layers.showSatellite && (
+        <TileLayer
+          attribution="© Esri"
+          url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+        />
+      )}
+
+      {/* 🛣 OpenStreet */}
+      {layers.showRoads && !layers.showSatellite && (
+        <TileLayer
+          attribution="© OpenStreetMap contributors"
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+      )}
+
+      {/* 🌗 Default Light/Dark */}
+      {!layers.showSatellite && !layers.showRoads && (
+        <TileLayer
+          attribution="© Carto"
+          url={
+            isDark
+              ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+              : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+          }
+        />
+      )}
+
+      {/* ================= DATA LAYERS ================= */}
 
       {districtBoundary && (
         <GeoJSON data={districtBoundary} style={districtBoundaryStyle} />

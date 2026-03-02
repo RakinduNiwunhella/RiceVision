@@ -16,22 +16,24 @@ export default function FieldMap() {
     paddyExtent: false,
     showCircles: false,
     showRoads: false,
+    showSatellite: false, // ✅ Satellite toggle
   });
 
   const [nationalView, setNationalView] = useState(false);
   const [resetViewKey, setResetViewKey] = useState(0);
 
   /* =========================================================
-     Auto disable layers ONLY if not national view
+     Auto disable data layers (but keep satellite intact)
   ========================================================= */
 
   useEffect(() => {
     if (filters.districts.length === 0 && !nationalView) {
-      setLayers({
+      setLayers((prev) => ({
+        ...prev,
         paddyExtent: false,
         showCircles: false,
         showRoads: false,
-      });
+      }));
     }
   }, [filters.districts, nationalView]);
 
@@ -49,30 +51,36 @@ export default function FieldMap() {
     <div className="relative flex gap-4 p-4 h-full">
 
       <FiltersPanel
-  filters={filters}
-  setFilters={setFilters}
-  nationalView={nationalView}
-  onNationalView={() => {
-    setFilters({ districts: [], health: [] });
-    setLayers({
-      paddyExtent: true,
-      showCircles: true,
-      showRoads: false,
-    });
-    setNationalView(true);
-    setResetViewKey(prev => prev + 1);
-  }}
-  onClearAll={() => {
-    setFilters({ districts: [], health: [] });
-    setLayers({
-      paddyExtent: false,
-      showCircles: false,
-      showRoads: false,
-    });
-    setNationalView(false);
-    setResetViewKey(prev => prev + 1);
-  }}
-/>
+        filters={filters}
+        setFilters={setFilters}
+        nationalView={nationalView}
+        onNationalView={() => {
+          setFilters({ districts: [], health: [] });
+
+          setLayers((prev) => ({
+            ...prev,
+            paddyExtent: true,
+            showCircles: true,
+            showRoads: false,
+          }));
+
+          setNationalView(true);
+          setResetViewKey(prev => prev + 1);
+        }}
+        onClearAll={() => {
+          setFilters({ districts: [], health: [] });
+
+          setLayers((prev) => ({
+            ...prev,
+            paddyExtent: false,
+            showCircles: false,
+            showRoads: false,
+          }));
+
+          setNationalView(false);
+          setResetViewKey(prev => prev + 1);
+        }}
+      />
 
       <div className="relative flex-1 bg-gray-200 dark:bg-gray-800 rounded-xl overflow-hidden shadow-md">
         
@@ -97,6 +105,7 @@ export default function FieldMap() {
           filters.districts.length > 0 || nationalView
         }
       />
+
     </div>
   );
 }

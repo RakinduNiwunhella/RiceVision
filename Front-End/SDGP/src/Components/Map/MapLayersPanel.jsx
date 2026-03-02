@@ -1,12 +1,32 @@
 export default function MapLayersPanel({ layers, setLayers, districtSelected }) {
 
-  const toggleLayer = (layer) => {
-    if (!districtSelected) return; // 🔒 prevent toggle
-    setLayers((prev) => ({
+const toggleLayer = (layer) => {
+  setLayers((prev) => {
+    // If selecting Satellite
+    if (layer === "showSatellite") {
+      return {
+        ...prev,
+        showSatellite: !prev.showSatellite,
+        showRoads: false, // 🔥 turn off OSM when satellite selected
+      };
+    }
+
+    // If selecting OpenStreet
+    if (layer === "showRoads") {
+      return {
+        ...prev,
+        showRoads: !prev.showRoads,
+        showSatellite: false, // 🔥 turn off satellite
+      };
+    }
+
+    // Normal layers
+    return {
       ...prev,
       [layer]: !prev[layer],
-    }));
-  };
+    };
+  });
+};
 
   return (
     <div className="w-72 bg-white dark:bg-gray-800 rounded-xl shadow-md p-4">
@@ -21,10 +41,11 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
       )}
 
       {[
-        { key: "paddyExtent", label: "🌾 Paddy Extent" },
-        { key: "showCircles", label: "📍 Field Health Markers" },
-        { key: "showRoads", label: "🛣 Show Roads & Labels" },
-      ].map(({ key, label }) => (
+  { key: "paddyExtent", label: "🌾 Paddy Extent" },
+  { key: "showCircles", label: "📍 Field Health Markers" },
+  { key: "showSatellite", label: "🛰 Satellite View" }, // 👈 ADD
+  { key: "showRoads", label: "🛣 Show Roads & Labels" },
+].map(({ key, label }) => (
         <div
           key={key}
           className={`flex items-center justify-between mb-3 ${
