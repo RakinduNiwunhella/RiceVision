@@ -19,6 +19,10 @@ export default function LoginPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [showForgot, setShowForgot] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetSuccess, setResetSuccess] = useState(false);
+  const [resetError, setResetError] = useState("");
 
   // Theme Logic
   useEffect(() => {
@@ -45,6 +49,30 @@ export default function LoginPage() {
       setLoading(false);
     } else {
       navigate("/dashboard");
+    }
+  };
+
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+
+    if (!email) {
+      setResetError("Please enter your email.");
+      return;
+    }
+
+    setResetLoading(true);
+    setResetError("");
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: "http://localhost:5173/reset-password",
+    });
+
+    setResetLoading(false);
+
+    if (error) {
+      setResetError(error.message);
+    } else {
+      setResetSuccess(true);
     }
   };
 
@@ -108,6 +136,14 @@ export default function LoginPage() {
               <div className="flex justify-between mb-2">
                 <label className="text-sm font-semibold">Password</label>
               </div>
+
+              <button
+                type="button"
+                onClick={() => setShowForgot(true)}
+                className="text-sm text-indigo-500 hover:text-indigo-400"
+              >
+                Forgot password?
+              </button>
 
               <div className="relative">
                 <input
@@ -212,6 +248,82 @@ export default function LoginPage() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
       </div>
+
+      {showForgot && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Background Blur */}
+          <div
+            className="absolute inset-0 bg-black/30 backdrop-blur-sm"
+            onClick={() => setShowForgot(false)}
+          ></div>
+
+          {/* Modal */}
+          <div className="relative z-10 w-full max-w-md p-8 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl">
+            <h2 className="text-2xl font-bold mb-6">Reset Password</h2>
+
+            <form onSubmit={handleResetPassword} className="space-y-4">
+              <input
+                type="email"
+                required
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800"
+              />
+              <button
+                type="submit"
+                disabled={resetLoading}
+                className="w-full py-3 bg-indigo-600 text-white rounded-xl flex items-center justify-center gap-2 disabled:opacity-70"
+              >
+                {resetLoading ? (
+                  <>
+                    <svg
+                      className="h-5 w-5 animate-spin"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                        fill="none"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.37 0 0 5.37 0 12h4z"
+                      />
+                    </svg>
+                    <span>Sending...</span>
+                  </>
+                ) : (
+                  "Send Reset Link"
+                )}
+              </button>
+
+              {resetError && (
+                <p className="text-sm text-red-500 text-center">{resetError}</p>
+              )}
+
+              {resetSuccess && (
+                <p className="text-sm text-green-600 text-center">
+                  ✅ Password reset email sent! Check your inbox.
+                </p>
+              )}
+            </form>
+
+            <button
+              onClick={() => setShowForgot(false)}
+              className="absolute top-4 right-4 text-slate-500 hover:text-red-500"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

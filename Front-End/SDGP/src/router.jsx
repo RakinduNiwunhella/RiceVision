@@ -10,6 +10,8 @@ import Profile from "./Components/Profile/Profile";
 import Help from "./Components/Sites/Help";
 import Signin from "./Components/Authentication/Signin";
 import Signup from "./Components/Authentication/Signup";
+import ForgotPassword from "./Components/Authentication/ForgotPassword";
+import ResetPassword from "./Components/Authentication/ResetPassword";
 
 const router = createBrowserRouter([
   {
@@ -26,18 +28,26 @@ const router = createBrowserRouter([
     element: <Signup />,
   },
   {
+    path: "/forgot-password",
+    element: <ForgotPassword />,
+  },
+  {
+    path: "/reset-password",
+    element: <ResetPassword />,
+  },
+  {
     // 2. Dashboard Layout starts here (No "/app" prefix)
-    path: "/", 
+    path: "/",
     element: <App />,
     children: [
       { path: "dashboard", element: <MyDashboard /> },
       { path: "field-map", element: <FieldMap /> },
       { path: "field-data", element: <FieldData /> },
-      { path: "alerts", element: <Alerts/> },
-      { path: "weather", element: <Weather/> },
-      { path: "report", element: <Report/> },
-      { path: "profile", element: <Profile/> }, 
-      { path: "help", element: <Help/> },
+      { path: "alerts", element: <Alerts /> },
+      { path: "weather", element: <Weather /> },
+      { path: "report", element: <Report /> },
+      { path: "profile", element: <Profile /> },
+      { path: "help", element: <Help /> },
     ],
   },
 ]);
