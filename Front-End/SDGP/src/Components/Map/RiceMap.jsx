@@ -195,23 +195,34 @@ export default function RiceMap({ filters, layers, isDark, resetViewKey }) {
 
       {/* ================= BASE MAP ================= */}
 
-      {/* 🛰 Satellite */}
+      {/* Satellite Mode */}
       {layers.showSatellite && (
-        <TileLayer
-          attribution="© Esri"
-          url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-        />
+        <>
+          <TileLayer
+            attribution="© Esri"
+            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+          />
+
+          {/* Roads overlay in Satellite mode */}
+          {layers.showRoads && (
+            <TileLayer
+              attribution="© OpenStreetMap contributors"
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              opacity={0.6}
+            />
+          )}
+        </>
       )}
 
-      {/* 🛣 OpenStreet */}
-      {layers.showRoads && !layers.showSatellite && (
+      {/* OpenStreet Full Base */}
+      {!layers.showSatellite && layers.showRoads && (
         <TileLayer
           attribution="© OpenStreetMap contributors"
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
       )}
 
-      {/* 🌗 Default Light/Dark */}
+      {/* Default Light/Dark Base */}
       {!layers.showSatellite && !layers.showRoads && (
         <TileLayer
           attribution="© Carto"

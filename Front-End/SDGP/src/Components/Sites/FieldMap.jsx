@@ -15,8 +15,9 @@ export default function FieldMap() {
   const [layers, setLayers] = useState({
     paddyExtent: false,
     showCircles: false,
-    showRoads: false,
-    showSatellite: false, // ✅ Satellite toggle
+    showSatellite: false,
+    showRoadOverlay: false,
+    roadOpacity: 0.6,
   });
 
   const [nationalView, setNationalView] = useState(false);
