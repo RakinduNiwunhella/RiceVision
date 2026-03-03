@@ -75,7 +75,9 @@ export default function SignupPage() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: "http://localhost:5173/dashboard",
+        // https://ricevisionlanka.com/dashboard for production
+        // http://localhost:5173/dashboard for development
+        redirectTo: "https://ricevisionlanka.com/dashboard",
       },
     });
 

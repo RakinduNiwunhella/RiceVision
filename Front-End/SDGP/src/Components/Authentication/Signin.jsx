@@ -57,7 +57,8 @@ export default function LoginPage() {
       provider: "google",
       options: {
         // https://ricevisionlanka.com/dashboard for production
-        redirectTo: "http://localhost:5173/dashboard",
+        // http://localhost:5173/dashboard for development
+        redirectTo: "https://ricevisionlanka.com/dashboard",
       },
     });
 
