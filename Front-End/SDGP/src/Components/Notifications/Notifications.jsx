@@ -1,39 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
-const Notifications = () => {
-  const [notifications, setNotifications] = useState([]);
-
-  const fetchNotifications = async () => {
-    try {
-      const BASE_URL = import.meta.env.VITE_API_BASE || "https://ricevision-backend.onrender.com";
-      const response = await fetch(`${BASE_URL}/notifications`);
-      const data = await response.json();
-      setNotifications(data);
-    } catch (error) {
-      console.error("Error fetching notifications:", error);
-    }
-  };
-
-  const markAsRead = async (id) => {
-    try {
-      const BASE_URL = import.meta.env.VITE_API_BASE || "https://ricevision-backend.onrender.com";
-      await fetch(`${BASE_URL}/notifications/${id}/read`, {
-        method: "PUT",
-      });
-
-      setNotifications((prev) =>
-        prev.map((n) =>
-          n.id === id ? { ...n, is_read: true } : n
-        )
-      );
-    } catch (error) {
-      console.error("Error updating notification:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchNotifications();
-  }, []);
+const Notifications = ({ notifications, markAsRead }) => {
 
   return (
     <div className="absolute right-6 top-16 w-80 bg-white dark:bg-slate-800 shadow-lg rounded-lg p-4 z-50 border border-slate-200 dark:border-slate-700">
