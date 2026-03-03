@@ -195,24 +195,33 @@ export default function RiceMap({ filters, layers, isDark, resetViewKey }) {
 
       {/* ================= BASE MAP ================= */}
 
-      {/* Satellite Mode */}
       {layers.showSatellite && (
-        <>
-          <TileLayer
-            attribution="© Esri"
-            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-          />
+  <>
+    {/* ESRI Satellite */}
+    <TileLayer
+      attribution="© Esri"
+      url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+    />
 
-          {/* Roads overlay in Satellite mode */}
-          {layers.showRoads && (
-            <TileLayer
-              attribution="© OpenStreetMap contributors"
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              opacity={0.6}
-            />
-          )}
-        </>
-      )}
+    {/* Faded OSM base */}
+    {layers.showRoads && (
+      <>
+        <TileLayer
+          attribution="© OpenStreetMap contributors"
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          opacity={layers.roadOpacity}
+        />
+
+        {/* Label-only overlay (always full opacity) */}
+        <TileLayer
+          attribution="© Carto"
+          url="https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png"
+          opacity={1}
+        />
+      </>
+    )}
+  </>
+)}
 
       {/* OpenStreet Full Base */}
       {!layers.showSatellite && layers.showRoads && (

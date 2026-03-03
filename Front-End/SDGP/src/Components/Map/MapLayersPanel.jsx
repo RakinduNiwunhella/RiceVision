@@ -21,9 +21,7 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
 
       {/* Paddy Extent */}
       <div className="flex items-center justify-between mb-3">
-        <span className="text-gray-700 dark:text-gray-200">
-          🌾 Paddy Extent
-        </span>
+        <span>🌾 Paddy Extent</span>
         <button
           onClick={() => toggleLayer("paddyExtent")}
           disabled={!districtSelected}
@@ -41,9 +39,7 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
 
       {/* Field Health Markers */}
       <div className="flex items-center justify-between mb-3">
-        <span className="text-gray-700 dark:text-gray-200">
-          📍 Field Health Markers
-        </span>
+        <span>📍 Field Health Markers</span>
         <button
           onClick={() => toggleLayer("showCircles")}
           disabled={!districtSelected}
@@ -59,12 +55,10 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
         </button>
       </div>
 
-      {/* Satellite View */}
+      {/* Satellite */}
       <div className="mb-3">
         <div className="flex items-center justify-between">
-          <span className="text-gray-700 dark:text-gray-200">
-            🛰 Satellite View
-          </span>
+          <span>🛰 Satellite View</span>
           <button
             onClick={() => toggleLayer("showSatellite")}
             disabled={!districtSelected}
@@ -80,13 +74,13 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
           </button>
         </div>
 
-        {/* Dropdown Section */}
+        {/* Dropdown */}
         {layers.showSatellite && (
-          <div className="mt-3 ml-4 border-l border-gray-300 pl-4">
+          <div className="mt-3 ml-4 border-l border-gray-300 pl-4 space-y-3">
+
+            {/* Roads toggle */}
             <div className="flex items-center justify-between">
-              <span className="text-gray-600 dark:text-gray-300">
-                🛣 Roads & Labels
-              </span>
+              <span className="text-sm">🛣 Roads & Labels</span>
               <button
                 onClick={() => toggleLayer("showRoads")}
                 className={`w-10 h-5 flex items-center rounded-full p-1 transition ${
@@ -100,6 +94,30 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
                 />
               </button>
             </div>
+
+            {/* Opacity slider */}
+            {layers.showRoads && (
+              <div>
+                <label className="text-xs text-gray-500 dark:text-gray-400">
+                  Opacity
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.1"
+                  value={layers.roadOpacity}
+                  onChange={(e) =>
+                    setLayers(prev => ({
+                      ...prev,
+                      roadOpacity: parseFloat(e.target.value),
+                    }))
+                  }
+                  className="w-full"
+                />
+              </div>
+            )}
+
           </div>
         )}
       </div>
