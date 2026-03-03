@@ -1,82 +1,120 @@
 import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import Notifications from '../Notifications/Notifications'
 
 const Header = () => {
   const [isDark, setIsDark] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
-  const [notifications, setNotifications] = useState([])
 
-  const BASE_URL =
-    import.meta.env.VITE_API_BASE ||
-    "https://ricevision-backend.onrender.com"
+  const [notifications, setNotifications] = useState([
+    { id: 1, message: "New complaint submitted", time: "2 minutes ago", read: false },
+    { id: 2, message: "Flood risk detected in area", time: "10 minutes ago", read: false },
+    { id: 3, message: "Weather warning issued", time: "20 minutes ago", read: true },
+    { id: 4, message: "Seasonal report ready", time: "1 hour ago", read: true },
+  ])
 
-  // Fetch notifications from FastAPI
-  const fetchNotifications = async () => {
-    try {
-      const response = await fetch(`${BASE_URL}/notifications`)
-      const data = await response.json()
-      setNotifications(data)
-    } catch (error) {
-      console.error("Error fetching notifications:", error)
-    }
-  }
-
-  // Mark notification as read
-  const markAsRead = async (id) => {
-    try {
-      await fetch(`${BASE_URL}/notifications/${id}/read`, {
-        method: "PUT",
-      })
-
-      setNotifications(prev =>
-        prev.map(n =>
-          n.id === id ? { ...n, is_read: true } : n
-        )
+  const markAsRead = (id) => {
+    setNotifications(prev =>
+      prev.map(n =>
+        n.id === id ? { ...n, read: true } : n
       )
-    } catch (error) {
-      console.error("Error updating notification:", error)
-    }
+    )
   }
-
-  useEffect(() => {
-    fetchNotifications()
-  }, [])
 
   useEffect(() => {
     const html = document.documentElement
-    if (isDark) html.classList.add('dark')
-    else html.classList.remove('dark')
+
+    if (isDark) {
+      html.classList.add('dark')
+    } else {
+      html.classList.remove('dark')
+    }
   }, [isDark])
 
   return (
-    <nav className="fixed top-0 w-full z-50 bg-white dark:bg-slate-900 shadow-md">
-      <div className="flex justify-end items-center h-14 px-6 space-x-6">
+    <nav className="fixed top-0 w-full z-50 transition-all duration-300 bg-white dark:bg-slate-900 shadow-md dark:shadow-black/30">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-14">
+          {/* Logo */}
+          <div className="flex items-center group cursor-pointer">
+            <img
+              src="/logoSDGP.webp"
+              alt="SDGP Logo"
+              className="h-12 w-auto transition-all duration-300 dark:brightness-110 dark:contrast-110"
+            />
+          </div>
 
-        {/* Dark Mode */}
-        <button onClick={() => setIsDark(prev => !prev)}>
-          <span className="material-symbols-outlined">
-            {isDark ? 'light_mode' : 'dark_mode'}
-          </span>
-        </button>
+          {/* Center search */}
+          <div className="flex-1 px-4 hidden md:flex items-center">
+            <div className="relative w-full max-w-2xl mx-auto">
+              <span
+                className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                style={{ fontSize: 20 }}
+              >
+                search
+              </span>
 
-        {/* Notifications */}
-        <button
-          onClick={() => setShowNotifications(prev => !prev)}
-          className="relative"
-        >
-          <span className="material-symbols-outlined">
-            notifications
-          </span>
+              <input
+                type="text"
+                placeholder="Search anything..."
+                className="w-full pl-10 pr-36 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
 
-          {notifications.filter(n => !n.is_read).length > 0 && (
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">
-              {notifications.filter(n => !n.is_read).length}
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center space-x-2">
+                <button className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:shadow transition">
+                  <span
+                    className="material-symbols-outlined text-slate-600"
+                    style={{ fontSize: 18 }}
+                  >
+                    tune
+                  </span>
+                  <span className="text-sm text-slate-600">Filter</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Header icons */}
+          <div className="flex items-center space-x-6 lg:space-x-8 mt-2">
+            {/* Language */}
+            <span className="material-symbols-outlined text-gray-800 dark:text-slate-300">
+              language
             </span>
-          )}
-        </button>
 
+            {/* Dark mode toggle */}
+            <button
+              onClick={() => setIsDark(prev => !prev)}
+              aria-label="Toggle dark mode"
+              className="flex items-center"
+            >
+              <span className="material-symbols-outlined text-gray-800 dark:text-slate-300">
+                {isDark ? 'light_mode' : 'dark_mode'}
+              </span>
+            </button>
+
+            {/* Notifications */}
+            <button
+              onClick={() => setShowNotifications(prev => !prev)}
+              className="relative flex items-center"
+            >
+              <span className="material-symbols-outlined text-gray-800 dark:text-slate-300">
+                notifications
+              </span>
+
+              {notifications.filter(n => !n.read).length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">
+                  {notifications.filter(n => !n.read).length}
+                </span>
+              )}
+            </button>
+
+            {/* Profile */}
+            <span className="material-symbols-outlined text-gray-800 dark:text-slate-300">
+              contacts_product
+            </span>
+          </div>
+        </div>
       </div>
-
       {showNotifications && (
         <Notifications
           notifications={notifications}
