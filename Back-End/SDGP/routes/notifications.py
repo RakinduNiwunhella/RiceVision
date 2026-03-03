@@ -1,55 +1,48 @@
-from fastapi import APIRouter
-from pydantic import BaseModel
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from ..db import supabase
 
-router = APIRouter()
+app = FastAPI()
 
-class NotificationCreate(BaseModel):
-    message: str
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # later restrict to frontend URL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-
-# GET notifications
-@router.get("/notifications")
+# GET ALL NOTIFICATIONS
+@app.get("/notifications")
 def get_notifications():
-    response = (
-        supabase
-        .table("notificationpanel")
-        .select("*")
+    response = supabase.table("notificationpanel") \
+        .select("*") \
+        .order("created_at", desc=True) \
         .execute()
-    )
 
     return response.data
 
 
-# CREATE notification (ADMIN)
-@router.post("/notifications")
-def create_notification(notification: NotificationCreate):
-    try:
-        response = (
-            supabase
-            .table("notificationpanel")
-            .insert({
-                "message": notification.message,
-                "is_read": False
-            })
-            .execute()
-        )
-        return response.data
-    except Exception as e:
-        return {"error": str(e)}
+# GET UNREAD COUNT
+@app.get("/notifications/unread-count")
+def get_unread_count():
+    response = supabase.table("notificationpanel") \
+        .select("id", count="exact") \
+        .eq("is_read", False) \
+        .execute()
+
+    return {"unread_count": response.count}
 
 
 # MARK AS READ
-@router.put("/notifications/{notification_id}/read")
-def mark_notification_read(notification_id: str):
-    try:
-        response = (
-            supabase
-            .table("notificationpanel")
-            .update({"is_read": True})
-            .eq("id", notification_id)
-            .execute()
-        )
-        return response.data
-    except Exception as e:
-        return {"error": str(e)}
+@app.put("/notifications/{notification_id}")
+def mark_as_read(notification_id: int):
+    response = supabase.table("notificationpanel") \
+        .update({"is_read": True}) \
+        .eq("id", notification_id) \
+        .execute()
+
+    if not response.data:
+        raise HTTPException(status_code=404, detail="Notification not found")
+
+    return {"message": "Marked as read"}
