@@ -244,7 +244,7 @@ export default function LoginPage() {
             </button>
 
             {/* Divider */}
-            <div className="flex items-center my-4">
+            <div className="flex items-center">
               <div className="flex-grow h-px bg-slate-300 dark:bg-slate-700"></div>
               <span className="px-4 text-sm text-slate-500">OR</span>
               <div className="flex-grow h-px bg-slate-300 dark:bg-slate-700"></div>
