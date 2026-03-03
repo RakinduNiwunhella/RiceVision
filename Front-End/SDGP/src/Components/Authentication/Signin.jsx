@@ -91,7 +91,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen transition-colors duration-500 bg-white dark:bg-slate-950 text-slate-900 dark:text-white font-sans">
+    <div className="flex transition-colors duration-500 ...">
       {/* Theme Toggle */}
       <button
         type="button"
@@ -106,10 +106,10 @@ export default function LoginPage() {
       </button>
 
       {/* Left Side: Form Container */}
-      <div className="flex flex-col justify-center w-full px-8 py-12 lg:w-1/2 md:px-24 lg:px-32 z-10">
+      <div className="flex flex-col w-full px-8 pt-3 pb-6 lg:w-1/2 md:px-24 lg:px-32 z-10">
         <div className="w-full max-w-md mx-auto">
           {/* Logo */}
-          <div className="flex items-center mb-10 space-x-3">
+          <div className="flex items-center mb-0 space-x-3">
             <div className="items-center group">
               <img
                 src="/logoSDGP.webp"
@@ -122,11 +122,11 @@ export default function LoginPage() {
           <h2 className="text-4xl font-extrabold mb-3 tracking-tight">
             Welcome Back
           </h2>
-          <p className="text-slate-500 dark:text-slate-400 mb-10">
+          <p className="text-slate-500 dark:text-slate-400 mb-6">
             Please enter your details to access your dashboard.
           </p>
 
-          <form onSubmit={handleLogin} className="space-y-6">
+          <form onSubmit={handleLogin} className="space-y-4">
             {/* Email Input */}
             <div>
               <label className="block text-sm font-semibold mb-2">
@@ -147,17 +147,9 @@ export default function LoginPage() {
 
             {/* Password Input */}
             <div>
-              <div className="flex justify-between mb-2">
-                <label className="text-sm font-semibold">Password</label>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setShowForgot(true)}
-                className="text-sm text-indigo-500 hover:text-indigo-400"
-              >
-                Forgot password?
-              </button>
+              <label className="block text-sm font-semibold mb-2">
+                Password
+              </label>
 
               <div className="relative">
                 <input
@@ -179,6 +171,17 @@ export default function LoginPage() {
                   className="absolute inset-y-0 right-4 flex items-center text-slate-500 dark:text-slate-400 hover:text-indigo-500 transition-colors"
                 >
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
+
+              {/* Forgot Password - now below input */}
+              <div className="flex justify-end mt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowForgot(true)}
+                  className="text-sm text-indigo-500 hover:text-indigo-400"
+                >
+                  Forgot password?
                 </button>
               </div>
             </div>
@@ -241,7 +244,7 @@ export default function LoginPage() {
             </button>
 
             {/* Divider */}
-            <div className="flex items-center my-6">
+            <div className="flex items-center my-4">
               <div className="flex-grow h-px bg-slate-300 dark:bg-slate-700"></div>
               <span className="px-4 text-sm text-slate-500">OR</span>
               <div className="flex-grow h-px bg-slate-300 dark:bg-slate-700"></div>
