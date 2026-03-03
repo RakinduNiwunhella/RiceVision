@@ -1,7 +1,6 @@
 export default function MapLayersPanel({ layers, setLayers, districtSelected }) {
 
   const toggleLayer = (layer) => {
-    if (!districtSelected) return; // 🔒 prevent toggle
     setLayers((prev) => ({
       ...prev,
       [layer]: !prev[layer],
@@ -20,36 +19,109 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
         </div>
       )}
 
-      {[
-        { key: "paddyExtent", label: "🌾 Paddy Extent" },
-        { key: "showCircles", label: "📍 Field Health Markers" },
-        { key: "showRoads", label: "🛣 Show Roads & Labels" },
-      ].map(({ key, label }) => (
-        <div
-          key={key}
-          className={`flex items-center justify-between mb-3 ${
-            !districtSelected ? "opacity-50 cursor-not-allowed" : ""
+      {/* Paddy Extent */}
+      <div className="flex items-center justify-between mb-3">
+        <span>🌾 Paddy Extent</span>
+        <button
+          onClick={() => toggleLayer("paddyExtent")}
+          disabled={!districtSelected}
+          className={`w-10 h-5 flex items-center rounded-full p-1 transition ${
+            layers.paddyExtent ? "bg-green-500" : "bg-gray-300"
           }`}
         >
-          <span className="text-gray-700 dark:text-gray-200">
-            {label}
-          </span>
+          <div
+            className={`bg-white w-4 h-4 rounded-full shadow-md transform transition ${
+              layers.paddyExtent ? "translate-x-5" : ""
+            }`}
+          />
+        </button>
+      </div>
 
+      {/* Field Health Markers */}
+      <div className="flex items-center justify-between mb-3">
+        <span>📍 Field Health Markers</span>
+        <button
+          onClick={() => toggleLayer("showCircles")}
+          disabled={!districtSelected}
+          className={`w-10 h-5 flex items-center rounded-full p-1 transition ${
+            layers.showCircles ? "bg-green-500" : "bg-gray-300"
+          }`}
+        >
+          <div
+            className={`bg-white w-4 h-4 rounded-full shadow-md transform transition ${
+              layers.showCircles ? "translate-x-5" : ""
+            }`}
+          />
+        </button>
+      </div>
+
+      {/* Satellite */}
+      <div className="mb-3">
+        <div className="flex items-center justify-between">
+          <span>🛰 Satellite View</span>
           <button
-            onClick={() => toggleLayer(key)}
+            onClick={() => toggleLayer("showSatellite")}
             disabled={!districtSelected}
             className={`w-10 h-5 flex items-center rounded-full p-1 transition ${
-              layers[key] ? "bg-green-500" : "bg-gray-300"
+              layers.showSatellite ? "bg-green-500" : "bg-gray-300"
             }`}
           >
             <div
               className={`bg-white w-4 h-4 rounded-full shadow-md transform transition ${
-                layers[key] ? "translate-x-5" : ""
+                layers.showSatellite ? "translate-x-5" : ""
               }`}
             />
           </button>
         </div>
-      ))}
+
+        {/* Dropdown */}
+        {layers.showSatellite && (
+          <div className="mt-3 ml-4 border-l border-gray-300 pl-4 space-y-3">
+
+            {/* Roads toggle */}
+            <div className="flex items-center justify-between">
+              <span className="text-sm">🛣 Roads & Labels</span>
+              <button
+                onClick={() => toggleLayer("showRoads")}
+                className={`w-10 h-5 flex items-center rounded-full p-1 transition ${
+                  layers.showRoads ? "bg-green-500" : "bg-gray-300"
+                }`}
+              >
+                <div
+                  className={`bg-white w-4 h-4 rounded-full shadow-md transform transition ${
+                    layers.showRoads ? "translate-x-5" : ""
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* Opacity slider */}
+            {layers.showRoads && (
+              <div>
+                <label className="text-xs text-gray-500 dark:text-gray-400">
+                  Opacity
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.1"
+                  value={layers.roadOpacity}
+                  onChange={(e) =>
+                    setLayers(prev => ({
+                      ...prev,
+                      roadOpacity: parseFloat(e.target.value),
+                    }))
+                  }
+                  className="w-full"
+                />
+              </div>
+            )}
+
+          </div>
+        )}
+      </div>
+
     </div>
   );
 }
