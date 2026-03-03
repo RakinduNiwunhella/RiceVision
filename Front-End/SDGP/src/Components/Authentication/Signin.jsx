@@ -52,6 +52,20 @@ export default function LoginPage() {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        // https://ricevisionlanka.com/dashboard for production
+        redirectTo: "http://localhost:5173/dashboard",
+      },
+    });
+
+    if (error) {
+      setErrorMessage(error.message);
+    }
+  };
+
   const handleResetPassword = async (e) => {
     e.preventDefault();
 
@@ -224,6 +238,27 @@ export default function LoginPage() {
               ) : (
                 "Sign In to Account"
               )}
+            </button>
+
+            {/* Divider */}
+            <div className="flex items-center my-6">
+              <div className="flex-grow h-px bg-slate-300 dark:bg-slate-700"></div>
+              <span className="px-4 text-sm text-slate-500">OR</span>
+              <div className="flex-grow h-px bg-slate-300 dark:bg-slate-700"></div>
+            </div>
+
+            {/* Google Login Button */}
+            <button
+              type="button"
+              onClick={handleGoogleLogin}
+              className="w-full py-3 border border-slate-300 dark:border-slate-700 rounded-xl flex items-center justify-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+            >
+              <img
+                src="https://www.svgrepo.com/show/475656/google-color.svg"
+                alt="Google"
+                className="h-5 w-5"
+              />
+              Continue with Google
             </button>
           </form>
 
