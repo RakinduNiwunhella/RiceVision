@@ -1,3 +1,8 @@
+import subprocess
+import sys
+import boto3
+from pathlib import Path
+from datetime import datetime
 from satellite.gee_pipeline.runner import run_national_inference_pipeline
 from satellite.scripts.combine_csvs import combine_timestep_csvs
 
@@ -7,6 +12,69 @@ from disaster.cleaner import clean_disaster_data
 from config.settings import PDF_DIR, DISASTER_CSV_DIR
 
 from merge.merge_pipeline import run_merge
+
+
+BUCKET_NAME = "ricevision"
+S3_PREFIX = "FinalPredictions"
+SUPABASE_S3_PREFIX = "SupabasePredictions"
+
+
+def upload_final_outputs():
+    print("\n Uploading results to S3...")
+
+    s3 = boto3.client("s3")
+
+    today_str = datetime.now().strftime("%Y-%m-%d")
+    base_prefix = f"{S3_PREFIX}/{today_str}"
+
+    local_final_path = Path("data/final")
+
+    if not local_final_path.exists():
+        print("⚠️ data/final folder not found.")
+        return
+
+    for file_path in local_final_path.rglob("*"):
+        if file_path.is_file():
+            relative_path = file_path.relative_to(local_final_path)
+            s3_key = f"{base_prefix}/{relative_path}"
+
+            print(f"Uploading {file_path} -> s3://{BUCKET_NAME}/{s3_key}")
+            s3.upload_file(
+                str(file_path),
+                BUCKET_NAME,
+                s3_key
+            )
+
+    print("✅ Upload completed successfully.")
+
+
+def upload_supabase_predictions():
+    print("\n Uploading Supabase predictions to S3...")
+
+    s3 = boto3.client("s3")
+
+    today_str = datetime.now().strftime("%Y-%m-%d")
+    base_prefix = f"{SUPABASE_S3_PREFIX}/{today_str}"
+
+    local_supabase_path = Path("data/final/finalPredictions")
+
+    if not local_supabase_path.exists():
+        print("⚠️ data/final/finalPredictions folder not found.")
+        return
+
+    for file_path in local_supabase_path.rglob("*"):
+        if file_path.is_file():
+            relative_path = file_path.relative_to(local_supabase_path)
+            s3_key = f"{base_prefix}/{relative_path}"
+
+            print(f"Uploading {file_path} -> s3://{BUCKET_NAME}/{s3_key}")
+            s3.upload_file(
+                str(file_path),
+                BUCKET_NAME,
+                s3_key
+            )
+
+    print("✅ Supabase upload completed successfully.")
 
 
 def cleanup_intermediate_files():
@@ -51,6 +119,21 @@ def run_pipeline():
     print("=== MERGE PIPELINE STARTED ===")
     run_merge()
     print("=== MERGE PIPELINE COMPLETED ===")
+
+    # ---------------- S3 UPLOADS ----------------
+    print("=== S3 UPLOADS STARTED ===")
+
+    upload_final_outputs()
+
+    print("\n🚀 Running Supabase merge and upload...")
+    subprocess.run(
+        [sys.executable, "supabaseDataset/mergeAndUpload.py"],
+        check=True,
+    )
+
+    upload_supabase_predictions()
+
+    print("=== S3 UPLOADS COMPLETED ===")
 
     print("=== FULL PIPELINE COMPLETED ===")
 
