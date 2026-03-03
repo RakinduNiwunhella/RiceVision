@@ -265,7 +265,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <p className="mt-8 text-center text-sm text-slate-500 dark:text-slate-400">
+          <p className="mt-3 text-center text-sm text-slate-500 dark:text-slate-400">
             Don't have an account?{" "}
             <Link
               to="/signup"
