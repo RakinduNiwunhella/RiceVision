@@ -1,23 +1,22 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 import requests
 
 router = APIRouter(prefix="/api", tags=["Weather"])
 
-# Colombo coordinates
-LAT = 6.9271
-LON = 79.8612
-
 
 @router.get("/weather")
-def get_weather():
+def get_weather(
+    latitude: float = Query(...),
+    longitude: float = Query(...)
+):
     """
     Fetch weather details from Open-Meteo
-    and send them to the frontend.
+    based on dynamic user location.
     """
     try:
         url = (
             f"https://api.open-meteo.com/v1/forecast?"
-            f"latitude={LAT}&longitude={LON}"
+            f"latitude={latitude}&longitude={longitude}"
             "&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,precipitation,cloud_cover"
             "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max"
             "&past_days=7&timezone=auto"

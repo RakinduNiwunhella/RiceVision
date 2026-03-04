@@ -15,7 +15,15 @@ export const fetchOutbreaks = () => get("/outbreaks");
 export const fetchNDVITrend = () => get("/ndvi-trend");
 export const fetchDistrictHealth = () => get("/district-health");
 export const fetchReportData = (districts, month) => get(`/api/report-data?districts=${districts}&month=${month}`);
-export const fetchWeather = () => get("/api/weather");
+export const fetchWeather = async (lat, lon) => {
+  const res = await fetch(
+    `${API_BASE}/api/weather?latitude=${lat}&longitude=${lon}`
+  );
+
+  if (!res.ok) throw new Error("Failed to fetch weather");
+
+  return res.json();
+};
 
 export const fetchFaqs = () => get("/api/help/faqs");
 

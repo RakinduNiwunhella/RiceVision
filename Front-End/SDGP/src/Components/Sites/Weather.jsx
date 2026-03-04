@@ -5,14 +5,41 @@ const RiceVisionWeather = () => {
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [locationName, setLocationName] = useState("Detecting Location...");
+const [districtName, setDistrictName] = useState("");
 
+const fetchLocationName = async (lat, lon) => {
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
+    );
 
+    const data = await res.json();
 
-  const fetchAgroWeather = useCallback(async () => {
+    const city =
+      data.address.city ||
+      data.address.town ||
+      data.address.village ||
+      "Unknown Area";
+
+    const district =
+      data.address.county ||
+      data.address.state_district ||
+      "";
+
+    setLocationName(city);
+    setDistrictName(district);
+
+  } catch (error) {
+    setLocationName("Location Unknown");
+  }
+};
+
+  const fetchAgroWeather = useCallback(async (lat, lon) => {
     try {
       setLoading(true);
       setError(null);
-      const data = await fetchWeather();
+      const data = await fetchWeather(lat, lon);
       setWeather(data);
     } catch (err) {
       setError(err.message);
@@ -21,8 +48,28 @@ const RiceVisionWeather = () => {
     }
   }, []);
 
-  useEffect(() => { fetchAgroWeather(); }, [fetchAgroWeather]);
+useEffect(() => {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
 
+        fetchAgroWeather(lat, lon);
+        fetchLocationName(lat, lon); // 👈 ADD THIS
+      },
+      () => {
+        fetchAgroWeather(6.9271, 79.8612);
+        setLocationName("Colombo");
+        setDistrictName("Colombo District");
+      }
+    );
+  } else {
+    fetchAgroWeather(6.9271, 79.8612);
+    setLocationName("Colombo");
+    setDistrictName("Colombo District");
+  }
+}, [fetchAgroWeather]);
   const getCondition = (code) => {
     if (code === 0) return { desc: "Optimal Day", icon: "☀️", color: "text-amber-500 dark:text-amber-400" };
     if (code <= 3) return { desc: "Good for Field", icon: "⛅", color: "text-emerald-600 dark:text-emerald-300" };
@@ -43,8 +90,13 @@ const RiceVisionWeather = () => {
         {/* Header Section */}
         <header className="mb-6 md:mb-10 border-b border-slate-200 dark:border-slate-800 pb-4 md:pb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-xl sm:text-2xl md:text-4xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Colombo Station</h1>
-            <p className="text-slate-500 text-[10px] sm:text-xs md:text-sm mt-1 font-bold uppercase tracking-wider">Paddy Field Intelligence Network</p>
+<h1 className="text-xl sm:text-2xl md:text-4xl font-black text-slate-900 dark:text-white uppercase tracking-tight">
+  {locationName}
+</h1>
+
+<p className="text-slate-500 text-[10px] sm:text-xs md:text-sm mt-1 font-bold uppercase tracking-wider">
+  {districtName}
+</p>
           </div>
           
         </header>
