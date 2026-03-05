@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { CSVLink } from "react-csv";
@@ -74,6 +75,7 @@ const districtsList = [
 ];
 
 const ReportPage = () => {
+  const location = useLocation();
   const [filterType, setFilterType] = useState("single"); // single or comparison
   const [month, setMonth] = useState(12);
   const [district1, setDistrict1] = useState("");
@@ -96,6 +98,16 @@ const ReportPage = () => {
 
     return () => observer.disconnect();
   }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const districtFromURL = params.get("district");
+
+    if (districtFromURL) {
+      setDistrict1(districtFromURL);
+      setFilterType("single");
+    }
+  }, [location.search]);
 
   const labelColor = isDark ? "#e5e7eb" : "#111827"; // slate-200 / slate-900
   const gridColor = isDark ? "#334155" : "#e5e7eb"; // slate-700 / slate-200

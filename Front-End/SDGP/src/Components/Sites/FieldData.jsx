@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "../../supabaseClient"; // adjust path if needed
 
 const healthColor = (health) => {
@@ -15,6 +16,7 @@ const healthColor = (health) => {
 };
 
 const FieldData = () => {
+  const navigate = useNavigate();
   const [stats, setStats] = useState([]);
   const [districtData, setDistrictData] = useState([]);
 
@@ -121,6 +123,7 @@ const FieldData = () => {
                   <th className="px-4 py-3 text-left">Avg NDVI</th>
                   <th className="px-4 py-3 text-left">Avg Yield (t/ha)</th>
                   <th className="px-4 py-3 text-left">Total Yield (tons)</th>
+                  <th className="px-4 py-3 text-left">Report</th>
                 </tr>
               </thead>
 
@@ -147,6 +150,15 @@ const FieldData = () => {
                     <td className="px-4 py-3">{d.avg_yield_ton_ha}</td>
                     <td className="px-4 py-3 font-medium">
                       {d.total_yield_tons}
+                    </td>
+
+                    <td className="px-4 py-3">
+                      <button
+                        onClick={() => navigate(`/report?district=${d.district}`)}
+                        className="px-3 py-1 text-xs font-medium rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 transition"
+                      >
+                        View Report
+                      </button>
                     </td>
                   </tr>
                 ))}
