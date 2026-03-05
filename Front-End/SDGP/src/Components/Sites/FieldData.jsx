@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "../../supabaseClient"; // adjust path if needed
 
 const healthColor = (health) => {
@@ -19,6 +20,8 @@ const FieldData = () => {
   const [districtData, setDistrictData] = useState([]);
 
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -128,7 +131,8 @@ const FieldData = () => {
                 {districtData.map((d) => (
                   <tr
                     key={d.district}
-                    className="hover:bg-gray-50 dark:hover:bg-slate-700 transition"
+                    onClick={() => navigate("/field-map", { state: { district: d.district } })}
+                    className="hover:bg-gray-50 dark:hover:bg-slate-700 transition cursor-pointer"
                   >
                     <td className="px-4 py-3 font-medium">{d.district}</td>
                     <td className="px-4 py-3">{d.total_fields}</td>

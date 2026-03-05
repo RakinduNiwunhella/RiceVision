@@ -1,14 +1,26 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import FiltersPanel from "../Map/FiltersPanel";
 import MapLayersPanel from "../Map/MapLayersPanel";
 import RiceMap from "../Map/RiceMap";
 
 export default function FieldMap() {
+  const location = useLocation();
+
   const [filters, setFilters] = useState({
     districts: [],
     season: "all",
     health: [],
   });
+
+  useEffect(() => {
+    if (location.state?.district) {
+      setFilters((prev) => ({
+        ...prev,
+        districts: [location.state.district],
+      }));
+    }
+  }, [location.state]);
 
   const [layers, setLayers] = useState({
     paddyExtent: false,
