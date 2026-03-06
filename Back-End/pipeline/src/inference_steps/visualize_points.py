@@ -20,7 +20,7 @@ def visualize_unique_points(
         s=5,
     )
 
-    plt.title('Distribution of 4719 Paddy Points in Sri Lanka', fontsize=14, pad=15)
+    plt.title('Distribution of 29228 Paddy Points in Sri Lanka', fontsize=14, pad=15)
     plt.xlabel('Longitude', fontsize=12)
     plt.ylabel('Latitude', fontsize=12)
     plt.grid(True, linestyle='--', alpha=0.5)
