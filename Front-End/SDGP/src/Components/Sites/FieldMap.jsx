@@ -12,7 +12,7 @@ export default function FieldMap() {
 
   const [layers, setLayers] = useState({
     paddyExtent: false,
-    showCircles: false,
+    showCircles: false,   // ✅ NEW
     ndvi: false,
     evi: false,
     vv: false,
@@ -20,18 +20,14 @@ export default function FieldMap() {
   });
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6 min-h-[calc(100vh-3rem)] -mx-6 -mt-6 p-6">
-      <div className="flex flex-col gap-6 w-full lg:w-auto">
-        <FiltersPanel filters={filters} setFilters={setFilters} />
-      </div>
+    <div className="relative flex gap-4 p-4 h-screen bg-gray-100 dark:bg-gray-900">
+      <FiltersPanel filters={filters} setFilters={setFilters} />
 
-      <div className="flex-1 rounded-3xl overflow-hidden glass border-white/20 shadow-2xl min-h-[500px]">
+      <div className="flex-1 bg-gray-200 rounded-xl overflow-hidden">
         <RiceMap filters={filters} layers={layers} />
       </div>
 
-      <div className="flex flex-col gap-6 w-full lg:w-auto">
-        <MapLayersPanel layers={layers} setLayers={setLayers} />
-      </div>
+      <MapLayersPanel layers={layers} setLayers={setLayers} />
     </div>
   );
 }
