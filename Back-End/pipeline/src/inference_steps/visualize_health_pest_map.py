@@ -64,7 +64,7 @@ def visualize_health_pest_map(
 
     plt.tight_layout()
     current_date_str = latest_status['date'].max().strftime('%Y-%m-%d')
-    plt.suptitle(f'RiceVision V7 Inference Snapshot: {current_date_str}', fontsize=18, y=1.02)
+    plt.suptitle(f'RiceVision Inference Snapshot: {current_date_str}', fontsize=18, y=1.02)
 
     out_dir = Path(artifacts_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
