@@ -27,34 +27,33 @@ import {
 
 /* ------------------ Components ------------------ */
 
-const StatWidget = ({ title, value, subtitle, icon }) => (
-  <div className="glass glass-hover p-8 text-center relative overflow-hidden group">
-    <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none">
-      <span className="material-symbols-outlined text-6xl">{icon}</span>
-    </div>
-    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-3">{title}</p>
-    <p className="text-5xl font-black text-white tracking-tighter drop-shadow-2xl">{value}</p>
-    {subtitle && <p className="text-[10px] font-bold text-emerald-400/60 mt-3 uppercase tracking-widest">{subtitle}</p>}
+const StatWidget = ({ title, value, subtitle }) => (
+  <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm">
+    <p className="text-sm text-slate-500 dark:text-slate-400">{title}</p>
+    <p className="text-3xl font-semibold text-slate-900 dark:text-white">
+      {value}
+    </p>
+    {subtitle && <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{subtitle}</p>}
   </div>
 );
 
 const ProgressWidget = ({ label, value, color }) => {
   const bar = {
-    green: "from-emerald-500 to-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.3)]",
-    yellow: "from-amber-500  to-amber-400  shadow-[0_0_20px_rgba(245,158,11,0.3)]",
-    blue: "from-blue-500   to-cyan-400   shadow-[0_0_20px_rgba(59,130,246,0.3)]",
+    green: "bg-emerald-500",
+    yellow: "bg-amber-400",
+    blue: "bg-blue-500",
   };
 
   return (
-    <div className="mb-5 last:mb-0">
-      <div className="flex justify-between text-[10px] font-black text-white/40 uppercase tracking-widest mb-2">
+    <div>
+      <div className="flex justify-between text-sm text-slate-500 dark:text-slate-400 mb-1">
         <span>{label}</span>
-        <span className="text-white/80">{value}%</span>
+        <span>{value}%</span>
       </div>
-      <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden border border-white/5">
+      <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full">
         <div
-          className={`h-full rounded-full bg-gradient-to-r ${bar[color]}`}
-          style={{ width: `${value}%`, transition: "width 1.5s cubic-bezier(0.34, 1.56, 0.64, 1)" }}
+          className={`h-2 rounded-full ${bar[color]}`}
+          style={{ width: `${value}%` }}
         />
       </div>
     </div>
@@ -73,90 +72,132 @@ const MyDashboard = () => {
   const [districtHealth, setDistrictHealth] = useState([]);
   const [showAllDistricts, setShowAllDistricts] = useState(false);
 
-  const pieColors = ["#10b981", "#f59e0b", "#ef4444"]; // Emerald-500, Amber-500, Red-500
+  const pieColors = ["#15803d", "#f59e0b", "#ef4444"];
 
   const healthPieData = healthSummary
     ? [
-      { name: "Optimal", value: healthSummary.normal_pct },
-      { name: "Mild Stress", value: healthSummary.mild_stress_pct },
-      { name: "Severe Stress", value: healthSummary.severe_stress_pct },
-    ]
+        { name: "Normal", value: healthSummary.normal_pct },
+        { name: "Mild Stress", value: healthSummary.mild_stress_pct },
+        { name: "Severe Stress", value: healthSummary.severe_stress_pct },
+      ]
     : [];
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const [health, yld, best, out, ndvi, dist] = await Promise.all([
-          fetchHealthSummary(),
-          fetchYield(),
-          fetchBestDistricts(),
-          fetchOutbreaks(),
-          fetchNDVITrend(),
-          fetchDistrictHealth()
-        ]);
-        setHealthSummary(health);
-        setYieldForecast(yld);
-        setBestYieldDistricts(best);
-        setOutbreaks(out);
-        setNdviTrend(ndvi);
-        setDistrictHealth(dist);
-      } catch (err) {
-        console.error("Dashboard synchronization error:", err);
-      }
-    };
-    loadData();
-  }, []);
+  /* ------------------ FETCH HEALTH (via FastAPI) ------------------ */
+useEffect(() => {
+  const loadHealth = async () => {
+    try {
+      const data = await fetchHealthSummary();
+      setHealthSummary(data);
+    } catch (err) {
+      console.error("Failed to load health summary:", err);
+    }
+  };
+
+  loadHealth();
+}, []);
+
+  /* ------------------ FETCH YIELD (via FastAPI) ------------------ */
+useEffect(() => {
+  const loadYield = async () => {
+    try {
+      const data = await fetchYield();
+      setYieldForecast(data);
+    } catch (err) {
+      console.error("Failed to load yield:", err);
+    }
+  };
+
+  loadYield();
+}, []);
+
+  /* ------------------ FETCH BEST YIELD DISTRICTS (via FastAPI) ------------------ */
+useEffect(() => {
+  const loadBestDistricts = async () => {
+    try {
+      const data = await fetchBestDistricts();
+      setBestYieldDistricts(data);
+    } catch (err) {
+      console.error("Failed to load best districts:", err);
+    }
+  };
+
+  loadBestDistricts();
+}, []);
+  /* ------------------ FETCH OUTBREAKS (via FastAPI) ------------------ */
+useEffect(() => {
+  const loadOutbreaks = async () => {
+    try {
+      const data = await fetchOutbreaks();
+      setOutbreaks(data);
+    } catch (err) {
+      console.error("Failed to load outbreaks:", err);
+    }
+  };
+
+  loadOutbreaks();
+}, []);
+
+  /* ------------------ FETCH NATIONAL NDVI TREND (via FastAPI) ------------------ */
+useEffect(() => {
+  const loadNDVI = async () => {
+    try {
+      const data = await fetchNDVITrend();
+      setNdviTrend(data);
+    } catch (err) {
+      console.error("Failed to load NDVI trend:", err);
+    }
+  };
+
+  loadNDVI();
+}, []);
+
+  /* ------------------ FETCH DISTRICT HEALTH OVERVIEW (via FastAPI) ------------------ */
+useEffect(() => {
+  const loadDistrictHealth = async () => {
+    try {
+      const data = await fetchDistrictHealth();
+      setDistrictHealth(data);
+    } catch (err) {
+      console.error("Failed to load district health:", err);
+    }
+  };
+
+  loadDistrictHealth();
+}, []);
 
   const formatMT = (value) => {
     if (!value) return "-";
-    if (value >= 1_000_000) return (value / 1_000_000).toFixed(2) + "M";
-    if (value >= 1_000) return (value / 1_000).toFixed(1) + "K";
-    return value.toLocaleString();
+    if (value >= 1_000_000) return (value / 1_000_000).toFixed(2) + "M MT";
+    if (value >= 1_000) return (value / 1_000).toFixed(1) + "K MT";
+    return value.toFixed(1) + " MT";
   };
 
   const getOutbreakIcon = (title) => {
     const t = title.toLowerCase();
     if (t.includes("flood") || t.includes("rain") || t.includes("storm"))
-      return <CloudRain size={18} className="text-blue-400" />;
+      return <CloudRain className="w-5 h-5 text-blue-500" />;
     if (t.includes("pest") || t.includes("insect"))
-      return <Bug size={18} className="text-rose-400" />;
-    return <AlertTriangle size={18} className="text-amber-400" />;
+      return <Bug className="w-5 h-5 text-rose-500" />;
+    return <AlertTriangle className="w-5 h-5 text-amber-500" />;
   };
 
   /* ------------------ RENDER ------------------ */
 
   return (
-    <div className="min-h-full p-6 lg:p-10 text-white font-sans transition-all duration-500">
-      <div className="max-w-7xl mx-auto space-y-12 pb-20">
+    <div className="max-w-7xl mx-auto bg-white dark:bg-slate-900 rounded-xl shadow-sm p-6 text-slate-700 dark:text-slate-300">
 
-        {/* ── Page Header ── */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-          <div>
-            <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
-              Command Center
-            </h1>
-            <p className="text-white/40 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em]">
-              Real-Time Agricultural Intelligence System
-            </p>
-          </div>
+      {/* OVERVIEW */}
+      <div>
+        <h1 className="text-xl font-semibold text-slate-900 dark:text-white">National Overview</h1>
 
-          <div className="glass px-6 py-3 rounded-2xl border-white/10 flex items-center gap-3">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-white/60">System Synchronized</span>
-          </div>
-        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+          <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm">
+            <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-4">
+              Field Health Distribution
+            </h3>
 
-        {/* ── Row 1: Stat Widgets ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-10">
-
-          {/* Field Health Distribution */}
-          <div className="glass glass-hover p-8 rounded-[3rem] border border-white/10 shadow-2xl flex flex-col items-center">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-8 self-start flex items-center gap-2">
-              <span className="material-symbols-outlined text-emerald-400 text-sm">radiology</span>
-              Health Topology
-            </p>
-            <div className="w-full aspect-square max-h-[240px] relative">
-              {healthSummary ? (
+            <div className="w-full h-64">
+              {healthSummary && (
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -165,259 +206,185 @@ const MyDashboard = () => {
                       nameKey="name"
                       cx="50%"
                       cy="50%"
-                      innerRadius={65}
-                      outerRadius={95}
-                      stroke="none"
-                      paddingAngle={8}
-                      isAnimationActive={true}
-                      animationDuration={1500}
+                      innerRadius={45}
+                      outerRadius={80}
+                      label={({ value }) => `${value.toFixed(1)}%`}
+                      isAnimationActive={false}
+                      activeIndex={-1}
+                      style={{ outline: "none", cursor: "default" }}
                     >
                       {healthPieData.map((_, i) => (
-                        <Cell key={i} fill={pieColors[i]} style={{ filter: `drop-shadow(0 0 10px ${pieColors[i]}44)` }} />
+                        <Cell key={i} fill={pieColors[i]} />
                       ))}
                     </Pie>
-                    <Tooltip
-                      contentStyle={{ background: 'rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '15px', backdropFilter: 'blur(10px)' }}
-                      itemStyle={{ color: '#fff', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase' }}
-                    />
+                    
+                    <Legend />
                   </PieChart>
                 </ResponsiveContainer>
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center text-white/20 animate-pulse text-xs font-black uppercase tracking-widest">
-                  Analyzing...
-                </div>
               )}
-              {/* Center stats */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span className="text-3xl font-black text-white">{healthSummary?.normal_pct.toFixed(0)}%</span>
-                <span className="text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">Optimal</span>
-              </div>
-            </div>
-            <div className="grid grid-cols-3 gap-4 w-full mt-8 pt-6 border-t border-white/5">
-              {healthPieData.map((d, i) => (
-                <div key={i} className="flex flex-col items-center text-center">
-                  <div className="w-1.5 h-1.5 rounded-full mb-2" style={{ background: pieColors[i] }} />
-                  <span className="text-[10px] font-black text-white/60 uppercase tracking-tighter mb-1 line-clamp-1">{d.name}</span>
-                  <span className="text-xs font-bold text-white">{d.value.toFixed(1)}%</span>
-                </div>
-              ))}
             </div>
           </div>
 
-          {/* Yield Forecast */}
-          <div className="glass glass-hover p-8 rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-6 flex items-center gap-2">
-              <span className="material-symbols-outlined text-cyan-400 text-sm">trending_up</span>
-              Output Projection
+          <div className="bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm">
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              Yield Forecast (MT)
             </p>
-            <div className="flex-1 flex flex-col justify-center py-4">
-              <p className="text-6xl font-black text-white tracking-tighter leading-none mb-2" style={{ textShadow: "0 10px 40px rgba(0,0,0,0.5)" }}>
-                {yieldForecast ? formatMT(yieldForecast.total_yield_tons) : "---"}
-              </p>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Metric Tons (Est.)</span>
-                <div className="flex-1 h-[1px] bg-white/10" />
-              </div>
-            </div>
 
-            <div className="mt-8 pt-8 border-t border-white/10">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/20 mb-4 ml-1">High Performance Sectors</p>
-              <div className="space-y-4">
+            <p className="text-3xl font-semibold text-slate-900 dark:text-white mt-1">
+              {yieldForecast
+                ? formatMT(yieldForecast.total_yield_tons)
+                : "Loading..."}
+            </p>
+
+
+            <div className="mt-4 border-t border-gray-200 dark:border-gray-700 pt-3">
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">
+                Top Producing Districts
+              </p>
+
+              <ul className="space-y-1">
                 {bestYieldDistricts.map((d, i) => (
-                  <div key={i} className="flex justify-between items-center group/item hover:translate-x-1 transition-transform">
-                    <div className="flex items-center gap-3">
-                      <span className="text-[10px] font-black text-white/20 w-4">{i + 1}</span>
-                      <span className="text-xs font-black text-white uppercase tracking-tight group-hover/item:text-cyan-400 transition-colors">{d.District}</span>
-                    </div>
-                    <span className="text-xs font-black text-white/80 tabular-nums">{formatMT(d.total_yield_ton_ha)} <span className="text-[10px] text-white/20">t</span></span>
-                  </div>
+                  <li
+                    key={i}
+                    className="flex justify-between text-sm"
+                  >
+                    <span className="text-slate-700 dark:text-slate-300">
+                      {i + 1}. {d.District}
+                    </span>
+                    <span className="font-medium text-emerald-700">
+                      {formatMT(d.total_yield_ton_ha)}
+                    </span>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
           </div>
 
-          {/* Expected Shortfall */}
-          <div className="glass glass-hover p-8 rounded-[3rem] border border-white/10 shadow-2xl flex flex-col justify-between">
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-6 flex items-center gap-2">
-                <span className="material-symbols-outlined text-amber-500 text-sm">error</span>
-                Supply Stability
-              </p>
-              <div className="py-2">
-                <p className="text-5xl font-black text-white tracking-tighter mb-1" style={{ textShadow: "0 10px 40px rgba(0,0,0,0.5)" }}>220K</p>
-                <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest">Expected Shortfall (MT)</p>
-              </div>
-            </div>
-
-            <div className="space-y-4 mt-8">
-              <div className="flex justify-between items-end text-[10px] font-black uppercase tracking-widest text-white/30">
-                <span>National Demand Saturation</span>
-                <span className="text-white">92.7%</span>
-              </div>
-              <div className="w-full h-3 bg-white/5 rounded-full overflow-hidden border border-white/5 p-[1px]">
-                <div
-                  className="h-full bg-gradient-to-r from-amber-500 to-emerald-500 rounded-full shadow-[0_0_15px_rgba(245,158,11,0.2)]"
-                  style={{ width: "92.7%", transition: "width 2s cubic-bezier(0.34, 1.56, 0.64, 1)" }}
-                />
-              </div>
-              <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.2em] italic text-center">Reference: 3.0M MT Threshold</p>
-            </div>
-          </div>
+          <StatWidget
+            title="Expected Shortfall (MT)"
+            value="220K MT"
+            subtitle="vs 3.0M MT demand"
+          />
         </div>
+      </div>
 
-        {/* ── Active Threats Section (Wider) ── */}
-        <div className="glass p-1 rounded-[3rem] border border-white/10 shadow-2xl overflow-hidden">
-          <div className="p-8 border-b border-white/10 flex justify-between items-center">
-            <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/40 flex items-center gap-3">
-              <span className="material-symbols-outlined text-rose-500">sensors</span>
-              Active Threat Matrix
-            </h2>
-            <div className="flex items-center gap-4">
-              <span className="text-[10px] font-black text-white/20 uppercase tracking-widest animate-pulse">Scanning...</span>
-              <div className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase text-white/60">
-                {outbreaks.length} Incidents Locked
-              </div>
-            </div>
-          </div>
+      {/* OUTBREAKS */}
+      <div className="mt-12">
+        <h2 className="text-lg font-medium text-slate-900 dark:text-white">Outbreaks</h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+          Disease and disaster outbreak monitoring
+        </p>
 
-          <div className="p-4 space-y-3">
-            {(showAllOutbreaks ? outbreaks : outbreaks.slice(0, 5)).map((o) => (
-              <div
-                key={o.id}
-                className="group flex justify-between items-center px-6 py-4 rounded-2xl bg-white/5 hover:bg-white/10 transition-all border border-white/5 hover:border-white/20"
-              >
-                <div className="flex items-center gap-5">
-                  <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    {getOutbreakIcon(o.title)}
-                  </div>
-                  <div>
-                    <p className="font-black text-white text-sm uppercase tracking-tight">{o.title} — {o.district}</p>
-                    <div className="flex items-center gap-3 mt-1 text-[10px] font-black text-white/30 uppercase tracking-widest">
-                      <span>{o.event_date}</span>
-                      <div className="w-1 h-1 rounded-full bg-white/10" />
-                      <span className="text-emerald-400 group-hover:animate-pulse">Active</span>
-                    </div>
-                  </div>
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+          {(showAllOutbreaks ? outbreaks : outbreaks.slice(0, 5)).map((o) => (
+            <div
+              key={o.id}
+              className="flex justify-between items-center px-6 py-4 hover:bg-gray-50 dark:hover:bg-slate-700 transition"
+            >
+              <div className="flex items-start gap-3">
+                {getOutbreakIcon(o.title)}
+                <div>
+                  <p className="font-medium text-slate-900 dark:text-white">
+                    {o.title} – {o.district}
+                  </p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">{o.event_date}</p>
                 </div>
-                <button className="text-[10px] font-black uppercase tracking-[0.2em] rounded-xl px-6 py-2.5 border border-white/10 text-white/40 hover:text-white hover:border-white/40 hover:bg-white/5 transition-all active:scale-95">
-                  Intelligence
-                </button>
               </div>
-            ))}
-          </div>
+
+              <button className="text-sm rounded-md bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1 transition">
+                View
+              </button>
+            </div>
+          ))}
 
           {outbreaks.length > 5 && (
-            <div className="px-8 py-6 bg-white/2 flex justify-center border-t border-white/5">
+            <div className="px-6 py-4 text-center border-t border-gray-200 dark:border-gray-700">
               <button
                 onClick={() => setShowAllOutbreaks(!showAllOutbreaks)}
-                className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 hover:text-white transition-colors flex items-center gap-2"
+                className="text-sm rounded-md bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1 transition"
               >
-                {showAllOutbreaks ? "Compress Matrix" : `Expand Full Matrix (${outbreaks.length} Nodes)`}
-                <span className="material-symbols-outlined text-sm">{showAllOutbreaks ? 'keyboard_double_arrow_up' : 'keyboard_double_arrow_down'}</span>
+                {showAllOutbreaks ? "View Less" : "View More"}
               </button>
             </div>
           )}
         </div>
+      </div>
 
-        {/* ── Analytical Depth Row ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-12">
+      {/* LOWER ANALYTICS */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-12">
+        <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm">
+          <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-4">
+            National NDVI Trend (30 days)
+          </h3>
 
-          {/* National NDVI Trend */}
-          <div className="glass glass-hover p-8 rounded-[3rem] border border-white/10 shadow-2xl">
-            <div className="flex justify-between items-start mb-10">
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-2 flex items-center gap-2">
-                  <span className="material-symbols-outlined text-emerald-400 text-sm">monitoring</span>
-                  Chronological Intensity
-                </p>
-                <h3 className="text-xl font-black text-white tracking-tight uppercase">National NDVI Flux</h3>
-              </div>
-              <div className="text-right">
-                <span className="text-2xl font-black text-emerald-400">0.842</span>
-                <p className="text-[8px] font-black text-white/20 uppercase tracking-[0.2em]">Peak Signal</p>
-              </div>
-            </div>
+          <ResponsiveContainer width="100%" height={180}>
+            <LineChart data={ndviTrend}>
+              <XAxis dataKey="day" stroke="#64748b" />
+              <YAxis domain={[0, 1]} stroke="#64748b" />
+              <Tooltip
+                cursor={{ strokeDasharray: "3 3", strokeWidth: 1 }}
+                contentStyle={{
+                  backgroundColor: "rgba(15, 23, 42, 0.95)",
+                  border: "1px solid #334155",
+                  borderRadius: "8px",
+                  padding: "8px 12px",
+                  boxShadow: "0 10px 25px rgba(0,0,0,0.25)",
+                }}
+                labelStyle={{ color: "#94a3b8", fontSize: "12px" }}
+                itemStyle={{ color: "#10b981", fontSize: "13px", fontWeight: 500 }}
+                formatter={(value) => [`${value.toFixed(3)} NDVI`, "Index"]}
+              />
+              <Line dataKey="value" stroke="#059669" />
+            </LineChart>
+          </ResponsiveContainer>
 
-            <div className="w-full h-44 mb-10">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={ndviTrend}>
-                  <defs>
-                    <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <XAxis dataKey="day" hide />
-                  <YAxis domain={[0, 1]} hide />
-                  <Tooltip
-                    cursor={{ stroke: "rgba(255,255,255,0.1)", strokeWidth: 2 }}
-                    contentStyle={{
-                      background: "rgba(0,0,0,0.8)",
-                      backdropFilter: "blur(20px)",
-                      border: "1px solid rgba(255,255,255,0.1)",
-                      borderRadius: "15px",
-                      padding: "10px 15px",
-                    }}
-                    labelStyle={{ color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: 'uppercase', fontWeight: 900, marginBottom: '4px' }}
-                    itemStyle={{ color: "#10b981", fontSize: "12px", fontWeight: 900 }}
-                    formatter={(value) => [`${value.toFixed(3)}`, "SIGNAL INTENSITY"]}
-                  />
-                  <Line type="monotone" dataKey="value" stroke="#10b981" strokeWidth={4} dot={false} animationDuration={2000} fillOpacity={1} fill="url(#colorValue)" />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-
+          <div className="mt-4 space-y-3">
             {healthSummary && (
-              <div className="space-y-6 pt-4 border-t border-white/5">
-                <ProgressWidget label="Optimal Saturation" value={healthSummary.normal_pct} color="green" />
-                <ProgressWidget label="Minor Deviation" value={healthSummary.mild_stress_pct} color="yellow" />
-                <ProgressWidget label="Critical Variance" value={healthSummary.severe_stress_pct} color="blue" />
-              </div>
+              <>
+                <ProgressWidget
+                  label="Normal"
+                  value={healthSummary.normal_pct}
+                  color="green"
+                />
+                <ProgressWidget
+                  label="Mild Stress"
+                  value={healthSummary.mild_stress_pct}
+                  color="yellow"
+                />
+                <ProgressWidget
+                  label="Severe Stress"
+                  value={healthSummary.severe_stress_pct}
+                  color="blue"
+                />
+              </>
             )}
           </div>
+        </div>
 
-          {/* Regional Health Ledger */}
-          <div className="glass glass-hover p-8 rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-2 flex items-center gap-2">
-              <span className="material-symbols-outlined text-cyan-400 text-sm">map</span>
-              Regional Granularity
-            </p>
-            <h3 className="text-xl font-black text-white tracking-tight uppercase mb-8">District Health Status</h3>
+        <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm">
+          <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-4">
+            District Health Overview
+          </h3>
 
-            <div className="flex-1 space-y-2 no-scrollbar overflow-y-auto max-h-[420px] pr-2">
-              {(showAllDistricts ? districtHealth : districtHealth.slice(0, 12)).map((d, i) => {
-                const healthPct = Math.round(d.normal_pct);
-                const color = healthPct >= 75 ? "#10b981" : healthPct >= 50 ? "#f59e0b" : "#ef4444";
-                return (
-                  <div
-                    key={i}
-                    className="flex justify-between items-center p-3 rounded-2xl bg-white/5 hover:bg-white/10 transition-all group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-1.5 h-1.5 rounded-full" style={{ background: color, boxShadow: `0 0 8px ${color}` }} />
-                      <span className="text-xs font-black text-white/70 uppercase tracking-tight group-hover:text-white transition-colors">{d.district}</span>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <div className="w-20 h-1.5 bg-white/5 rounded-full overflow-hidden p-[1px]">
-                        <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${healthPct}%`, background: color }} />
-                      </div>
-                      <span className="text-[10px] font-black tabular-nums w-8 text-right" style={{ color }}>{healthPct}%</span>
-                    </div>
-                  </div>
-                );
-              })}
+          {(showAllDistricts ? districtHealth : districtHealth.slice(0, 7)).map((d, i) => (
+            <div
+              key={i}
+              className="flex justify-between px-4 py-3 text-sm border-b border-gray-200 dark:border-gray-700 last:border-b-0"
+            >
+              <span className="font-medium capitalize text-slate-900 dark:text-white">{d.district}</span>
+              <span className="text-slate-700 dark:text-slate-300">{Math.round(d.normal_pct)}% Healthy</span>
             </div>
-
-            <div className="mt-8 pt-6 border-t border-white/5 text-center">
+          ))}
+          {districtHealth.length > 7 && (
+            <div className="px-4 py-4 text-center border-t border-gray-200 dark:border-gray-700">
               <button
                 onClick={() => setShowAllDistricts(!showAllDistricts)}
-                className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 hover:text-white transition-colors"
+                className="text-sm rounded-md bg-emerald-700 hover:bg-emerald-800 text-white px-4 py-1.5 transition"
               >
-                {showAllDistricts ? "Contract Ledger" : `Expand Ledger (${districtHealth.length} Items)`}
+                {showAllDistricts ? "Show Less" : "Show More"}
               </button>
             </div>
-          </div>
-
+          )}
         </div>
       </div>
     </div>
