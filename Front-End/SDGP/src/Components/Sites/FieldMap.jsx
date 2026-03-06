@@ -28,7 +28,7 @@ const [layers, setLayers] = useState({
         <FiltersPanel filters={filters} setFilters={setFilters} />
       </div>
 
-      <div className="flex-1 rounded-3xl overflow-hidden glass border-white/20 shadow-2xl h-[70vh]">
+      <div className="flex-1 rounded-3xl overflow-hidden glass border-white/20 shadow-2xl h-[80vh]">
         <RiceMap filters={filters} layers={layers} />
       </div>
 

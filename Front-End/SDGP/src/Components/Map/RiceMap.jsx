@@ -10,8 +10,8 @@ import "react-leaflet-cluster/dist/assets/MarkerCluster.Default.css";
 /* ---------- CONFIG ---------- */
 
 const SRI_LANKA_BOUNDS = [
-  [6.1, 79.65],
-  [9.85, 81.85],
+  [6.2, 79.7],
+  [9.8, 81.8],
 ];
 
 const SRI_LANKA_CENTER = [7.8731, 80.7718];
@@ -156,12 +156,19 @@ useEffect(() => {
 
 {/* ---------- BASE MAP ---------- */}
 
-{/* Default white map (no roads) */}
+{/* Default white map with labels */}
 {!layers.showSatellite && (
-  <TileLayer
-    attribution="© Carto"
-    url="https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png"
-  />
+  <>
+    <TileLayer
+      attribution="© Carto"
+      url="https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png"
+    />
+
+    <TileLayer
+      attribution="© Carto"
+      url="https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png"
+    />
+  </>
 )}
 
 {/* Satellite */}
