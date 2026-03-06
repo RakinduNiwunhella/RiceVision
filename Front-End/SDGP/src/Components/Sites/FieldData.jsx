@@ -4,26 +4,24 @@ import { supabase } from "../../supabaseClient"; // adjust path if needed
 const healthColor = (health) => {
   switch (health) {
     case "Healthy":
-      return "text-green-600 bg-green-100";
+      return "text-emerald-400 bg-emerald-500/10 border-emerald-500/20";
     case "Moderate":
-      return "text-yellow-600 bg-yellow-100";
+      return "text-amber-400 bg-amber-500/10 border-amber-500/20";
     case "Critical":
-      return "text-red-600 bg-red-100";
+      return "text-red-400 bg-red-500/10 border-red-500/20";
     default:
-      return "text-gray-600 bg-gray-100";
+      return "text-white/40 bg-white/5 border-white/10";
   }
 };
 
 const FieldData = () => {
   const [stats, setStats] = useState([]);
   const [districtData, setDistrictData] = useState([]);
-
   const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-
-      // 1️⃣ Fetch summary stats
       const { data: summary, error: summaryError } = await supabase
         .from("field_summary_view")
         .select("*")
@@ -36,13 +34,12 @@ const FieldData = () => {
       }
 
       setStats([
-        { label: "Total Fields", value: summary.total_fields },
-        { label: "Healthy Fields", value: summary.healthy_fields },
-        { label: "Stressed Fields", value: summary.stressed_fields },
-        { label: "Critical Alerts", value: summary.critical_alerts },
+        { label: "Total Fields", value: summary.total_fields, icon: "analytics" },
+        { label: "Healthy Fields", value: summary.healthy_fields, icon: "check_circle", color: "text-emerald-400" },
+        { label: "Stressed Fields", value: summary.stressed_fields, icon: "potted_plant", color: "text-amber-400" },
+        { label: "Critical Alerts", value: summary.critical_alerts, icon: "warning", color: "text-red-400" },
       ]);
 
-      // 2️⃣ Fetch table data
       const { data: districts, error: districtError } = await supabase
         .from("district_health_summary")
         .select("*")
@@ -55,46 +52,61 @@ const FieldData = () => {
       }
 
       setDistrictData(districts);
-
       setLoading(false);
     };
 
     fetchData();
   }, []);
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-900">
-        <p className="text-slate-500 dark:text-slate-400">
-          Loading field data...
-        </p>
+      <div className="min-h-full flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+          <p className="text-white/40 font-black uppercase tracking-widest text-xs animate-pulse">Decrypting Field Intelligence...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-900 p-6">
-      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6 space-y-6">
+    <div className="min-h-full p-6 lg:p-10 text-white font-sans transition-all duration-500">
+      <div className="max-w-7xl mx-auto space-y-10 pb-20">
+
         {/* Page Header */}
-        <div>
-          <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">
-            Field Data Overview
-          </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Aggregated satellite-derived insights on paddy field conditions
-          </p>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+          <div>
+            <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
+              Field Intelligence
+            </h1>
+            <p className="text-white/40 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em]">
+              Synchronized Satellite-Derived District Metrics
+            </p>
+          </div>
+
+          <div className="glass px-6 py-3 rounded-2xl border-white/10 flex items-center gap-3">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-[10px] font-black uppercase tracking-widest text-white/60">Live Sentinel Stream</span>
+          </div>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((item) => (
             <div
               key={item.label}
-              className="rounded-xl bg-white dark:bg-slate-800 shadow-sm p-4"
+              className="glass glass-hover p-6 rounded-[2.5rem] border border-white/10 shadow-xl group transition-all duration-500"
             >
-              <p className="text-sm text-slate-500 dark:text-slate-400">
+              <div className="flex justify-between items-start mb-4">
+                <span className={`material-symbols-outlined ${item.color || 'text-white/40'} text-3xl group-hover:scale-110 transition-transform duration-500`}>
+                  {item.icon}
+                </span>
+                <span className="text-[10px] font-black text-white/20 uppercase tracking-tighter">RV-CORE-INTEL</span>
+              </div>
+              <p className="text-xs font-bold text-white/40 uppercase tracking-widest mb-1">
                 {item.label}
               </p>
-              <p className="text-2xl font-bold text-slate-900 dark:text-white">
+              <p className="text-4xl font-black text-white tracking-tighter">
                 {item.value}
               </p>
             </div>
@@ -102,56 +114,83 @@ const FieldData = () => {
         </div>
 
         {/* Table Section */}
-        <div className="rounded-xl bg-white dark:bg-slate-800 shadow-sm overflow-hidden">
-          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-lg font-medium text-slate-900 dark:text-white">
-              District-wise Paddy Health & Yield Summary
+        <div className="glass p-1 rounded-[3rem] border border-white/10 shadow-2xl overflow-hidden group">
+          <div className="p-8 border-b border-white/10 flex justify-between items-center">
+            <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/40 flex items-center gap-3">
+              <span className="material-symbols-outlined text-emerald-400">dataset</span>
+              District Performance Ledger
             </h2>
+            <div className="flex gap-2">
+              <div className="w-2 h-2 rounded-full bg-white/10" />
+              <div className="w-2 h-2 rounded-full bg-white/10" />
+              <div className="w-2 h-2 rounded-full bg-white/10" />
+            </div>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400">
-                <tr>
-                  <th className="px-4 py-3 text-left">District</th>
-                  <th className="px-4 py-3 text-left">Total Fields</th>
-                  <th className="px-4 py-3 text-left">Healthy</th>
-                  <th className="px-4 py-3 text-left">Stressed</th>
-                  <th className="px-4 py-3 text-left">Critical</th>
-                  <th className="px-4 py-3 text-left">Avg NDVI</th>
-                  <th className="px-4 py-3 text-left">Avg Yield (t/ha)</th>
-                  <th className="px-4 py-3 text-left">Total Yield (tons)</th>
+          <div className="overflow-x-auto no-scrollbar">
+            <table className="w-full text-sm border-collapse">
+              <thead>
+                <tr className="text-white/30 uppercase text-[10px] font-black tracking-widest border-b border-white/5">
+                  <th className="px-8 py-6 text-left font-black">District Identifier</th>
+                  <th className="px-6 py-6 text-left font-black">Total Fields</th>
+                  <th className="px-6 py-6 text-left font-black">Healthy</th>
+                  <th className="px-6 py-6 text-left font-black">Stressed</th>
+                  <th className="px-6 py-6 text-left font-black">Critical</th>
+                  <th className="px-6 py-6 text-left font-black">Avg NDVI</th>
+                  <th className="px-6 py-6 text-left font-black">Yield Intensity</th>
+                  <th className="px-8 py-6 text-right font-black">Gross Tonnage</th>
                 </tr>
               </thead>
 
-              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+              <tbody className="divide-y divide-white/5 font-medium">
                 {districtData.map((d) => (
                   <tr
                     key={d.district}
-                    className="hover:bg-gray-50 dark:hover:bg-slate-700 transition"
+                    className="hover:bg-white/5 transition-all duration-300 group/row"
                   >
-                    <td className="px-4 py-3 font-medium">{d.district}</td>
-                    <td className="px-4 py-3">{d.total_fields}</td>
-
-                    <td className="px-4 py-3 text-green-600">
-                      {d.healthy_fields}
+                    <td className="px-8 py-5">
+                      <div className="flex items-center gap-3">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/50 group-hover/row:bg-emerald-400 transition-colors" />
+                        <span className="font-black text-white group-hover/row:translate-x-1 transition-transform inline-block">
+                          {d.district}
+                        </span>
+                      </div>
                     </td>
-                    <td className="px-4 py-3 text-yellow-600">
-                      {d.stressed_fields}
+                    <td className="px-6 py-5 text-white/60 font-bold">{d.total_fields}</td>
+                    <td className="px-6 py-5">
+                      <span className="px-3 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[11px] font-black uppercase">
+                        {d.healthy_fields}
+                      </span>
                     </td>
-                    <td className="px-4 py-3 text-red-600">
-                      {d.critical_fields}
+                    <td className="px-6 py-5">
+                      <span className="px-3 py-1 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[11px] font-black uppercase">
+                        {d.stressed_fields}
+                      </span>
                     </td>
-
-                    <td className="px-4 py-3">{d.avg_ndvi}</td>
-                    <td className="px-4 py-3">{d.avg_yield_ton_ha}</td>
-                    <td className="px-4 py-3 font-medium">
-                      {d.total_yield_tons}
+                    <td className="px-6 py-5">
+                      <span className="px-3 py-1 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 text-[11px] font-black uppercase">
+                        {d.critical_fields}
+                      </span>
+                    </td>
+                    <td className="px-6 py-5 font-mono text-emerald-400/80">{d.avg_ndvi}</td>
+                    <td className="px-6 py-5">
+                      <div className="flex flex-col">
+                        <span className="text-white/80">{d.avg_yield_ton_ha}</span>
+                        <span className="text-[10px] text-white/20 uppercase font-black tracking-tighter">Metric Tons/Ha</span>
+                      </div>
+                    </td>
+                    <td className="px-8 py-5 text-right">
+                      <span className="text-lg font-black text-white">{Number(d.total_yield_tons).toLocaleString()}</span>
+                      <span className="ml-1 text-[10px] text-white/40 uppercase font-black">t</span>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+          </div>
+
+          <div className="p-6 bg-white/5 flex justify-center border-t border-white/5">
+            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20">End of Intelligence Ledger</p>
           </div>
         </div>
       </div>
