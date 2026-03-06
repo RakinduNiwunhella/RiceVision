@@ -29,25 +29,27 @@ const Header = () => {
           </div>
 
           {/* Navigation Links */}
-          <div className="hidden md:flex items-center p-1 rounded-xl bg-white/5 border border-white/10">
-            {navItems.map((item) => {
-              const isActive = location.pathname === item.path || (item.path === '/dashboard' && location.pathname === '/');
-              return (
-                <Link
-                  key={item.label}
-                  to={item.path}
-                  className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-300 ${isActive
+          <div className="hidden md:flex items-center p-1 rounded-xl bg-white/5 border border-white/10 overflow-x-auto no-scrollbar max-w-[50%] lg:max-w-none">
+            <div className="flex items-center min-w-max">
+              {navItems.map((item) => {
+                const isActive = location.pathname === item.path || (item.path === '/dashboard' && location.pathname === '/');
+                return (
+                  <Link
+                    key={item.label}
+                    to={item.path}
+                    className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-300 ${isActive
                       ? "bg-white/15 text-white shadow-xl shadow-black/5 border border-white/20"
                       : "text-white/50 hover:text-white hover:bg-white/10"
-                    }`}
-                >
-                  <span className="material-symbols-outlined text-[18px]">
-                    {item.icon}
-                  </span>
-                  {item.label}
-                </Link>
-              )
-            })}
+                      }`}
+                  >
+                    <span className="material-symbols-outlined text-[18px]">
+                      {item.icon}
+                    </span>
+                    {item.label}
+                  </Link>
+                )
+              })}
+            </div>
           </div>
 
           {/* Right Section */}

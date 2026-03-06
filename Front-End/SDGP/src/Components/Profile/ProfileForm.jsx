@@ -119,19 +119,22 @@ export default function ProfileForm() {
 
   if (loading && !formData.email) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-50 dark:bg-slate-950">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+      <div className="flex flex-col items-center gap-4 py-20">
+        <div className="w-12 h-12 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+        <p className="text-white/40 font-black uppercase tracking-widest text-xs animate-pulse">Synchronizing Identity...</p>
       </div>
     );
   }
 
+  const inputClass = "w-full px-5 py-4 rounded-2xl border border-white/10 bg-white/5 text-white placeholder:text-white/20 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500/50 transition-all duration-300 font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed";
+
   return (
-    <div className="font-sans transition-colors duration-300">
+    <div className="font-sans">
       <div className="max-w-4xl mx-auto">
         {/* Avatar Upload Section */}
-        <div className="flex flex-col items-center mb-10">
+        <div className="flex flex-col items-center mb-16">
           <div className="relative group">
-            <div className="w-32 h-32 rounded-full overflow-hidden bg-green-100 dark:bg-green-900/30 flex items-center justify-center border-4 border-white dark:border-slate-800 shadow-md">
+            <div className="w-40 h-40 rounded-full overflow-hidden glass border-4 border-white/10 flex items-center justify-center shadow-2xl relative transition-transform duration-500 group-hover:scale-105">
               {formData.avatarUrl ? (
                 <img
                   src={formData.avatarUrl}
@@ -139,18 +142,22 @@ export default function ProfileForm() {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <span className="text-4xl font-bold text-green-600 dark:text-green-400 uppercase">
-                  {formData.firstName?.charAt(0)}
-                  {formData.lastName?.charAt(0)}
-                </span>
+                <div className="flex flex-col items-center gap-1">
+                  <span className="text-5xl font-black text-emerald-400 tracking-tighter uppercase">
+                    {formData.firstName?.charAt(0)}
+                    {formData.lastName?.charAt(0)}
+                  </span>
+                </div>
               )}
+              {/* Overlay for glass effect */}
+              <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent pointer-events-none" />
             </div>
 
             <label
               htmlFor="avatar-upload"
-              className="absolute inset-0 flex items-center justify-center bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 cursor-pointer transition-all duration-200"
+              className="absolute bottom-2 right-2 p-3 bg-emerald-500 text-white rounded-2xl shadow-xl cursor-pointer hover:bg-emerald-400 hover:scale-110 active:scale-95 transition-all duration-300 border-4 border-white/20"
             >
-              <FaCamera size={24} />
+              <FaCamera size={20} />
             </label>
 
             <input
@@ -164,60 +171,60 @@ export default function ProfileForm() {
           </div>
 
           {uploading && (
-            <p className="text-xs text-green-600 dark:text-green-400 mt-3 font-semibold animate-pulse">
-              Uploading Image...
+            <p className="text-[10px] text-emerald-400 mt-6 font-black uppercase tracking-[0.3em] animate-pulse">
+              Uploading Identity Matrix...
             </p>
           )}
         </div>
 
-        <form onSubmit={handleUpdate} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {[
-              { label: "First Name", key: "firstName", type: "text" },
-              { label: "Last Name", key: "lastName", type: "text" },
-              { label: "Email Address", key: "email", type: "email", disabled: true },
-              { label: "Phone Number", key: "phone", type: "text" },
-              { label: "NIC Number", key: "nic", type: "text" },
-              { label: "District", key: "district", type: "text" },
-            ].map((field) => (
-              <div key={field.key}>
-                <label className="block text-sm font-semibold mb-2">
-                  {field.label}
-                </label>
-                <input
-                  type={field.type}
-                  value={formData[field.key]}
-                  disabled={field.disabled}
-                  onChange={(e) =>
-                    setFormData({ ...formData, [field.key]: e.target.value })
-                  }
-                  className="w-full px-4 py-3 rounded-xl border"
-                />
-              </div>
-            ))}
-          </div>
+        <form onSubmit={handleUpdate} className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {[
+            { label: "Given Name", key: "firstName", type: "text", placeholder: "e.g. Sentinel" },
+            { label: "Surname", key: "lastName", type: "text", placeholder: "e.g. Operator" },
+            { label: "Encrypted Email", key: "email", type: "email", disabled: true },
+            { label: "Tactical Phone", key: "phone", type: "text", placeholder: "+94 77 XXX XXXX" },
+            { label: "Government NIC", key: "nic", type: "text", placeholder: "XXXXXXXXXV" },
+            { label: "District Sector", key: "district", type: "text", placeholder: "e.g. Colombo" },
+          ].map((field) => (
+            <div key={field.key} className="space-y-2">
+              <label className="block text-[10px] font-black uppercase tracking-widest text-white/30 ml-1">
+                {field.label}
+              </label>
+              <input
+                type={field.type}
+                placeholder={field.placeholder}
+                value={formData[field.key]}
+                disabled={field.disabled}
+                onChange={(e) =>
+                  setFormData({ ...formData, [field.key]: e.target.value })
+                }
+                className={inputClass}
+              />
+            </div>
+          ))}
 
-          <div>
-            <label className="block text-sm font-semibold mb-2">
-              Address
+          <div className="md:col-span-2 space-y-2">
+            <label className="block text-[10px] font-black uppercase tracking-widest text-white/30 ml-1">
+              Physical Registry Address
             </label>
             <textarea
-              rows="3"
+              rows="4"
+              placeholder="Full registry address..."
               value={formData.address}
               onChange={(e) =>
                 setFormData({ ...formData, address: e.target.value })
               }
-              className="w-full px-4 py-3 rounded-xl border"
+              className={inputClass + " resize-none"}
             ></textarea>
           </div>
 
-          <div className="flex justify-end pt-4">
+          <div className="md:col-span-2 flex justify-end pt-10">
             <button
               type="submit"
               disabled={loading || uploading}
-              className="bg-green-600 text-white font-bold py-3 px-8 rounded-xl disabled:opacity-50"
+              className="w-full md:w-auto px-10 py-5 glass bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-400 text-sm font-black uppercase tracking-[0.2em] border border-emerald-500/30 rounded-2xl transition-all active:scale-95 shadow-xl shadow-emerald-500/10 disabled:opacity-50"
             >
-              {loading ? "Processing..." : "Save Changes"}
+              {loading ? "Processing..." : "Commit Identity Changes"}
             </button>
           </div>
         </form>

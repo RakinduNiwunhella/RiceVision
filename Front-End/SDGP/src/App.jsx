@@ -1,7 +1,7 @@
 import React from 'react'
 import Header from './Components/Navbar/Header'
 import { Outlet } from 'react-router-dom'
-import bgImage from './Components/assets/cool_paddy.jpg'
+import bgImage from './Components/assets/user_paddy_bg_v3.jpg'
 
 const App = () => {
   return (
@@ -21,7 +21,7 @@ const App = () => {
       <Header />
 
       {/* Main content (scrolls) */}
-      <main className="relative z-10 pt-20 px-6 pb-6 overflow-y-auto h-screen text-white transition-colors duration-500">
+      <main className="relative z-10 pt-28 px-6 pb-6 overflow-y-auto h-screen text-white transition-colors duration-500">
         <Outlet />
       </main>
     </div>
