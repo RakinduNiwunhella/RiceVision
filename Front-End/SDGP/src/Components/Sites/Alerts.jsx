@@ -82,240 +82,129 @@ const Alerts = () => {
   const formatTimestamp = (iso) => new Date(iso).toLocaleString();
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-8 sm:px-6 lg:px-10">
-      <div className="mx-auto max-w-6xl space-y-6 lg:space-y-8">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <div className="min-h-full p-6 lg:p-10 text-white font-sans">
+      <div className="max-w-7xl mx-auto space-y-8 pb-12">
+
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
-            <h1 className="text-3xl font-semibold tracking-tight text-gray-900">
-              Paddy Field Risk Alerts
+            <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
+              Field Risk Alerts
             </h1>
-            <p className="mt-2 text-sm text-gray-500">
-              Monitor live field conditions, triage critical issues, and track
-              resolution status
-            </p>
+            <p className="text-white/40 text-[10px] sm:text-xs md:text-sm mt-1 font-bold uppercase tracking-[0.2em]">Automated Sentinel Monitoring</p>
           </div>
-          <div className="inline-flex items-center gap-3 rounded-2xl border border-gray-200 bg-white px-4 py-2 shadow-sm">
-            <div className="flex items-baseline gap-1">
-              <span className="text-xs uppercase tracking-wide text-gray-500">
-                Total
-              </span>
-              <span className="text-sm font-semibold text-gray-900">
-                {counts.All}
-              </span>
+
+          {/* Stats mini-glass */}
+          <div className="flex gap-3">
+            <div className="glass px-4 py-2 rounded-xl border-white/10">
+              <span className="text-[10px] font-black uppercase text-white/30 block">Active</span>
+              <span className="text-xl font-black text-red-400">{counts.Open}</span>
             </div>
-            <span className="h-4 w-px bg-gray-200" />
-            <div className="flex items-center gap-1.5 text-xs text-gray-500">
-              <span className="flex h-1.5 w-1.5 rounded-full bg-red-500" />
-              <span>Open {counts.Open}</span>
+            <div className="glass px-4 py-2 rounded-xl border-white/10">
+              <span className="text-[10px] font-black uppercase text-white/30 block">Resolved</span>
+              <span className="text-xl font-black text-emerald-400">{counts.Resolved}</span>
             </div>
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="inline-flex gap-1 rounded-3xl border border-gray-200 bg-gray-100 p-1.5 shadow-sm">
-            {tabOptions.map((tab) => {
-              const isActive = activeTab === tab;
-
-              const activeClasses = isActive
-                ? tab === "Open"
-                  ? "bg-red-500 text-white shadow-sm"
-                  : tab === "Resolved"
-                    ? "bg-emerald-500 text-white shadow-sm"
-                    : tab === "Ignored"
-                      ? "bg-gray-700 text-white shadow-sm"
-                      : "bg-gray-900 text-white shadow-sm"
-                : "text-gray-600 hover:text-gray-900 hover:bg-white";
-
-              return (
+        {/* Search & Tabs Glass Container */}
+        <div className="glass glass-hover p-6 rounded-[2rem] shadow-xl border-white/20">
+          <div className="flex flex-col lg:flex-row gap-6 justify-between">
+            {/* Custom Tabs */}
+            <div className="flex p-1 rounded-2xl bg-white/5 border border-white/10 w-fit">
+              {tabOptions.map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`relative rounded-2xl px-4 py-2.5 text-xs font-medium sm:px-6 sm:text-sm
-                    transition-colors duration-150 ${activeClasses}`}
+                  className={`px-5 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${activeTab === tab
+                    ? "glass bg-white/15 text-white shadow-lg border-white/20"
+                    : "text-white/40 hover:text-white/70"
+                    }`}
                 >
-                  <span>{tab}</span>
-                  <span
-                    className={`ml-2 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-[10px] sm:text-xs
-                      ${
-                        isActive
-                          ? "bg-white/20 text-white"
-                          : "bg-white text-gray-600 border border-gray-200"
-                      }`}
-                  >
-                    {counts[tab]}
-                  </span>
+                  {tab} <span className="ml-1 opacity-50 px-1.5 py-0.5 rounded-md bg-white/5">{counts[tab]}</span>
                 </button>
-              );
-            })}
-          </div>
+              ))}
+            </div>
 
-          <div className="w-full lg:max-w-sm">
-            <div className="relative">
-              <span className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-gray-400">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M21 21l-4.35-4.35M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14Z"
-                  />
-                </svg>
+            {/* Modern Search */}
+            <div className="relative group flex-1 max-w-md">
+              <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-white/30 group-focus-within:text-emerald-400 transition">
+                search
               </span>
               <input
                 type="text"
-                placeholder="Search alerts..."
+                placeholder="Find specific anomaly..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full rounded-2xl border border-gray-200 bg-white pl-11 pr-4 py-3.5
-                  text-sm text-gray-900 placeholder-gray-400 shadow-sm
-                  focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 pl-12 pr-6 text-sm text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:bg-white/10 transition-all shadow-inner"
               />
             </div>
           </div>
         </div>
 
-        <div className="rounded-3xl border border-gray-200 bg-white/80 px-3 py-4 shadow-sm sm:px-4 sm:py-5">
-          <div className="max-h-[70vh] space-y-4 overflow-y-auto pr-1">
-            {filteredAlerts.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-16 text-center">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-gray-200 bg-gray-50 shadow-sm">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 text-gray-400"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-9-3a1 1 0 112 0 1 1 0 01-2 0zm.25 3.25a.75.75 0 000 1.5h.5v3a.75.75 0 001.5 0v-3A1.75 1.75 0 009.25 10h-.5z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-                <p className="text-sm font-medium text-gray-800">
-                  No alerts found
-                </p>
-                <p className="mt-1 text-xs text-gray-500">
-                  Adjust your filters or search to refine the results.
-                </p>
-              </div>
-            )}
+        {/* Alerts List */}
+        <div className="space-y-6">
+          {filteredAlerts.length === 0 && (
+            <div className="glass p-20 rounded-[2rem] text-center">
+              <span className="material-symbols-outlined text-6xl text-white/10 mb-4">check_circle</span>
+              <p className="text-white/30 font-bold uppercase tracking-widest">No active threats detected</p>
+            </div>
+          )}
 
-            {filteredAlerts.map((alert) => (
-              <div
-                key={alert.id}
-                className="relative rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md sm:p-7"
-              >
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                  <div className="flex items-start gap-3">
-                    <div className="mt-1 flex h-8 w-8 items-center justify-center rounded-2xl border border-gray-200 bg-gray-50">
-                      <span
-                        className={`h-2.5 w-2.5 rounded-full
-                          ${
-                            alert.status === "Open"
-                              ? "bg-red-500"
-                              : alert.status === "Resolved"
-                                ? "bg-emerald-500"
-                                : "bg-gray-400"
-                          }`}
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <h2 className="text-lg font-semibold tracking-tight text-gray-900 sm:text-xl">
-                        {alert.title}
-                      </h2>
+          {filteredAlerts.map((alert) => (
+            <div
+              key={alert.id}
+              className={`glass glass-hover p-6 rounded-3xl border border-white/10 shadow-lg transition-all transform hover:-translate-x-1 duration-300 relative overflow-hidden group ${alert.status === "Open" ? "border-l-4 border-l-red-500/50" :
+                alert.status === "Resolved" ? "border-l-4 border-l-emerald-500/50" :
+                  "border-l-4 border-l-white/20"
+                }`}
+            >
+              {/* Status Glow */}
+              <div className={`absolute top-0 right-0 w-32 h-32 blur-[80px] -mr-16 -mt-16 opacity-20 pointer-events-none ${alert.status === "Open" ? "bg-red-500" :
+                alert.status === "Resolved" ? "bg-emerald-500" :
+                  "bg-white"
+                }`} />
 
-                      <span
-                        className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold sm:text-xs
-                        ${
-                          alert.status === "Open"
-                            ? "bg-red-50 text-red-600"
-                            : alert.status === "Resolved"
-                              ? "bg-emerald-50 text-emerald-600"
-                              : "bg-gray-100 text-gray-600"
-                        }`}
-                      >
-                        {alert.status}
-                      </span>
-                    </div>
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative z-10">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-xl font-black text-white group-hover:text-emerald-400 transition">{alert.title}</h2>
+                    <span className="px-2 py-0.5 rounded-md bg-white/5 text-[10px] font-black uppercase text-white/40 border border-white/5">{alert.field}</span>
+                  </div>
+                  <p className="text-white/60 text-sm leading-relaxed max-w-3xl">
+                    {alert.description}
+                  </p>
+                  <div className="flex items-center gap-4 mt-4">
+                    <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-white/30">
+                      <span className="material-symbols-outlined text-xs">priority_high</span>
+                      {alert.priority}
+                    </span>
+                    <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-white/30">
+                      <span className="material-symbols-outlined text-xs">schedule</span>
+                      {formatTimestamp(alert.timestamp)}
+                    </span>
                   </div>
                 </div>
 
-                <p className="mt-3 text-sm leading-relaxed text-gray-600">
-                  {alert.description}
-                </p>
-
-                <div className="mt-4 flex flex-col gap-2 text-[11px] text-gray-500 sm:flex-row sm:items-center sm:justify-between sm:text-xs">
-                  <span className="inline-flex items-center gap-2">
-                    <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-gray-200 bg-gray-50">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-3 w-3 text-amber-500"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path d="M10.75 2.75a.75.75 0 0 0-1.5 0V10c0 .199.079.39.22.53l4 4a.75.75 0 1 0 1.06-1.06l-3.78-3.78V2.75Z" />
-                        <path d="M4.5 10a5.5 5.5 0 0 1 8.535-4.556.75.75 0 1 0 .83-1.244A7 7 0 1 0 15.25 15a.75.75 0 0 0-1.5 0A5.5 5.5 0 0 1 4.5 10Z" />
-                      </svg>
-                    </span>
-                    <span className="text-xs text-gray-600">
-                      Priority: {alert.priority}
-                    </span>
-                  </span>
-                  <span className="inline-flex items-center gap-2 tabular-nums">
-                    <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-gray-200 bg-gray-50">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-3.5 w-3.5 text-gray-400"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth="1.6"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M12 6v6l3 3m5-3a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"
-                        />
-                      </svg>
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      {formatTimestamp(alert.timestamp)}
-                    </span>
-                  </span>
-                </div>
-
                 {alert.status === "Open" && (
-                  <div className="mt-4 flex flex-wrap gap-3">
+                  <div className="flex gap-2 shrink-0">
                     <button
                       onClick={() => handleResolve(alert.id)}
-                      disabled={updatingId === alert.id}
-                      className="inline-flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-2 text-sm font-medium text-white
-                        shadow-sm transition-all duration-150 hover:bg-emerald-700 hover:shadow-md
-                        disabled:cursor-not-allowed disabled:opacity-60"
+                      className="px-6 py-2.5 glass bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-400 text-xs font-black uppercase tracking-widest border border-emerald-500/30 rounded-xl transition-all active:scale-95 shadow-lg shadow-emerald-500/10"
                     >
-                      {updatingId === alert.id ? "Updating..." : "Resolve"}
+                      Resolve
                     </button>
                     <button
-                      onClick={() => handleIgnore(alert.id)}
-                      disabled={updatingId === alert.id}
-                      className="inline-flex items-center justify-center rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700
-                        shadow-sm transition-all duration-150 hover:bg-gray-50 hover:shadow-md
-                        disabled:cursor-not-allowed disabled:opacity-60"
+                      onClick={() => handleDeny(alert.id)}
+                      className="px-6 py-2.5 glass bg-white/5 hover:bg-white/10 text-white/40 hover:text-white/60 text-xs font-black uppercase tracking-widest border border-white/10 rounded-xl transition-all active:scale-95"
                     >
-                      {updatingId === alert.id ? "Updating..." : "Ignore"}
+                      Deny
                     </button>
                   </div>
                 )}
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
