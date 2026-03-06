@@ -1,12 +1,13 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { fetchAlerts, updateAlertStatus } from "../../api/api";
 
-const tabOptions = ["Open", "Resolved", "Denied", "All"];
+const tabOptions = ["Open", "Resolved", "Ignored", "All"];
 
 const Alerts = () => {
   const [alerts, setAlerts] = useState([]);
   const [activeTab, setActiveTab] = useState("Open");
   const [searchTerm, setSearchTerm] = useState("");
+  const [updatingId, setUpdatingId] = useState(null);
 
   const filteredAlerts = useMemo(() => {
     return alerts.filter((alert) => {
@@ -32,7 +33,7 @@ const Alerts = () => {
   }, []);
 
   const counts = useMemo(() => {
-    const countObj = { Open: 0, Resolved: 0, Denied: 0 };
+    const countObj = { Open: 0, Resolved: 0, Ignored: 0 };
     alerts.forEach((alert) => {
       if (countObj[alert.status] !== undefined) {
         countObj[alert.status]++;
@@ -44,11 +45,29 @@ const Alerts = () => {
 
   const updateStatus = async (id, newStatus) => {
     try {
-      await updateAlertStatus(id, newStatus);
-      const data = await fetchAlerts();
-      setAlerts(data);
+      setUpdatingId(id);
+
+      setAlerts((prev) =>
+        prev.map((alert) =>
+          alert.id === id ? { ...alert, _justUpdated: true } : alert,
+        ),
+      );
+
+      setTimeout(async () => {
+        setAlerts((prev) =>
+          prev.map((alert) =>
+            alert.id === id
+              ? { ...alert, status: newStatus, _justUpdated: false }
+              : alert,
+          ),
+        );
+
+        await updateAlertStatus(id, newStatus);
+      }, 300);
     } catch (err) {
       console.error("Error updating alert:", err);
+    } finally {
+      setTimeout(() => setUpdatingId(null), 300);
     }
   };
 
@@ -56,8 +75,8 @@ const Alerts = () => {
     updateStatus(id, "Resolved");
   };
 
-  const handleDeny = (id) => {
-    updateStatus(id, "Denied");
+  const handleIgnore = (id) => {
+    updateStatus(id, "Ignored");
   };
 
   const formatTimestamp = (iso) => new Date(iso).toLocaleString();

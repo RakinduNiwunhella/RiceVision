@@ -95,6 +95,12 @@ const Header = () => {
           </div>
         </div>
       </div>
+      {showNotifications && (
+        <Notifications
+          notifications={notifications}
+          markAsRead={markAsRead}
+        />
+      )}
     </nav>
   )
 }
