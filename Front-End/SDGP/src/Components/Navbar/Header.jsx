@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import logo from '../assets/logo.png'
 
 const Header = () => {
   const location = useLocation()
@@ -19,13 +20,14 @@ const Header = () => {
         <div className="flex justify-between items-center h-full gap-4">
 
           {/* Logo Section */}
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-              <span className="material-symbols-outlined text-white text-xl">
-                visibility
-              </span>
-            </div>
-            <span className="text-sm font-bold tracking-tight text-white hidden sm:block">RiceVision</span>
+          <div className="flex items-center gap-3">
+            <Link to="/" className="flex items-center gap-3 active:scale-95 transition-transform">
+              <img
+                src={logo}
+                alt="RiceVision"
+                className="h-9 w-auto drop-shadow-[0_0_8px_rgba(16,185,129,0.4)] opacity-90 hover:opacity-100 transition-opacity"
+              />
+            </Link>
           </div>
 
           {/* Navigation Links */}
@@ -69,22 +71,27 @@ const Header = () => {
 
             {/* Actions */}
             <div className="flex items-center gap-1.5 border-l border-white/10 pl-3">
-              <button className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition">
+              <Link
+                to="/alerts"
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition"
+                title="Notifications"
+              >
                 <span className="material-symbols-outlined text-[20px]">
                   notifications
                 </span>
-              </button>
-              <button className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition">
-                <span className="material-symbols-outlined text-[20px]">
-                  settings
-                </span>
-              </button>
+              </Link>
             </div>
 
             {/* Avatar */}
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-slate-400 to-slate-600 flex items-center justify-center text-white text-[10px] font-black tracking-tighter ring-1 ring-white/20 shadow-lg cursor-pointer hover:scale-105 active:scale-95 transition">
-              USER
-            </div>
+            <Link
+              to="/profile"
+              className="w-8 h-8 rounded-lg bg-gradient-to-br from-slate-400 to-slate-600 flex items-center justify-center text-white ring-1 ring-white/20 shadow-lg cursor-pointer hover:scale-105 active:scale-95 transition"
+              title="View Profile"
+            >
+              <span className="material-symbols-outlined text-[20px]">
+                person
+              </span>
+            </Link>
           </div>
         </div>
       </div>
