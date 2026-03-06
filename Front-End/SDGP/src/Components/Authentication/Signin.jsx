@@ -58,7 +58,9 @@ export default function LoginPage() {
       options: {
         // https://app.ricevisionlanka.com/dashboard for production
         // http://localhost:5173/dashboard for development
-        redirectTo: "https://app.ricevisionlanka.com/dashboard",
+        redirectTo: import.meta.env.DEV
+          ? "http://localhost:5173/dashboard"
+          : "https://app.ricevisionlanka.com/dashboard",
       },
     });
 
@@ -79,7 +81,9 @@ export default function LoginPage() {
     setResetError("");
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: "https://app.ricevisionlanka.com/reset-password",
+      redirectTo: import.meta.env.DEV
+        ? "http://localhost:5173/reset-password"
+        : "https://app.ricevisionlanka.com/reset-password",
     });
 
     setResetLoading(false);
