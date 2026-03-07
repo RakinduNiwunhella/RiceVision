@@ -19,7 +19,7 @@ def get_yield():
 @router.get("/best-districts")
 def get_best_yield_districts():
     response = supabase.table("best_yield_districts_view") \
-        .select("District, total_yield_ton_ha") \
+        .select("District, total_yield_kg_ha") \
         .limit(5) \
         .execute()
     return response.data
