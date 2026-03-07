@@ -445,79 +445,36 @@ export default function RiceVisionWeather() {
             </div>
 
             <SectionHeading>Hourly Detail Table</SectionHeading>
-            <div className="space-y-2">
-              {next24.map((idx, i) => {
-                const info = wmoLabel(h.weather_code[idx]);
-                const rain = h.precipitation_probability[idx];
-                const wind = h.wind_speed_10m[idx];
-                const uv = h.uv_index[idx];
-                const humid = h.relative_humidity_2m[idx];
-                return (
-                  <div
-                    key={idx}
-                    className={`glass rounded-2xl px-5 py-4 border transition-all duration-200 hover:border-white/20 hover:bg-white/[0.04] ${
-                      i === 0 ? "border-emerald-500/30 bg-emerald-500/5" : "border-white/5"
-                    }`}
-                  >
-                    <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-                      {/* Time */}
-                      <span className="text-sm font-black text-white/80 w-20 shrink-0">
-                        {new Date(h.time[idx]).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true })}
-                      </span>
-
-                      {/* Condition */}
-                      <span className="flex items-center gap-1.5 font-black text-xs text-white/70 min-w-[130px]">
-                        <span className="text-base">{info.icon}</span>
-                        {info.label}
-                      </span>
-
-                      {/* Temp */}
-                      <span className="flex flex-col items-center">
-                        <span className="text-[9px] text-white/30 uppercase tracking-widest">Temp</span>
-                        <span className="text-sm font-black text-amber-400">{Math.round(h.temperature_2m[idx])}° <span className="text-white/30 font-normal text-xs">/ {Math.round(h.apparent_temperature[idx])}°</span></span>
-                      </span>
-
-                      {/* Humidity */}
-                      <span className="flex flex-col items-center">
-                        <span className="text-[9px] text-white/30 uppercase tracking-widest">Humid</span>
-                        <span className={`text-sm font-black ${humid > 85 ? "text-red-400" : "text-blue-400"}`}>{humid}%</span>
-                      </span>
-
-                      {/* Rain */}
-                      <span className="flex flex-col items-center">
-                        <span className="text-[9px] text-white/30 uppercase tracking-widest">Rain</span>
-                        <span className={`text-sm font-black ${rain > 50 ? "text-blue-300" : "text-white/50"}`}>{rain}%</span>
-                      </span>
-
-                      {/* Wind */}
-                      <span className="flex flex-col items-center">
-                        <span className="text-[9px] text-white/30 uppercase tracking-widest">Wind</span>
-                        <span className={`text-sm font-black ${wind > 15 ? "text-rose-400" : "text-cyan-400"}`}>{wind} <span className="text-[10px] font-bold text-white/40">{windDir(h.wind_direction_10m[idx])}</span></span>
-                      </span>
-
-                      {/* UV */}
-                      {uv > 0 && (
-                        <span className="flex flex-col items-center">
-                          <span className="text-[9px] text-white/30 uppercase tracking-widest">UV</span>
-                          <span className={`text-sm font-black ${uv >= 8 ? "text-red-400" : uv >= 5 ? "text-amber-400" : "text-white/50"}`}>{uv}</span>
-                        </span>
-                      )}
-
-                      {/* ET₀ */}
-                      <span className="flex flex-col items-center">
-                        <span className="text-[9px] text-white/30 uppercase tracking-widest">ET₀</span>
-                        <span className="text-sm font-black text-emerald-400">{h.et0_fao_evapotranspiration[idx].toFixed(2)}<span className="text-[9px] text-white/30"> mm</span></span>
-                      </span>
-
-                      {/* Visibility */}
-                      <span className="flex flex-col items-center ml-auto">
-                        <span className="text-[9px] text-white/30 uppercase tracking-widest">Vis</span>
-                        <span className="text-sm font-black text-sky-400">{h.visibility[idx] != null ? (h.visibility[idx]/1000).toFixed(1)+" km" : "—"}</span>
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
+            <div className="overflow-x-auto">
+              <table className="w-full text-[10px] font-bold">
+                <thead>
+                  <tr className="text-white/30 uppercase tracking-widest border-b border-white/10">
+                    {["Time","Cond","Temp","Feels","Humid","Rain%","Rain mm","Wind","UV","ET₀","Visibility"].map((col) => (
+                      <th key={col} className="px-3 py-3 text-left whitespace-nowrap">{col}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {next24.map((idx, i) => {
+                    const info = wmoLabel(h.weather_code[idx]);
+                    return (
+                      <tr key={idx} className={`border-b border-white/5 hover:bg-white/[0.03] transition-colors ${i === 0 ? "bg-emerald-500/5" : ""}`}>
+                        <td className="px-3 py-3 text-white/70 whitespace-nowrap">{new Date(h.time[idx]).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true })}</td>
+                        <td className="px-3 py-3 whitespace-nowrap">{info.icon} {info.label}</td>
+                        <td className="px-3 py-3 text-amber-400">{Math.round(h.temperature_2m[idx])}°C</td>
+                        <td className="px-3 py-3 text-white/50">{Math.round(h.apparent_temperature[idx])}°C</td>
+                        <td className="px-3 py-3 text-blue-400">{h.relative_humidity_2m[idx]}%</td>
+                        <td className="px-3 py-3 text-blue-300">{h.precipitation_probability[idx]}%</td>
+                        <td className="px-3 py-3 text-blue-400">{h.precipitation[idx]} mm</td>
+                        <td className="px-3 py-3 text-cyan-400 whitespace-nowrap">{h.wind_speed_10m[idx]} {windDir(h.wind_direction_10m[idx])}</td>
+                        <td className="px-3 py-3 text-amber-400">{h.uv_index[idx]}</td>
+                        <td className="px-3 py-3 text-emerald-400">{h.et0_fao_evapotranspiration[idx].toFixed(2)} mm</td>
+                        <td className="px-3 py-3 text-sky-400 whitespace-nowrap">{h.visibility[idx] != null ? (h.visibility[idx]/1000).toFixed(1)+" km" : "—"}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
           </div>
         )}
@@ -706,75 +663,35 @@ export default function RiceVisionWeather() {
             </div>
 
             <SectionHeading>Historical Detail Table</SectionHeading>
-            <div className="space-y-2">
-              {pastIdx.map((date, idx) => {
-                const info = wmoLabel(d.weather_code[idx]);
-                return (
-                  <div
-                    key={idx}
-                    className="glass rounded-2xl px-5 py-4 border border-white/5 opacity-75 hover:opacity-100 hover:border-white/20 transition-all duration-200"
-                  >
-                    <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-                      {/* Date */}
-                      <span className="text-sm font-black text-white/80 w-36 shrink-0">
-                        {fmtDay(date, true)}
-                      </span>
-
-                      {/* Condition */}
-                      <span className="flex items-center gap-1.5 font-black text-xs text-white/60 min-w-[130px]">
-                        <span className="text-base">{info.icon}</span>
-                        {info.label}
-                      </span>
-
-                      {/* Temp range */}
-                      <span className="flex flex-col items-center">
-                        <span className="text-[9px] text-white/30 uppercase tracking-widest">Temp</span>
-                        <span className="text-sm font-black">
-                          <span className="text-amber-400">{Math.round(d.temperature_2m_max[idx])}°</span>
-                          <span className="text-white/20 mx-1">/</span>
-                          <span className="text-sky-400">{Math.round(d.temperature_2m_min[idx])}°</span>
-                        </span>
-                      </span>
-
-                      {/* Rain */}
-                      <span className="flex flex-col items-center">
-                        <span className="text-[9px] text-white/30 uppercase tracking-widest">Rain</span>
-                        <span className="text-sm font-black text-blue-400">{d.precipitation_sum[idx]?.toFixed(1)}<span className="text-[9px] text-white/30"> mm</span></span>
-                      </span>
-
-                      {/* Rain hours */}
-                      <span className="flex flex-col items-center">
-                        <span className="text-[9px] text-white/30 uppercase tracking-widest">Rain Hrs</span>
-                        <span className="text-sm font-black text-blue-300">{d.precipitation_hours[idx]}<span className="text-[9px] text-white/30">h</span></span>
-                      </span>
-
-                      {/* Wind max */}
-                      <span className="flex flex-col items-center">
-                        <span className="text-[9px] text-white/30 uppercase tracking-widest">Wind</span>
-                        <span className="text-sm font-black text-cyan-400">{d.wind_speed_10m_max[idx]}<span className="text-[9px] text-white/30"> km/h</span></span>
-                      </span>
-
-                      {/* UV max */}
-                      <span className="flex flex-col items-center">
-                        <span className="text-[9px] text-white/30 uppercase tracking-widest">UV</span>
-                        <span className={`text-sm font-black ${d.uv_index_max[idx] >= 8 ? "text-red-400" : d.uv_index_max[idx] >= 5 ? "text-amber-400" : "text-white/50"}`}>{d.uv_index_max[idx]}</span>
-                      </span>
-
-                      {/* ET₀ */}
-                      <span className="flex flex-col items-center">
-                        <span className="text-[9px] text-white/30 uppercase tracking-widest">ET₀</span>
-                        <span className="text-sm font-black text-emerald-400">{d.et0_fao_evapotranspiration[idx]?.toFixed(1)}<span className="text-[9px] text-white/30"> mm</span></span>
-                      </span>
-
-                      {/* Radiation */}
-                      <span className="flex flex-col items-center ml-auto">
-                        <span className="text-[9px] text-white/30 uppercase tracking-widest">Radiation</span>
-                        <span className="text-sm font-black text-orange-400">{d.shortwave_radiation_sum[idx]?.toFixed(1)}<span className="text-[9px] text-white/30"> MJ/m²</span></span>
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
+            <div className="overflow-x-auto">
+              <table className="w-full text-[10px] font-bold">
+                <thead>
+                  <tr className="text-white/30 uppercase tracking-widest border-b border-white/10">
+                    {["Date","Conditions","Max°C","Min°C","Rain Sum","Rain Hrs","Wind Max","UV Max","ET₀","Radiation"].map((col) => (
+                      <th key={col} className="px-3 py-3 text-left whitespace-nowrap">{col}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {pastIdx.map((date, idx) => {
+                    const info = wmoLabel(d.weather_code[idx]);
+                    return (
+                      <tr key={idx} className="border-b border-white/5 hover:bg-white/[0.03] transition-colors opacity-70 hover:opacity-100">
+                        <td className="px-3 py-3 text-white/70 whitespace-nowrap">{fmtDay(date)}</td>
+                        <td className="px-3 py-3 whitespace-nowrap">{info.icon} {info.label}</td>
+                        <td className="px-3 py-3 text-amber-400">{Math.round(d.temperature_2m_max[idx])}°C</td>
+                        <td className="px-3 py-3 text-sky-400">{Math.round(d.temperature_2m_min[idx])}°C</td>
+                        <td className="px-3 py-3 text-blue-400">{d.precipitation_sum[idx]?.toFixed(1)} mm</td>
+                        <td className="px-3 py-3 text-blue-300">{d.precipitation_hours[idx]}h</td>
+                        <td className="px-3 py-3 text-cyan-400">{d.wind_speed_10m_max[idx]} km/h</td>
+                        <td className="px-3 py-3 text-amber-400">{d.uv_index_max[idx]}</td>
+                        <td className="px-3 py-3 text-emerald-400">{d.et0_fao_evapotranspiration[idx]?.toFixed(1)} mm</td>
+                        <td className="px-3 py-3 text-orange-400">{d.shortwave_radiation_sum[idx]?.toFixed(1)} MJ/m²</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
           </div>
         )}

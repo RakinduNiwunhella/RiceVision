@@ -21,10 +21,45 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
     { key: "paddyExtent", label: "Paddy Extent" },
     { key: "showCircles", label: "Show Circles" },
     { key: "showSatellite", label: "Satellite View" },
-    { key: "ndvi", label: "NDVI" },
-    { key: "evi", label: "EVI" },
-    { key: "vv", label: "VV" },
-    { key: "vh", label: "VH" },
+    { key: "ndvi", label: "NDVI", tag: "S2" },
+    { key: "evi",  label: "EVI",  tag: "S2" },
+    { key: "vv",   label: "VV",   tag: "S1" },
+    { key: "vh",   label: "VH",   tag: "S1" },
+  ];
+
+  // Show the overlay opacity + legend block when any index layer is ON
+  const anyIndexActive = layers.ndvi || layers.evi || layers.vv || layers.vh;
+
+  // Colour legend data (matches RiceMap OVERLAY_META)
+  const LEGEND_ITEMS = [
+    {
+      key: "ndvi",
+      label: "NDVI",
+      gradient: "linear-gradient(to right, #7f2700, #d4a017, #aaff44, #228b22, #004d00)",
+      min: "-0.2",
+      max: "0.9",
+    },
+    {
+      key: "evi",
+      label: "EVI",
+      gradient: "linear-gradient(to right, #7f2700, #d4a017, #aaff44, #228b22, #004d00)",
+      min: "-0.2",
+      max: "0.9",
+    },
+    {
+      key: "vv",
+      label: "VV (dB)",
+      gradient: "linear-gradient(to right, #000080, #0000ff, #00ffff, #ffff00, #ff0000)",
+      min: "-25",
+      max: "0",
+    },
+    {
+      key: "vh",
+      label: "VH (dB)",
+      gradient: "linear-gradient(to right, #000080, #0000ff, #00ffff, #ffff00, #ff0000)",
+      min: "-30",
+      max: "-5",
+    },
   ];
 
   return (
@@ -42,14 +77,21 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
 
       <div className="space-y-2">
 
-        {layerList.map(({ key, label }) => (
+        {layerList.map(({ key, label, tag }) => (
           <div key={key}>
 
             <div
               onClick={() => districtSelected && toggleLayer(key)}
               className="group flex items-center justify-between p-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition cursor-pointer"
             >
-              <span className="text-sm text-white/90">{label}</span>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-white/90">{label}</span>
+                {tag && (
+                  <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-white/10 text-white/40 tracking-wider">
+                    {tag}
+                  </span>
+                )}
+              </div>
 
               <div
                 className={`relative w-8 h-4 rounded-full ${
@@ -113,9 +155,59 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
 
       </div>
 
+      {/* ── Overlay opacity + colour legends ──────────────────────────── */}
+
+      {anyIndexActive && (
+        <div className="mt-6 pt-5 border-t border-white/10 space-y-5">
+
+          {/* Opacity slider */}
+          <div>
+            <div className="flex justify-between text-[10px] text-white/40 font-bold uppercase tracking-widest mb-2">
+              <span>Overlay Opacity</span>
+              <span>{Math.round((layers.overlayOpacity ?? 0.75) * 100)}%</span>
+            </div>
+            <input
+              type="range"
+              min="0.1"
+              max="1"
+              step="0.05"
+              value={layers.overlayOpacity ?? 0.75}
+              onChange={(e) =>
+                setLayers((prev) => ({
+                  ...prev,
+                  overlayOpacity: parseFloat(e.target.value),
+                }))
+              }
+              className="w-full accent-emerald-500"
+            />
+          </div>
+
+          {/* Colour legend for each active index */}
+          {LEGEND_ITEMS.filter((l) => layers[l.key]).map((l) => (
+            <div key={l.key}>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-white/50 mb-1.5">
+                {l.label}
+              </p>
+              <div
+                className="h-3 w-full rounded-full"
+                style={{ background: l.gradient }}
+              />
+              <div className="flex justify-between text-[9px] text-white/30 mt-1">
+                <span>{l.min}</span>
+                <span>{l.max}</span>
+              </div>
+            </div>
+          ))}
+
+        </div>
+      )}
+
       <div className="mt-8 pt-6 border-t border-white/10">
         <p className="text-[10px] text-white/40 italic">
           Select layers to overlay specialized agricultural satellite telemetry.
+        </p>
+        <p className="text-[9px] text-white/25 mt-1">
+          S2 = Sentinel-2 optical · S1 = Sentinel-1 SAR
         </p>
       </div>
 

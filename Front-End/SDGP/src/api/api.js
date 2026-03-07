@@ -87,3 +87,38 @@ export const fetchMapFields = async ({ districts = [], health = [] }) => {
 
   return result.data;
 };
+
+/**
+ * Fetch per-point NDVI or EVI values for a district.
+ * Returns { vmin, vmax, data: [{ lat, lng, value, norm }] }
+ */
+export const fetchMapOverlay = async ({ type, districts = [] }) => {
+  const params = new URLSearchParams({ type });
+  districts.forEach((d) => params.append("districts", d));
+
+  const res = await fetch(`${API_BASE}/map-overlay?${params.toString()}`);
+  if (!res.ok) throw new Error("Failed to fetch overlay data");
+
+  const result = await res.json();
+  if (result.status !== "success") throw new Error(result.message || "Overlay fetch failed");
+
+  return result; // { overlay, vmin, vmax, data }
+};
+
+/**
+ * Request a GEE XYZ tile URL for Sentinel-1 VV or VH.
+ * Returns { tile_url, vmin, vmax } or throws if GEE is not configured.
+ */
+export const fetchGEETileUrl = async ({ type, district, startDate, endDate }) => {
+  const params = new URLSearchParams({ type });
+  if (district) params.set("district", district);
+  if (startDate) params.set("start_date", startDate);
+  if (endDate)   params.set("end_date", endDate);
+
+  const res = await fetch(`${API_BASE}/map-gee-tiles?${params.toString()}`);
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail || "GEE tile fetch failed");
+  }
+  return res.json();
+};
