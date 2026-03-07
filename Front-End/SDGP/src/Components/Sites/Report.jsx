@@ -35,7 +35,7 @@ const ReportPage = () => {
   const [error, setError] = useState(null);
 
   // Define API Base
-  const API_BASE = "https://ricevision-cakt.onrender.com";
+  const API_BASE = "http://localhost:8000";
 
   const fetchData = async () => {
     setLoading(true);
