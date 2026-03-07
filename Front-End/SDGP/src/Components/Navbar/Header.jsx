@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import logo from '../assets/logo.png'
 
@@ -10,7 +10,6 @@ const Header = () => {
   const [unreadCount, setUnreadCount] = useState(0)
 
   useEffect(() => {
-    // Fetch unread notifications count when component mounts
     async function fetchUnreadCount() {
       try {
         const response = await fetch('/api/notifications/unread-count')
@@ -34,7 +33,6 @@ const Header = () => {
     { label: 'Help', icon: 'help', path: '/help' },
   ]
 
-  // Handler to close notifications panel and reset unread count
   const handleCloseNotifications = () => {
     setShowNotifications(false)
     setUnreadCount(0)
@@ -60,15 +58,19 @@ const Header = () => {
           <div className="hidden md:flex items-center p-1 rounded-xl bg-white/5 border border-white/10 overflow-x-auto no-scrollbar max-w-[50%] lg:max-w-none">
             <div className="flex items-center min-w-max">
               {navItems.map((item) => {
-                const isActive = location.pathname === item.path || (item.path === '/dashboard' && location.pathname === '/');
+                const isActive =
+                  location.pathname === item.path ||
+                  (item.path === '/dashboard' && location.pathname === '/')
+
                 return (
                   <Link
                     key={item.label}
                     to={item.path}
-                    className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-300 ${isActive
-                      ? "bg-white/15 text-white shadow-xl shadow-black/5 border border-white/20"
-                      : "text-white/50 hover:text-white hover:bg-white/10"
-                      }`}
+                    className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-300 ${
+                      isActive
+                        ? "bg-white/15 text-white shadow-xl shadow-black/5 border border-white/20"
+                        : "text-white/50 hover:text-white hover:bg-white/10"
+                    }`}
                   >
                     <span className="material-symbols-outlined text-[18px]">
                       {item.icon}
@@ -83,11 +85,12 @@ const Header = () => {
           {/* Right Section */}
           <div className="flex items-center gap-3">
 
-            {/* Search Bar - Glass variant */}
+            {/* Search */}
             <div className="relative group hidden lg:block">
               <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-white/40 group-focus-within:text-emerald-400 transition text-[18px]">
                 search
               </span>
+
               <input
                 type="text"
                 placeholder="Search analytics..."
@@ -96,22 +99,33 @@ const Header = () => {
             </div>
 
             {/* Actions */}
-            <div className="flex items-center gap-1.5 border-l border-white/10 pl-3 relative">
-              <button
-                onClick={() => setShowNotifications(!showNotifications)}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition relative"
-                title="Notifications"
-              >
-                <span className="material-symbols-outlined text-[20px]">
-                  notifications
-                </span>
-                {unreadCount > 0 && (
-                  <span className="absolute top-0 right-0 -translate-x-1/2 translate-y-1/2 bg-emerald-500 text-white text-[10px] font-bold rounded-full px-1.5 leading-none animate-pulse select-none pointer-events-none">
-                    {unreadCount}
+            <div className="flex items-center gap-1.5 border-l border-white/10 pl-3">
+
+              {/* Notification Wrapper */}
+              <div className="relative">
+
+                <button
+                  onClick={() => setShowNotifications(!showNotifications)}
+                  className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition relative"
+                  title="Notifications"
+                >
+                  <span className="material-symbols-outlined text-[20px]">
+                    notifications
                   </span>
+
+                  {unreadCount > 0 && (
+                    <span className="absolute top-0 right-0 -translate-x-1/2 translate-y-1/2 bg-emerald-500 text-white text-[10px] font-bold rounded-full px-1.5 leading-none animate-pulse select-none pointer-events-none">
+                      {unreadCount}
+                    </span>
+                  )}
+                </button>
+
+                {showNotifications && (
+                  <Notifications onClose={handleCloseNotifications} />
                 )}
-              </button>
-              {showNotifications && <Notifications onClose={handleCloseNotifications} />}
+
+              </div>
+
             </div>
 
             {/* Avatar */}
@@ -124,6 +138,7 @@ const Header = () => {
                 person
               </span>
             </Link>
+
           </div>
         </div>
       </div>
