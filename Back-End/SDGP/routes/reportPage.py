@@ -1,80 +1,69 @@
-from fastapi import APIRouter, Query, HTTPException
+import io
 import boto3
 import pandas as pd
-import io
+import numpy as np  # Add this import
+from fastapi import APIRouter
 
 router = APIRouter()
-
-# Initialize S3 Client
 s3_client = boto3.client('s3')
-
-# CORRECT BUCKET NAME (Extracted from your URL)
 BUCKET_NAME = "ricevision"
 
-@router.get("/compare-reports")
-def compare_reports(
-    date_a: str = Query(..., description="Format: YYYY-MM-DD"),
-    date_b: str = Query(..., description="Format: YYYY-MM-DD"),
-    district: str = Query(None)
-):
-    """
-    Fetches prediction artifacts from S3 for two different dates 
-    and returns a comparison delta for the report page.
-    """
+# HELPER: Converts NumPy types to standard Python types for JSON safety
+def sanitize(val):
+    if isinstance(val, (np.integer, np.int64)):
+        return int(val)
+    if isinstance(val, (np.floating, np.float64)):
+        return float(val)
+    if isinstance(val, pd.Timestamp):
+        return str(val)
+    if isinstance(val, dict):
+        return {k: sanitize(v) for k, v in val.items()}
+    if isinstance(val, list):
+        return [sanitize(v) for v in val]
+    return val
+
+def get_csv_from_s3(key):
     try:
-        def get_df_from_s3(date_str):
-            # Log exactly what we are looking for
-            key = f"FinalPredictions/{date_str}/modelPredictions/lstm_results.csv"
-            print(f"DEBUG: Looking for bucket: {BUCKET_NAME}")
-            print(f"DEBUG: Looking for key: {key}")
-            
-            try:
-                obj = s3_client.get_object(Bucket=BUCKET_NAME, Key=key)
-                return pd.read_csv(io.BytesIO(obj['Body'].read()))
-            except s3_client.exceptions.NoSuchKey:
-                print(f"ERROR: The file {key} DOES NOT EXIST in bucket {BUCKET_NAME}")
-                raise HTTPException(status_code=404, detail=f"File not found in S3: {key}")
-            except Exception as e:
-                print(f"ERROR: Unexpected S3 error: {str(e)}")
-                raise HTTPException(status_code=500, detail=str(e))
-       
+        obj = s3_client.get_object(Bucket=BUCKET_NAME, Key=key)
+        return pd.read_csv(io.BytesIO(obj['Body'].read()))
+    except:
+        return None
 
-        # Download both datasets
-        df_a = get_df_from_s3(date_a)
-        df_b = get_df_from_s3(date_b)
+@router.get("/detailed-report")
+async def get_detailed_report(date: str, district: str, season: str):
+    df_pixel = get_csv_from_s3(f"SupabasePredictions/{date}/FinalMlPredictions.csv")
+    df_yield = get_csv_from_s3(f"SupabasePredictions/{date}/yieldPredictions.csv")
 
-        # Filter by district if requested
-        if district:
-            df_a = df_a[df_a['district'].str.lower() == district.lower()]
-            df_b = df_b[df_b['district'].str.lower() == district.lower()]
+    def norm(name): return str(name).strip().lower().replace("th", "t")
+    target = norm(district)
 
-        if df_a.empty or df_b.empty:
-            return {"error": "No data found for the selected district in one or both dates."}
+    y_match = df_yield[df_yield['districtname'].apply(norm) == target] if df_yield is not None else pd.DataFrame()
+    p_match = df_pixel[df_pixel['district'].apply(norm) == target] if df_pixel is not None else pd.DataFrame()
 
-        # Calculate Aggregates for comparison
-        # Using the column names identified in your previous snippets (pred_health_z, pred_pest_cpi)
-        stats = {
-            "baseline_date": date_a,
-            "comparison_date": date_b,
-            "baseline": {
-                "avg_health": float(df_a['pred_health_z'].mean()),
-                "avg_pest": float(df_a['pred_pest_cpi'].mean()),
-                "common_stage": str(df_a['pred_stage_name'].mode()[0] if not df_a['pred_stage_name'].empty else "N/A")
-            },
-            "current": {
-                "avg_health": float(df_b['pred_health_z'].mean()),
-                "avg_pest": float(df_b['pred_pest_cpi'].mean()),
-                "common_stage": str(df_b['pred_stage_name'].mode()[0] if not df_b['pred_stage_name'].empty else "N/A")
-            },
-            "deltas": {
-                "health_change": float(df_b['pred_health_z'].mean() - df_a['pred_health_z'].mean()),
-                "pest_trend": "Increasing" if df_b['pred_pest_cpi'].mean() > df_a['pred_pest_cpi'].mean() else "Stable/Decreasing",
-                "is_health_improving": bool(df_b['pred_health_z'].mean() > df_a['pred_health_z'].mean())
-            }
+    # Use .item() to convert numpy scalars to python scalars immediately
+    res = {
+        "summary": {
+            "yield": float(y_match.iloc[0]['predictedyield_kg_ha']) if not y_match.empty else 0.0,
+            "historical": float(y_match.iloc[0]['historicalavg_kg_ha']) if not y_match.empty else 0.0,
+            "gap": float(y_match.iloc[0]['yieldgap_kg_ha']) if not y_match.empty else 0.0,
+            "change": float(y_match.iloc[0]['percent_change']) if not y_match.empty else 0.0
+        },
+        "categories": {
+            "current_stage": str(p_match['stage_name'].mode()[0]) if not p_match.empty else "N/A",
+            "health_status": str(p_match['paddy_health'].mode()[0]) if not p_match.empty else "N/A",
+            "most_common_stage": str(y_match.iloc[0]['most_common_stage']) if not y_match.empty else "N/A"
+        },
+        "metrics": {
+            "stress_pct": float(y_match.iloc[0]['severe_stress_pct']) if not y_match.empty else 0.0,
+            "pest_count": int(y_match.iloc[0]['pest_attack_count']) if not y_match.empty else 0,
+            "risk_score": float(y_match.iloc[0]['risk_score']) if not y_match.empty else 0.0,
+            "harvest_date": str(y_match.iloc[0]['est_harvest_date']) if not y_match.empty else "TBD"
+        },
+        "raw_data": {
+            # Sanitize the entire dictionary before sending
+            "yield_csv": sanitize(y_match.iloc[0].to_dict()) if not y_match.empty else {},
+            "sample_pixel": sanitize(p_match.iloc[0].to_dict()) if not p_match.empty else {}
         }
-        
-        return stats
-
-    except Exception as e:
-        print(f"S3 Error: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+    }
+    
+    return res
