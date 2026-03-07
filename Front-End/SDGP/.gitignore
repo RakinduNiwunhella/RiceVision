@@ -24,3 +24,5 @@ dist-ssr
 *.sw?
 .env
 .env.*
+Front-End/SDGP/node_modules
+node_modules
