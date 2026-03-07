@@ -82,6 +82,43 @@ async def get_pest_risk_by_district():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# -----------------------------
+# 3️⃣ GET DISASTER RISK
+# -----------------------------
+@router.get("/disasters")
+async def get_disasters():
+    try:
+        response = (
+            supabase
+            .table("alerts_overview_view")
+            .select("*")
+            .in_("disaster_risk", ["Flood", "Drought", "Storm"])
+            .order("date", desc=True)
+            .execute()
+        )
+
+        if not response.data:
+            return []
+
+        mapped_data = [
+            {
+                "id": a.get("id"),
+                "district": a.get("district"),
+                "disaster_type": a.get("disaster_risk"),
+                "stage": a.get("stage_name"),
+                "health": a.get("paddy_health"),
+                "timestamp": a.get("date"),
+                "lat": a.get("lat"),
+                "lon": a.get("lon")
+            }
+            for a in response.data
+        ]
+
+        return mapped_data
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))        
+
 
 # -----------------------------
 # 3️⃣ UPDATE ALERT STATUS
