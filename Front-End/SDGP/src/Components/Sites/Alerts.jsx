@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { fetchAlerts, updateAlertStatus } from "../../api/api";
 
-const tabOptions = ["Open", "Resolved", "Ignored", "All"];
+const tabOptions = ["Open", "Resolved", "Denied", "All"];
 
 const Alerts = () => {
   const [alerts, setAlerts] = useState([]);
@@ -33,7 +33,7 @@ const Alerts = () => {
   }, []);
 
   const counts = useMemo(() => {
-    const countObj = { Open: 0, Resolved: 0, Ignored: 0 };
+    const countObj = { Open: 0, Resolved: 0, Denied: 0 };
     alerts.forEach((alert) => {
       if (countObj[alert.status] !== undefined) {
         countObj[alert.status]++;
@@ -75,8 +75,8 @@ const Alerts = () => {
     updateStatus(id, "Resolved");
   };
 
-  const handleIgnore = (id) => {
-    updateStatus(id, "Ignored");
+  const handleDeny = (id) => {
+    updateStatus(id, "Denied");
   };
 
   const formatTimestamp = (iso) => new Date(iso).toLocaleString();
