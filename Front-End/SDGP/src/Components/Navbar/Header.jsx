@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import logo from '../assets/logo.png'
+import { supabase } from '../../supabaseClient'
 
 import Notifications from '../Notifications/Notifications'
 
@@ -8,17 +9,17 @@ const Header = () => {
   const location = useLocation()
   const [showNotifications, setShowNotifications] = useState(false)
   const [unreadCount, setUnreadCount] = useState(0)
+  const bellRef = useRef(null)
 
   useEffect(() => {
     async function fetchUnreadCount() {
       try {
-        const response = await fetch('/api/notifications/unread-count')
-        if (response.ok) {
-          const data = await response.json()
-          setUnreadCount(data.unreadCount || 0)
-        }
-      } catch (error) {
-        console.error('Failed to fetch unread notifications count:', error)
+        const { count, error } = await supabase
+          .from("notificationpanel")
+          .select("*", { count: "exact", head: true })
+        if (!error) setUnreadCount(count ?? 0)
+      } catch (err) {
+        console.error("Failed to fetch notification count:", err)
       }
     }
     fetchUnreadCount()
@@ -105,6 +106,7 @@ const Header = () => {
               <div className="relative">
 
                 <button
+                  ref={bellRef}
                   onClick={() => setShowNotifications(!showNotifications)}
                   className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition relative"
                   title="Notifications"
@@ -114,14 +116,14 @@ const Header = () => {
                   </span>
 
                   {unreadCount > 0 && (
-                    <span className="absolute top-0 right-0 -translate-x-1/2 translate-y-1/2 bg-emerald-500 text-white text-[10px] font-bold rounded-full px-1.5 leading-none animate-pulse select-none pointer-events-none">
-                      {unreadCount}
+                    <span className="absolute -top-0.5 -right-0.5 min-w-4 h-4 bg-emerald-500 text-white text-[9px] font-black rounded-full px-1 flex items-center justify-center leading-none shadow-lg shadow-emerald-900/40 animate-pulse select-none pointer-events-none">
+                      {unreadCount > 99 ? "99+" : unreadCount}
                     </span>
                   )}
                 </button>
 
                 {showNotifications && (
-                  <Notifications onClose={handleCloseNotifications} />
+                  <Notifications onClose={handleCloseNotifications} anchorRef={bellRef} />
                 )}
 
               </div>
@@ -131,7 +133,7 @@ const Header = () => {
             {/* Avatar */}
             <Link
               to="/profile"
-              className="w-8 h-8 rounded-lg bg-gradient-to-br from-slate-400 to-slate-600 flex items-center justify-center text-white ring-1 ring-white/20 shadow-lg cursor-pointer hover:scale-105 active:scale-95 transition"
+              className="w-8 h-8 rounded-lg bg-linear-to-br from-slate-400 to-slate-600 flex items-center justify-center text-white ring-1 ring-white/20 shadow-lg cursor-pointer hover:scale-105 active:scale-95 transition"
               title="View Profile"
             >
               <span className="material-symbols-outlined text-[20px]">
