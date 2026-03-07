@@ -43,7 +43,7 @@ const FieldData = () => {
       const { data: districts, error: districtError } = await supabase
         .from("district_health_summary")
         .select("*")
-        .order("total_yield_tons", { ascending: false });
+        .order("total_yield_kg", { ascending: false });
 
       if (districtError) {
         console.error("District error:", districtError);
@@ -135,9 +135,8 @@ const FieldData = () => {
                   <th className="px-6 py-6 text-left font-black">Healthy</th>
                   <th className="px-6 py-6 text-left font-black">Stressed</th>
                   <th className="px-6 py-6 text-left font-black">Critical</th>
-                  <th className="px-6 py-6 text-left font-black">Avg NDVI</th>
-                  <th className="px-6 py-6 text-left font-black">Avg Yield</th>
-                  <th className="px-8 py-6 text-right font-black">Total Yield(tons)</th>
+                  <th className="px-6 py-6 text-left font-black">Avg Yield (kg/ha)</th>
+                  <th className="px-8 py-6 text-right font-black">Total Yield (kg)</th>
                 </tr>
               </thead>
 
@@ -171,16 +170,15 @@ const FieldData = () => {
                         {d.critical_fields}
                       </span>
                     </td>
-                    <td className="px-6 py-5 font-mono text-emerald-400/80">{d.avg_ndvi}</td>
                     <td className="px-6 py-5">
                       <div className="flex flex-col">
-                        <span className="text-white/80">{d.avg_yield_ton_ha}</span>
-                        <span className="text-[10px] text-white/20 uppercase font-black tracking-tighter">Metric Tons/Ha</span>
+                        <span className="text-white/80">{d.avg_yield_kg_ha}</span>
+                        <span className="text-[10px] text-white/20 uppercase font-black tracking-tighter">kg/Ha</span>
                       </div>
                     </td>
                     <td className="px-8 py-5 text-right">
-                      <span className="text-lg font-black text-white">{Number(d.total_yield_tons).toLocaleString()}</span>
-                      <span className="ml-1 text-[10px] text-white/40 uppercase font-black">t</span>
+                      <span className="text-lg font-black text-white">{Number(d.total_yield_kg).toLocaleString()}</span>
+                      <span className="ml-1 text-[10px] text-white/40 uppercase font-black">kg</span>
                     </td>
                   </tr>
                 ))}
