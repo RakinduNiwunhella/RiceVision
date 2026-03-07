@@ -4,8 +4,10 @@ from ..db import supabase
 
 router = APIRouter(prefix="/alerts", tags=["Alerts"])
 
+
 class AlertStatusUpdate(BaseModel):
     status: str
+
 
 @router.get("/all")
 async def get_all_alerts():
@@ -14,24 +16,28 @@ async def get_all_alerts():
             supabase
             .table("alerts_overview_view")
             .select("*")
-            .order("created_at", desc=True)
+            .order("date", desc=True)   # use date instead of created_at
             .execute()
         )
 
-        # If no data, return empty list instead of error
         if not response.data:
             return []
 
-        # Supabase returns dictionaries, so use ["key"] not .key
         mapped_data = [
             {
                 "id": a.get("id"),
-                "title": a.get("title"),
-                "description": a.get("description"),
+                "title": a.get("alert_type"),                 # derived column from view
+                "description": f"Stage: {a.get('stage_name')} | Health: {a.get('paddy_health')}",
                 "status": a.get("status"),
-                "priority": a.get("priority"),
+                "priority": (
+                    "High" if a.get("pest_risk", 0) >= 80
+                    else "Medium" if a.get("pest_risk", 0) >= 50
+                    else "Low"
+                ),
                 "field": a.get("district"),
-                "timestamp": a.get("created_at"),
+                "timestamp": a.get("date"),
+                "lat": a.get("lat"),
+                "lon": a.get("lon")
             }
             for a in response.data
         ]
@@ -41,12 +47,13 @@ async def get_all_alerts():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.put("/{alert_id}")
 async def update_alert_status(alert_id: int, body: AlertStatusUpdate):
     try:
         response = (
             supabase
-            .table("alerts")  # use your real base table name if different
+            .table("alerts")   # base table storing alert statuses
             .update({"status": body.status})
             .eq("id", alert_id)
             .execute()
