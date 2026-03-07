@@ -27,7 +27,7 @@ async def get_district_health_summary():
             supabase
             .table("district_health_summary")
             .select("*")
-            .order("total_yield_tons", desc=True)
+            .order("total_yield_kg", desc=True)
             .execute()
         )
 
