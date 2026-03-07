@@ -1,26 +1,26 @@
 import io
 import boto3
 import pandas as pd
-import numpy as np  # Add this import
-from fastapi import APIRouter
+import numpy as np
+from fastapi import APIRouter, HTTPException
 
 router = APIRouter()
 s3_client = boto3.client('s3')
 BUCKET_NAME = "ricevision"
 
-# HELPER: Converts NumPy types to standard Python types for JSON safety
 def sanitize(val):
-    if isinstance(val, (np.integer, np.int64)):
-        return int(val)
-    if isinstance(val, (np.floating, np.float64)):
-        return float(val)
-    if isinstance(val, pd.Timestamp):
-        return str(val)
-    if isinstance(val, dict):
-        return {k: sanitize(v) for k, v in val.items()}
-    if isinstance(val, list):
-        return [sanitize(v) for v in val]
+    if isinstance(val, (np.integer, np.int64)): return int(val)
+    if isinstance(val, (np.floating, np.float64)): return float(val)
+    if isinstance(val, pd.Timestamp): return str(val)
+    if isinstance(val, dict): return {k: sanitize(v) for k, v in val.items()}
+    if isinstance(val, list): return [sanitize(v) for v in val]
     return val
+
+def check_s3_date_exists(date_str):
+    """Checks if the 'folder' for the date exists in S3"""
+    prefix = f"SupabasePredictions/{date_str}/"
+    response = s3_client.list_objects_v2(Bucket=BUCKET_NAME, Prefix=prefix, MaxKeys=1)
+    return 'Contents' in response
 
 def get_csv_from_s3(key):
     try:
@@ -31,39 +31,48 @@ def get_csv_from_s3(key):
 
 @router.get("/detailed-report")
 async def get_detailed_report(date: str, district: str, season: str):
-    df_pixel = get_csv_from_s3(f"SupabasePredictions/{date}/FinalMlPredictions.csv")
+    # 1. Validation: Check if date exists
+    if not check_s3_date_exists(date):
+        raise HTTPException(status_code=404, detail=f"Data for date {date} is not available in S3.")
+
+    # 2. Fetch Files
     df_yield = get_csv_from_s3(f"SupabasePredictions/{date}/yieldPredictions.csv")
+    
+    if df_yield is None:
+        raise HTTPException(status_code=404, detail="Prediction files missing for this date.")
 
     def norm(name): return str(name).strip().lower().replace("th", "t")
     target = norm(district)
 
-    y_match = df_yield[df_yield['districtname'].apply(norm) == target] if df_yield is not None else pd.DataFrame()
-    p_match = df_pixel[df_pixel['district'].apply(norm) == target] if df_pixel is not None else pd.DataFrame()
+    # 3. Filter Data
+    y_match = df_yield[(df_yield['districtname'].apply(norm) == target) & 
+                       (df_yield['season'].str.lower() == season.lower())]
 
-    # Use .item() to convert numpy scalars to python scalars immediately
+    if y_match.empty:
+        raise HTTPException(status_code=404, detail="No matching district/season record found.")
+
+    row = y_match.iloc[0]
+
+    # 4. Construct Response with new 'total_kg' field
     res = {
         "summary": {
-            "yield": float(y_match.iloc[0]['predictedyield_kg_ha']) if not y_match.empty else 0.0,
-            "historical": float(y_match.iloc[0]['historicalavg_kg_ha']) if not y_match.empty else 0.0,
-            "gap": float(y_match.iloc[0]['yieldgap_kg_ha']) if not y_match.empty else 0.0,
-            "change": float(y_match.iloc[0]['percent_change']) if not y_match.empty else 0.0
+            "yield": float(row['predictedyield_kg_ha']),
+            "historical": float(row['historicalavg_kg_ha']),
+            "total_kg": float(row['totalyield_kg']), # New Field
+            "gap": float(row['yieldgap_kg_ha']),
         },
         "categories": {
-            "current_stage": str(p_match['stage_name'].mode()[0]) if not p_match.empty else "N/A",
-            "health_status": str(p_match['paddy_health'].mode()[0]) if not p_match.empty else "N/A",
-            "most_common_stage": str(y_match.iloc[0]['most_common_stage']) if not y_match.empty else "N/A"
+            "current_stage": str(row['most_common_stage']),
+            "health_status": "Normal" if float(row['severe_stress_pct']) < 5 else "Action Required"
         },
         "metrics": {
-            "stress_pct": float(y_match.iloc[0]['severe_stress_pct']) if not y_match.empty else 0.0,
-            "pest_count": int(y_match.iloc[0]['pest_attack_count']) if not y_match.empty else 0,
-            "risk_score": float(y_match.iloc[0]['risk_score']) if not y_match.empty else 0.0,
-            "harvest_date": str(y_match.iloc[0]['est_harvest_date']) if not y_match.empty else "TBD"
+            "stress_pct": float(row['severe_stress_pct']),
+            "pest_count": int(row['pest_attack_count']),
+            "risk_score": float(row['risk_score']),
+            "harvest_date": str(row['est_harvest_date']).split(' ')[0]
         },
         "raw_data": {
-            # Sanitize the entire dictionary before sending
-            "yield_csv": sanitize(y_match.iloc[0].to_dict()) if not y_match.empty else {},
-            "sample_pixel": sanitize(p_match.iloc[0].to_dict()) if not p_match.empty else {}
+            "yield_csv": sanitize(row.to_dict())
         }
     }
-    
     return res
