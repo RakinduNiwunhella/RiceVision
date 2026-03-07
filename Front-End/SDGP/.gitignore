@@ -25,3 +25,5 @@ dist-ssr
 .env
 .env.*
 Front-End/SDGP/node_modules
+node_modules
+Front-End/SDGP/node_modules
