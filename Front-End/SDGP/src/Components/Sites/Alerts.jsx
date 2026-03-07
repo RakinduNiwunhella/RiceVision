@@ -1,7 +1,8 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { updateAlertStatus } from "../../api/api";
 
-const tabOptions = ["Disasters", "Pest Risks"];
+const API_BASE = "http://localhost:8000";
+const tabOptions = ["Disasters", "Pest Risks", "Past Alerts"];
 
 const Alerts = () => {
   const [alerts, setAlerts] = useState([]);
@@ -12,24 +13,83 @@ const Alerts = () => {
   const filteredAlerts = useMemo(() => {
     const normalizedSearch = searchTerm.toLowerCase();
 
-    return alerts.filter((alert) => {
+    // Base filtering: preserve existing search behavior
+    const baseAlerts = alerts.filter((alert) => {
       const title = (alert.title ?? "").toLowerCase();
       const description = (alert.description ?? "").toLowerCase();
 
       const matchesSearch =
         title.includes(normalizedSearch) || description.includes(normalizedSearch);
 
+      if (activeTab === "Past Alerts") {
+        const isPast =
+          alert.status === "Resolved" || alert.status === "Denied";
+        return matchesSearch && isPast;
+      }
+
       return matchesSearch;
     });
-  }, [alerts, searchTerm]);
+
+    // Group pest risk alerts by district when that tab is active
+    if (activeTab === "Pest Risks") {
+      const groups = new Map();
+
+      baseAlerts.forEach((alert) => {
+        const key = alert.field ?? "Unknown Field";
+        if (!groups.has(key)) {
+          groups.set(key, []);
+        }
+        groups.get(key).push(alert);
+      });
+
+      const grouped = Array.from(groups.entries()).map(([field, group]) => {
+        if (group.length === 0) {
+          return {
+            id: field,
+            title: "Pest Risk Alert",
+            description: "Multiple pest risks detected in this district.",
+            status: "Open",
+            priority: "Medium",
+            field,
+            timestamp: new Date().toISOString(),
+          };
+        }
+
+        // Use the most recent timestamp in the group
+        const latest = group.reduce((latestAlert, current) => {
+          if (!latestAlert) return current;
+          const latestTime = new Date(latestAlert.timestamp || 0).getTime();
+          const currentTime = new Date(current.timestamp || 0).getTime();
+          return currentTime > latestTime ? current : latestAlert;
+        }, null);
+
+        return {
+          ...latest,
+          title: "Pest Risk Alert",
+          description: "Multiple pest risks detected in this district.",
+          field,
+        };
+      });
+
+      return grouped;
+    }
+
+    // "Disasters" and "Past Alerts" use the flat list
+    return baseAlerts;
+  }, [alerts, searchTerm, activeTab]);
 
   useEffect(() => {
+    // "Past Alerts" is derived from existing alerts; no fetch needed
+    if (activeTab === "Past Alerts") {
+      return;
+    }
+
     const loadAlerts = async () => {
       try {
         const isDisasters = activeTab === "Disasters";
         const endpoint = isDisasters
-          ? "/api/alerts/disasters"
-          : "/api/alerts/pest-risk";
+          ? `${API_BASE}/api/alerts/disasters`
+          : `${API_BASE}/api/alerts/pest-risk`;
 
         const response = await fetch(endpoint);
 
@@ -230,7 +290,7 @@ const Alerts = () => {
                   </div>
                 </div>
 
-                {alert.status === "Open" && (
+                {alert.status === "Open" && activeTab !== "Past Alerts" && (
                   <div className="flex gap-2 shrink-0">
                     <button
                       onClick={() => handleResolve(alert.id)}
@@ -238,6 +298,13 @@ const Alerts = () => {
                     >
                       Resolve
                     </button>
+                    {activeTab === "Pest Risks" && (
+                      <button
+                        className="px-6 py-2.5 glass bg-white/5 hover:bg-white/10 text-white/60 text-xs font-black uppercase tracking-widest border border-white/10 rounded-xl transition-all active:scale-95"
+                      >
+                        View in Map
+                      </button>
+                    )}
                     <button
                       onClick={() => handleDeny(alert.id)}
                       className="px-6 py-2.5 glass bg-white/5 hover:bg-white/10 text-white/40 hover:text-white/60 text-xs font-black uppercase tracking-widest border border-white/10 rounded-xl transition-all active:scale-95"
