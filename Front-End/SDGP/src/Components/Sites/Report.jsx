@@ -139,26 +139,26 @@ const Report = () => {
         </div>
 
         {/* Yield Hero */}
-        <div className="glass p-8 rounded-[2.5rem] border border-emerald-500/20 shadow-xl mb-6 relative overflow-hidden">
+        <div className="glass p-5 rounded-[2rem] border border-emerald-500/20 shadow-xl mb-6 relative overflow-hidden">
           {/* subtle glow */}
-          <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/10 blur-[60px] -mr-12 -mt-12 pointer-events-none rounded-full" />
+          <div className="absolute top-0 right-0 w-36 h-36 bg-emerald-500/10 blur-[50px] -mr-8 -mt-8 pointer-events-none rounded-full" />
           <div className="relative z-10">
             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-1 flex items-center gap-2">
               <span className="material-symbols-outlined text-emerald-400 text-sm">monitoring</span>
               Predicted Average
             </p>
-            <h2 className="text-6xl font-black tracking-tighter text-white">
+            <h2 className="text-4xl font-black tracking-tighter text-white">
               {Math.round(report.summary.yield).toLocaleString()}
-              <span className="text-xl font-normal text-white/50 ml-2">kg/ha</span>
+              <span className="text-base font-normal text-white/50 ml-2">kg/ha</span>
             </h2>
-            <div className="mt-5 pt-5 border-t border-white/5 grid grid-cols-2 gap-4">
+            <div className="mt-3 pt-3 border-t border-white/5 grid grid-cols-2 gap-3">
               <div>
-                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/30 mb-1">Total Yield</p>
-                <p className="text-xl font-black text-white">{Math.round(report.summary.total_kg).toLocaleString()} <span className="text-xs font-bold text-white/40">kg</span></p>
+                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/30 mb-0.5">Total Yield</p>
+                <p className="text-base font-black text-white">{Math.round(report.summary.total_kg).toLocaleString()} <span className="text-xs font-bold text-white/40">kg</span></p>
               </div>
               <div>
-                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/30 mb-1">Historical Baseline</p>
-                <p className="text-xl font-black text-white">{Math.round(report.summary.historical).toLocaleString()} <span className="text-xs font-bold text-white/40">kg/ha</span></p>
+                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/30 mb-0.5">Historical Baseline</p>
+                <p className="text-base font-black text-white">{Math.round(report.summary.historical).toLocaleString()} <span className="text-xs font-bold text-white/40">kg/ha</span></p>
               </div>
             </div>
           </div>
