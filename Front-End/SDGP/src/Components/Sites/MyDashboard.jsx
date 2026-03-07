@@ -19,7 +19,6 @@ import {
   fetchYield,
   fetchBestDistricts,
   fetchOutbreaks,
-  fetchNDVITrend,
   fetchDistrictHealth
 } from "../../api/api";
 
@@ -68,7 +67,6 @@ const MyDashboard = () => {
   const [yieldForecast, setYieldForecast] = useState(null);
   const [bestYieldDistricts, setBestYieldDistricts] = useState([]);
   const [outbreaks, setOutbreaks] = useState([]);
-  const [ndviTrend, setNdviTrend] = useState([]);
   const [showAllOutbreaks, setShowAllOutbreaks] = useState(false);
   const [districtHealth, setDistrictHealth] = useState([]);
   const [showAllDistricts, setShowAllDistricts] = useState(false);
@@ -86,19 +84,17 @@ const MyDashboard = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [health, yld, best, out, ndvi, dist] = await Promise.all([
+        const [health, yld, best, out, dist] = await Promise.all([
           fetchHealthSummary(),
           fetchYield(),
           fetchBestDistricts(),
           fetchOutbreaks(),
-          fetchNDVITrend(),
           fetchDistrictHealth()
         ]);
         setHealthSummary(health);
         setYieldForecast(yld);
         setBestYieldDistricts(best);
         setOutbreaks(out);
-        setNdviTrend(ndvi);
         setDistrictHealth(dist);
       } catch (err) {
         console.error("Dashboard synchronization error:", err);
@@ -321,60 +317,6 @@ const MyDashboard = () => {
 
         {/* ── Analytical Depth Row ── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-12">
-
-          {/* National NDVI Trend */}
-          <div className="glass glass-hover p-8 rounded-[3rem] border border-white/10 shadow-2xl">
-            <div className="flex justify-between items-start mb-10">
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-2 flex items-center gap-2">
-                  <span className="material-symbols-outlined text-emerald-400 text-sm">monitoring</span>
-                  Chronological Intensity
-                </p>
-                <h3 className="text-xl font-black text-white tracking-tight uppercase">National NDVI Flux</h3>
-              </div>
-              <div className="text-right">
-                <span className="text-2xl font-black text-emerald-400">0.842</span>
-                <p className="text-[8px] font-black text-white/20 uppercase tracking-[0.2em]">Peak Signal</p>
-              </div>
-            </div>
-
-            <div className="w-full h-44 mb-10">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={ndviTrend}>
-                  <defs>
-                    <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <XAxis dataKey="day" hide />
-                  <YAxis domain={[0, 1]} hide />
-                  <Tooltip
-                    cursor={{ stroke: "rgba(255,255,255,0.1)", strokeWidth: 2 }}
-                    contentStyle={{
-                      background: "rgba(0,0,0,0.8)",
-                      backdropFilter: "blur(20px)",
-                      border: "1px solid rgba(255,255,255,0.1)",
-                      borderRadius: "15px",
-                      padding: "10px 15px",
-                    }}
-                    labelStyle={{ color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: 'uppercase', fontWeight: 900, marginBottom: '4px' }}
-                    itemStyle={{ color: "#10b981", fontSize: "12px", fontWeight: 900 }}
-                    formatter={(value) => [`${value.toFixed(3)}`, "SIGNAL INTENSITY"]}
-                  />
-                  <Line type="monotone" dataKey="value" stroke="#10b981" strokeWidth={4} dot={false} animationDuration={2000} fillOpacity={1} fill="url(#colorValue)" />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-
-            {healthSummary && (
-              <div className="space-y-6 pt-4 border-t border-white/5">
-                <ProgressWidget label="Optimal Saturation" value={healthSummary.normal_pct} color="green" />
-                <ProgressWidget label="Minor Deviation" value={healthSummary.mild_stress_pct} color="yellow" />
-                <ProgressWidget label="Critical Variance" value={healthSummary.severe_stress_pct} color="blue" />
-              </div>
-            )}
-          </div>
 
           {/* Regional Health Ledger */}
           <div className="glass glass-hover p-8 rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">

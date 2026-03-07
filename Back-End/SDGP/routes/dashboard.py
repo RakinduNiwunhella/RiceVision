@@ -6,7 +6,7 @@ router = APIRouter()
 @router.get("/yield")
 def get_yield():
     response = supabase.table("yield_forecast_view") \
-        .select("total_yield_tons") \
+        .select("total_yield_kgs") \
         .single() \
         .execute()
 
@@ -19,7 +19,7 @@ def get_yield():
 @router.get("/best-districts")
 def get_best_yield_districts():
     response = supabase.table("best_yield_districts_view") \
-        .select("District, total_yield_ton_ha") \
+        .select("District, total_yield_kg_ha") \
         .limit(5) \
         .execute()
     return response.data
@@ -27,11 +27,11 @@ def get_best_yield_districts():
 
 @router.get("/health-summary")
 def get_health_summary():
-    response = supabase.table("paddy_health_summary_view") \
+    response = supabase.table("sri_lanka_paddy_health_summary") \
         .select("normal_pct, mild_stress_pct, severe_stress_pct") \
-        .eq("district", "kurunegala") \
         .single() \
         .execute()
+
     return response.data
 
 
