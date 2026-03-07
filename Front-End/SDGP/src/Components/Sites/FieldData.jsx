@@ -80,7 +80,7 @@ const FieldData = () => {
               Field Intelligence
             </h1>
             <p className="text-white/40 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em]">
-              Synchronized Satellite-Derived District Metrics
+              Aggregated Satellite-derived insights on Crop Health & Yield Performance
             </p>
           </div>
 
@@ -101,7 +101,6 @@ const FieldData = () => {
                 <span className={`material-symbols-outlined ${item.color || 'text-white/40'} text-3xl group-hover:scale-110 transition-transform duration-500`}>
                   {item.icon}
                 </span>
-                <span className="text-[10px] font-black text-white/20 uppercase tracking-tighter">RV-CORE-INTEL</span>
               </div>
               <p className="text-xs font-bold text-white/40 uppercase tracking-widest mb-1">
                 {item.label}
@@ -118,7 +117,7 @@ const FieldData = () => {
           <div className="p-8 border-b border-white/10 flex justify-between items-center">
             <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/40 flex items-center gap-3">
               <span className="material-symbols-outlined text-emerald-400">dataset</span>
-              District Performance Ledger
+              District-wise Performance Summary
             </h2>
             <div className="flex gap-2">
               <div className="w-2 h-2 rounded-full bg-white/10" />
@@ -131,14 +130,14 @@ const FieldData = () => {
             <table className="w-full text-sm border-collapse">
               <thead>
                 <tr className="text-white/30 uppercase text-[10px] font-black tracking-widest border-b border-white/5">
-                  <th className="px-8 py-6 text-left font-black">District Identifier</th>
+                  <th className="px-8 py-6 text-left font-black">District</th>
                   <th className="px-6 py-6 text-left font-black">Total Fields</th>
                   <th className="px-6 py-6 text-left font-black">Healthy</th>
                   <th className="px-6 py-6 text-left font-black">Stressed</th>
                   <th className="px-6 py-6 text-left font-black">Critical</th>
                   <th className="px-6 py-6 text-left font-black">Avg NDVI</th>
-                  <th className="px-6 py-6 text-left font-black">Yield Intensity</th>
-                  <th className="px-8 py-6 text-right font-black">Gross Tonnage</th>
+                  <th className="px-6 py-6 text-left font-black">Avg Yield</th>
+                  <th className="px-8 py-6 text-right font-black">Total Yield(tons)</th>
                 </tr>
               </thead>
 
@@ -187,10 +186,6 @@ const FieldData = () => {
                 ))}
               </tbody>
             </table>
-          </div>
-
-          <div className="p-6 bg-white/5 flex justify-center border-t border-white/5">
-            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20">End of Intelligence Ledger</p>
           </div>
         </div>
       </div>
