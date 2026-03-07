@@ -9,6 +9,9 @@ class AlertStatusUpdate(BaseModel):
     status: str
 
 
+# -----------------------------
+# 1️⃣ GET ALL ALERTS
+# -----------------------------
 @router.get("/all")
 async def get_all_alerts():
     try:
@@ -16,7 +19,7 @@ async def get_all_alerts():
             supabase
             .table("alerts_overview_view")
             .select("*")
-            .order("date", desc=True)   # use date instead of created_at
+            .order("date", desc=True)
             .execute()
         )
 
@@ -26,7 +29,7 @@ async def get_all_alerts():
         mapped_data = [
             {
                 "id": a.get("id"),
-                "title": a.get("alert_type"),                 # derived column from view
+                "title": a.get("alert_type"),
                 "description": f"Stage: {a.get('stage_name')} | Health: {a.get('paddy_health')}",
                 "status": a.get("status"),
                 "priority": (
@@ -48,12 +51,47 @@ async def get_all_alerts():
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# -----------------------------
+# 2️⃣ GET PEST RISK BY DISTRICT
+# -----------------------------
+@router.get("/pest-risk")
+async def get_pest_risk_by_district():
+    try:
+        response = (
+            supabase
+            .table("pest_risk_by_district")
+            .select("*")
+            .execute()
+        )
+
+        if not response.data:
+            return []
+
+        mapped_data = [
+            {
+                "district": r.get("district"),
+                "total_pixels": r.get("total_pixels"),
+                "risky_pixels": r.get("risky_pixels"),
+                "risky_pixel_locations": r.get("risky_pixel_locations")
+            }
+            for r in response.data
+        ]
+
+        return mapped_data
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# -----------------------------
+# 3️⃣ UPDATE ALERT STATUS
+# -----------------------------
 @router.put("/{alert_id}")
 async def update_alert_status(alert_id: int, body: AlertStatusUpdate):
     try:
         response = (
             supabase
-            .table("alerts")   # base table storing alert statuses
+            .table("alerts")
             .update({"status": body.status})
             .eq("id", alert_id)
             .execute()
