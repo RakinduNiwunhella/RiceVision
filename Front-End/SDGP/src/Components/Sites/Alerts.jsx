@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { updateAlertStatus } from "../../api/api";
 
-const API_BASE = "http://localhost:8000";
+const API_BASE = "https://ricevision-cakt.onrender.com";
 const tabOptions = ["Disasters", "Pest Risks", "Past Alerts"];
 
 const Alerts = () => {

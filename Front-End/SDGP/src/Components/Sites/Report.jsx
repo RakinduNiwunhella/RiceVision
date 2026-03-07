@@ -7,14 +7,14 @@ const Report = () => {
   const districts = ["Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle", "Gampaha", "Hambantota", "Jaffna", "Kalutara", "Kandy", "Kegalle", "Kilinochchi", "Kurunegala", "Mannar", "Matale", "Matara", "Monaragala", "Mullaitivu", "Nuwara Eliya", "Polonnaruwa", "Puttalam", "Ratnapura", "Trincomalee", "Vavuniya"];
 
   const [mode, setMode] = useState("single");
-  const [configA, setConfigA] = useState({ district: "Anuradhapura", date: "2026-03-06", season: "Maha" });
-  const [configB, setConfigB] = useState({ district: "Gampaha", date: "2026-03-06", season: "Maha" });
+  const [configA, setConfigA] = useState({ district: "Anuradhapura", season: "Maha" });
+  const [configB, setConfigB] = useState({ district: "Gampaha", season: "Maha" });
   const [dataA, setDataA] = useState(null);
   const [dataB, setDataB] = useState(null);
 
   const fetchData = async (conf, setter) => {
     try {
-      const res = await fetch(`http://localhost:8000/api/detailed-report?date=${conf.date}&district=${conf.district}&season=${conf.season}`);
+      const res = await fetch(`https://ricevision-cakt.onrender.com/api/detailed-report?district=${conf.district}&season=${conf.season}`);
       const json = await res.json();
       if (!res.ok) throw new Error(json.detail || "Data not found");
       setter(json);
@@ -36,7 +36,7 @@ const Report = () => {
     doc.setFontSize(22);
     doc.text("RICEVISION ANALYTICS REPORT", 15, 25);
     doc.setFontSize(10);
-    doc.text(`District: ${config.district} | Season: ${config.season} | Date: ${config.date}`, 15, 33);
+    doc.text(`District: ${config.district} | Season: ${config.season}`, 15, 33);
     doc.setTextColor(40, 40, 40);
     doc.setFontSize(14);
     doc.text("Agricultural Forecast Summary", 15, 55);
@@ -78,12 +78,6 @@ const Report = () => {
         <span className="material-symbols-outlined text-5xl text-red-400/40 mb-4 block">signal_disconnected</span>
         <h3 className="text-red-400 font-black uppercase tracking-widest mb-3 text-sm">Data Unavailable</h3>
         <p className="text-xs text-white/30 mb-6">{report.message}</p>
-        <input
-          type="date"
-          value={config.date}
-          onChange={(e) => setConfig({ ...config, date: e.target.value })}
-          className="bg-white/5 border border-white/10 text-[10px] p-3 rounded-xl font-bold text-white outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all"
-        />
       </div>
     );
 
@@ -130,12 +124,7 @@ const Report = () => {
             <option className="bg-slate-900">Maha</option>
             <option className="bg-slate-900">Yala</option>
           </select>
-          <input
-            type="date"
-            value={config.date}
-            onChange={(e) => setConfig({ ...config, date: e.target.value })}
-            className="col-span-2 bg-white/5 border border-white/10 text-[10px] p-3 rounded-xl font-bold text-white outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all"
-          />
+
         </div>
 
         {/* Yield Hero */}
