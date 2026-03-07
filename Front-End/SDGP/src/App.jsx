@@ -2,6 +2,7 @@ import React from 'react'
 import Header from './Components/Navbar/Header'
 import { Outlet } from 'react-router-dom'
 import bgImage from './Components/assets/user_paddy_bg_v6.jpg'
+import YieldChatbot from './Components/chatbot/Yieldchatbot'
 
 const App = () => {
   return (
@@ -19,6 +20,8 @@ const App = () => {
 
       {/* Fixed Header */}
       <Header />
+
+      <YieldChatbot />
 
       {/* Main content (scrolls) */}
       <main className="relative z-10 pt-[72px] px-6 pb-6 overflow-y-auto h-screen text-white transition-colors duration-500 text-sm">

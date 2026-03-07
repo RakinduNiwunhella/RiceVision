@@ -43,7 +43,7 @@ const FieldData = () => {
       const { data: districts, error: districtError } = await supabase
         .from("district_health_summary")
         .select("*")
-        .order("total_yield_tons", { ascending: false });
+        .order("total_yield_kg", { ascending: false });
 
       if (districtError) {
         console.error("District error:", districtError);
@@ -80,7 +80,7 @@ const FieldData = () => {
               Field Intelligence
             </h1>
             <p className="text-white/40 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em]">
-              Synchronized Satellite-Derived District Metrics
+              Aggregated Satellite-derived insights on Crop Health & Yield Performance
             </p>
           </div>
 
@@ -101,7 +101,6 @@ const FieldData = () => {
                 <span className={`material-symbols-outlined ${item.color || 'text-white/40'} text-3xl group-hover:scale-110 transition-transform duration-500`}>
                   {item.icon}
                 </span>
-                <span className="text-[10px] font-black text-white/20 uppercase tracking-tighter">RV-CORE-INTEL</span>
               </div>
               <p className="text-xs font-bold text-white/40 uppercase tracking-widest mb-1">
                 {item.label}
@@ -118,7 +117,7 @@ const FieldData = () => {
           <div className="p-8 border-b border-white/10 flex justify-between items-center">
             <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/40 flex items-center gap-3">
               <span className="material-symbols-outlined text-emerald-400">dataset</span>
-              District Performance Ledger
+              District-wise Performance Summary
             </h2>
             <div className="flex gap-2">
               <div className="w-2 h-2 rounded-full bg-white/10" />
@@ -131,14 +130,13 @@ const FieldData = () => {
             <table className="w-full text-sm border-collapse">
               <thead>
                 <tr className="text-white/30 uppercase text-[10px] font-black tracking-widest border-b border-white/5">
-                  <th className="px-8 py-6 text-left font-black">District Identifier</th>
+                  <th className="px-8 py-6 text-left font-black">District</th>
                   <th className="px-6 py-6 text-left font-black">Total Fields</th>
                   <th className="px-6 py-6 text-left font-black">Healthy</th>
                   <th className="px-6 py-6 text-left font-black">Stressed</th>
                   <th className="px-6 py-6 text-left font-black">Critical</th>
-                  <th className="px-6 py-6 text-left font-black">Avg NDVI</th>
-                  <th className="px-6 py-6 text-left font-black">Yield Intensity</th>
-                  <th className="px-8 py-6 text-right font-black">Gross Tonnage</th>
+                  <th className="px-6 py-6 text-left font-black">Avg Yield (kg/ha)</th>
+                  <th className="px-8 py-6 text-right font-black">Total Yield (kg)</th>
                 </tr>
               </thead>
 
@@ -172,25 +170,20 @@ const FieldData = () => {
                         {d.critical_fields}
                       </span>
                     </td>
-                    <td className="px-6 py-5 font-mono text-emerald-400/80">{d.avg_ndvi}</td>
                     <td className="px-6 py-5">
                       <div className="flex flex-col">
-                        <span className="text-white/80">{d.avg_yield_ton_ha}</span>
-                        <span className="text-[10px] text-white/20 uppercase font-black tracking-tighter">Metric Tons/Ha</span>
+                        <span className="text-white/80">{d.avg_yield_kg_ha}</span>
+                        <span className="text-[10px] text-white/20 uppercase font-black tracking-tighter">kg/Ha</span>
                       </div>
                     </td>
                     <td className="px-8 py-5 text-right">
-                      <span className="text-lg font-black text-white">{Number(d.total_yield_tons).toLocaleString()}</span>
-                      <span className="ml-1 text-[10px] text-white/40 uppercase font-black">t</span>
+                      <span className="text-lg font-black text-white">{Number(d.total_yield_kg).toLocaleString()}</span>
+                      <span className="ml-1 text-[10px] text-white/40 uppercase font-black">kg</span>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          </div>
-
-          <div className="p-6 bg-white/5 flex justify-center border-t border-white/5">
-            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20">End of Intelligence Ledger</p>
           </div>
         </div>
       </div>

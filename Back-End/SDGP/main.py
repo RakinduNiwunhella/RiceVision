@@ -35,3 +35,4 @@ app.include_router(profile_router)
 app.include_router(map_router)
 app.include_router(alerts_router, prefix="/api")
 app.include_router(notifications_router)
+

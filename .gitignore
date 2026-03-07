@@ -25,3 +25,11 @@ yarn-error.log*
 GeoData/kurunegala_supabase_final.csv
 *.csv
 data
+
+__pycache__/
+*.py[cod]
+*.pyc
+venv/
+.venv/
+*.py[cod]
+*.pyc
