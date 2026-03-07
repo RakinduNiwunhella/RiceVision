@@ -44,17 +44,6 @@ def get_outbreaks():
     return response.data
 
 
-@router.get("/ndvi-trend")
-def get_ndvi_trend():
-    response = supabase.table("national_ndvi_trend_view") \
-        .select("date, mean_ndvi") \
-        .order("date") \
-        .execute()
-
-    return [
-        {"day": row["date"], "value": row["mean_ndvi"]}
-        for row in response.data
-    ]
 
 
 @router.get("/district-health")
