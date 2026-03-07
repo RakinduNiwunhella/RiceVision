@@ -82,8 +82,9 @@ async def get_pest_risk_by_district():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 # -----------------------------
-# 3️⃣ GET DISASTER RISK
+# 3️⃣ GET DISASTER ALERTS
 # -----------------------------
 @router.get("/disasters")
 async def get_disasters():
@@ -92,7 +93,7 @@ async def get_disasters():
             supabase
             .table("alerts_overview_view")
             .select("*")
-            .in_("disaster_risk", ["Flood", "Drought", "Storm"])
+            .neq("disaster_risk", "Not Applicable")
             .order("date", desc=True)
             .execute()
         )
@@ -104,7 +105,12 @@ async def get_disasters():
             {
                 "id": a.get("id"),
                 "district": a.get("district"),
-                "disaster_type": a.get("disaster_risk"),
+                "disaster_type": (
+                    a.get("disaster_risk")
+                    .replace("hazard_", "")
+                    .lower()
+                    .replace("_", " ")
+                ),
                 "stage": a.get("stage_name"),
                 "health": a.get("paddy_health"),
                 "timestamp": a.get("date"),
@@ -117,11 +123,11 @@ async def get_disasters():
         return mapped_data
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))        
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # -----------------------------
-# 3️⃣ UPDATE ALERT STATUS
+# 4️⃣ UPDATE ALERT STATUS
 # -----------------------------
 @router.put("/{alert_id}")
 async def update_alert_status(alert_id: int, body: AlertStatusUpdate):
