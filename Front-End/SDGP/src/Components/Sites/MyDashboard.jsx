@@ -21,6 +21,7 @@ import {
   fetchOutbreaks,
   fetchDistrictHealth
 } from "../../api/api";
+import YieldChatbot from "../chatbot/Yieldchatbot";
 
 
 
@@ -129,7 +130,7 @@ const MyDashboard = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
             <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
-              Welcome to RiceVision 
+              Welcome to RiceVision
             </h1>
             <p className="text-white/40 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em]">
               Insights of smarter farming
@@ -355,7 +356,7 @@ const MyDashboard = () => {
                 onClick={() => setShowAllDistricts(!showAllDistricts)}
                 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 hover:text-white transition-colors"
               >
-              {showAllDistricts ? "Show Less" : `Show All (${districtHealth.length} Items)`}
+                {showAllDistricts ? "Show Less" : `Show All (${districtHealth.length} Items)`}
               </button>
             </div>
           </div>

@@ -92,7 +92,7 @@ const Help = () => {
               Help & Support
             </h1>
             <p className="text-white/40 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em] max-w-2xl">
-              Knowledge Base & Centralized Concierge — Find answers or synchronize with our intelligence team.
+
             </p>
           </div>
         </div>
@@ -102,14 +102,14 @@ const Help = () => {
           {[
             {
               icon: <PhoneIcon className="w-5 h-5 text-emerald-400" />,
-              title: "Rapid Response Support",
+              title: "Quick Assistance",
               desc: "Immediate tactical assistance for critical infrastructure failures.",
               action: "Dial Concierge",
               color: "emerald"
             },
             {
               icon: <EnvelopeIcon className="w-5 h-5 text-cyan-400" />,
-              title: "Strategic Inquiry",
+              title: "Ask Our Team",
               desc: "Submit non-urgent data requests or detailed system feedback.",
               action: "Transmit Email",
               color: "cyan"
@@ -197,7 +197,7 @@ const Help = () => {
                   onChange={handleChange}
                   rows="6"
                   className={inputClass + " resize-none"}
-                  placeholder="Describe the spectral anomaly or system behavior..."
+                  placeholder="Describe the issue in detail so we can help you...."
                 />
               </div>
 
@@ -206,7 +206,7 @@ const Help = () => {
                 disabled={loading}
                 className="w-full glass bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-400 py-4 rounded-2xl font-black uppercase tracking-widest transition-all active:scale-[0.98] border border-emerald-500/30 shadow-xl shadow-emerald-500/10 disabled:opacity-50"
               >
-                {loading ? "Transmitting..." : "Synchronize Complaint"}
+                {loading ? "Transmitting..." : "Submit Your Report"}
               </button>
             </div>
           </div>
@@ -216,7 +216,7 @@ const Help = () => {
             <div className="glass p-8 rounded-[2.5rem] border border-white/10 shadow-xl h-fit">
               <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/40 mb-8 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-                Knowledge Base Alpha
+                Quick Help
               </h2>
 
               {faqLoading && (
