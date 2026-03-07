@@ -213,21 +213,27 @@ export default function RiceMap({ filters, layers }) {
 {/* ---------- HEALTH POINTS ---------- */}
 
 {layers.showCircles && points.length > 0 && (
-  <MarkerClusterGroup>
-    {points.map((p, idx) => (
-      <CircleMarker
-        key={idx}
-        center={[p.lat, p.lng]}
-        radius={5}
-        pathOptions={{
-          color: getHealthColor(p.paddy_health),
-          fillColor: getHealthColor(p.paddy_health),
-          fillOpacity: 0.8,
-          weight: 1,
-        }}
-      />
-    ))}
-  </MarkerClusterGroup>
+<MarkerClusterGroup
+  disableClusteringAtZoom={10}
+  spiderfyOnMaxZoom={false}
+  showCoverageOnHover={false}
+  maxClusterRadius={30}
+  chunkedLoading
+>
+  {points.map((p, idx) => (
+    <CircleMarker
+      key={idx}
+      center={[p.lat, p.lng]}
+      radius={5}
+      pathOptions={{
+        color: getHealthColor(p.paddy_health),
+        fillColor: getHealthColor(p.paddy_health),
+        fillOpacity: 0.8,
+        weight: 1,
+      }}
+    />
+  ))}
+</MarkerClusterGroup>
 )}
 
 </MapContainer>
