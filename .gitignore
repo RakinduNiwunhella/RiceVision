@@ -25,3 +25,7 @@ yarn-error.log*
 GeoData/kurunegala_supabase_final.csv
 *.csv
 data
+
+# Python virtual environment
+venv/
+venv
