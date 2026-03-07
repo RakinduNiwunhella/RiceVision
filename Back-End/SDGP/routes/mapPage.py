@@ -4,7 +4,6 @@ from ..db import supabase
 
 router = APIRouter()
 
-# Mapping UI health names -> DB health names
 HEALTH_MAP = {
     "Healthy": "Normal",
     "Stressed": "Mild Stress",
@@ -17,19 +16,16 @@ async def get_map_fields(
     districts: List[str] = Query(default=[]),
 ):
     try:
-        # Query ML predictions table
-        query = supabase.table("final_ml_predictions").select(
-            "lat, lng, paddy_health, District"
+
+        query = supabase.table("Final_Dataset_Points").select(
+            "lat, lon, paddy_health, district"
         )
 
-        # Always remove Not Applicable
         query = query.neq("paddy_health", "Not Applicable")
 
-        # Filter by district (match DB column name exactly: "District")
         if districts:
-            query = query.in_("District", districts)
+            query = query.in_("district", districts)
 
-        # Filter by health (convert UI values → DB values)
         if health:
             db_health_values = [
                 HEALTH_MAP[h] for h in health if h in HEALTH_MAP
@@ -39,10 +35,20 @@ async def get_map_fields(
 
         response = query.execute()
 
+        data = [
+            {
+                "lat": r["lat"],
+                "lng": r["lon"],
+                "paddy_health": r["paddy_health"],
+                "district": r["district"],
+            }
+            for r in response.data
+        ]
+
         return {
             "status": "success",
-            "count": len(response.data),
-            "data": response.data
+            "count": len(data),
+            "data": data
         }
 
     except Exception as e:

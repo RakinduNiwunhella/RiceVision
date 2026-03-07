@@ -10,24 +10,35 @@ export default function FieldMap() {
     health: [],
   });
 
-  const [layers, setLayers] = useState({
-    paddyExtent: false,
-    showCircles: false,   // ✅ NEW
-    ndvi: false,
-    evi: false,
-    vv: false,
-    vh: false,
-  });
+const [layers, setLayers] = useState({
+  paddyExtent: false,
+  showCircles: false,
+  showSatellite: false,
+  showRoadOverlay: false,
+  roadOpacity: 0.6,
+  ndvi: false,
+  evi: false,
+  vv: false,
+  vh: false,
+});
 
   return (
-    <div className="relative flex gap-4 p-4 h-screen bg-gray-100 dark:bg-gray-900">
-      <FiltersPanel filters={filters} setFilters={setFilters} />
+    <div className="flex flex-col lg:flex-row gap-6 min-h-[calc(100vh-4rem)] p-6">
+      <div className="flex flex-col gap-6 w-full lg:w-auto">
+        <FiltersPanel filters={filters} setFilters={setFilters} />
+      </div>
 
-      <div className="flex-1 bg-gray-200 rounded-xl overflow-hidden">
+      <div className="flex-1 rounded-3xl overflow-hidden glass border-white/20 shadow-2xl h-[80vh]">
         <RiceMap filters={filters} layers={layers} />
       </div>
 
-      <MapLayersPanel layers={layers} setLayers={setLayers} />
+      <div className="flex flex-col gap-6 w-full lg:w-auto">
+        <MapLayersPanel
+  layers={layers}
+  setLayers={setLayers}
+  districtSelected={filters.districts.length > 0}
+/>
+      </div>
     </div>
   );
 }
