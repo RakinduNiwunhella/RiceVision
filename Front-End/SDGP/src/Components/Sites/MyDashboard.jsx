@@ -209,7 +209,7 @@ const MyDashboard = () => {
             </p>
             <div className="flex-1 flex flex-col justify-center py-4">
               <p className="text-6xl font-black text-white tracking-tighter leading-none mb-2" style={{ textShadow: "0 10px 40px rgba(0,0,0,0.5)" }}>
-                {yieldForecast ? formatMT(yieldForecast.total_yield_tons) : "---"}
+                {yieldForecast ? formatMT(yieldForecast.total_yield_kgs) : "---"}
               </p>
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Metric Tons (Est.)</span>
@@ -226,7 +226,7 @@ const MyDashboard = () => {
                       <span className="text-[10px] font-black text-white/20 w-4">{i + 1}</span>
                       <span className="text-xs font-black text-white uppercase tracking-tight group-hover/item:text-cyan-400 transition-colors">{d.District}</span>
                     </div>
-                    <span className="text-xs font-black text-white/80 tabular-nums">{formatMT(d.total_yield_ton_ha)} <span className="text-[10px] text-white/20">t</span></span>
+                    <span className="text-xs font-black text-white/80 tabular-nums">{formatMT(d.total_yield_kg_ha)} <span className="text-[10px] text-white/20">t</span></span>
                   </div>
                 ))}
               </div>
