@@ -15,7 +15,20 @@ export const fetchOutbreaks = () => get("/outbreaks");
 export const fetchNDVITrend = () => get("/ndvi-trend");
 export const fetchDistrictHealth = () => get("/district-health");
 export const fetchReportData = (districts, month) => get(`/api/report-data?districts=${districts}&month=${month}`);
-export const fetchWeather = () => get("/api/weather");
+
+// Called directly from the browser — Open-Meteo is free, no API key needed
+export const fetchWeather = async () => {
+  const url =
+    "https://api.open-meteo.com/v1/forecast" +
+    "?latitude=6.9271&longitude=79.8612" +
+    "&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,precipitation,cloud_cover" +
+    "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max" +
+    "&past_days=7&timezone=auto";
+
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Open-Meteo error: ${res.status}`);
+  return res.json();
+};
 
 export const fetchFaqs = () => get("/api/help/faqs");
 
