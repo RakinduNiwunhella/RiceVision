@@ -164,21 +164,23 @@ async def get_map_overlay(
 
 @router.get("/map-gee-tiles")
 async def get_gee_tiles(
-    type: str = Query(..., description="vv or vh"),
+    type: str = Query(..., description="vv, vh, ndvi, or evi"),
     district: Optional[str] = Query(default=None),
     start_date: Optional[str] = Query(default="2024-01-01"),
     end_date: Optional[str]   = Query(default="2024-04-30"),
 ):
     """
-    Generate a Google Earth Engine XYZ tile URL for Sentinel-1 VV or VH.
+    Generate a Google Earth Engine XYZ tile URL for:
+    - Sentinel-1 SAR: VV or VH backscatter
+    - Sentinel-2 optical: NDVI or EVI vegetation indices
     Requires GEE credentials (env vars GEE_SERVICE_ACCOUNT_EMAIL +
     GEE_SERVICE_ACCOUNT_KEY_FILE, or application-default credentials).
     """
-    band = type.upper()
-    if band not in ("VV", "VH"):
-        raise HTTPException(status_code=400, detail="type must be vv or vh")
+    layer_type = type.lower()
+    if layer_type not in ("vv", "vh", "ndvi", "evi"):
+        raise HTTPException(status_code=400, detail="type must be vv, vh, ndvi, or evi")
 
-    vmin, vmax = OVERLAY_RANGE[type.lower()]
+    vmin, vmax = OVERLAY_RANGE[layer_type]
 
     ee = _get_ee()
     if ee is None:
@@ -190,28 +192,53 @@ async def get_gee_tiles(
         )
 
     try:
-        s1 = (
-            ee.ImageCollection("COPERNICUS/S1_GRD")
-            .filter(ee.Filter.eq("instrumentMode", "IW"))
-            .filter(ee.Filter.listContains("transmitterReceiverPolarisation", band))
-            .filter(ee.Filter.eq("orbitProperties_pass", "DESCENDING"))
-            .filterDate(start_date, end_date)
-            .select(band)
-            .mean()
-        )
+        if layer_type in ("vv", "vh"):
+            band = layer_type.upper()
+            image = (
+                ee.ImageCollection("COPERNICUS/S1_GRD")
+                .filter(ee.Filter.eq("instrumentMode", "IW"))
+                .filter(ee.Filter.listContains("transmitterReceiverPolarisation", band))
+                .filter(ee.Filter.eq("orbitProperties_pass", "DESCENDING"))
+                .filterDate(start_date, end_date)
+                .select(band)
+                .mean()
+            )
+            palette = ["#000080", "#0000ff", "#00ffff", "#ffff00", "#ff0000"]
 
-        vis = {
-            "min": vmin,
-            "max": vmax,
-            "palette": ["#000080", "#0000ff", "#00ffff", "#ffff00", "#ff0000"],
-        }
+        elif layer_type == "ndvi":
+            s2 = (
+                ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
+                .filterDate(start_date, end_date)
+                .filter(ee.Filter.lt("CLOUDY_PIXEL_PERCENTAGE", 20))
+                .median()
+            )
+            image = s2.normalizedDifference(["B8", "B4"]).rename("NDVI")
+            palette = ["#7f2700", "#d4a017", "#aaff44", "#228b22", "#004d00"]
 
-        map_id = s1.getMapId(vis)
+        else:  # evi
+            s2 = (
+                ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
+                .filterDate(start_date, end_date)
+                .filter(ee.Filter.lt("CLOUDY_PIXEL_PERCENTAGE", 20))
+                .median()
+            )
+            image = s2.expression(
+                "2.5 * ((NIR - RED) / (NIR + 6.0 * RED - 7.5 * BLUE + 1.0))",
+                {
+                    "NIR":  s2.select("B8").divide(10000),
+                    "RED":  s2.select("B4").divide(10000),
+                    "BLUE": s2.select("B2").divide(10000),
+                },
+            ).rename("EVI")
+            palette = ["#7f2700", "#d4a017", "#aaff44", "#228b22", "#004d00"]
+
+        vis = {"min": vmin, "max": vmax, "palette": palette}
+        map_id = image.getMapId(vis)
         tile_url: str = map_id["tile_fetcher"].url_format
 
         return {
             "status": "success",
-            "band": band,
+            "type": layer_type,
             "tile_url": tile_url,
             "vmin": vmin,
             "vmax": vmax,

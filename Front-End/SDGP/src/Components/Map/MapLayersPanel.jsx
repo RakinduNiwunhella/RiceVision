@@ -1,3 +1,5 @@
+const OVERLAY_KEYS = ["ndvi", "evi", "vv", "vh"];
+
 export default function MapLayersPanel({ layers, setLayers, districtSelected }) {
 
   const toggleLayer = (layer) => {
@@ -11,6 +13,13 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
       // If satellite is turned OFF → disable road overlay
       if (layer === "showSatellite" && prev.showSatellite === true) {
         updated.showRoadOverlay = false;
+      }
+
+      // Only one overlay at a time — turning one ON turns the rest OFF
+      if (OVERLAY_KEYS.includes(layer) && !prev[layer]) {
+        OVERLAY_KEYS.forEach((k) => {
+          if (k !== layer) updated[k] = false;
+        });
       }
 
       return updated;

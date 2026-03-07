@@ -1,7 +1,7 @@
 import { MapContainer, TileLayer, CircleMarker, GeoJSON, Tooltip } from "react-leaflet";
 import { useEffect, useState, useRef } from "react";
 import L from "leaflet";
-import { fetchMapFields, fetchMapOverlay, fetchGEETileUrl } from "../../api/api";
+import { fetchMapFields, fetchGEETileUrl } from "../../api/api";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import "react-leaflet-cluster/dist/assets/MarkerCluster.css";
 import "react-leaflet-cluster/dist/assets/MarkerCluster.Default.css";
@@ -84,11 +84,11 @@ export default function RiceMap({ filters, layers }) {
   const [paddyGeo, setPaddyGeo] = useState(null);
   const [districtBoundary, setDistrictBoundary] = useState(null);
 
-  // Overlay data for NDVI / EVI (per-point values from Supabase)
-  const [ndviData, setNdviData] = useState([]);
-  const [eviData,  setEviData]  = useState([]);
-
-  // GEE tile URLs for Sentinel-1 VV / VH
+  // GEE tile URLs for all overlays (Sentinel-2 NDVI/EVI + Sentinel-1 VV/VH)
+  const [ndviTileUrl, setNdviTileUrl] = useState(null);
+  const [eviTileUrl,  setEviTileUrl]  = useState(null);
+  const [ndviError,   setNdviError]   = useState(null);
+  const [eviError,    setEviError]    = useState(null);
   const [vvTileUrl, setVvTileUrl] = useState(null);
   const [vhTileUrl, setVhTileUrl] = useState(null);
   const [vvError,   setVvError]   = useState(null);
@@ -157,28 +157,32 @@ export default function RiceMap({ filters, layers }) {
 
   }, [districtBoundary]);
 
-  /* ---------- LOAD NDVI OVERLAY ---------- */
+  /* ---------- LOAD NDVI TILE (GEE Sentinel-2) ---------- */
 
   useEffect(() => {
     if (!selectedDistrict || !layers.ndvi) {
-      setNdviData([]);
+      setNdviTileUrl(null);
+      setNdviError(null);
       return;
     }
-    fetchMapOverlay({ type: "ndvi", districts: [selectedDistrict] })
-      .then((res) => setNdviData(res.data))
-      .catch((err) => { console.error("NDVI overlay:", err); setNdviData([]); });
+    setNdviError(null);
+    fetchGEETileUrl({ type: "ndvi", district: selectedDistrict })
+      .then((res) => setNdviTileUrl(res.tile_url))
+      .catch((err) => { setNdviTileUrl(null); setNdviError(err.message); });
   }, [selectedDistrict, layers.ndvi]);
 
-  /* ---------- LOAD EVI OVERLAY ---------- */
+  /* ---------- LOAD EVI TILE (GEE Sentinel-2) ---------- */
 
   useEffect(() => {
     if (!selectedDistrict || !layers.evi) {
-      setEviData([]);
+      setEviTileUrl(null);
+      setEviError(null);
       return;
     }
-    fetchMapOverlay({ type: "evi", districts: [selectedDistrict] })
-      .then((res) => setEviData(res.data))
-      .catch((err) => { console.error("EVI overlay:", err); setEviData([]); });
+    setEviError(null);
+    fetchGEETileUrl({ type: "evi", district: selectedDistrict })
+      .then((res) => setEviTileUrl(res.tile_url))
+      .catch((err) => { setEviTileUrl(null); setEviError(err.message); });
   }, [selectedDistrict, layers.evi]);
 
   /* ---------- LOAD VV TILE (GEE) ---------- */
@@ -311,52 +315,24 @@ export default function RiceMap({ filters, layers }) {
   <GeoJSON data={paddyGeo} style={paddyStyle} />
 )}
 
-{/* ---------- NDVI OVERLAY ---------- */}
+{/* ---------- NDVI TILE (GEE Sentinel-2) ---------- */}
 
-{layers.ndvi && ndviData.length > 0 && (
-  <>
-    {ndviData.map((p, i) => (
-      <CircleMarker
-        key={`ndvi-${i}`}
-        center={[p.lat, p.lng]}
-        radius={4}
-        pathOptions={{
-          color: "transparent",
-          fillColor: interpolateColor(NDVI_STOPS, p.norm),
-          fillOpacity: overlayOpacity,
-          weight: 0,
-        }}
-      >
-        <Tooltip sticky>
-          <span className="text-xs">NDVI: {p.value.toFixed(3)}</span>
-        </Tooltip>
-      </CircleMarker>
-    ))}
-  </>
+{layers.ndvi && ndviTileUrl && (
+  <TileLayer
+    url={ndviTileUrl}
+    opacity={overlayOpacity}
+    attribution="Sentinel-2 NDVI © Copernicus / Google Earth Engine"
+  />
 )}
 
-{/* ---------- EVI OVERLAY ---------- */}
+{/* ---------- EVI TILE (GEE Sentinel-2) ---------- */}
 
-{layers.evi && eviData.length > 0 && (
-  <>
-    {eviData.map((p, i) => (
-      <CircleMarker
-        key={`evi-${i}`}
-        center={[p.lat, p.lng]}
-        radius={4}
-        pathOptions={{
-          color: "transparent",
-          fillColor: interpolateColor(NDVI_STOPS, p.norm),
-          fillOpacity: overlayOpacity,
-          weight: 0,
-        }}
-      >
-        <Tooltip sticky>
-          <span className="text-xs">EVI: {p.value.toFixed(3)}</span>
-        </Tooltip>
-      </CircleMarker>
-    ))}
-  </>
+{layers.evi && eviTileUrl && (
+  <TileLayer
+    url={eviTileUrl}
+    opacity={overlayOpacity}
+    attribution="Sentinel-2 EVI © Copernicus / Google Earth Engine"
+  />
 )}
 
 {/* ---------- VV TILE (GEE Sentinel-1) ---------- */}
