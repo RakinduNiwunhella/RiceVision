@@ -29,3 +29,7 @@ data
 __pycache__/
 *.py[cod]
 *.pyc
+venv/
+.venv/
+*.py[cod]
+*.pyc
