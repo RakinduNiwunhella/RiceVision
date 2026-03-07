@@ -1,36 +1,80 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { fetchAlerts, updateAlertStatus } from "../../api/api";
+import { updateAlertStatus } from "../../api/api";
 
-const tabOptions = ["Open", "Resolved", "Denied", "All"];
+const tabOptions = ["Disasters", "Pest Risks"];
 
 const Alerts = () => {
   const [alerts, setAlerts] = useState([]);
-  const [activeTab, setActiveTab] = useState("Open");
+  const [activeTab, setActiveTab] = useState("Disasters");
   const [searchTerm, setSearchTerm] = useState("");
   const [updatingId, setUpdatingId] = useState(null);
 
   const filteredAlerts = useMemo(() => {
+    const normalizedSearch = searchTerm.toLowerCase();
+
     return alerts.filter((alert) => {
-      const matchesTab = activeTab === "All" || alert.status === activeTab;
+      const title = (alert.title ?? "").toLowerCase();
+      const description = (alert.description ?? "").toLowerCase();
+
       const matchesSearch =
-        alert.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        alert.description.toLowerCase().includes(searchTerm.toLowerCase());
-      return matchesTab && matchesSearch;
+        title.includes(normalizedSearch) || description.includes(normalizedSearch);
+
+      return matchesSearch;
     });
-  }, [alerts, activeTab, searchTerm]);
+  }, [alerts, searchTerm]);
 
   useEffect(() => {
     const loadAlerts = async () => {
       try {
-        const data = await fetchAlerts();
-        setAlerts(data);
+        const isDisasters = activeTab === "Disasters";
+        const endpoint = isDisasters
+          ? "/api/alerts/disasters"
+          : "/api/alerts/pest-risk";
+
+        const response = await fetch(endpoint);
+
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch ${isDisasters ? "disaster" : "pest risk"} alerts: ${response.status}`,
+          );
+        }
+
+        const data = await response.json();
+
+        if (isDisasters) {
+          const mappedAlerts = (Array.isArray(data) ? data : []).map((a) => ({
+            id: a.id,
+            title: `${a.disaster_type} risk`,
+            description: `Stage: ${a.stage} | Health: ${a.health}`,
+            status: "Open",
+            priority: "High",
+            field: a.district,
+            timestamp: a.timestamp,
+            lat: a.lat,
+            lon: a.lon,
+          }));
+
+          setAlerts(mappedAlerts);
+        } else {
+          const mappedAlerts = (Array.isArray(data) ? data : []).map((a, index) => ({
+            id: a.id ?? index,
+            title: a.title ?? a.pest_type ?? "Pest Risk Alert",
+            description: a.description ?? a.details ?? "",
+            status: "Open",
+            priority: a.priority ?? a.risk_level ?? "Medium",
+            field: a.field ?? a.location ?? a.district ?? "Unknown Field",
+            timestamp: a.timestamp ?? a.created_at ?? new Date().toISOString(),
+          }));
+
+          setAlerts(mappedAlerts);
+        }
       } catch (err) {
         console.error("Error fetching alerts:", err);
       }
     };
 
     loadAlerts();
-  }, []);
+  }, [activeTab]);
 
   const counts = useMemo(() => {
     const countObj = { Open: 0, Resolved: 0, Denied: 0 };
@@ -110,7 +154,7 @@ const Alerts = () => {
         {/* Search & Tabs Glass Container */}
         <div className="glass glass-hover p-6 rounded-[2rem] shadow-xl border-white/20">
           <div className="flex flex-col lg:flex-row gap-6 justify-between">
-            {/* Custom Tabs */}
+            {/* Category Tabs */}
             <div className="flex p-1 rounded-2xl bg-white/5 border border-white/10 w-fit">
               {tabOptions.map((tab) => (
                 <button
@@ -121,7 +165,7 @@ const Alerts = () => {
                     : "text-white/40 hover:text-white/70"
                     }`}
                 >
-                  {tab} <span className="ml-1 opacity-50 px-1.5 py-0.5 rounded-md bg-white/5">{counts[tab]}</span>
+                  {tab}
                 </button>
               ))}
             </div>
@@ -168,11 +212,11 @@ const Alerts = () => {
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative z-10">
                 <div className="space-y-1">
                   <div className="flex items-center gap-3">
-                    <h2 className="text-xl font-black text-white group-hover:text-emerald-400 transition">{alert.title}</h2>
+                    <h2 className="text-xl font-black text-white group-hover:text-emerald-400 transition">{alert.title ?? ""}</h2>
                     <span className="px-2 py-0.5 rounded-md bg-white/5 text-[10px] font-black uppercase text-white/40 border border-white/5">{alert.field}</span>
                   </div>
                   <p className="text-white/60 text-sm leading-relaxed max-w-3xl">
-                    {alert.description}
+                    {alert.description ?? ""}
                   </p>
                   <div className="flex items-center gap-4 mt-4">
                     <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-white/30">
