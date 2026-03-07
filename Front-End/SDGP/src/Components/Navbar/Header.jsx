@@ -1,9 +1,29 @@
-import React from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import logo from '../assets/logo.png'
 
+import Notifications from '../Notifications/Notifications'
+
 const Header = () => {
   const location = useLocation()
+  const [showNotifications, setShowNotifications] = useState(false)
+  const [unreadCount, setUnreadCount] = useState(0)
+
+  useEffect(() => {
+    // Fetch unread notifications count when component mounts
+    async function fetchUnreadCount() {
+      try {
+        const response = await fetch('/api/notifications/unread-count')
+        if (response.ok) {
+          const data = await response.json()
+          setUnreadCount(data.unreadCount || 0)
+        }
+      } catch (error) {
+        console.error('Failed to fetch unread notifications count:', error)
+      }
+    }
+    fetchUnreadCount()
+  }, [])
 
   const navItems = [
     { label: 'Dashboard', icon: 'apps', path: '/dashboard' },
@@ -13,6 +33,12 @@ const Header = () => {
     { label: 'Report', icon: 'bar_chart', path: '/report' },
     { label: 'Help', icon: 'help', path: '/help' },
   ]
+
+  // Handler to close notifications panel and reset unread count
+  const handleCloseNotifications = () => {
+    setShowNotifications(false)
+    setUnreadCount(0)
+  }
 
   return (
     <nav className="fixed top-4 left-1/2 -translate-x-1/2 w-[calc(100%-3rem)] max-w-7xl z-50 glass h-14 rounded-2xl shadow-2xl border-white/20">
@@ -70,16 +96,22 @@ const Header = () => {
             </div>
 
             {/* Actions */}
-            <div className="flex items-center gap-1.5 border-l border-white/10 pl-3">
-              <Link
-                to="/alerts"
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition"
+            <div className="flex items-center gap-1.5 border-l border-white/10 pl-3 relative">
+              <button
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition relative"
                 title="Notifications"
               >
                 <span className="material-symbols-outlined text-[20px]">
                   notifications
                 </span>
-              </Link>
+                {unreadCount > 0 && (
+                  <span className="absolute top-0 right-0 -translate-x-1/2 translate-y-1/2 bg-emerald-500 text-white text-[10px] font-bold rounded-full px-1.5 leading-none animate-pulse select-none pointer-events-none">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+              {showNotifications && <Notifications onClose={handleCloseNotifications} />}
             </div>
 
             {/* Avatar */}
