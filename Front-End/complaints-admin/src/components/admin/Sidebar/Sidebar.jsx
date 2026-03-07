@@ -7,6 +7,7 @@ import { supabase } from "@/services/client";
 const navItems = [
   { id: "", label: "Dashboard", icon: "dashboard" },
   { id: "complaints", label: "Complaints", icon: "report_problem" },
+  { id: "admin-notifications", label: "Notifications", icon: "notifications" },
   { id: "analytics", label: "Analytics", icon: "analytics" },
   { id: "settings", label: "Settings", icon: "settings" },
 ];

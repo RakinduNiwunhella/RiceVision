@@ -7,6 +7,7 @@ import AnalyticsPage from "./components/pages/AnalyticsPage";
 import SettingsPage from "./components/pages/SettingsPage";
 import LoginPage from "./components/pages/LoginPage";
 import AdminRoute from "./components/auth/AdminRoute";
+import AdminNotifications from "./components/pages/AdminNotifications";
 
 function ComplaintsPage() {
   const { complaints, loading } = useComplaints();
@@ -41,6 +42,7 @@ export default function App() {
       >
         <Route index element={<Dashboard />} />
         <Route path="complaints" element={<ComplaintsPage />} />
+        <Route path="admin-notifications" element={<AdminNotifications />} />
         <Route path="analytics" element={<AnalyticsPage />} />
         <Route path="settings" element={<SettingsPage />} />
       </Route>
