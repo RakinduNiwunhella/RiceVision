@@ -17,8 +17,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",           # local React dev
-        "https://ricevision-frontend.onrender.com",  # deployed frontend (change to your real frontend URL)
-        "*"                                # temporary: allow all during testing
+        "https://ricevision-cakt.onrender.com",  # deployed frontend (change to your real frontend URL)
+                                     # temporary: allow all during testing
     ],
     allow_credentials=True,
     allow_methods=["*"],

@@ -20,19 +20,15 @@ async def get_field_summary():
 
 
 # 2️⃣ Get District Table Data
+
 @router.get("/districts")
 async def get_district_health_summary():
     try:
-        response = (
-            supabase
-            .table("district_health_summary")
-            .select("*")
-            .order("total_yield_tons", desc=True)
-            .execute()
-        )
+        response = supabase.table("district_health_summary").select("*").execute()
+        return response.data
 
-        if response.data is None:
-            raise HTTPException(status_code=404, detail="No district data found")
+        if response.error:
+            raise HTTPException(status_code=500, detail=response.error.message)
 
         return response.data
 

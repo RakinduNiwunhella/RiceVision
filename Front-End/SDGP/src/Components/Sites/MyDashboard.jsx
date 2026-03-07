@@ -19,7 +19,6 @@ import {
   fetchYield,
   fetchBestDistricts,
   fetchOutbreaks,
-  fetchNDVITrend,
   fetchDistrictHealth
 } from "../../api/api";
 
@@ -68,7 +67,6 @@ const MyDashboard = () => {
   const [yieldForecast, setYieldForecast] = useState(null);
   const [bestYieldDistricts, setBestYieldDistricts] = useState([]);
   const [outbreaks, setOutbreaks] = useState([]);
-  const [ndviTrend, setNdviTrend] = useState([]);
   const [showAllOutbreaks, setShowAllOutbreaks] = useState(false);
   const [districtHealth, setDistrictHealth] = useState([]);
   const [showAllDistricts, setShowAllDistricts] = useState(false);
@@ -86,22 +84,20 @@ const MyDashboard = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [health, yld, best, out, ndvi, dist] = await Promise.all([
+        const [health, yld, best, out, dist] = await Promise.all([
           fetchHealthSummary(),
           fetchYield(),
           fetchBestDistricts(),
           fetchOutbreaks(),
-          fetchNDVITrend(),
           fetchDistrictHealth()
         ]);
         setHealthSummary(health);
         setYieldForecast(yld);
         setBestYieldDistricts(best);
         setOutbreaks(out);
-        setNdviTrend(ndvi);
         setDistrictHealth(dist);
       } catch (err) {
-        console.error("Dashboard synchronization error:", err);
+        console.error("Dashboard synchronisation error:", err);
       }
     };
     loadData();
@@ -133,10 +129,10 @@ const MyDashboard = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
             <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
-              Command Center
+              Welcome to RiceVision 
             </h1>
             <p className="text-white/40 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em]">
-              Real-Time Agricultural Intelligence System
+              Insights of smarter farming
             </p>
           </div>
 
@@ -153,7 +149,7 @@ const MyDashboard = () => {
           <div className="glass glass-hover p-8 rounded-[3rem] border border-white/10 shadow-2xl flex flex-col items-center">
             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-8 self-start flex items-center gap-2">
               <span className="material-symbols-outlined text-emerald-400 text-sm">radiology</span>
-              Health Topology
+              Crop Health Distribution
             </p>
             <div className="w-full aspect-square max-h-[240px] relative">
               {healthSummary ? (
@@ -184,7 +180,7 @@ const MyDashboard = () => {
                 </ResponsiveContainer>
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center text-white/20 animate-pulse text-xs font-black uppercase tracking-widest">
-                  Analyzing...
+                  Analysing...
                 </div>
               )}
               {/* Center stats */}
@@ -212,7 +208,7 @@ const MyDashboard = () => {
             </p>
             <div className="flex-1 flex flex-col justify-center py-4">
               <p className="text-6xl font-black text-white tracking-tighter leading-none mb-2" style={{ textShadow: "0 10px 40px rgba(0,0,0,0.5)" }}>
-                {yieldForecast ? formatMT(yieldForecast.total_yield_tons) : "---"}
+                {yieldForecast ? formatMT(yieldForecast.total_yield_kgs) : "---"}
               </p>
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Metric Tons (Est.)</span>
@@ -229,7 +225,7 @@ const MyDashboard = () => {
                       <span className="text-[10px] font-black text-white/20 w-4">{i + 1}</span>
                       <span className="text-xs font-black text-white uppercase tracking-tight group-hover/item:text-cyan-400 transition-colors">{d.District}</span>
                     </div>
-                    <span className="text-xs font-black text-white/80 tabular-nums">{formatMT(d.total_yield_ton_ha)} <span className="text-[10px] text-white/20">t</span></span>
+                    <span className="text-xs font-black text-white/80 tabular-nums">{formatMT(d.total_yield_kg_ha)} <span className="text-[10px] text-white/20">t</span></span>
                   </div>
                 ))}
               </div>
@@ -270,12 +266,12 @@ const MyDashboard = () => {
           <div className="p-8 border-b border-white/10 flex justify-between items-center">
             <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/40 flex items-center gap-3">
               <span className="material-symbols-outlined text-rose-500">sensors</span>
-              Active Threat Matrix
+              Disease & Disaster Outbreak
             </h2>
             <div className="flex items-center gap-4">
-              <span className="text-[10px] font-black text-white/20 uppercase tracking-widest animate-pulse">Scanning...</span>
+              <span className="text-[10px] font-black text-white/20 uppercase tracking-widest animate-pulse">Checking Fields...</span>
               <div className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase text-white/60">
-                {outbreaks.length} Incidents Locked
+                {outbreaks.length} Alerts Detected
               </div>
             </div>
           </div>
@@ -300,7 +296,7 @@ const MyDashboard = () => {
                   </div>
                 </div>
                 <button className="text-[10px] font-black uppercase tracking-[0.2em] rounded-xl px-6 py-2.5 border border-white/10 text-white/40 hover:text-white hover:border-white/40 hover:bg-white/5 transition-all active:scale-95">
-                  Intelligence
+                  View Details
                 </button>
               </div>
             ))}
@@ -312,7 +308,7 @@ const MyDashboard = () => {
                 onClick={() => setShowAllOutbreaks(!showAllOutbreaks)}
                 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 hover:text-white transition-colors flex items-center gap-2"
               >
-                {showAllOutbreaks ? "Compress Matrix" : `Expand Full Matrix (${outbreaks.length} Nodes)`}
+                {showAllOutbreaks ? "Show Less" : `Show All  (${outbreaks.length} )`}
                 <span className="material-symbols-outlined text-sm">{showAllOutbreaks ? 'keyboard_double_arrow_up' : 'keyboard_double_arrow_down'}</span>
               </button>
             </div>
@@ -322,65 +318,11 @@ const MyDashboard = () => {
         {/* ── Analytical Depth Row ── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-12">
 
-          {/* National NDVI Trend */}
-          <div className="glass glass-hover p-8 rounded-[3rem] border border-white/10 shadow-2xl">
-            <div className="flex justify-between items-start mb-10">
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-2 flex items-center gap-2">
-                  <span className="material-symbols-outlined text-emerald-400 text-sm">monitoring</span>
-                  Chronological Intensity
-                </p>
-                <h3 className="text-xl font-black text-white tracking-tight uppercase">National NDVI Flux</h3>
-              </div>
-              <div className="text-right">
-                <span className="text-2xl font-black text-emerald-400">0.842</span>
-                <p className="text-[8px] font-black text-white/20 uppercase tracking-[0.2em]">Peak Signal</p>
-              </div>
-            </div>
-
-            <div className="w-full h-44 mb-10">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={ndviTrend}>
-                  <defs>
-                    <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <XAxis dataKey="day" hide />
-                  <YAxis domain={[0, 1]} hide />
-                  <Tooltip
-                    cursor={{ stroke: "rgba(255,255,255,0.1)", strokeWidth: 2 }}
-                    contentStyle={{
-                      background: "rgba(0,0,0,0.8)",
-                      backdropFilter: "blur(20px)",
-                      border: "1px solid rgba(255,255,255,0.1)",
-                      borderRadius: "15px",
-                      padding: "10px 15px",
-                    }}
-                    labelStyle={{ color: "rgba(255,255,255,0.4)", fontSize: "9px", textTransform: 'uppercase', fontWeight: 900, marginBottom: '4px' }}
-                    itemStyle={{ color: "#10b981", fontSize: "12px", fontWeight: 900 }}
-                    formatter={(value) => [`${value.toFixed(3)}`, "SIGNAL INTENSITY"]}
-                  />
-                  <Line type="monotone" dataKey="value" stroke="#10b981" strokeWidth={4} dot={false} animationDuration={2000} fillOpacity={1} fill="url(#colorValue)" />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-
-            {healthSummary && (
-              <div className="space-y-6 pt-4 border-t border-white/5">
-                <ProgressWidget label="Optimal Saturation" value={healthSummary.normal_pct} color="green" />
-                <ProgressWidget label="Minor Deviation" value={healthSummary.mild_stress_pct} color="yellow" />
-                <ProgressWidget label="Critical Variance" value={healthSummary.severe_stress_pct} color="blue" />
-              </div>
-            )}
-          </div>
-
-          {/* Regional Health Ledger */}
+          {/* Regional Health Overview */}
           <div className="glass glass-hover p-8 rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-2 flex items-center gap-2">
               <span className="material-symbols-outlined text-cyan-400 text-sm">map</span>
-              Regional Granularity
+              District Overview
             </p>
             <h3 className="text-xl font-black text-white tracking-tight uppercase mb-8">District Health Status</h3>
 
@@ -413,7 +355,7 @@ const MyDashboard = () => {
                 onClick={() => setShowAllDistricts(!showAllDistricts)}
                 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 hover:text-white transition-colors"
               >
-                {showAllDistricts ? "Contract Ledger" : `Expand Ledger (${districtHealth.length} Items)`}
+              {showAllDistricts ? "Show Less" : `Show All (${districtHealth.length} Items)`}
               </button>
             </div>
           </div>
