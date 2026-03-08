@@ -349,7 +349,7 @@ const MyDashboard = () => {
 
                   {/* Bar chart */}
                   <div className="flex-1">
-                    <ResponsiveContainer width="100%" height={220}>
+                    <ResponsiveContainer width="100%" height={320}>
                       <BarChart data={stageDistribution} margin={{ top: 5, right: 5, left: -10, bottom: 40 }}>
                         <XAxis
                           dataKey="stage_name"
