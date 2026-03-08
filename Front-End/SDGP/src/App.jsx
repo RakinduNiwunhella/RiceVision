@@ -1,7 +1,7 @@
 import React from 'react'
 import Header from './Components/Navbar/Header'
 import { Outlet } from 'react-router-dom'
-import bgImage from './Components/assets/user_paddy_bg_v6.jpg'
+import bgImage from '/src/Components/assets/field1.jpg'
 import YieldChatbot from './Components/chatbot/Yieldchatbot'
 
 const App = () => {

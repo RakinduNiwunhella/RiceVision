@@ -28,7 +28,13 @@ export default function FiltersPanel({ filters, setFilters }) {
     "Vavuniya",
   ];
 
-  const healthStatuses = ["Healthy", "Stressed", "Damaged"];
+  const healthStatuses = [
+  "Healthy",
+  "Normal",
+  "Mild Stress",
+  "Severe Stress",
+  "Not Applicable",
+];
 
   const toggleArrayValue = (key, value) => {
     setFilters((prev) => {
