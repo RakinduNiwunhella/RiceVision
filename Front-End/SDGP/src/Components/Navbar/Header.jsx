@@ -1,9 +1,11 @@
 import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import logo from '../assets/logo.png'
+import { useTheme } from '../../context/ThemeContext'
 
 const Header = () => {
   const location = useLocation()
+  const { isDark, toggleTheme } = useTheme()
 
   const navItems = [
     { label: 'Dashboard', icon: 'apps', path: '/dashboard' },
@@ -72,6 +74,17 @@ const Header = () => {
 
             {/* Actions */}
             <div className="flex items-center gap-1.5 border-l border-white/10 pl-3">
+              {/* Dark mode toggle */}
+              <button
+                onClick={toggleTheme}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition"
+                title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              >
+                <span className="material-symbols-outlined text-[20px]">
+                  {isDark ? 'light_mode' : 'dark_mode'}
+                </span>
+              </button>
+
               <Link
                 to="/alerts"
                 className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition"
