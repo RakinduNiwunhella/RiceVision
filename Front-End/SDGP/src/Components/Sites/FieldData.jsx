@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "../../supabaseClient"; // adjust path if needed
 
 const healthColor = (health) => {
@@ -15,9 +16,16 @@ const healthColor = (health) => {
 };
 
 const FieldData = () => {
+  const navigate = useNavigate();
+
   const [stats, setStats] = useState([]);
   const [districtData, setDistrictData] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const handleViewMap = (district) => {
+    // navigate to map page and filter/zoom to the selected district
+    navigate("/field-map", { state: { district } });
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -137,6 +145,7 @@ const FieldData = () => {
                   <th className="px-6 py-6 text-left font-black">Critical</th>
                   <th className="px-6 py-6 text-left font-black">Avg Yield (kg/ha)</th>
                   <th className="px-8 py-6 text-right font-black">Total Yield (kg)</th>
+                  <th className="px-6 py-6 text-center font-black">Action</th>
                 </tr>
               </thead>
 
@@ -179,6 +188,14 @@ const FieldData = () => {
                     <td className="px-8 py-5 text-right">
                       <span className="text-lg font-black text-white">{Number(d.total_yield_kg).toLocaleString()}</span>
                       <span className="ml-1 text-[10px] text-white/40 uppercase font-black">kg</span>
+                    </td>
+                    <td className="px-6 py-5 text-center">
+                      <button
+                        onClick={() => handleViewMap(d.district)}
+                        className="glass-btn text-xs uppercase tracking-widest bg-white/10 hover:bg-white/20"
+                      >
+                        View Map
+                      </button>
                     </td>
                   </tr>
                 ))}
