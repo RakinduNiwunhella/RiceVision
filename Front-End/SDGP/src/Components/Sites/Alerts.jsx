@@ -14,6 +14,8 @@ const Alerts = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [updatingId, setUpdatingId] = useState(null);
 
+  const navigate = useNavigate();
+
   const filteredAlerts = useMemo(() => {
     const normalizedSearch = searchTerm.toLowerCase();
 
@@ -55,6 +57,8 @@ const Alerts = () => {
 
         const data = await response.json();
 
+        /* ---------------- DISASTER ALERTS ---------------- */
+
         if (isDisaster) {
           const mappedAlerts = (Array.isArray(data) ? data : []).map((a) => ({
             id: a.id,
@@ -63,14 +67,18 @@ const Alerts = () => {
             status: "Open",
             priority: "High",
             field: a.district,
-            health: a.health,
+            health: a.health, // IMPORTANT
             timestamp: a.timestamp,
             lat: a.lat,
             lon: a.lon,
           }));
 
           setAlerts(mappedAlerts);
-        } else {
+        }
+
+        /* ---------------- PEST ALERTS ---------------- */
+
+        else {
           const mappedAlerts = (Array.isArray(data) ? data : [])
             .filter((a) => a.risky_pixels > 0)
             .map((a, index) => ({
@@ -80,14 +88,13 @@ const Alerts = () => {
               status: "Open",
               priority: "High",
               field: a.district,
-              health: a.health,
+              health: a.health || "Not Applicable", // IMPORTANT
               count: a.risky_pixels,
               locations: a.risky_pixel_locations || [],
               timestamp: new Date().toISOString(),
             }));
 
           setAlerts(mappedAlerts);
-          console.log("Received health:", state?.health);
         }
       } catch (err) {
         console.error("Error fetching alerts:", err);
@@ -138,21 +145,26 @@ const Alerts = () => {
     }
   };
 
-  const navigate = useNavigate();
-
   const handleResolve = (id) => updateStatus(id, "Resolved");
   const handleDeny = (id) => updateStatus(id, "Denied");
 
+  /* ---------------- MAP NAVIGATION ---------------- */
+
   const handleViewInMap = (alert) => {
+    /* Pest risk */
     if (activeTab === "Pest Risks" && alert.locations?.length > 0) {
       navigate("/field-map", {
         state: {
           type: "pest",
           district: alert.field,
           locations: alert.locations,
+          health: alert.health, // send health
         },
       });
-    } else if (alert.lat != null && alert.lon != null) {
+    }
+
+    /* Disaster risk */
+    else if (alert.lat != null && alert.lon != null) {
       navigate("/field-map", {
         state: {
           type: "disaster",
@@ -214,8 +226,8 @@ const Alerts = () => {
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={`px-5 py-2 rounded-xl text-xs font-bold transition-all ${activeTab === tab
-                    ? "bg-white/15 text-white"
-                    : "text-white/40 hover:text-white/70"
+                      ? "bg-white/15 text-white"
+                      : "text-white/40 hover:text-white/70"
                     }`}
                 >
                   {tab}
@@ -233,7 +245,7 @@ const Alerts = () => {
           </div>
         </div>
 
-        {/* Alerts List */}
+        {/* Alerts */}
         <div className="space-y-6">
 
           {filteredAlerts.length === 0 && (
@@ -254,7 +266,12 @@ const Alerts = () => {
                 <div>
                   <h2 className="text-xl font-black text-emerald-400">
                     {activeTab === "Pest Risks" && alert.count != null ? (
-                      <>{alert.field} : <span className="text-red-500">{alert.count} RISKS</span> </>
+                      <>
+                        {alert.field} •{" "}
+                        <span className="text-red-500">
+                          {alert.count} RISKS
+                        </span>
+                      </>
                     ) : (
                       alert.title
                     )}
