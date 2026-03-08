@@ -227,11 +227,20 @@ export default function RiceMap({ filters, layers }) {
 
     const loadPoints = async () => {
       try {
-
-        const data = await fetchMapFields({
+        let data = await fetchMapFields({
           districts: [selectedDistrict],
           health: selectedHealth,
         });
+
+        // defensive client-side filtering: ensure only the chosen
+        // health status is shown, since backend filtering may sometimes
+        // misfire or be case-sensitive.
+        if (selectedHealth && selectedHealth.length === 1) {
+          const wanted = selectedHealth[0].toLowerCase();
+          data = data.filter(
+            (p) => String(p.paddy_health).toLowerCase() === wanted
+          );
+        }
 
         setPoints(data);
 
