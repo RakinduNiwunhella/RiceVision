@@ -29,7 +29,8 @@ export default function FiltersPanel({ filters, setFilters }) {
   ];
 
   const healthStatuses = [
-  "Healthy" || "Normal",
+  "Healthy",
+  "Normal",
   "Mild Stress",
   "Severe Stress",
   "Not Applicable",
