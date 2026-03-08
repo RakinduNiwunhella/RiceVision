@@ -1,13 +1,21 @@
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import FiltersPanel from "../Map/FiltersPanel";
 import MapLayersPanel from "../Map/MapLayersPanel";
 import RiceMap from "../Map/RiceMap";
 
 export default function FieldMap() {
+  const { state } = useLocation();
+  const flyTo = state?.type ? state : null;
+
+  // Auto-select district and crop condition from navigation state
+  const initialDistrict = state?.district ? [state.district] : [];
+  const initialHealth   = state?.health   ? [state.health]   : [];
+
   const [filters, setFilters] = useState({
-    districts: [],
+    districts: initialDistrict,
     season: "all",
-    health: [],
+    health: initialHealth,
   });
 
 const [layers, setLayers] = useState({
@@ -30,7 +38,7 @@ const [layers, setLayers] = useState({
       </div>
 
       <div className="flex-1 rounded-3xl overflow-hidden glass border-white/20 shadow-2xl h-[80vh]">
-        <RiceMap filters={filters} layers={layers} />
+        <RiceMap filters={filters} layers={layers} flyTo={flyTo} />
       </div>
 
       <div className="flex flex-col gap-6 w-full lg:w-auto">
