@@ -20,6 +20,7 @@ const [layers, setLayers] = useState({
   evi: false,
   vv: false,
   vh: false,
+  overlayOpacity: 0.75,
 });
 
   return (

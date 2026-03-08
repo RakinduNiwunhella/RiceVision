@@ -173,6 +173,7 @@ export default function YieldChatbot() {
             <button
                 onClick={() => setIsOpen((o) => !o)}
                 title="Yield Assistant"
+                className="chatbot-fab"
                 style={styles.fab}
             >
                 {isOpen ? (
@@ -208,7 +209,7 @@ export default function YieldChatbot() {
                     </div>
 
                     {/* Messages */}
-                    <div style={styles.messages}>
+                    <div className="chatbot-messages" style={styles.messages}>
                         {messages.map((m, i) => (
                             <div key={i} style={styles.msgRow(m.role)}>
                                 {m.role === "assistant" && (
@@ -249,6 +250,7 @@ export default function YieldChatbot() {
                             ].map((q) => (
                                 <button
                                     key={q}
+                                    className="chatbot-chip"
                                     style={styles.chip}
                                     onClick={() => {
                                         setInput(q);
@@ -265,6 +267,7 @@ export default function YieldChatbot() {
                     <div style={styles.inputRow}>
                         <input
                             ref={inputRef}
+                            className="chatbot-input"
                             style={styles.input}
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
@@ -297,24 +300,29 @@ export default function YieldChatbot() {
 
             {/* Typing animation keyframes */}
             <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600&display=swap');
         @keyframes bounce {
-          0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+          0%, 80%, 100% { transform: translateY(0); opacity: 0.35; }
           40% { transform: translateY(-6px); opacity: 1; }
         }
         @keyframes fadeSlideUp {
           from { opacity: 0; transform: translateY(16px); }
           to   { opacity: 1; transform: translateY(0); }
         }
+        .chatbot-input::placeholder { color: rgba(255,255,255,0.25); }
+        .chatbot-input:focus { border-color: rgba(16,185,129,0.6) !important; }
+        .chatbot-messages::-webkit-scrollbar { width: 4px; }
+        .chatbot-messages::-webkit-scrollbar-track { background: transparent; }
+        .chatbot-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+        .chatbot-chip:hover { background: rgba(16,185,129,0.15) !important; border-color: rgba(16,185,129,0.6) !important; }
+        .chatbot-fab:hover { transform: scale(1.08); box-shadow: 0 8px 32px rgba(16,185,129,0.45) !important; }
       `}</style>
         </>
     );
 }
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
-const GREEN = "#2d6a4f";
-const GREEN_LIGHT = "#52b788";
-const BG = "#f0f7f4";
+const EMERALD      = "#10b981";
+const EMERALD_DARK = "#065f46";
 
 const styles = {
     fab: {
@@ -324,10 +332,10 @@ const styles = {
         width: 56,
         height: 56,
         borderRadius: "50%",
-        background: `linear-gradient(135deg, ${GREEN}, ${GREEN_LIGHT})`,
-        border: "none",
+        background: "linear-gradient(135deg, #065f46, #10b981)",
+        border: "1px solid rgba(16,185,129,0.4)",
         cursor: "pointer",
-        boxShadow: "0 4px 24px rgba(45,106,79,0.45)",
+        boxShadow: "0 4px 24px rgba(16,185,129,0.35), 0 2px 8px rgba(0,0,0,0.4)",
         zIndex: 9999,
         display: "flex",
         alignItems: "center",
@@ -340,18 +348,23 @@ const styles = {
         right: 28,
         width: 370,
         height: 520,
-        background: "#fff",
-        borderRadius: 20,
-        boxShadow: "0 12px 48px rgba(0,0,0,0.15)",
+        background: "rgba(8, 15, 28, 0.88)",
+        backdropFilter: "blur(40px) saturate(180%)",
+        WebkitBackdropFilter: "blur(40px) saturate(180%)",
+        borderRadius: 24,
+        border: "1px solid rgba(255,255,255,0.12)",
+        borderTop: "1px solid rgba(255,255,255,0.22)",
+        boxShadow: "0 24px 64px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.08)",
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
         zIndex: 9998,
-        fontFamily: "'Sora', sans-serif",
-        animation: "fadeSlideUp 0.25s ease",
+        fontFamily: "ui-sans-serif, system-ui, sans-serif",
+        animation: "fadeSlideUp 0.25s cubic-bezier(0.34,1.56,0.64,1)",
     },
     header: {
-        background: `linear-gradient(135deg, ${GREEN}, ${GREEN_LIGHT})`,
+        background: "rgba(255,255,255,0.05)",
+        borderBottom: "1px solid rgba(255,255,255,0.08)",
         padding: "14px 16px",
         display: "flex",
         alignItems: "center",
@@ -366,35 +379,41 @@ const styles = {
         width: 36,
         height: 36,
         borderRadius: "50%",
-        background: "rgba(255,255,255,0.2)",
+        background: "linear-gradient(135deg, rgba(6,95,70,0.8), rgba(16,185,129,0.6))",
+        border: "1px solid rgba(16,185,129,0.4)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        fontSize: 18,
+        fontSize: 17,
     },
     headerTitle: {
-        color: "#fff",
-        fontWeight: 600,
-        fontSize: 14,
+        color: "rgba(255,255,255,0.92)",
+        fontWeight: 700,
+        fontSize: 13.5,
+        letterSpacing: "0.01em",
         lineHeight: 1.3,
     },
     headerSub: {
-        color: "rgba(255,255,255,0.75)",
-        fontSize: 11,
+        color: "rgba(255,255,255,0.35)",
+        fontSize: 10.5,
+        fontWeight: 600,
+        textTransform: "uppercase",
+        letterSpacing: "0.12em",
         marginTop: 1,
     },
     closeBtn: {
-        background: "rgba(255,255,255,0.15)",
-        border: "none",
-        color: "#fff",
+        background: "rgba(255,255,255,0.07)",
+        border: "1px solid rgba(255,255,255,0.1)",
+        color: "rgba(255,255,255,0.6)",
         width: 28,
         height: 28,
         borderRadius: 8,
         cursor: "pointer",
-        fontSize: 13,
+        fontSize: 12,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        transition: "background 0.15s, color 0.15s",
     },
     messages: {
         flex: 1,
@@ -403,7 +422,7 @@ const styles = {
         display: "flex",
         flexDirection: "column",
         gap: 10,
-        background: BG,
+        background: "transparent",
     },
     msgRow: (role) => ({
         display: "flex",
@@ -415,23 +434,31 @@ const styles = {
         width: 28,
         height: 28,
         borderRadius: "50%",
-        background: "#d8f3dc",
+        background: "rgba(16,185,129,0.15)",
+        border: "1px solid rgba(16,185,129,0.3)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        fontSize: 14,
+        fontSize: 13,
         flexShrink: 0,
     },
     bubble: (role) => ({
         maxWidth: "78%",
         padding: "10px 14px",
         borderRadius: role === "user" ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
-        fontSize: 13.5,
-        lineHeight: 1.55,
+        fontSize: 13,
+        lineHeight: 1.6,
         whiteSpace: "pre-wrap",
-        background: role === "user" ? GREEN : "#fff",
-        color: role === "user" ? "#fff" : "#1a2e22",
-        boxShadow: "0 1px 4px rgba(0,0,0,0.07)",
+        background: role === "user"
+            ? "linear-gradient(135deg, #065f46, #10b981)"
+            : "rgba(255,255,255,0.07)",
+        color: "rgba(255,255,255,0.88)",
+        border: role === "user"
+            ? "1px solid rgba(16,185,129,0.4)"
+            : "1px solid rgba(255,255,255,0.08)",
+        boxShadow: role === "user"
+            ? "0 4px 16px rgba(16,185,129,0.2)"
+            : "0 2px 8px rgba(0,0,0,0.2)",
     }),
     typing: {
         display: "flex",
@@ -444,7 +471,7 @@ const styles = {
         width: 7,
         height: 7,
         borderRadius: "50%",
-        background: GREEN_LIGHT,
+        background: EMERALD,
         animation: `bounce 1.2s ease-in-out ${i * 0.2}s infinite`,
     }),
     suggestions: {
@@ -452,41 +479,45 @@ const styles = {
         flexWrap: "wrap",
         gap: 6,
         padding: "8px 12px",
-        background: BG,
-        borderTop: "1px solid #d8eedf",
+        borderTop: "1px solid rgba(255,255,255,0.06)",
+        background: "rgba(255,255,255,0.02)",
     },
     chip: {
-        background: "#fff",
-        border: `1px solid ${GREEN_LIGHT}`,
-        color: GREEN,
+        background: "rgba(255,255,255,0.05)",
+        border: "1px solid rgba(255,255,255,0.12)",
+        color: "rgba(255,255,255,0.65)",
         borderRadius: 20,
         padding: "5px 11px",
-        fontSize: 11.5,
+        fontSize: 11,
+        fontWeight: 600,
         cursor: "pointer",
-        fontFamily: "'Sora', sans-serif",
-        transition: "background 0.15s",
+        fontFamily: "ui-sans-serif, system-ui, sans-serif",
+        textTransform: "uppercase",
+        letterSpacing: "0.05em",
+        transition: "background 0.15s, border-color 0.15s",
     },
     inputRow: {
         display: "flex",
         padding: "10px 12px",
         gap: 8,
-        background: "#fff",
-        borderTop: "1px solid #e4f0e8",
+        background: "rgba(255,255,255,0.03)",
+        borderTop: "1px solid rgba(255,255,255,0.07)",
     },
     input: {
         flex: 1,
-        border: "1.5px solid #c8e6d0",
+        border: "1px solid rgba(255,255,255,0.12)",
         borderRadius: 12,
         padding: "9px 14px",
-        fontSize: 13.5,
+        fontSize: 13,
         outline: "none",
-        background: BG,
-        fontFamily: "'Sora', sans-serif",
-        color: "#1a2e22",
+        background: "rgba(255,255,255,0.06)",
+        fontFamily: "ui-sans-serif, system-ui, sans-serif",
+        color: "rgba(255,255,255,0.88)",
+        transition: "border-color 0.2s",
     },
     sendBtn: {
-        background: `linear-gradient(135deg, ${GREEN}, ${GREEN_LIGHT})`,
-        border: "none",
+        background: "linear-gradient(135deg, #065f46, #10b981)",
+        border: "1px solid rgba(16,185,129,0.4)",
         borderRadius: 12,
         width: 42,
         height: 42,
@@ -496,13 +527,15 @@ const styles = {
         justifyContent: "center",
         flexShrink: 0,
         transition: "opacity 0.2s",
+        boxShadow: "0 4px 12px rgba(16,185,129,0.25)",
     },
     errorBanner: {
-        background: "#fee2e2",
-        color: "#991b1b",
+        background: "rgba(239,68,68,0.12)",
+        border: "1px solid rgba(239,68,68,0.25)",
+        color: "rgba(252,165,165,0.9)",
         fontSize: 12,
         padding: "8px 12px",
-        borderRadius: 8,
+        borderRadius: 10,
         margin: "0 4px",
     },
 };

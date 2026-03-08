@@ -26,6 +26,9 @@ GeoData/kurunegala_supabase_final.csv
 *.csv
 data
 
+# Python virtual environment
+venv/
+venv
 __pycache__/
 *.py[cod]
 *.pyc
