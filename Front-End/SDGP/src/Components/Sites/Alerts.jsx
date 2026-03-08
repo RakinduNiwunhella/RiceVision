@@ -30,7 +30,7 @@ const Alerts = () => {
       if (activeTab === "Past Alerts") {
         return (
           matchesSearch &&
-          (alert.status === "Resolved" || alert.status === "Denied")
+          (alert.status === "Resolved" || alert.status === "Ignored")
         );
       }
 
@@ -105,7 +105,7 @@ const Alerts = () => {
   }, [activeTab]);
 
   const counts = useMemo(() => {
-    const countObj = { Open: 0, Resolved: 0, Denied: 0 };
+    const countObj = { Open: 0, Resolved: 0, Ignored: 0 };
 
     alerts.forEach((alert) => {
       if (countObj[alert.status] !== undefined) {
@@ -146,7 +146,7 @@ const Alerts = () => {
   };
 
   const handleResolve = (id) => updateStatus(id, "Resolved");
-  const handleDeny = (id) => updateStatus(id, "Denied");
+  const handleIgnore = (id) => updateStatus(id, "Ignored");
 
   /* ---------------- MAP NAVIGATION ---------------- */
 
@@ -226,8 +226,8 @@ const Alerts = () => {
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={`px-5 py-2 rounded-xl text-xs font-bold transition-all ${activeTab === tab
-                      ? "bg-white/15 text-white"
-                      : "text-white/40 hover:text-white/70"
+                    ? "bg-white/15 text-white"
+                    : "text-white/40 hover:text-white/70"
                     }`}
                 >
                   {tab}
@@ -299,7 +299,7 @@ const Alerts = () => {
                       onClick={() => handleDeny(alert.id)}
                       className="glass-btn text-[10px] px-3 py-1 tracking-widest bg-white/10 hover:bg-white/20"
                     >
-                      Deny
+                      Ignore
                     </button>
 
                     <button
