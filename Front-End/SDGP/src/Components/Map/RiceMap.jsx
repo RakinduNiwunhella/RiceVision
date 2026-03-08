@@ -22,11 +22,10 @@ const SRI_LANKA_ZOOM = 7;
 
 function getHealthColor(health) {
 
-  if (health === "Healthy") return "#22c55e";      // bright green
-  if (health === "Normal") return "#16a34a";       // green
+  if (health === "Healthy" || health === "Normal") return "#22c55e";      // bright green
   if (health === "Mild Stress") return "#facc15";  // yellow
   if (health === "Severe Stress") return "#dc2626"; // red
-  if (health === "Damaged") return "#7f1d1d";      // dark red
+  if (health === "Not Applicable") return "#696969"; // ash color
 
   return "#2563eb"; // fallback
 }

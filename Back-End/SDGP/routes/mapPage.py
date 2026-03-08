@@ -16,9 +16,6 @@ async def get_map_fields(
             "lat, lon, paddy_health, district"
         )
 
-        # remove invalid rows
-        query = query.neq("paddy_health", "Not Applicable")
-
         # district filter
         if districts:
             query = query.in_("district", districts)
