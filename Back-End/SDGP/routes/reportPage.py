@@ -1,91 +1,120 @@
-from datetime import date, timedelta
+import io
+import os
+import boto3
+import pandas as pd
+import numpy as np
+from botocore.exceptions import BotoCoreError, ClientError
 from fastapi import APIRouter, HTTPException
-from ..db import supabase
 
 router = APIRouter()
+BUCKET_NAME = "ricevision"
 
-# Sri Lanka national paddy historical average (kg/ha) used as baseline
-HISTORICAL_BASELINE = 3900.0
+
+def _s3():
+    """Create an S3 client using env-var credentials (required on Render)."""
+    return boto3.client(
+        "s3",
+        region_name=os.getenv("AWS_DEFAULT_REGION", "ap-southeast-1"),
+        aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+        aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
+    )
+
+
+def sanitize(val):
+    if isinstance(val, (np.integer, np.int64)): return int(val)
+    if isinstance(val, (np.floating, np.float64)): return float(val)
+    if isinstance(val, pd.Timestamp): return str(val)
+    if isinstance(val, dict): return {k: sanitize(v) for k, v in val.items()}
+    if isinstance(val, list): return [sanitize(v) for v in val]
+    return val
+
+
+def _check_s3_date_exists(client, date_str):
+    prefix = f"SupabasePredictions/{date_str}/"
+    resp = client.list_objects_v2(Bucket=BUCKET_NAME, Prefix=prefix, MaxKeys=1)
+    return "Contents" in resp
+
+
+def _get_csv_from_s3(client, key):
+    try:
+        obj = client.get_object(Bucket=BUCKET_NAME, Key=key)
+        return pd.read_csv(io.BytesIO(obj["Body"].read()))
+    except Exception:
+        return None
+
+
+@router.get("/available-dates")
+async def get_available_dates():
+    """Return sorted list of dates that have prediction data in S3."""
+    try:
+        client = _s3()
+        resp = client.list_objects_v2(
+            Bucket=BUCKET_NAME,
+            Prefix="SupabasePredictions/",
+            Delimiter="/",
+        )
+        prefixes = resp.get("CommonPrefixes", [])
+        dates = sorted(
+            [p["Prefix"].split("/")[1] for p in prefixes if p.get("Prefix")],
+            reverse=True,
+        )
+        return {"dates": dates}
+    except (BotoCoreError, ClientError) as e:
+        raise HTTPException(status_code=503, detail=f"S3 error: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/detailed-report")
-async def get_detailed_report(district: str, season: str = "Maha"):
+async def get_detailed_report(date: str, district: str, season: str):
     try:
-        # 1. District health summary (yield, stress counts)
-        health_res = (
-            supabase.table("district_health_summary")
-            .select("*")
-            .eq("district", district)
-            .single()
-            .execute()
-        )
+        client = _s3()
 
-        if not health_res.data:
-            raise HTTPException(status_code=404, detail=f"No data found for district: {district}")
+        if not _check_s3_date_exists(client, date):
+            raise HTTPException(status_code=404, detail=f"No data for date {date} in S3.")
 
-        health = health_res.data
+        df_yield = _get_csv_from_s3(client, f"SupabasePredictions/{date}/yieldPredictions.csv")
+        if df_yield is None:
+            raise HTTPException(status_code=404, detail="Prediction files missing for this date.")
 
-        # 2. Latest growth stage & pest risk for this district
-        stage_res = (
-            supabase.table("alerts_overview_view")
-            .select("stage_name, pest_risk, date")
-            .eq("district", district)
-            .order("date", desc=True)
-            .limit(1)
-            .execute()
-        )
-        stage = stage_res.data[0] if stage_res.data else {}
+        def norm(name): return str(name).strip().lower().replace("th", "t")
+        target = norm(district)
 
-        # 3. Pest pixel count for this district
-        pest_res = (
-            supabase.table("pest_risk_by_district")
-            .select("risky_pixels")
-            .eq("district", district)
-            .single()
-            .execute()
-        )
-        pest = pest_res.data or {}
+        y_match = df_yield[
+            (df_yield["districtname"].apply(norm) == target) &
+            (df_yield["season"].str.lower() == season.lower())
+        ]
 
-        # ---- Compute fields ----
-        avg_yield   = float(health.get("avg_yield_kg_ha") or 0)
-        total_yield = float(health.get("total_yield_kg")  or 0)
-        total_fields = int(health.get("total_fields", 1) or 1)
-        stressed  = int(health.get("stressed_fields",  0) or 0)
-        critical  = int(health.get("critical_fields",  0) or 0)
+        if y_match.empty:
+            raise HTTPException(status_code=404, detail="No matching district/season record found.")
 
-        stress_pct  = round((stressed + critical) / total_fields * 100, 2)
-        pest_count  = int(pest.get("risky_pixels", 0) or 0)
-        # pest_risk in DB is 0–100; normalise to 0–10 for the UI risk score
-        raw_risk    = float(stage.get("pest_risk", 0) or 0)
-        risk_score  = round(raw_risk / 10, 2)
-
-        current_stage = stage.get("stage_name") or "N/A"
-        health_status = "Normal" if stress_pct < 5 else "Action Required"
-
-        # Estimate harvest ~30 days from today
-        harvest_date = (date.today() + timedelta(days=30)).isoformat()
+        row = y_match.iloc[0]
 
         return {
             "summary": {
-                "yield":      avg_yield,
-                "historical": HISTORICAL_BASELINE,
-                "total_kg":   total_yield,
-                "gap":        round(avg_yield - HISTORICAL_BASELINE, 2),
+                "yield":      float(row["predictedyield_kg_ha"]),
+                "historical": float(row["historicalavg_kg_ha"]),
+                "total_kg":   float(row["totalyield_kg"]),
+                "gap":        float(row["yieldgap_kg_ha"]),
             },
             "categories": {
-                "current_stage": current_stage,
-                "health_status": health_status,
+                "current_stage": str(row["most_common_stage"]),
+                "health_status": "Normal" if float(row["severe_stress_pct"]) < 5 else "Action Required",
             },
             "metrics": {
-                "stress_pct":   stress_pct,
-                "pest_count":   pest_count,
-                "risk_score":   risk_score,
-                "harvest_date": harvest_date,
+                "stress_pct":   float(row["severe_stress_pct"]),
+                "pest_count":   int(row["pest_attack_count"]),
+                "risk_score":   float(row["risk_score"]),
+                "harvest_date": str(row["est_harvest_date"]).split(" ")[0],
             },
-            "raw_data": {},
+            "raw_data": {
+                "yield_csv": sanitize(row.to_dict()),
+            },
         }
 
     except HTTPException:
         raise
+    except (BotoCoreError, ClientError) as e:
+        raise HTTPException(status_code=503, detail=f"S3 error: {str(e)}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
