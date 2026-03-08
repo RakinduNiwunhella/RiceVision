@@ -75,7 +75,6 @@ const MyDashboard = () => {
   const [districtHealth, setDistrictHealth] = useState([]);
   const [showAllDistricts, setShowAllDistricts] = useState(false);
   const [stageDistribution, setStageDistribution] = useState([]);
-  const [selectedDistrict, setSelectedDistrict] = useState("");
 
   const stageColors = ["#10b981", "#06b6d4", "#8b5cf6", "#f59e0b", "#ef4444", "#f97316"];
 
@@ -92,18 +91,20 @@ const MyDashboard = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [health, yld, best, out, dist] = await Promise.all([
+        const [health, yld, best, out, dist, stages] = await Promise.all([
           fetchHealthSummary(),
           fetchYield(),
           fetchBestDistricts(),
           fetchOutbreaks(),
-          fetchDistrictHealth()
+          fetchDistrictHealth(),
+          fetchStageDistribution()
         ]);
         setHealthSummary(health);
         setYieldForecast(yld);
         setBestYieldDistricts(best);
         setOutbreaks(out);
         setDistrictHealth(dist);
+        setStageDistribution(stages);
       } catch (err) {
         console.error("Dashboard synchronisation error:", err);
       }
@@ -111,18 +112,7 @@ const MyDashboard = () => {
     loadData();
   }, []);
 
-  useEffect(() => {
-    if (districtHealth.length > 0 && !selectedDistrict) {
-      setSelectedDistrict(districtHealth[0].district);
-    }
-  }, [districtHealth]);
 
-  useEffect(() => {
-    if (!selectedDistrict) return;
-    fetchStageDistribution(selectedDistrict)
-      .then(setStageDistribution)
-      .catch((err) => console.error("Stage distribution error:", err));
-  }, [selectedDistrict]);
 
   const formatMT = (value) => {
     if (!value) return "-";
@@ -339,6 +329,91 @@ const MyDashboard = () => {
         {/* ── Analytical Depth Row ── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-12">
 
+          {/* Stage Distribution */}
+          <div className="glass glass-hover p-8 rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-2 flex items-center gap-2">
+              <span className="material-symbols-outlined text-purple-400 text-sm">bar_chart</span>
+              Growth Analysis
+            </p>
+            <h3 className="text-xl font-black text-white tracking-tight uppercase mb-6">Crop Stage Distribution</h3>
+
+            {stageDistribution.length > 0 ? (() => {
+              const total = stageDistribution.reduce((sum, d) => sum + d.stage_count, 0);
+              return (
+                <>
+                  {/* Total pill */}
+                  <div className="flex items-center justify-between mb-5 p-4 rounded-2xl bg-white/5 border border-white/5">
+                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/30">Total Fields Tracked</p>
+                    <p className="text-2xl font-black text-white tracking-tighter">{total.toLocaleString()}</p>
+                  </div>
+
+                  {/* Bar chart */}
+                  <div className="flex-1">
+                    <ResponsiveContainer width="100%" height={220}>
+                      <BarChart data={stageDistribution} margin={{ top: 5, right: 5, left: -10, bottom: 40 }}>
+                        <XAxis
+                          dataKey="stage_name"
+                          tick={{ fill: "rgba(255,255,255,0.45)", fontSize: 9, fontWeight: 900 }}
+                          axisLine={{ stroke: "rgba(255,255,255,0.05)" }}
+                          tickLine={false}
+                          angle={-35}
+                          textAnchor="end"
+                          interval={0}
+                          height={55}
+                        />
+                        <YAxis
+                          tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 9, fontWeight: 900 }}
+                          axisLine={false}
+                          tickLine={false}
+                          width={40}
+                          allowDecimals={false}
+                        />
+                        <Tooltip
+                          contentStyle={{ background: "rgba(5,5,20,0.95)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "16px", backdropFilter: "blur(20px)" }}
+                          labelStyle={{ color: "#fff", fontSize: "10px", fontWeight: "900", textTransform: "uppercase", letterSpacing: "0.15em" }}
+                          itemStyle={{ color: "#a78bfa", fontSize: "11px", fontWeight: "bold" }}
+                          cursor={{ fill: "rgba(255,255,255,0.02)" }}
+                          formatter={(value) => [`${value.toLocaleString()} fields`, "Count"]}
+                        />
+                        <Bar dataKey="stage_count" radius={[8, 8, 0, 0]} maxBarSize={56}>
+                          {stageDistribution.map((_, i) => (
+                            <Cell
+                              key={i}
+                              fill={stageColors[i % stageColors.length]}
+                              style={{ filter: `drop-shadow(0 0 8px ${stageColors[i % stageColors.length]}55)` }}
+                            />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  {/* Per-stage breakdown */}
+                  <div className="mt-4 pt-5 border-t border-white/5 flex flex-col gap-2">
+                    {stageDistribution.map((d, i) => {
+                      const pct = total > 0 ? Math.round((d.stage_count / total) * 100) : 0;
+                      const color = stageColors[i % stageColors.length];
+                      return (
+                        <div key={i} className="flex items-center gap-3 group">
+                          <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: color, boxShadow: `0 0 6px ${color}` }} />
+                          <span className="text-[10px] font-black text-white/50 uppercase tracking-tight flex-1 group-hover:text-white/80 transition-colors truncate">{d.stage_name}</span>
+                          <div className="w-24 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                            <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${pct}%`, background: color }} />
+                          </div>
+                          <span className="text-[10px] font-black tabular-nums w-8 text-right" style={{ color }}>{pct}%</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              );
+            })() : (
+              <div className="flex-1 min-h-75 flex items-center justify-center text-white/20 animate-pulse text-xs font-black uppercase tracking-widest">
+                Loading Stage Data...
+              </div>
+            )}
+          </div>
+
           {/* Regional Health Overview */}
           <div className="glass glass-hover p-8 rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-2 flex items-center gap-2">
@@ -379,92 +454,6 @@ const MyDashboard = () => {
                 {showAllDistricts ? "Show Less" : `Show All (${districtHealth.length} Items)`}
               </button>
             </div>
-          </div>
-
-          {/* Stage Distribution Bar Chart */}
-          <div className="glass glass-hover p-8 rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-2 flex items-center gap-2">
-              <span className="material-symbols-outlined text-purple-400 text-sm">bar_chart</span>
-              Growth Analysis
-            </p>
-            <div className="flex flex-wrap justify-between items-center gap-4 mb-8">
-              <h3 className="text-xl font-black text-white tracking-tight uppercase">Stage Distribution</h3>
-              <select
-                value={selectedDistrict}
-                onChange={(e) => setSelectedDistrict(e.target.value)}
-                className="text-[10px] font-black uppercase tracking-wider text-white/60 bg-white/5 border border-white/10 rounded-xl px-4 py-2 outline-none cursor-pointer hover:bg-white/10 transition-colors appearance-none"
-              >
-                {districtHealth.map((d) => (
-                  <option key={d.district} value={d.district} className="bg-[#0f172a] text-white">
-                    {d.district}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {stageDistribution.length > 0 ? (
-              <>
-                <div className="flex-1 min-h-65">
-                  <ResponsiveContainer width="100%" height={280}>
-                    <BarChart data={stageDistribution} margin={{ top: 10, right: 10, left: 10, bottom: 60 }}>
-                      <XAxis
-                        dataKey="stage_name"
-                        tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 9, fontWeight: 900 }}
-                        axisLine={{ stroke: "rgba(255,255,255,0.05)" }}
-                        tickLine={false}
-                        angle={-40}
-                        textAnchor="end"
-                        interval={0}
-                        height={70}
-                      />
-                      <YAxis
-                        label={{
-                          value: "Count",
-                          angle: -90,
-                          position: "insideLeft",
-                          offset: -5,
-                          style: { fill: "rgba(255,255,255,0.25)", fontSize: 9, fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.1em" },
-                        }}
-                        tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 9, fontWeight: 900 }}
-                        axisLine={false}
-                        tickLine={false}
-                        width={55}
-                        allowDecimals={false}
-                      />
-                      <Tooltip
-                        contentStyle={{ background: "rgba(0,0,0,0.85)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "15px", backdropFilter: "blur(10px)" }}
-                        labelStyle={{ color: "#fff", fontSize: "10px", fontWeight: "900", textTransform: "uppercase" }}
-                        itemStyle={{ color: "#a78bfa", fontSize: "10px", fontWeight: "bold" }}
-                        cursor={{ fill: "rgba(255,255,255,0.03)" }}
-                        formatter={(value) => [value, "Fields"]}
-                      />
-                      <Bar dataKey="stage_count" radius={[8, 8, 0, 0]}>
-                        {stageDistribution.map((_, i) => (
-                          <Cell
-                            key={i}
-                            fill={stageColors[i % stageColors.length]}
-                            style={{ filter: `drop-shadow(0 0 8px ${stageColors[i % stageColors.length]}66)` }}
-                          />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-
-                <div className="mt-6 pt-6 border-t border-white/5 grid grid-cols-3 gap-3">
-                  {stageDistribution.map((d, i) => (
-                    <div key={i} className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: stageColors[i % stageColors.length], boxShadow: `0 0 6px ${stageColors[i % stageColors.length]}` }} />
-                      <span className="text-[9px] font-black text-white/40 uppercase tracking-tighter truncate">{d.stage_name}</span>
-                    </div>
-                  ))}
-                </div>
-              </>
-            ) : (
-              <div className="flex-1 min-h-75 flex items-center justify-center text-white/20 animate-pulse text-xs font-black uppercase tracking-widest">
-                {selectedDistrict ? "Loading Stage Data..." : "Select a District"}
-              </div>
-            )}
           </div>
 
         </div>
