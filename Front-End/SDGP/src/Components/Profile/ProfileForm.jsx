@@ -138,7 +138,7 @@ export default function ProfileForm() {
     );
   }
 
-  const inputClass = "w-full px-5 py-4 rounded-2xl border border-white/10 bg-white/5 text-white placeholder:text-white/20 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500/40 transition-all duration-300 font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed";
+  const inputClass = "w-full px-5 py-4 rounded-2xl border border-white/10 bg-white/5 text-white placeholder:text-white/30 focus:outline-none focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500/60 hover:border-white/25 hover:bg-white/[0.08] transition-all duration-200 font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed cursor-text";
 
   return (
     <div className="font-sans relative">
@@ -209,7 +209,7 @@ export default function ProfileForm() {
           <div className="space-y-8">
             <div className="flex items-center gap-4">
               <span className="h-px flex-1 bg-white/10"></span>
-              <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-white/40">Personal Identification</h3>
+              <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-white/60">Personal Identification</h3>
               <span className="h-px flex-1 bg-white/10"></span>
             </div>
 
@@ -220,8 +220,8 @@ export default function ProfileForm() {
                 { label: "Identification (NIC)", key: "nic", type: "text", placeholder: "XXXXXXXXXV" },
                 { label: "Tactical Phone", key: "phone", type: "text", placeholder: "+94 77 XXX XXXX" },
               ].map((field) => (
-                <div key={field.key} className="space-y-3">
-                  <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/20 ml-2">
+                <div key={field.key} className="group/field space-y-2">
+                  <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/50 ml-2 transition-colors duration-200 group-hover/field:text-emerald-400/70">
                     {field.label}
                   </label>
                   <input
@@ -240,13 +240,13 @@ export default function ProfileForm() {
           <div className="space-y-8">
             <div className="flex items-center gap-4">
               <span className="h-px flex-1 bg-white/10"></span>
-              <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-white/40">Sector Registration</h3>
+              <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-white/60">Sector Registration</h3>
               <span className="h-px flex-1 bg-white/10"></span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-3">
-                <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/20 ml-2">
+              <div className="group/field space-y-2">
+                <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/50 ml-2 transition-colors duration-200 group-hover/field:text-emerald-400/70">
                   Encryption Endpoint (Email)
                 </label>
                 <input
@@ -256,8 +256,8 @@ export default function ProfileForm() {
                   className={inputClass}
                 />
               </div>
-              <div className="space-y-3">
-                <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/20 ml-2">
+              <div className="group/field space-y-2">
+                <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/50 ml-2 transition-colors duration-200 group-hover/field:text-emerald-400/70">
                   District Sector
                 </label>
                 <input
@@ -268,8 +268,8 @@ export default function ProfileForm() {
                   className={inputClass}
                 />
               </div>
-              <div className="md:col-span-2 space-y-3">
-                <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/20 ml-2">
+              <div className="group/field md:col-span-2 space-y-2">
+                <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/50 ml-2 transition-colors duration-200 group-hover/field:text-emerald-400/70">
                   Physical Registry Address
                 </label>
                 <textarea
@@ -287,10 +287,10 @@ export default function ProfileForm() {
             <button
               type="submit"
               disabled={loading || uploading}
-              className="group relative w-full md:w-80 h-16 rounded-2xl overflow-hidden transition-all active:scale-95 disabled:opacity-50"
+              className="group relative w-full md:w-80 h-16 rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.03] hover:shadow-lg hover:shadow-emerald-500/25 active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
             >
-              <div className="absolute inset-0 bg-emerald-500/20 group-hover:bg-emerald-500/30 transition-colors" />
-              <div className="absolute inset-x-0 bottom-0 h-[2px] bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
+              <div className="absolute inset-0 bg-emerald-500/20 group-hover:bg-emerald-500/35 transition-colors duration-300" />
+              <div className="absolute inset-x-0 bottom-0 h-[2px] bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)] group-hover:shadow-[0_0_25px_rgba(16,185,129,0.8)] transition-all duration-300" />
               <div className="relative flex items-center justify-center gap-3 text-emerald-400 text-[11px] font-black uppercase tracking-[0.4em]">
                 {loading ? (
                   <div className="w-4 h-4 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />

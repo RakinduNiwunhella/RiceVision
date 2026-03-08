@@ -1,7 +1,7 @@
-import { MapContainer, TileLayer, CircleMarker, GeoJSON } from "react-leaflet";
+import { MapContainer, TileLayer, CircleMarker, GeoJSON, Tooltip } from "react-leaflet";
 import { useEffect, useState, useRef } from "react";
 import L from "leaflet";
-import { fetchMapFields } from "../../api/api";
+import { fetchMapFields, fetchGEETileUrl } from "../../api/api";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import "react-leaflet-cluster/dist/assets/MarkerCluster.css";
 import "react-leaflet-cluster/dist/assets/MarkerCluster.Default.css";
@@ -17,6 +17,42 @@ const SRI_LANKA_BOUNDS = [
 ];
 
 const SRI_LANKA_ZOOM = 7;
+
+/* ---------- COLOUR SCALES ---------- */
+
+/**
+ * Simple linear colour interpolation between a list of hex stops.
+ * t ∈ [0, 1].
+ */
+function hexToRgb(hex) {
+  const n = parseInt(hex.replace("#", ""), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+function interpolateColor(stops, t) {
+  const clamped = Math.max(0, Math.min(1, t));
+  const seg = stops.length - 1;
+  const idx = Math.min(Math.floor(clamped * seg), seg - 1);
+  const localT = clamped * seg - idx;
+  const a = hexToRgb(stops[idx]);
+  const b = hexToRgb(stops[idx + 1]);
+  const r = Math.round(a[0] + (b[0] - a[0]) * localT);
+  const g = Math.round(a[1] + (b[1] - a[1]) * localT);
+  const bl = Math.round(a[2] + (b[2] - a[2]) * localT);
+  return `rgb(${r},${g},${bl})`;
+}
+
+// NDVI / EVI:  brown → yellow → light-green → dark-green
+const NDVI_STOPS = ["#7f2700", "#d4a017", "#aaff44", "#228b22", "#004d00"];
+// VV / VH SAR: deep-blue → cyan → yellow → orange → red  (used in GEE vis)
+const SAR_STOPS  = ["#000080", "#0000ff", "#00ffff", "#ffff00", "#ff0000"];
+
+const OVERLAY_META = {
+  ndvi: { label: "NDVI",  unit: "",   stops: NDVI_STOPS, vmin: -0.2, vmax: 0.9 },
+  evi:  { label: "EVI",   unit: "",   stops: NDVI_STOPS, vmin: -0.2, vmax: 0.9 },
+  vv:   { label: "VV",    unit: " dB", stops: SAR_STOPS,  vmin: -25,  vmax: 0  },
+  vh:   { label: "VH",    unit: " dB", stops: SAR_STOPS,  vmin: -30,  vmax: -5 },
+};
 
 /* ---------- HEALTH COLOR ---------- */
 
@@ -47,6 +83,19 @@ export default function RiceMap({ filters, layers }) {
   const [points, setPoints] = useState([]);
   const [paddyGeo, setPaddyGeo] = useState(null);
   const [districtBoundary, setDistrictBoundary] = useState(null);
+
+  // GEE tile URLs for all overlays (Sentinel-2 NDVI/EVI + Sentinel-1 VV/VH)
+  const [ndviTileUrl, setNdviTileUrl] = useState(null);
+  const [eviTileUrl,  setEviTileUrl]  = useState(null);
+  const [ndviError,   setNdviError]   = useState(null);
+  const [eviError,    setEviError]    = useState(null);
+  const [vvTileUrl, setVvTileUrl] = useState(null);
+  const [vhTileUrl, setVhTileUrl] = useState(null);
+  const [vvError,   setVvError]   = useState(null);
+  const [vhError,   setVhError]   = useState(null);
+
+  // overlayOpacity comes from shared layers state (controlled in MapLayersPanel)
+  const overlayOpacity = layers.overlayOpacity ?? 0.75;
 
   const mapRef = useRef(null);
 
@@ -107,6 +156,62 @@ export default function RiceMap({ filters, layers }) {
     }
 
   }, [districtBoundary]);
+
+  /* ---------- LOAD NDVI TILE (GEE Sentinel-2) ---------- */
+
+  useEffect(() => {
+    if (!selectedDistrict || !layers.ndvi) {
+      setNdviTileUrl(null);
+      setNdviError(null);
+      return;
+    }
+    setNdviError(null);
+    fetchGEETileUrl({ type: "ndvi", district: selectedDistrict })
+      .then((res) => setNdviTileUrl(res.tile_url))
+      .catch((err) => { setNdviTileUrl(null); setNdviError(err.message); });
+  }, [selectedDistrict, layers.ndvi]);
+
+  /* ---------- LOAD EVI TILE (GEE Sentinel-2) ---------- */
+
+  useEffect(() => {
+    if (!selectedDistrict || !layers.evi) {
+      setEviTileUrl(null);
+      setEviError(null);
+      return;
+    }
+    setEviError(null);
+    fetchGEETileUrl({ type: "evi", district: selectedDistrict })
+      .then((res) => setEviTileUrl(res.tile_url))
+      .catch((err) => { setEviTileUrl(null); setEviError(err.message); });
+  }, [selectedDistrict, layers.evi]);
+
+  /* ---------- LOAD VV TILE (GEE) ---------- */
+
+  useEffect(() => {
+    if (!selectedDistrict || !layers.vv) {
+      setVvTileUrl(null);
+      setVvError(null);
+      return;
+    }
+    setVvError(null);
+    fetchGEETileUrl({ type: "vv", district: selectedDistrict })
+      .then((res) => setVvTileUrl(res.tile_url))
+      .catch((err) => { setVvTileUrl(null); setVvError(err.message); });
+  }, [selectedDistrict, layers.vv]);
+
+  /* ---------- LOAD VH TILE (GEE) ---------- */
+
+  useEffect(() => {
+    if (!selectedDistrict || !layers.vh) {
+      setVhTileUrl(null);
+      setVhError(null);
+      return;
+    }
+    setVhError(null);
+    fetchGEETileUrl({ type: "vh", district: selectedDistrict })
+      .then((res) => setVhTileUrl(res.tile_url))
+      .catch((err) => { setVhTileUrl(null); setVhError(err.message); });
+  }, [selectedDistrict, layers.vh]);
 
   /* ---------- FETCH ML POINTS ---------- */
 
@@ -208,6 +313,46 @@ export default function RiceMap({ filters, layers }) {
 
 {selectedDistrict && layers.paddyExtent && paddyGeo && (
   <GeoJSON data={paddyGeo} style={paddyStyle} />
+)}
+
+{/* ---------- NDVI TILE (GEE Sentinel-2) ---------- */}
+
+{layers.ndvi && ndviTileUrl && (
+  <TileLayer
+    url={ndviTileUrl}
+    opacity={overlayOpacity}
+    attribution="Sentinel-2 NDVI © Copernicus / Google Earth Engine"
+  />
+)}
+
+{/* ---------- EVI TILE (GEE Sentinel-2) ---------- */}
+
+{layers.evi && eviTileUrl && (
+  <TileLayer
+    url={eviTileUrl}
+    opacity={overlayOpacity}
+    attribution="Sentinel-2 EVI © Copernicus / Google Earth Engine"
+  />
+)}
+
+{/* ---------- VV TILE (GEE Sentinel-1) ---------- */}
+
+{layers.vv && vvTileUrl && (
+  <TileLayer
+    url={vvTileUrl}
+    opacity={overlayOpacity}
+    attribution="Sentinel-1 VV © Copernicus / Google Earth Engine"
+  />
+)}
+
+{/* ---------- VH TILE (GEE Sentinel-1) ---------- */}
+
+{layers.vh && vhTileUrl && (
+  <TileLayer
+    url={vhTileUrl}
+    opacity={overlayOpacity}
+    attribution="Sentinel-1 VH © Copernicus / Google Earth Engine"
+  />
 )}
 
 {/* ---------- HEALTH POINTS ---------- */}
