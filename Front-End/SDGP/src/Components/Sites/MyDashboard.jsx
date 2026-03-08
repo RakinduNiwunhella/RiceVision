@@ -405,21 +405,31 @@ const MyDashboard = () => {
             {stageDistribution.length > 0 ? (
               <>
                 <div className="flex-1 min-h-65">
-                  <ResponsiveContainer width="100%" height={260}>
-                    <BarChart data={stageDistribution} margin={{ top: 10, right: 10, left: -20, bottom: 40 }}>
+                  <ResponsiveContainer width="100%" height={280}>
+                    <BarChart data={stageDistribution} margin={{ top: 10, right: 10, left: 10, bottom: 60 }}>
                       <XAxis
                         dataKey="stage_name"
                         tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 9, fontWeight: 900 }}
                         axisLine={{ stroke: "rgba(255,255,255,0.05)" }}
                         tickLine={false}
-                        angle={-30}
+                        angle={-40}
                         textAnchor="end"
                         interval={0}
+                        height={70}
                       />
                       <YAxis
+                        label={{
+                          value: "Count",
+                          angle: -90,
+                          position: "insideLeft",
+                          offset: -5,
+                          style: { fill: "rgba(255,255,255,0.25)", fontSize: 9, fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.1em" },
+                        }}
                         tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 9, fontWeight: 900 }}
                         axisLine={false}
                         tickLine={false}
+                        width={55}
+                        allowDecimals={false}
                       />
                       <Tooltip
                         contentStyle={{ background: "rgba(0,0,0,0.85)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "15px", backdropFilter: "blur(10px)" }}
@@ -428,7 +438,7 @@ const MyDashboard = () => {
                         cursor={{ fill: "rgba(255,255,255,0.03)" }}
                         formatter={(value) => [value, "Fields"]}
                       />
-                      <Bar dataKey="total_fields" radius={[8, 8, 0, 0]}>
+                      <Bar dataKey="stage_count" radius={[8, 8, 0, 0]}>
                         {stageDistribution.map((_, i) => (
                           <Cell
                             key={i}
