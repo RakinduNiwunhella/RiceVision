@@ -133,7 +133,7 @@ export default function ProfileForm() {
     return (
       <div className="flex flex-col items-center gap-4 py-20">
         <div className="w-12 h-12 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
-        <p className="text-white/40 font-black uppercase tracking-widest text-xs animate-pulse">Synchronizing Identity...</p>
+        <p className="text-white/40 font-black uppercase tracking-widest text-xs animate-pulse">Registry Identity</p>
       </div>
     );
   }
@@ -299,7 +299,7 @@ export default function ProfileForm() {
                     {status?.type === 'success' ? 'verified' : 'shield_with_heart'}
                   </span>
                 )}
-                {loading ? "Synchronizing..." : status?.type === 'success' ? "Synchronized" : "Synchronize Identity"}
+                {loading ? "Synchronizing..." : status?.type === 'success' ? "Synchronized" : "Registry Identity"}
               </div>
             </button>
           </div>
