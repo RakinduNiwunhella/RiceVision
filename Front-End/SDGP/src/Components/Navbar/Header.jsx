@@ -4,6 +4,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import logo from '../assets/logo.png'
 import { useTheme } from '../../context/ThemeContext'
 import { useLanguage, LANGUAGES } from '../../context/LanguageContext'
+import Notifications from '../Notifications/Notifications'
+import { supabase } from "../../supabaseClient"
 
 const searchIndex = [
   { label: 'Dashboard', description: 'Overview, analytics, yield summary', icon: 'apps', path: '/dashboard' },
@@ -15,12 +17,6 @@ const searchIndex = [
   { label: 'Help', description: 'FAQ, documentation, support', icon: 'help', path: '/help' },
   { label: 'Profile', description: 'Account settings, preferences', icon: 'person', path: '/profile' },
 ]
-import React, { useState, useEffect, useRef } from 'react'
-import { Link, useLocation } from 'react-router-dom'
-import { createPortal } from 'react-dom'
-import logo from '../assets/logo.png'
-import Notifications from '../Notifications/Notifications'
-import { supabase } from "../../supabaseClient";
 
 const Header = () => {
   const location = useLocation()
@@ -161,7 +157,7 @@ const Header = () => {
                 onFocus={() => { if (searchQuery) { updateDropdownPos(); setShowResults(true) } }}
                 onKeyDown={handleKeyDown}
                 placeholder={t('searchPlaceholder')}
-                className="w-48 xl:w-64 bg-white/5 border border-white/10 rounded-xl py-1.5 pl-10 pr-4 text-xs text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:bg-white/10 focus:border-white/20 transition-all shadow-inner"
+                className="w-32 xl:w-44 bg-white/5 border border-white/10 rounded-xl py-1 pl-9 pr-3 text-xs text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:bg-white/10 focus:border-white/20 transition-all shadow-inner"
                 autoComplete="off"
               />
               {showResults && (filteredResults.length > 0 || searchQuery) && createPortal(
