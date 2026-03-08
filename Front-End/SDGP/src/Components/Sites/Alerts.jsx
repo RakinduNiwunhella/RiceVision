@@ -1,8 +1,12 @@
 import React, { useState, useMemo, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { updateAlertStatus } from "../../api/api";
 
 const API_BASE = "https://ricevision-cakt.onrender.com";
 const tabOptions = ["Disasters", "Pest Risks", "Past Alerts"];
+
+const formatTitle = (text) =>
+  text.replace(/\b\w/g, (char) => char.toUpperCase());
 
 const Alerts = () => {
   const [alerts, setAlerts] = useState([]);
@@ -54,11 +58,12 @@ const Alerts = () => {
         if (isDisaster) {
           const mappedAlerts = (Array.isArray(data) ? data : []).map((a) => ({
             id: a.id,
-            title: `${a.disaster_type} risk`,
+            title: formatTitle(`${a.disaster_type} risk`),
             description: `Stage: ${a.stage} | Health: ${a.health}`,
             status: "Open",
             priority: "High",
             field: a.district,
+            health: a.health,
             timestamp: a.timestamp,
             lat: a.lat,
             lon: a.lon,
@@ -75,12 +80,14 @@ const Alerts = () => {
               status: "Open",
               priority: "High",
               field: a.district,
+              health: a.health,
               count: a.risky_pixels,
               locations: a.risky_pixel_locations || [],
               timestamp: new Date().toISOString(),
             }));
 
           setAlerts(mappedAlerts);
+          console.log("Received health:", state?.health);
         }
       } catch (err) {
         console.error("Error fetching alerts:", err);
@@ -131,8 +138,33 @@ const Alerts = () => {
     }
   };
 
+  const navigate = useNavigate();
+
   const handleResolve = (id) => updateStatus(id, "Resolved");
   const handleDeny = (id) => updateStatus(id, "Denied");
+
+  const handleViewInMap = (alert) => {
+    if (activeTab === "Pest Risks" && alert.locations?.length > 0) {
+      navigate("/field-map", {
+        state: {
+          type: "pest",
+          district: alert.field,
+          locations: alert.locations,
+        },
+      });
+    } else if (alert.lat != null && alert.lon != null) {
+      navigate("/field-map", {
+        state: {
+          type: "disaster",
+          district: alert.field,
+          disasterType: alert.title,
+          health: alert.health,
+          lat: alert.lat,
+          lon: alert.lon,
+        },
+      });
+    }
+  };
 
   const formatTimestamp = (iso) => new Date(iso).toLocaleString();
 
@@ -182,8 +214,8 @@ const Alerts = () => {
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={`px-5 py-2 rounded-xl text-xs font-bold transition-all ${activeTab === tab
-                      ? "bg-white/15 text-white"
-                      : "text-white/40 hover:text-white/70"
+                    ? "bg-white/15 text-white"
+                    : "text-white/40 hover:text-white/70"
                     }`}
                 >
                   {tab}
@@ -221,7 +253,11 @@ const Alerts = () => {
 
                 <div>
                   <h2 className="text-xl font-black text-emerald-400">
-                    {alert.title}
+                    {activeTab === "Pest Risks" && alert.count != null ? (
+                      <>{alert.field} : <span className="text-red-500">{alert.count} RISKS</span> </>
+                    ) : (
+                      alert.title
+                    )}
                   </h2>
 
                   <p className="text-white/60 text-sm mt-1">
@@ -249,7 +285,10 @@ const Alerts = () => {
                       Deny
                     </button>
 
-                    <button className="px-6 py-2 bg-white/10 text-white/60 rounded-xl text-xs font-bold">
+                    <button
+                      onClick={() => handleViewInMap(alert)}
+                      className="px-6 py-2 bg-white/10 text-white/60 rounded-xl text-xs font-bold"
+                    >
                       View in Map
                     </button>
                   </div>
