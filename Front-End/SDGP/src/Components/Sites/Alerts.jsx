@@ -194,7 +194,7 @@ const Alerts = () => {
               {t('fieldRiskAlerts')}
             </h1>
             <p className="text-white/40 text-xs mt-1 font-bold uppercase tracking-[0.2em]">
-              {t('automatedMonitoring')}
+              Real-time Field Health intelligence
             </p>
           </div>
 
@@ -203,7 +203,7 @@ const Alerts = () => {
               <span className="text-[10px] font-black uppercase text-white/30 block">
                 {t('active')}
               </span>
-              <span className="text-xl font-black text-red-400">
+              <span className="text-lg font-black text-red-400">
                 {counts.Open}
               </span>
             </div>
@@ -212,7 +212,7 @@ const Alerts = () => {
               <span className="text-[10px] font-black uppercase text-white/30 block">
                 {t('resolved')}
               </span>
-              <span className="text-xl font-black text-emerald-400">
+              <span className="text-lg font-black text-emerald-400">
                 {counts.Resolved}
               </span>
             </div>
@@ -254,7 +254,7 @@ const Alerts = () => {
           {filteredAlerts.length === 0 && (
             <div className="glass p-20 rounded-[2rem] text-center">
               <p className="text-white/30 font-bold uppercase">
-                {t('noThreats')}
+                No Past threats detected
               </p>
             </div>
           )}
@@ -271,8 +271,8 @@ const Alerts = () => {
                     {activeTab === "Pest Risks" && alert.count != null ? (
                       <>
                         {alert.field} •{" "}
-                        <span className="text-red-500">
-                          {alert.count} RISKS
+                        <span className="text-rose-700">
+                          {alert.count} Risks
                         </span>
                       </>
                     ) : (
@@ -299,17 +299,17 @@ const Alerts = () => {
                     </button>
 
                     <button
-                      onClick={() => handleIgnore(alert.id)}
-                      className="px-6 py-2 bg-white/10 text-white/60 rounded-xl text-xs font-bold"
+                      onClick={() => handleDeny(alert.id)}
+                      className="glass-btn text-[10px] px-3 py-1 tracking-widest bg-white/10 hover:bg-white/20"
                     >
                       Ignore
                     </button>
 
                     <button
                       onClick={() => handleViewInMap(alert)}
-                      className="px-6 py-2 bg-white/10 text-white/60 rounded-xl text-xs font-bold"
+                      className="glass-btn text-[10px] px-3 py-1 tracking-widest bg-white/10 hover:bg-white/20"
                     >
-                      View in Map
+                      View Map
                     </button>
                   </div>
                 )}

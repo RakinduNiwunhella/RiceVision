@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react";
+import { supabase } from "../../supabaseClient";
 
-const Notifications = () => {
+const Notifications = ({ onRead, style }) => {
   const [notifications, setNotifications] = useState([]);
 
   const fetchNotifications = async () => {
     try {
-      const BASE_URL = import.meta.env.VITE_API_BASE || "https://ricevision-backend.onrender.com";
-      const response = await fetch(`${BASE_URL}/notifications`);
-      const data = await response.json();
-      setNotifications(data);
+      const { data, error } = await supabase
+        .from("notificationpanel")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      setNotifications(data || []);
     } catch (error) {
       console.error("Error fetching notifications:", error);
     }
@@ -16,16 +19,20 @@ const Notifications = () => {
 
   const markAsRead = async (id) => {
     try {
-      const BASE_URL = import.meta.env.VITE_API_BASE || "https://ricevision-backend.onrender.com";
-      await fetch(`${BASE_URL}/notifications/${id}/read`, {
-        method: "PUT",
-      });
+      // update via supabase directly
+      const { error } = await supabase
+        .from("notificationpanel")
+        .update({ is_read: true })
+        .eq("id", id);
+      if (error) throw error;
 
       setNotifications((prev) =>
         prev.map((n) =>
           n.id === id ? { ...n, is_read: true } : n
         )
       );
+
+      if (onRead) onRead(id);
     } catch (error) {
       console.error("Error updating notification:", error);
     }
@@ -36,35 +43,37 @@ const Notifications = () => {
   }, []);
 
   return (
-    <div className="absolute right-6 top-16 w-80 bg-white dark:bg-slate-800 shadow-lg rounded-lg p-4 z-50 border border-slate-200 dark:border-slate-700">
+    <div style={style} className="glass border border-white/10 rounded-2xl overflow-hidden shadow-2xl max-h-96 overflow-y-auto p-4 bg-slate-800 dark:bg-slate-900">
 
-      <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-slate-200">
-        Notifications
-      </h3>
+      <div className="mb-4">
+        <h3 className="text-lg font-semibold text-white">
+          Notifications
+        </h3>
+      </div>
 
       {notifications.length === 0 ? (
-        <p className="text-gray-500 text-sm">No notifications</p>
+        <p className="text-white/60 text-sm">No notifications</p>
       ) : (
         notifications.map((note) => (
           <div
             key={note.id}
             onClick={() => markAsRead(note.id)}
-            className={`flex items-start gap-3 border-b border-slate-200 dark:border-slate-700 last:border-none py-3 px-2 rounded cursor-pointer transition hover:bg-slate-100 dark:hover:bg-slate-700 ${
-              !note.is_read ? "bg-blue-50 dark:bg-slate-700/60" : ""
+            className={`flex items-start gap-3 border-b border-white/10 last:border-none py-3 px-2 rounded-lg cursor-pointer transition-colors duration-200 hover:bg-white/20 dark:hover:bg-white/10 ${
+              !note.is_read ? "bg-emerald-500/10 dark:bg-emerald-400/20" : ""
             }`}
           >
             <div className="mt-1">
               {!note.is_read && (
-                <span className="w-2 h-2 bg-blue-500 rounded-full block"></span>
+                <span className="w-2 h-2 bg-emerald-500 rounded-full block"></span>
               )}
             </div>
 
             <div className="flex-1">
-              <p className="text-sm text-slate-700 dark:text-slate-200">
+              <p className="text-sm text-white wrap-break-word">
                 {note.message}
               </p>
 
-              <span className="text-xs text-slate-400">
+              <span className="text-xs text-white/70">
                 {new Date(note.created_at).toLocaleString()}
               </span>
             </div>
