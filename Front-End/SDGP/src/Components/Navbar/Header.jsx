@@ -7,6 +7,7 @@ const Header = () => {
 
   const navItems = [
     { label: 'Dashboard', icon: 'apps', path: '/dashboard' },
+    { label: 'Field Data', icon: 'table_chart', path: '/field-data' },
     { label: 'Map', icon: 'map', path: '/field-map' },
     { label: 'Weather', icon: 'cloud', path: '/weather' },
     { label: 'Alerts', icon: 'notification_important', path: '/alerts' },
