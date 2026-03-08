@@ -63,6 +63,7 @@ const Alerts = () => {
             status: "Open",
             priority: "High",
             field: a.district,
+            health: a.health,
             timestamp: a.timestamp,
             lat: a.lat,
             lon: a.lon,
@@ -79,12 +80,14 @@ const Alerts = () => {
               status: "Open",
               priority: "High",
               field: a.district,
+              health: a.health,
               count: a.risky_pixels,
               locations: a.risky_pixel_locations || [],
               timestamp: new Date().toISOString(),
             }));
 
           setAlerts(mappedAlerts);
+          console.log("Received health:", state?.health);
         }
       } catch (err) {
         console.error("Error fetching alerts:", err);
