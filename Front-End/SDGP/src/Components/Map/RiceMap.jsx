@@ -1,4 +1,4 @@
-import { MapContainer, TileLayer, CircleMarker, GeoJSON, Tooltip } from "react-leaflet";
+import { MapContainer, TileLayer, CircleMarker, Circle, GeoJSON, Tooltip, useMap } from "react-leaflet";
 import { useEffect, useState, useRef } from "react";
 import L from "leaflet";
 import { fetchMapFields, fetchGEETileUrl } from "../../api/api";
@@ -81,7 +81,67 @@ const districtBoundaryStyle = {
   fillOpacity: 0,
 };
 
-export default function RiceMap({ filters, layers }) {
+/* ---------- FLY-TO CONTROLLER ---------- */
+
+function FlyToController({ flyTo }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!flyTo) return;
+
+    if (flyTo.type === "pest" && flyTo.locations?.length > 0) {
+      const first = flyTo.locations[0];
+      map.flyTo([first.lat, first.lon], 13, { animate: true, duration: 1.5 });
+    } else if (flyTo.type === "disaster") {
+      map.flyTo([flyTo.lat, flyTo.lon], 13, { animate: true, duration: 1.5 });
+    }
+  }, [flyTo, map]);
+
+  return null;
+}
+
+/* ---------- ALERT MARKER ---------- */
+
+function AlertMarker({ flyTo }) {
+  if (!flyTo) return null;
+
+  // Pest risk — one small circle per risky pixel
+  if (flyTo.type === "pest") {
+    return (
+      <>
+        {flyTo.locations.map((loc, idx) => (
+          <CircleMarker
+            key={idx}
+            center={[loc.lat, loc.lon]}
+            radius={5}
+            pathOptions={{
+              color: "#ef4444",
+              fillColor: "#ef4444",
+              fillOpacity: 0.6,
+              weight: 1.5,
+            }}
+          />
+        ))}
+      </>
+    );
+  }
+
+  // Disaster — circular zone centred on the event location
+  return (
+    <Circle
+      center={[flyTo.lat, flyTo.lon]}
+      radius={2000}
+      pathOptions={{
+        color: "#ef4444",
+        fillColor: "#ef4444",
+        fillOpacity: 0.25,
+        weight: 2,
+      }}
+    />
+  );
+}
+
+export default function RiceMap({ filters, layers, flyTo }) {
 
   const [points, setPoints] = useState([]);
   const [paddyGeo, setPaddyGeo] = useState(null);
@@ -271,6 +331,10 @@ export default function RiceMap({ filters, layers }) {
   preferCanvas={true}
   className="h-full w-full rounded-3xl"
 >
+
+{/* ---------- FLY-TO (alert navigation) ---------- */}
+<FlyToController flyTo={flyTo} />
+<AlertMarker flyTo={flyTo} />
 
 {/* ---------- DEFAULT MAP ---------- */}
 
