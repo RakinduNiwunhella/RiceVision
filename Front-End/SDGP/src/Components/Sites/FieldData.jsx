@@ -18,6 +18,7 @@ const healthColor = (health) => {
 
 const FieldData = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const [stats, setStats] = useState([]);
   const [districtData, setDistrictData] = useState([]);
