@@ -1,9 +1,86 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import ReactDOM from "react-dom";
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import autoTable from 'jspdf-autotable';
 import logoImg from '../assets/logo.png';
+
+const CustomSelect = ({ value, onChange, options, className = "" }) => {
+  const [open, setOpen] = useState(false);
+  const [dropdownStyle, setDropdownStyle] = useState({});
+  const wrapperRef = useRef(null);
+  const buttonRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleToggle = () => {
+    if (!open && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setDropdownStyle({
+        position: "fixed",
+        top: rect.bottom + 4,
+        left: rect.left,
+        width: rect.width,
+        zIndex: 99999,
+      });
+    }
+    setOpen((o) => !o);
+  };
+
+  return (
+    <div className={`relative ${className}`} ref={wrapperRef}>
+      <button
+        ref={buttonRef}
+        type="button"
+        onClick={handleToggle}
+        className="w-full flex justify-between items-center bg-white/5 border border-white/10 text-[10px] px-4 py-3 rounded-xl font-bold text-white outline-none hover:bg-white/10 transition-all"
+      >
+        <span>{value}</span>
+        <span
+          className="material-symbols-outlined text-sm text-white/40 transition-transform duration-200"
+          style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)" }}
+        >
+          expand_more
+        </span>
+      </button>
+      {open && ReactDOM.createPortal(
+        <div
+          style={{
+            ...dropdownStyle,
+            background: "rgba(10, 22, 14, 0.95)",
+            backdropFilter: "blur(24px)",
+            WebkitBackdropFilter: "blur(24px)",
+          }}
+          className="max-h-52 overflow-y-auto rounded-xl border border-white/20 shadow-2xl"
+        >
+          {options.map((opt) => (
+            <button
+              key={opt}
+              type="button"
+              onClick={() => { onChange(opt); setOpen(false); }}
+              className={`w-full text-left px-4 py-2.5 text-[10px] font-bold flex items-center gap-2 transition-all ${
+                value === opt
+                  ? "text-emerald-400 bg-emerald-500/20"
+                  : "text-white hover:bg-white/20 hover:text-white"
+              }`}
+            >
+              <span className="material-symbols-outlined text-xs" style={{ visibility: value === opt ? "visible" : "hidden" }}>check</span>
+              {opt}
+            </button>
+          ))}
+        </div>,
+        document.body
+      )}
+    </div>
+  );
+};
 
 const Report = () => {
   const districts = ["Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle", "Gampaha", "Hambantota", "Jaffna", "Kalutara", "Kandy", "Kegalle", "Kilinochchi", "Kurunegala", "Mannar", "Matale", "Matara", "Monaragala", "Mullaitivu", "Nuwara Eliya", "Polonnaruwa", "Puttalam", "Ratnapura", "Trincomalee", "Vavuniya"];
@@ -422,13 +499,11 @@ const Report = () => {
         <h3 className="text-red-400 font-black uppercase tracking-widest mb-3 text-sm">Data Unavailable</h3>
         <p className="text-xs text-white/30 mb-6">{report.message}</p>
         {availableDates.length > 0 && (
-          <select
+          <CustomSelect
             value={config.date}
-            onChange={(e) => setConfig({ ...config, date: e.target.value })}
-            className="bg-white/5 border border-white/10 text-[10px] p-3 rounded-xl font-bold text-white outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all"
-          >
-            {availableDates.map((d) => <option key={d} className="bg-slate-900">{d}</option>)}
-          </select>
+            onChange={(val) => setConfig({ ...config, date: val })}
+            options={availableDates}
+          />
         )}
       </div>
     );
@@ -461,29 +536,23 @@ const Report = () => {
               Export PDF
             </button>
           </div>
-          <select
+          <CustomSelect
             value={config.district}
-            onChange={(e) => setConfig({ ...config, district: e.target.value })}
-            className="bg-white/5 border border-white/10 text-[10px] p-3 rounded-xl font-bold outline-none text-white focus:ring-2 focus:ring-emerald-500/30 transition-all"
-          >
-            {districts.map(d => <option key={d} className="bg-slate-900">{d}</option>)}
-          </select>
-          <select
+            onChange={(val) => setConfig({ ...config, district: val })}
+            options={districts}
+          />
+          <CustomSelect
             value={config.season}
-            onChange={(e) => setConfig({ ...config, season: e.target.value })}
-            className="bg-white/5 border border-white/10 text-[10px] p-3 rounded-xl font-bold outline-none text-white focus:ring-2 focus:ring-emerald-500/30 transition-all"
-          >
-            <option className="bg-slate-900">Maha</option>
-            <option className="bg-slate-900">Yala</option>
-          </select>
+            onChange={(val) => setConfig({ ...config, season: val })}
+            options={["Maha", "Yala"]}
+          />
           {availableDates.length > 0 && (
-            <select
+            <CustomSelect
+              className="col-span-2"
               value={config.date}
-              onChange={(e) => setConfig({ ...config, date: e.target.value })}
-              className="col-span-2 bg-white/5 border border-white/10 text-[10px] p-3 rounded-xl font-bold text-white outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all"
-            >
-              {availableDates.map((d) => <option key={d} className="bg-slate-900">{d}</option>)}
-            </select>
+              onChange={(val) => setConfig({ ...config, date: val })}
+              options={availableDates}
+            />
           )}
 
         </div>
