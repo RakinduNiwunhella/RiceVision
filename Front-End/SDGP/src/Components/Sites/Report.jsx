@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 
 const Report = () => {
   const districts = ["Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle", "Gampaha", "Hambantota", "Jaffna", "Kalutara", "Kandy", "Kegalle", "Kilinochchi", "Kurunegala", "Mannar", "Matale", "Matara", "Monaragala", "Mullaitivu", "Nuwara Eliya", "Polonnaruwa", "Puttalam", "Ratnapura", "Trincomalee", "Vavuniya"];
@@ -73,7 +74,8 @@ const Report = () => {
       ["General Risk Score", report.metrics.risk_score.toFixed(2)],
       ["Estimated Harvest Date", report.metrics.harvest_date]
     ];
-    doc.autoTable({
+    // FIX: Call autoTable as a function, passing 'doc' as the first argument
+    autoTable(doc, {
       startY: 60,
       head: [['Metric', 'Value']],
       body: tableData,
