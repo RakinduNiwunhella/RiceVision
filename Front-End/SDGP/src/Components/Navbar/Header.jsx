@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import logo from '../assets/logo.png'
 import { useTheme } from '../../context/ThemeContext'
+import { useLanguage, LANGUAGES } from '../../context/LanguageContext'
 
 const searchIndex = [
   { label: 'Dashboard', description: 'Overview, analytics, yield summary', icon: 'apps', path: '/dashboard' },
@@ -19,6 +20,11 @@ const Header = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const { isDark, toggleTheme } = useTheme()
+  const { language, setLanguage, t } = useLanguage()
+  const [langOpen, setLangOpen] = useState(false)
+  const [langDropdownPos, setLangDropdownPos] = useState({ top: 0, right: 0 })
+  const langRef = useRef(null)
+  const langBtnRef = useRef(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [showResults, setShowResults] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState(0)
@@ -48,6 +54,9 @@ const Header = () => {
     const handleClickOutside = (e) => {
       if (searchRef.current && !searchRef.current.contains(e.target)) {
         setShowResults(false)
+      }
+      if (langBtnRef.current && !langBtnRef.current.contains(e.target)) {
+        setLangOpen(false)
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
@@ -79,14 +88,16 @@ const Header = () => {
   }
 
   const navItems = [
-    { label: 'Dashboard', icon: 'apps', path: '/dashboard' },
-    { label: 'Field Data', icon: 'table_chart', path: '/field-data' },
-    { label: 'Map', icon: 'map', path: '/field-map' },
-    { label: 'Weather', icon: 'cloud', path: '/weather' },
-    { label: 'Alerts', icon: 'notification_important', path: '/alerts' },
-    { label: 'Report', icon: 'bar_chart', path: '/report' },
-    { label: 'Help', icon: 'help', path: '/help' },
+    { label: t('dashboard'), icon: 'apps', path: '/dashboard' },
+    { label: t('fieldData'), icon: 'table_chart', path: '/field-data' },
+    { label: t('map'), icon: 'map', path: '/field-map' },
+    { label: t('weather'), icon: 'cloud', path: '/weather' },
+    { label: t('alerts'), icon: 'notification_important', path: '/alerts' },
+    { label: t('report'), icon: 'bar_chart', path: '/report' },
+    { label: t('help'), icon: 'help', path: '/help' },
   ]
+
+  const currentLang = LANGUAGES.find(l => l.code === language) || LANGUAGES[0]
 
   return (
     <nav className="fixed top-4 left-1/2 -translate-x-1/2 w-[calc(100%-3rem)] max-w-7xl z-50 glass h-14 rounded-2xl shadow-2xl border-white/20">
@@ -143,7 +154,7 @@ const Header = () => {
                 onChange={(e) => { setSearchQuery(e.target.value); updateDropdownPos(); setShowResults(true) }}
                 onFocus={() => { if (searchQuery) { updateDropdownPos(); setShowResults(true) } }}
                 onKeyDown={handleKeyDown}
-                placeholder="Search analytics..."
+                placeholder={t('searchPlaceholder')}
                 className="w-48 xl:w-64 bg-white/5 border border-white/10 rounded-xl py-1.5 pl-10 pr-4 text-xs text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:bg-white/10 focus:border-white/20 transition-all shadow-inner"
                 autoComplete="off"
               />
@@ -177,6 +188,47 @@ const Header = () => {
 
             {/* Actions */}
             <div className="flex items-center gap-1.5 border-l border-white/10 pl-3">
+
+              {/* Language Selector */}
+              <div ref={langRef}>
+                <button
+                  ref={langBtnRef}
+                  onClick={() => {
+                    if (!langOpen && langBtnRef.current) {
+                      const rect = langBtnRef.current.getBoundingClientRect()
+                      setLangDropdownPos({ top: rect.bottom + 8, right: window.innerWidth - rect.right })
+                    }
+                    setLangOpen(prev => !prev)
+                  }}
+                  className="h-8 px-2 rounded-lg flex items-center gap-1 text-white/50 hover:text-white hover:bg-white/10 transition text-[11px] font-semibold"
+                  title="Change Language"
+                >
+                  <span className="material-symbols-outlined text-[16px]">language</span>
+                  <span>{currentLang.short}</span>
+                </button>
+                {langOpen && createPortal(
+                  <div
+                    style={{ position: 'fixed', top: langDropdownPos.top, right: langDropdownPos.right, zIndex: 9999, minWidth: 130 }}
+                    className="bg-[#0f1a12]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl overflow-hidden"
+                  >
+                    {LANGUAGES.map(lang => (
+                      <button
+                        key={lang.code}
+                        onMouseDown={() => { setLanguage(lang.code); setLangOpen(false) }}
+                        className={`w-full flex items-center gap-2 px-4 py-2.5 text-left text-xs transition ${
+                          language === lang.code
+                            ? 'bg-emerald-500/20 text-emerald-300 font-semibold'
+                            : 'text-white/70 hover:bg-white/5 hover:text-white'
+                        }`}
+                      >
+                        {lang.label}
+                      </button>
+                    ))}
+                  </div>,
+                  document.body
+                )}
+              </div>
+
               {/* Dark mode toggle */}
               <button
                 onClick={toggleTheme}

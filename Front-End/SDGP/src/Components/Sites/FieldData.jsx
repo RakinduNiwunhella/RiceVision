@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { supabase } from "../../supabaseClient"; // adjust path if needed
+import { supabase } from "../../supabaseClient";
+import { useLanguage } from "../../context/LanguageContext";
 
 const healthColor = (health) => {
   switch (health) {
@@ -15,6 +16,7 @@ const healthColor = (health) => {
 };
 
 const FieldData = () => {
+  const { t } = useLanguage();
   const [stats, setStats] = useState([]);
   const [districtData, setDistrictData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -34,10 +36,10 @@ const FieldData = () => {
       }
 
       setStats([
-        { label: "Total Fields", value: summary.total_fields, icon: "analytics" },
-        { label: "Healthy Fields", value: summary.healthy_fields, icon: "check_circle", color: "text-emerald-400" },
-        { label: "Stressed Fields", value: summary.stressed_fields, icon: "potted_plant", color: "text-amber-400" },
-        { label: "Critical Alerts", value: summary.critical_alerts, icon: "warning", color: "text-red-400" },
+        { label: t('colTotalFields'), value: summary.total_fields, icon: "analytics" },
+        { label: t('colHealthy'), value: summary.healthy_fields, icon: "check_circle", color: "text-emerald-400" },
+        { label: t('colStressed'), value: summary.stressed_fields, icon: "potted_plant", color: "text-amber-400" },
+        { label: t('colCritical'), value: summary.critical_alerts, icon: "warning", color: "text-red-400" },
       ]);
 
       const { data: districts, error: districtError } = await supabase
@@ -63,7 +65,7 @@ const FieldData = () => {
       <div className="min-h-full flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
-          <p className="text-white/40 font-black uppercase tracking-widest text-xs animate-pulse">Decrypting Field Intelligence...</p>
+          <p className="text-white/40 font-black uppercase tracking-widest text-xs animate-pulse">{t('decryptingIntel')}</p>
         </div>
       </div>
     );
@@ -77,16 +79,16 @@ const FieldData = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
             <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
-              Field Intelligence
+              {t('fieldIntelligence')}
             </h1>
             <p className="text-white/40 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em]">
-              Aggregated Satellite-derived insights on Crop Health & Yield Performance
+              {t('liveStream')}
             </p>
           </div>
 
           <div className="glass px-6 py-3 rounded-2xl border-white/10 flex items-center gap-3">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-white/60">Live Sentinel Stream</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-white/60">{t('liveStream')}</span>
           </div>
         </div>
 
@@ -117,7 +119,7 @@ const FieldData = () => {
           <div className="p-8 border-b border-white/10 flex justify-between items-center">
             <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/40 flex items-center gap-3">
               <span className="material-symbols-outlined text-emerald-400">dataset</span>
-              District-wise Performance Summary
+              {t('districtPerformance')}
             </h2>
             <div className="flex gap-2">
               <div className="w-2 h-2 rounded-full bg-white/10" />
@@ -130,13 +132,13 @@ const FieldData = () => {
             <table className="w-full text-sm border-collapse">
               <thead>
                 <tr className="text-white/30 uppercase text-[10px] font-black tracking-widest border-b border-white/5">
-                  <th className="px-8 py-6 text-left font-black">District</th>
-                  <th className="px-6 py-6 text-left font-black">Total Fields</th>
-                  <th className="px-6 py-6 text-left font-black">Healthy</th>
-                  <th className="px-6 py-6 text-left font-black">Stressed</th>
-                  <th className="px-6 py-6 text-left font-black">Critical</th>
-                  <th className="px-6 py-6 text-left font-black">Avg Yield (kg/ha)</th>
-                  <th className="px-8 py-6 text-right font-black">Total Yield (kg)</th>
+                  <th className="px-8 py-6 text-left font-black">{t('colDistrict')}</th>
+                  <th className="px-6 py-6 text-left font-black">{t('colTotalFields')}</th>
+                  <th className="px-6 py-6 text-left font-black">{t('colHealthy')}</th>
+                  <th className="px-6 py-6 text-left font-black">{t('colStressed')}</th>
+                  <th className="px-6 py-6 text-left font-black">{t('colCritical')}</th>
+                  <th className="px-6 py-6 text-left font-black">{t('colAvgYield')}</th>
+                  <th className="px-8 py-6 text-right font-black">{t('colTotalYield')}</th>
                 </tr>
               </thead>
 
