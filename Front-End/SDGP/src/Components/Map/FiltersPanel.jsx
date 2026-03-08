@@ -28,19 +28,13 @@ export default function FiltersPanel({ filters, setFilters }) {
     "Vavuniya",
   ];
 
-  const healthStatuses = ["Healthy", "Stressed", "Damaged"];
+  const healthStatuses = [
+  "Normal",
+  "Mild Stress",
+  "Severe Stress",
+  "Not Applicable",
+];
 
-  const toggleArrayValue = (key, value) => {
-    setFilters((prev) => {
-      const exists = prev[key].includes(value);
-      return {
-        ...prev,
-        [key]: exists
-          ? prev[key].filter((v) => v !== value)
-          : [...prev[key], value],
-      };
-    });
-  };
 
   return (
     <div className="w-full lg:w-80 glass p-6 overflow-y-auto max-h-[calc(100vh-6rem)] shadow-xl">
@@ -112,8 +106,43 @@ export default function FiltersPanel({ filters, setFilters }) {
 
       {/* Health Status */}
       <div>
-        <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/40 mb-3">Crop Condition</p>
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/40">Crop Condition</p>
+          {/* clear all by selecting 'All' or using button */}
+          {filters.health.length > 0 && (
+            <button
+              className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 hover:text-emerald-300"
+              onClick={() =>
+                setFilters((prev) => ({
+                  ...prev,
+                  health: [],
+                }))
+              }
+            >
+              Clear
+            </button>
+          )}
+        </div>
         <div className="grid grid-cols-1 gap-2">
+          {/* explicit "All statuses" option */}
+          <label
+            className="flex items-center justify-between px-3 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20 transition cursor-pointer"
+          >
+            <span className="text-sm font-medium text-white/90">All</span>
+            <input
+              type="radio"
+              name="health"
+              className="w-4 h-4 accent-emerald-500 cursor-pointer"
+              value=""
+              checked={filters.health.length === 0}
+              onChange={() =>
+                setFilters((prev) => ({
+                  ...prev,
+                  health: [],
+                }))
+              }
+            />
+          </label>
           {healthStatuses.map((s) => (
             <label
               key={s}
@@ -121,10 +150,17 @@ export default function FiltersPanel({ filters, setFilters }) {
             >
               <span className="text-sm font-medium text-white/90">{s}</span>
               <input
-                type="checkbox"
-                className="w-4 h-4 rounded-lg accent-emerald-500 cursor-pointer"
-                checked={filters.health.includes(s)}
-                onChange={() => toggleArrayValue("health", s)}
+                type="radio"
+                name="health"
+                className="w-4 h-4 accent-emerald-500 cursor-pointer"
+                value={s}
+                checked={filters.health[0] === s}
+                onChange={() =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    health: [s],
+                  }))
+                }
               />
             </label>
           ))}
