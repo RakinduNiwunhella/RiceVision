@@ -1,6 +1,9 @@
-import React from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import { createPortal } from 'react-dom'
 import logo from '../assets/logo.png'
+import Notifications from '../Notifications/Notifications'
+import { supabase } from "../../supabaseClient";
 
 const Header = () => {
   const location = useLocation()
@@ -16,7 +19,7 @@ const Header = () => {
   ]
 
   return (
-    <nav className="fixed top-4 left-1/2 -translate-x-1/2 w-[calc(100%-3rem)] max-w-7xl z-50 glass h-14 rounded-2xl shadow-2xl border-white/20">
+    <nav className="fixed top-4 left-1/2 -translate-x-1/2 w-[calc(100%-3rem)] max-w-7xl z-50 glass h-14 rounded-2xl shadow-2xl border-white/20 overflow-visible">
       <div className="max-w-7xl mx-auto px-4 h-full">
         <div className="flex justify-between items-center h-full gap-4">
 
@@ -72,15 +75,7 @@ const Header = () => {
 
             {/* Actions */}
             <div className="flex items-center gap-1.5 border-l border-white/10 pl-3">
-              <Link
-                to="/alerts"
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition"
-                title="Notifications"
-              >
-                <span className="material-symbols-outlined text-[20px]">
-                  notifications
-                </span>
-              </Link>
+              <NotificationButton />
             </div>
 
             {/* Avatar */}
@@ -98,6 +93,101 @@ const Header = () => {
       </div>
     </nav>
   )
+}
+
+
+// notification-specific button component so header stays clean
+function NotificationButton() {
+  const [show, setShow] = useState(false);
+  const [unread, setUnread] = useState(0);
+  const [coords, setCoords] = useState({ top: 0, right: 0 });
+  const [maxHeight, setMaxHeight] = useState(0);
+  const buttonRef = useRef(null);
+
+  // directly query supabase for unread count from notificationpanel table
+  const fetchCount = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("notificationpanel")
+        .select("id", { count: 'exact', head: true })
+        .eq("is_read", false);
+      if (error) throw error;
+      // supabase returns count via data.length when head=true so use it
+      setUnread(data?.length || 0);
+    } catch (e) {
+      console.error("failed to get notifications count", e);
+    }
+  };
+
+  useEffect(() => {
+    // fetch unread count when component mounts or panel visibility changes
+    fetchCount();
+  }, [show]);
+
+  const handleRead = (id) => {
+    // decrement badge and refresh from server to stay accurate
+    setUnread((u) => Math.max(0, u - 1));
+    fetchCount();
+  };
+
+  // close when clicking outside
+  const wrapperRef = React.useRef(null);
+  useEffect(() => {
+    function handleClick(e) {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+        setShow(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  // recalc coords and available height when button toggles
+  useEffect(() => {
+    if (show && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      const top = rect.bottom + 8;
+      setCoords({ top, right: window.innerWidth - rect.right });
+      // available space below the button (with some margin)
+      setMaxHeight(window.innerHeight - top - 16);
+    }
+  }, [show]);
+
+  const panel = (
+    <Notifications
+      onRead={handleRead}
+      style={{
+        position: 'fixed',
+        top: coords.top,
+        right: coords.right,
+        zIndex: 9999,
+        width: '20rem',
+        maxHeight: maxHeight > 0 ? maxHeight : '24rem',
+        overflowY: 'auto',
+      }}
+    />
+  );
+
+  return (
+    <div ref={wrapperRef} className="relative overflow-visible">
+      <button
+        ref={buttonRef}
+        className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition relative"
+        title="Notifications"
+        onClick={() => setShow((s) => !s)}
+      >
+        <span className="material-symbols-outlined text-[20px]">
+          notifications
+        </span>
+        {unread > 0 && (
+          <span className="absolute -top-1 -right-1 bg-red-500 text-[10px] text-white rounded-full w-4 h-4 flex items-center justify-center">
+            {unread}
+          </span>
+        )}
+      </button>
+      {show && createPortal(panel, document.body)}
+    </div>
+  );
 }
 
 export default Header
