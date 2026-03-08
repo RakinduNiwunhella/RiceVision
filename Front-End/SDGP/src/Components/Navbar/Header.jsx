@@ -75,13 +75,26 @@ const Header = () => {
 
             {/* Actions */}
             <div className="flex items-center gap-1.5 border-l border-white/10 pl-3">
+              <button
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition"
+                title="Toggle Dark Mode"
+              >
+                <span className="material-symbols-outlined text-[20px]">dark_mode</span>
+              </button>
+              <button
+                className="h-8 px-2 rounded-lg flex items-center gap-1 text-white/50 hover:text-white hover:bg-white/10 transition"
+                title="Language"
+              >
+                <span className="material-symbols-outlined text-[20px]">language</span>
+                <span className="text-xs font-semibold">EN</span>
+              </button>
               <NotificationButton />
             </div>
 
             {/* Avatar */}
             <Link
               to="/profile"
-              className="w-8 h-8 rounded-lg bg-gradient-to-br from-slate-400 to-slate-600 flex items-center justify-center text-white ring-1 ring-white/20 shadow-lg cursor-pointer hover:scale-105 active:scale-95 transition"
+              className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition"
               title="View Profile"
             >
               <span className="material-symbols-outlined text-[20px]">
