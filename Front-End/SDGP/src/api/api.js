@@ -14,6 +14,7 @@ export const fetchBestDistricts = () => get("/best-districts");
 export const fetchOutbreaks = () => get("/outbreaks");
 export const fetchNDVITrend = () => get("/ndvi-trend");
 export const fetchDistrictHealth = () => get("/district-health");
+export const fetchStageDistribution = (district) => get(`/stage-distribution/${encodeURIComponent(district)}`);
 export const fetchReportData = (districts, month) => get(`/api/report-data?districts=${districts}&month=${month}`);
 
 // Called directly from the browser — Open-Meteo is free, no API key needed

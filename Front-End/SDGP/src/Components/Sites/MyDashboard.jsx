@@ -11,6 +11,8 @@ import {
   Pie,
   Cell,
   Legend,
+  BarChart,
+  Bar,
 } from "recharts";
 import { AlertTriangle, CloudRain, Bug } from "lucide-react";
 
@@ -19,7 +21,8 @@ import {
   fetchYield,
   fetchBestDistricts,
   fetchOutbreaks,
-  fetchDistrictHealth
+  fetchDistrictHealth,
+  fetchStageDistribution,
 } from "../../api/api";
 import YieldChatbot from "../chatbot/Yieldchatbot";
 
@@ -71,6 +74,10 @@ const MyDashboard = () => {
   const [showAllOutbreaks, setShowAllOutbreaks] = useState(false);
   const [districtHealth, setDistrictHealth] = useState([]);
   const [showAllDistricts, setShowAllDistricts] = useState(false);
+  const [stageDistribution, setStageDistribution] = useState([]);
+  const [selectedDistrict, setSelectedDistrict] = useState("");
+
+  const stageColors = ["#10b981", "#06b6d4", "#8b5cf6", "#f59e0b", "#ef4444", "#f97316"];
 
   const pieColors = ["#10b981", "#f59e0b", "#ef4444"]; // Emerald-500, Amber-500, Red-500
 
@@ -103,6 +110,19 @@ const MyDashboard = () => {
     };
     loadData();
   }, []);
+
+  useEffect(() => {
+    if (districtHealth.length > 0 && !selectedDistrict) {
+      setSelectedDistrict(districtHealth[0].district);
+    }
+  }, [districtHealth]);
+
+  useEffect(() => {
+    if (!selectedDistrict) return;
+    fetchStageDistribution(selectedDistrict)
+      .then(setStageDistribution)
+      .catch((err) => console.error("Stage distribution error:", err));
+  }, [selectedDistrict]);
 
   const formatMT = (value) => {
     if (!value) return "-";
@@ -359,6 +379,82 @@ const MyDashboard = () => {
                 {showAllDistricts ? "Show Less" : `Show All (${districtHealth.length} Items)`}
               </button>
             </div>
+          </div>
+
+          {/* Stage Distribution Bar Chart */}
+          <div className="glass glass-hover p-8 rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-2 flex items-center gap-2">
+              <span className="material-symbols-outlined text-purple-400 text-sm">bar_chart</span>
+              Growth Analysis
+            </p>
+            <div className="flex flex-wrap justify-between items-center gap-4 mb-8">
+              <h3 className="text-xl font-black text-white tracking-tight uppercase">Stage Distribution</h3>
+              <select
+                value={selectedDistrict}
+                onChange={(e) => setSelectedDistrict(e.target.value)}
+                className="text-[10px] font-black uppercase tracking-wider text-white/60 bg-white/5 border border-white/10 rounded-xl px-4 py-2 outline-none cursor-pointer hover:bg-white/10 transition-colors appearance-none"
+              >
+                {districtHealth.map((d) => (
+                  <option key={d.district} value={d.district} className="bg-[#0f172a] text-white">
+                    {d.district}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {stageDistribution.length > 0 ? (
+              <>
+                <div className="flex-1 min-h-65">
+                  <ResponsiveContainer width="100%" height={260}>
+                    <BarChart data={stageDistribution} margin={{ top: 10, right: 10, left: -20, bottom: 40 }}>
+                      <XAxis
+                        dataKey="stage_name"
+                        tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 9, fontWeight: 900 }}
+                        axisLine={{ stroke: "rgba(255,255,255,0.05)" }}
+                        tickLine={false}
+                        angle={-30}
+                        textAnchor="end"
+                        interval={0}
+                      />
+                      <YAxis
+                        tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 9, fontWeight: 900 }}
+                        axisLine={false}
+                        tickLine={false}
+                      />
+                      <Tooltip
+                        contentStyle={{ background: "rgba(0,0,0,0.85)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "15px", backdropFilter: "blur(10px)" }}
+                        labelStyle={{ color: "#fff", fontSize: "10px", fontWeight: "900", textTransform: "uppercase" }}
+                        itemStyle={{ color: "#a78bfa", fontSize: "10px", fontWeight: "bold" }}
+                        cursor={{ fill: "rgba(255,255,255,0.03)" }}
+                        formatter={(value) => [value, "Fields"]}
+                      />
+                      <Bar dataKey="total_fields" radius={[8, 8, 0, 0]}>
+                        {stageDistribution.map((_, i) => (
+                          <Cell
+                            key={i}
+                            fill={stageColors[i % stageColors.length]}
+                            style={{ filter: `drop-shadow(0 0 8px ${stageColors[i % stageColors.length]}66)` }}
+                          />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+
+                <div className="mt-6 pt-6 border-t border-white/5 grid grid-cols-3 gap-3">
+                  {stageDistribution.map((d, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: stageColors[i % stageColors.length], boxShadow: `0 0 6px ${stageColors[i % stageColors.length]}` }} />
+                      <span className="text-[9px] font-black text-white/40 uppercase tracking-tighter truncate">{d.stage_name}</span>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div className="flex-1 min-h-75 flex items-center justify-center text-white/20 animate-pulse text-xs font-black uppercase tracking-widest">
+                {selectedDistrict ? "Loading Stage Data..." : "Select a District"}
+              </div>
+            )}
           </div>
 
         </div>
