@@ -2,7 +2,3 @@ venv/
 __pycache__/
 *.pyc
 # Ignore the .env file that contains sensitive information
-venv/
-.venv/
-*.py[cod]
-*.pyc

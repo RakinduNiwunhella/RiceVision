@@ -4,14 +4,9 @@ from ..db import supabase
 
 router = APIRouter(prefix="/alerts", tags=["Alerts"])
 
-
 class AlertStatusUpdate(BaseModel):
     status: str
 
-
-# -----------------------------
-# 1️⃣ GET ALL ALERTS
-# -----------------------------
 @router.get("/all")
 async def get_all_alerts():
     try:
@@ -19,28 +14,24 @@ async def get_all_alerts():
             supabase
             .table("alerts_overview_view")
             .select("*")
-            .order("date", desc=True)
+            .order("created_at", desc=True)
             .execute()
         )
 
+        # If no data, return empty list instead of error
         if not response.data:
             return []
 
+        # Supabase returns dictionaries, so use ["key"] not .key
         mapped_data = [
             {
                 "id": a.get("id"),
-                "title": a.get("alert_type"),
-                "description": f"Stage: {a.get('stage_name')} | Health: {a.get('paddy_health')}",
+                "title": a.get("title"),
+                "description": a.get("description"),
                 "status": a.get("status"),
-                "priority": (
-                    "High" if a.get("pest_risk", 0) >= 80
-                    else "Medium" if a.get("pest_risk", 0) >= 50
-                    else "Low"
-                ),
+                "priority": a.get("priority"),
                 "field": a.get("district"),
-                "timestamp": a.get("date"),
-                "lat": a.get("lat"),
-                "lon": a.get("lon")
+                "timestamp": a.get("created_at"),
             }
             for a in response.data
         ]
@@ -50,91 +41,12 @@ async def get_all_alerts():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
-# -----------------------------
-# 2️⃣ GET PEST RISK BY DISTRICT
-# -----------------------------
-@router.get("/pest-risk")
-async def get_pest_risk_by_district():
-    try:
-        response = (
-            supabase
-            .table("pest_risk_by_district")
-            .select("*")
-            .execute()
-        )
-
-        if not response.data:
-            return []
-
-        mapped_data = [
-            {
-                "district": r.get("district"),
-                "total_pixels": r.get("total_pixels"),
-                "risky_pixels": r.get("risky_pixels"),
-                "risky_pixel_locations": r.get("risky_pixel_locations")
-            }
-            for r in response.data
-        ]
-
-        return mapped_data
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-# -----------------------------
-# 3️⃣ GET DISASTER ALERTS
-# -----------------------------
-@router.get("/disasters")
-async def get_disasters():
-    try:
-        response = (
-            supabase
-            .table("alerts_overview_view")
-            .select("*")
-            .neq("disaster_risk", "Not Applicable")
-            .order("date", desc=True)
-            .execute()
-        )
-
-        if not response.data:
-            return []
-
-        mapped_data = [
-            {
-                "id": a.get("id"),
-                "district": a.get("district"),
-                "disaster_type": (
-                    a.get("disaster_risk")
-                    .replace("hazard_", "")
-                    .lower()
-                    .replace("_", " ")
-                ),
-                "stage": a.get("stage_name"),
-                "health": a.get("paddy_health"),
-                "timestamp": a.get("date"),
-                "lat": a.get("lat"),
-                "lon": a.get("lon")
-            }
-            for a in response.data
-        ]
-
-        return mapped_data
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-# -----------------------------
-# 4️⃣ UPDATE ALERT STATUS
-# -----------------------------
 @router.put("/{alert_id}")
 async def update_alert_status(alert_id: int, body: AlertStatusUpdate):
     try:
         response = (
             supabase
-            .table("alerts")
+            .table("alerts")  # use your real base table name if different
             .update({"status": body.status})
             .eq("id", alert_id)
             .execute()
