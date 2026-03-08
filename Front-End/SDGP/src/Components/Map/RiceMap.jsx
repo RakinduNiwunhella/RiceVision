@@ -287,11 +287,20 @@ export default function RiceMap({ filters, layers, flyTo }) {
 
     const loadPoints = async () => {
       try {
-
-        const data = await fetchMapFields({
+        let data = await fetchMapFields({
           districts: [selectedDistrict],
           health: selectedHealth,
         });
+
+        // defensive client-side filtering: ensure only the chosen
+        // health status is shown, since backend filtering may sometimes
+        // misfire or be case-sensitive.
+        if (selectedHealth && selectedHealth.length === 1) {
+          const wanted = selectedHealth[0].toLowerCase();
+          data = data.filter(
+            (p) => String(p.paddy_health).toLowerCase() === wanted
+          );
+        }
 
         setPoints(data);
 
@@ -431,20 +440,114 @@ export default function RiceMap({ filters, layers, flyTo }) {
   showCoverageOnHover={false}
   maxClusterRadius={30}
   chunkedLoading
+  iconCreateFunction={(cluster) => {
+
+    const markers = cluster.getAllChildMarkers();
+    const selectedFilter = filters.health?.[0];   // current filter
+
+    let healthy = 0;
+    let mild = 0;
+    let severe = 0;
+
+    markers.forEach(m => {
+
+      const health = m.options.health;
+
+      if (health === "Healthy" || health === "Normal") healthy++;
+      else if (health === "Mild Stress") mild++;
+      else if (health === "Severe Stress") severe++;
+
+    });
+
+    const total = markers.length;
+
+    /* ------------------------------
+       CASE 1: SPECIFIC FILTER ACTIVE
+       ------------------------------ */
+
+    if (selectedFilter) {
+
+      const color = getHealthColor(selectedFilter);
+
+      return L.divIcon({
+        html: `
+          <div style="
+            background:${color};
+            width:40px;
+            height:40px;
+            border-radius:50%;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            color:white;
+            font-weight:bold;
+            border:2px solid white;
+          ">
+            ${cluster.getChildCount()}
+          </div>
+        `,
+        className: "cluster-health",
+        iconSize: L.point(40,40)
+      });
+
+    }
+
+    /* ------------------------------
+       CASE 2: ALL SELECTED
+       MIXED COLOR GRADIENT
+       ------------------------------ */
+
+    const healthyPct = (healthy / total) * 100;
+    const mildPct = (mild / total) * 100;
+    const severePct = (severe / total) * 100;
+
+    const gradient = `
+      conic-gradient(
+        #22c55e 0% ${healthyPct}%,
+        #facc15 ${healthyPct}% ${healthyPct + mildPct}%,
+        #dc2626 ${healthyPct + mildPct}% 100%
+      )
+    `;
+
+    return L.divIcon({
+      html: `
+        <div style="
+          background:${gradient};
+          width:40px;
+          height:40px;
+          border-radius:50%;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          color:white;
+          font-weight:bold;
+          border:2px solid white;
+        ">
+          ${cluster.getChildCount()}
+        </div>
+      `,
+      className: "cluster-health",
+      iconSize: L.point(40,40)
+    });
+
+  }}
 >
-  {points.map((p, idx) => (
-    <CircleMarker
-      key={idx}
-      center={[p.lat, p.lng]}
-      radius={5}
-      pathOptions={{
-        color: getHealthColor(p.paddy_health),
-        fillColor: getHealthColor(p.paddy_health),
-        fillOpacity: 0.8,
-        weight: 1,
-      }}
-    />
-  ))}
+{points.map((p, idx) => (
+<CircleMarker
+  key={idx}
+  center={[p.lat, p.lng]}
+  radius={5}
+  pathOptions={{
+    color: getHealthColor(p.paddy_health),
+    fillColor: getHealthColor(p.paddy_health),
+    fillOpacity: 0.8,
+    weight: 1,
+  }}
+  ref={(ref) => {
+    if (ref) ref.options.health = p.paddy_health;
+  }}
+/>
+))}
 </MarkerClusterGroup>
 )}
 
