@@ -1,8 +1,86 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import ReactDOM from "react-dom";
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import autoTable from 'jspdf-autotable';
+import logoImg from '../assets/logo.png';
+
+const CustomSelect = ({ value, onChange, options, className = "" }) => {
+  const [open, setOpen] = useState(false);
+  const [dropdownStyle, setDropdownStyle] = useState({});
+  const wrapperRef = useRef(null);
+  const buttonRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleToggle = () => {
+    if (!open && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setDropdownStyle({
+        position: "fixed",
+        top: rect.bottom + 4,
+        left: rect.left,
+        width: rect.width,
+        zIndex: 99999,
+      });
+    }
+    setOpen((o) => !o);
+  };
+
+  return (
+    <div className={`relative ${className}`} ref={wrapperRef}>
+      <button
+        ref={buttonRef}
+        type="button"
+        onClick={handleToggle}
+        className="w-full flex justify-between items-center bg-white/5 border border-white/10 text-[10px] px-4 py-3 rounded-xl font-bold text-white outline-none hover:bg-white/10 transition-all"
+      >
+        <span>{value}</span>
+        <span
+          className="material-symbols-outlined text-sm text-white/40 transition-transform duration-200"
+          style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)" }}
+        >
+          expand_more
+        </span>
+      </button>
+      {open && ReactDOM.createPortal(
+        <div
+          style={{
+            ...dropdownStyle,
+            background: "rgba(10, 22, 14, 0.95)",
+            backdropFilter: "blur(24px)",
+            WebkitBackdropFilter: "blur(24px)",
+          }}
+          className="max-h-52 overflow-y-auto rounded-xl border border-white/20 shadow-2xl"
+        >
+          {options.map((opt) => (
+            <button
+              key={opt}
+              type="button"
+              onClick={() => { onChange(opt); setOpen(false); }}
+              className={`w-full text-left px-4 py-2.5 text-[10px] font-bold flex items-center gap-2 transition-all ${
+                value === opt
+                  ? "text-emerald-400 bg-emerald-500/20"
+                  : "text-white hover:bg-white/20 hover:text-white"
+              }`}
+            >
+              <span className="material-symbols-outlined text-xs" style={{ visibility: value === opt ? "visible" : "hidden" }}>check</span>
+              {opt}
+            </button>
+          ))}
+        </div>,
+        document.body
+      )}
+    </div>
+  );
+};
 
 const Report = () => {
   const districts = ["Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle", "Gampaha", "Hambantota", "Jaffna", "Kalutara", "Kandy", "Kegalle", "Kilinochchi", "Kurunegala", "Mannar", "Matale", "Matara", "Monaragala", "Mullaitivu", "Nuwara Eliya", "Polonnaruwa", "Puttalam", "Ratnapura", "Trincomalee", "Vavuniya"];
@@ -52,37 +130,354 @@ const Report = () => {
     if (mode === "compare") fetchData(configB, setDataB);
   }, [configA, configB, mode]);
 
-  const generatePDF = (report, config) => {
-    const doc = new jsPDF();
-    doc.setFillColor(16, 185, 129);
-    doc.rect(0, 0, 210, 40, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(22);
-    doc.text("RICEVISION ANALYTICS REPORT", 15, 25);
-    doc.setFontSize(10);
-    doc.text(`District: ${config.district} | Season: ${config.season} | Date: ${config.date}`, 15, 33);
-    doc.setTextColor(40, 40, 40);
-    doc.setFontSize(14);
-    doc.text("Agricultural Forecast Summary", 15, 55);
-    const tableData = [
-      ["Predicted Average Yield", `${report.summary.yield.toLocaleString()} kg / ha`],
-      ["Total Estimated Production", `${report.summary.total_kg.toLocaleString()} kg`],
-      ["Historical Baseline", `${report.summary.historical.toLocaleString()} kg/ha`],
-      ["Growth Stage", report.categories.current_stage],
-      ["Health Status", report.categories.health_status],
-      ["Pest Attack Count", report.metrics.pest_count],
-      ["General Risk Score", report.metrics.risk_score.toFixed(2)],
-      ["Estimated Harvest Date", report.metrics.harvest_date]
+  const generatePDF = async (report, config) => {
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const PW = 210;
+    const PH = 297;
+    const M  = 14;
+
+    // ── PALETTE ───────────────────────────────────────────────────
+    const WHITE  = [255, 255, 255];
+    const OFFWH  = [248, 250, 252];
+    const GREEN  = [16, 185, 129];   // single brand green throughout
+    const NAVY   = [15,  23,  42];
+    const INK    = [15,  23,  42];
+    const DARK   = [30,  41,  59];
+    const SUBTEXT= [71,  85, 105];
+    const MUTED  = [148, 163, 184];
+    const LGRAY  = [241, 245, 249];
+    const BORDER = [226, 232, 240];
+    const ORANGE = [217, 119,   6];
+    const RED    = [220,  38,  38];
+    const REDLT  = [254, 242, 242];
+
+    // ── PAGE BACKGROUND ───────────────────────────────────────────
+    doc.setFillColor(...WHITE);
+    doc.rect(0, 0, PW, PH, 'F');
+
+    // ── LOAD LOGO (maintain aspect ratio) ─────────────────────────
+    let logoDataUrl = null;
+    let logoW = 0, logoH = 0;
+    try {
+      const imgEl = await new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload  = () => resolve(img);
+        img.onerror = reject;
+        img.src = logoImg;
+      });
+      const maxH = 16;
+      const ratio = imgEl.naturalWidth / imgEl.naturalHeight;
+      logoH = maxH;
+      logoW = maxH * ratio;
+      const canvas = document.createElement('canvas');
+      canvas.width  = imgEl.naturalWidth;
+      canvas.height = imgEl.naturalHeight;
+      canvas.getContext('2d').drawImage(imgEl, 0, 0);
+      logoDataUrl = canvas.toDataURL('image/png');
+    } catch (_) { /* logo is optional */ }
+
+    // ── HEADER (white background) ────────────────────────────────
+    doc.setFillColor(...WHITE);
+    doc.rect(0, 0, PW, 40, 'F');
+
+    // Dark green separator between header and district row
+    doc.setFillColor(0, 100, 50);
+    doc.rect(0, 40, PW, 2, 'F');
+
+    // Logo — vertically centred in header
+    const logoY = (39 - logoH) / 2;
+    if (logoDataUrl) {
+      doc.addImage(logoDataUrl, 'PNG', M, logoY, logoW, logoH);
+    }
+
+    // Centred title block
+    const cx = PW / 2;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(13);
+    doc.setTextColor(...INK);
+    doc.text('YIELD ANALYTICS REPORT', cx, 16, { align: 'center' });
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(...INK);
+    doc.text(
+      `Generated  ${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}`,
+      cx, 26, { align: 'center' }
+    );
+    doc.text(`Satellite data  ${config.date}`, cx, 36, { align: 'center' });
+
+    // ── DISTRICT ROW ──────────────────────────────────────────────
+    doc.setFillColor(...OFFWH);
+    doc.rect(0, 42, PW, 20, 'F');
+    doc.setDrawColor(...BORDER);
+    doc.setLineWidth(0.25);
+    doc.line(0, 62, PW, 62);
+
+    // District name + subtitle
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(13);
+    doc.setTextColor(...INK);
+    doc.text(config.district, M, 53.5);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7);
+    doc.setTextColor(...SUBTEXT);
+    doc.text('Sri Lanka  ·  District Yield Forecast', M, 59);
+
+    // Chips (right-aligned)
+    const chipH  = 8;
+    const chipW  = 34;
+    const chipY2 = 45;
+    const chip2X = PW - M - chipW;
+    const chip1X = chip2X - 4 - chipW;
+    const chipTY = chipY2 + chipH / 2 + 1.1;
+
+    // Season chip — white fill, green text
+    doc.setFillColor(...WHITE);
+    doc.roundedRect(chip1X, chipY2, chipW, chipH, 2, 2, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(6.5);
+    doc.setTextColor(...GREEN);
+    doc.text(`${config.season} Season`, chip1X + chipW / 2, chipTY, { align: 'center' });
+
+    // Date chip — light gray
+    doc.setFillColor(...LGRAY);
+    doc.roundedRect(chip2X, chipY2, chipW, chipH, 2, 2, 'F');
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(6.5);
+    doc.setTextColor(...DARK);
+    doc.text(config.date, chip2X + chipW / 2, chipTY, { align: 'center' });
+
+    // ── HELPERS ───────────────────────────────────────────────────
+    const raw = report.raw_data?.yield_csv || {};
+
+    const newPage = () => {
+      doc.addPage();
+      doc.setFillColor(...WHITE);
+      doc.rect(0, 0, PW, PH, 'F');
+      // slim green stripe on continuation pages
+      doc.setFillColor(...GREEN);
+      doc.rect(0, 0, PW, 6, 'F');
+      doc.setFillColor(10, 160, 110);
+      doc.rect(0, 5.5, PW, 0.5, 'F');
+      return 14;
+    };
+
+    const sectionHeading = (label, yy) => {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.setTextColor(...GREEN);
+      doc.text(label.toUpperCase(), M, yy);
+      doc.setDrawColor(...GREEN);
+      doc.setLineWidth(0.4);
+      doc.line(M, yy + 1.5, PW - M, yy + 1.5);
+    };
+
+    const drawStatCard = (x, cy, w, h, label, value, sub, accentColor = GREEN) => {
+      // card bg
+      doc.setFillColor(...OFFWH);
+      doc.roundedRect(x, cy, w, h, 2.5, 2.5, 'F');
+      // left accent
+      doc.setFillColor(...accentColor);
+      doc.roundedRect(x, cy, 3, h, 1.5, 1.5, 'F');
+      // label
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(6.5);
+      doc.setTextColor(...MUTED);
+      doc.text(label, x + 7, cy + 7);
+      // value
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      doc.setTextColor(...INK);
+      doc.text(String(value), x + 7, cy + 15.5);
+      // sub
+      if (sub) {
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(6);
+        doc.setTextColor(...SUBTEXT);
+        doc.text(sub, x + 7, cy + 21);
+      }
+    };
+
+    // ── KPI SUMMARY CARDS ─────────────────────────────────────────
+    let y = 70;
+    const gapVal    = report.summary.gap;
+    const gapSign   = gapVal >= 0 ? '+' : '';
+    const gapAccent = gapVal >= 0 ? GREEN : RED;
+    const pct = raw.percent_change !== undefined
+      ? parseFloat(raw.percent_change).toFixed(1)
+      : ((gapVal / report.summary.historical) * 100).toFixed(1);
+
+    const cW = (PW - M * 2 - 5) / 2;
+    const cH = 27;
+
+    drawStatCard(M,          y, cW, cH, 'PREDICTED AVG YIELD',   `${Math.round(report.summary.yield).toLocaleString()} kg/ha`,        'Satellite-derived ML forecast');
+    drawStatCard(M + cW + 5, y, cW, cH, 'HISTORICAL BASELINE',   `${Math.round(report.summary.historical).toLocaleString()} kg/ha`,   'Long-term district average');
+    y += cH + 4;
+    drawStatCard(M,          y, cW, cH, 'YIELD GAP',             `${gapSign}${Math.round(gapVal).toLocaleString()} kg/ha`,            `${gapSign}${pct}% vs baseline`, gapAccent);
+    drawStatCard(M + cW + 5, y, cW, cH, 'TOTAL PRODUCTION EST.', `${Math.round(report.summary.total_kg / 1000).toLocaleString()} MT`, 'Full district (metric tons)');
+    y += cH + 10;
+
+    // ── FIELD OVERVIEW TABLE ──────────────────────────────────────
+    sectionHeading('Field Overview', y);
+    y += 6;
+
+    const riskScore  = report.metrics.risk_score;
+    const riskLabel  = riskScore < 1 ? 'Low' : riskScore < 4 ? 'Moderate' : 'High';
+    const riskAccent = riskScore < 1 ? GREEN : riskScore < 4 ? ORANGE : RED;
+    const pestLabel  = report.metrics.pest_count === 0 ? 'Clear' : report.metrics.pest_count < 20 ? 'Moderate' : 'Critical';
+
+    const fieldRows = [
+      ['Growth Stage',       report.categories.current_stage,                       'Health Status',      report.categories.health_status],
+      ['Pest Incidents',     `${report.metrics.pest_count} (${pestLabel})`,          'Risk Score',         `${riskScore.toFixed(2)} / 10 (${riskLabel})`],
+      ['Severe Stress Area', `${report.metrics.stress_pct.toFixed(2)}%`,             'Est. Harvest Date',  report.metrics.harvest_date],
+      ['Season',             config.season,                                          'Data Date',          config.date],
     ];
-    // FIX: Call autoTable as a function, passing 'doc' as the first argument
+    if (raw.percent_change !== undefined)
+      fieldRows.push(['% vs Historical', `${parseFloat(raw.percent_change).toFixed(2)}%`, 'Pixels Analysed', raw.total_pixels !== undefined ? Number(raw.total_pixels).toLocaleString() : 'N/A']);
+    if (raw.health_index_z !== undefined)
+      fieldRows.push(['Health Index (Z)', parseFloat(raw.health_index_z).toFixed(3), 'Climate Stress Idx', raw.climate_stress_index !== undefined ? parseFloat(raw.climate_stress_index).toFixed(3) : 'N/A']);
+
     autoTable(doc, {
-      startY: 60,
-      head: [['Metric', 'Value']],
-      body: tableData,
-      theme: 'striped',
-      headStyles: { fillColor: [16, 185, 129] }
+      startY: y,
+      margin: { left: M, right: M },
+      body: fieldRows,
+      theme: 'plain',
+      styles:             { fontSize: 8, cellPadding: { top: 3.5, bottom: 3.5, left: 5, right: 5 }, textColor: INK, fillColor: WHITE },
+      alternateRowStyles: { fillColor: LGRAY },
+      columnStyles: {
+        0: { fontStyle: 'bold', textColor: SUBTEXT, cellWidth: 44 },
+        1: { cellWidth: 50 },
+        2: { fontStyle: 'bold', textColor: SUBTEXT, cellWidth: 44 },
+        3: { cellWidth: 'auto' },
+      },
+      tableLineColor: BORDER,
+      tableLineWidth: 0.2,
     });
-    doc.save(`RiceVision_${config.district}_Report.pdf`);
+    y = doc.lastAutoTable.finalY + 10;
+
+    // ── YIELD BREAKDOWN TABLE ─────────────────────────────────────
+    if (y > 240) y = newPage();
+    sectionHeading('Yield Forecast Breakdown', y);
+    y += 6;
+
+    autoTable(doc, {
+      startY: y,
+      margin: { left: M, right: M },
+      head: [['Metric', 'Value', 'Unit', 'Notes']],
+      body: [
+        ['Predicted Average Yield',    Math.round(report.summary.yield).toLocaleString(),            'kg/ha', 'ML satellite forecast'],
+        ['Historical Average Yield',   Math.round(report.summary.historical).toLocaleString(),       'kg/ha', 'District long-term baseline'],
+        ['Total Estimated Production', Math.round(report.summary.total_kg).toLocaleString(),         'kg',    'Full district acreage'],
+        ['Total Estimated Production', Math.round(report.summary.total_kg / 1000).toLocaleString(),  'MT',    'Metric tons (÷ 1,000)'],
+        ['Yield Gap',                  `${gapSign}${Math.round(gapVal).toLocaleString()}`,            'kg/ha', gapVal >= 0 ? 'Above historical average' : 'Below historical average'],
+        ['% Change vs Historical',     `${gapSign}${pct}%`,                                          '—',     gapVal >= 0 ? 'Out-performing baseline' : 'Under-performing vs baseline'],
+      ],
+      theme: 'grid',
+      headStyles:         { fillColor: GREEN, textColor: WHITE, fontSize: 7.5, fontStyle: 'bold', cellPadding: 4 },
+      bodyStyles:         { fontSize: 7.5, textColor: INK, fillColor: WHITE, cellPadding: 3.5 },
+      alternateRowStyles: { fillColor: LGRAY },
+      columnStyles: {
+        0: { fontStyle: 'bold', textColor: DARK, cellWidth: 58 },
+        1: { cellWidth: 26, halign: 'right' },
+        2: { cellWidth: 16 },
+        3: { textColor: SUBTEXT },
+      },
+      tableLineColor: BORDER,
+      tableLineWidth: 0.2,
+    });
+    y = doc.lastAutoTable.finalY + 10;
+
+    // ── RISK & HEALTH ─────────────────────────────────────────────
+    if (y > 210) y = newPage();
+
+    // Reset state fully before heading (autoTable can leave stale draw color)
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(...GREEN);
+    doc.text('RISK & HEALTH ASSESSMENT', M, y);
+    doc.setDrawColor(...GREEN);
+    doc.setLineWidth(0.4);
+    doc.line(M, y + 1.5, PW - M, y + 1.5);
+    y += 9;
+
+    // Risk indicator bar
+    const barW = PW - M * 2;
+    const fillW = Math.max(barW * Math.min(riskScore / 10, 1), 4);
+    doc.setFillColor(...LGRAY);
+    doc.roundedRect(M, y, barW, 7, 1.5, 1.5, 'F');
+    doc.setFillColor(...riskAccent);
+    doc.roundedRect(M, y, fillW, 7, 1.5, 1.5, 'F');
+    y += 10;
+
+    // Label below the bar — always readable on white background
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(7.5);
+    doc.setTextColor(...riskAccent);
+    doc.text(`Risk Level: ${riskLabel}`, M, y);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...SUBTEXT);
+    doc.text(`Score: ${riskScore.toFixed(2)} / 10`, M + 30, y);
+    y += 8;
+
+    autoTable(doc, {
+      startY: y,
+      margin: { left: M, right: M },
+      head: [['Risk Factor', 'Value', 'Status']],
+      body: [
+        ['Overall Risk Score',     riskScore.toFixed(2),                            riskLabel],
+        ['Severe Stress Coverage', `${report.metrics.stress_pct.toFixed(2)}%`,      report.metrics.stress_pct < 5 ? 'Acceptable' : 'Action Required'],
+        ['Pest Attack Incidents',  String(report.metrics.pest_count),               pestLabel],
+        ['Crop Health Status',     report.categories.health_status,                 report.categories.health_status === 'Normal' ? 'Normal' : 'Warning'],
+        ['Growth Stage',           report.categories.current_stage,                 '—'],
+      ],
+      theme: 'grid',
+      headStyles:         { fillColor: riskAccent, textColor: WHITE, fontSize: 7.5, fontStyle: 'bold', cellPadding: 4 },
+      bodyStyles:         { fontSize: 7.5, textColor: INK, fillColor: WHITE, cellPadding: 3.5 },
+      alternateRowStyles: { fillColor: LGRAY },
+      columnStyles: {
+        0: { fontStyle: 'bold', textColor: DARK, cellWidth: 70 },
+        1: { cellWidth: 30, halign: 'center' },
+        2: { halign: 'center' },
+      },
+      tableLineColor: BORDER,
+      tableLineWidth: 0.2,
+    });
+    y = doc.lastAutoTable.finalY + 10;
+
+    // ── DISCLAIMER ────────────────────────────────────────────────
+    const disclaimerText = 'This report is generated from satellite imagery and machine-learning models. Data is indicative only — please use alongside on-ground verification. RiceVision assumes no liability for agricultural decisions made solely on the basis of this report.';
+    const textLines = doc.splitTextToSize(disclaimerText, PW - M * 2 - 10);
+    const boxH = textLines.length * 4.2 + 12;
+    if (y + boxH > PH - 18) y = newPage();
+
+    doc.setFillColor(...REDLT);
+    doc.roundedRect(M, y, PW - M * 2, boxH, 3, 3, 'F');
+    doc.setFillColor(...ORANGE);
+    doc.rect(M, y, 3, boxH, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(6.5);
+    doc.setTextColor(...ORANGE);
+    doc.text('DISCLAIMER', M + 8, y + 7);
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(6.5);
+    doc.setTextColor(120, 80, 30);
+    doc.text(textLines, M + 8, y + 12.5);
+
+    // ── FOOTER (all pages) ────────────────────────────────────────
+    const totalPages = doc.getNumberOfPages();
+    for (let p = 1; p <= totalPages; p++) {
+      doc.setPage(p);
+      doc.setDrawColor(...BORDER);
+      doc.setLineWidth(0.3);
+      doc.line(M, PH - 13, PW - M, PH - 13);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(6.5);
+      doc.setTextColor(...MUTED);
+      doc.text('RiceVision Analytics  |  Agricultural Intelligence Platform  |  Confidential', M, PH - 7);
+      doc.text(`Page ${p} of ${totalPages}`, PW - M, PH - 7, { align: 'right' });
+    }
+
+    doc.save(`RiceVision_${config.district}_${config.season}_${config.date}.pdf`);
   };
 
   const getPestStatus = (count) => {
@@ -104,13 +499,11 @@ const Report = () => {
         <h3 className="text-red-400 font-black uppercase tracking-widest mb-3 text-sm">Data Unavailable</h3>
         <p className="text-xs text-white/30 mb-6">{report.message}</p>
         {availableDates.length > 0 && (
-          <select
+          <CustomSelect
             value={config.date}
-            onChange={(e) => setConfig({ ...config, date: e.target.value })}
-            className="bg-white/5 border border-white/10 text-[10px] p-3 rounded-xl font-bold text-white outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all"
-          >
-            {availableDates.map((d) => <option key={d} className="bg-slate-900">{d}</option>)}
-          </select>
+            onChange={(val) => setConfig({ ...config, date: val })}
+            options={availableDates}
+          />
         )}
       </div>
     );
@@ -143,29 +536,23 @@ const Report = () => {
               Export PDF
             </button>
           </div>
-          <select
+          <CustomSelect
             value={config.district}
-            onChange={(e) => setConfig({ ...config, district: e.target.value })}
-            className="bg-white/5 border border-white/10 text-[10px] p-3 rounded-xl font-bold outline-none text-white focus:ring-2 focus:ring-emerald-500/30 transition-all"
-          >
-            {districts.map(d => <option key={d} className="bg-slate-900">{d}</option>)}
-          </select>
-          <select
+            onChange={(val) => setConfig({ ...config, district: val })}
+            options={districts}
+          />
+          <CustomSelect
             value={config.season}
-            onChange={(e) => setConfig({ ...config, season: e.target.value })}
-            className="bg-white/5 border border-white/10 text-[10px] p-3 rounded-xl font-bold outline-none text-white focus:ring-2 focus:ring-emerald-500/30 transition-all"
-          >
-            <option className="bg-slate-900">Maha</option>
-            <option className="bg-slate-900">Yala</option>
-          </select>
+            onChange={(val) => setConfig({ ...config, season: val })}
+            options={["Maha", "Yala"]}
+          />
           {availableDates.length > 0 && (
-            <select
+            <CustomSelect
+              className="col-span-2"
               value={config.date}
-              onChange={(e) => setConfig({ ...config, date: e.target.value })}
-              className="col-span-2 bg-white/5 border border-white/10 text-[10px] p-3 rounded-xl font-bold text-white outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all"
-            >
-              {availableDates.map((d) => <option key={d} className="bg-slate-900">{d}</option>)}
-            </select>
+              onChange={(val) => setConfig({ ...config, date: val })}
+              options={availableDates}
+            />
           )}
 
         </div>

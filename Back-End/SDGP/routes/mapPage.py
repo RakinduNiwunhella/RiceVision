@@ -8,11 +8,6 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
-HEALTH_MAP = {
-    "Healthy": "Normal",
-    "Stressed": "Mild Stress",
-    "Damaged": "Severe Stress",
-}
 
 # ── Supabase column names for each overlay type ──────────────────────────────
 OVERLAY_COLUMN = {
@@ -62,17 +57,13 @@ async def get_map_fields(
             "lat, lon, paddy_health, district"
         )
 
-        query = query.neq("paddy_health", "Not Applicable")
-
+        # district filter
         if districts:
             query = query.in_("district", districts)
 
+        # health filter (direct DB values)
         if health:
-            db_health_values = [
-                HEALTH_MAP[h] for h in health if h in HEALTH_MAP
-            ]
-            if db_health_values:
-                query = query.in_("paddy_health", db_health_values)
+            query = query.in_("paddy_health", health)
 
         response = query.execute()
 

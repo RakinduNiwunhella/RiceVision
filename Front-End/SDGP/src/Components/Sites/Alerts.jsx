@@ -1,14 +1,20 @@
 import React, { useState, useMemo, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { updateAlertStatus } from "../../api/api";
 
 const API_BASE = "https://ricevision-cakt.onrender.com";
 const tabOptions = ["Disasters", "Pest Risks", "Past Alerts"];
+
+const formatTitle = (text) =>
+  text.replace(/\b\w/g, (char) => char.toUpperCase());
 
 const Alerts = () => {
   const [alerts, setAlerts] = useState([]);
   const [activeTab, setActiveTab] = useState("Disasters");
   const [searchTerm, setSearchTerm] = useState("");
   const [updatingId, setUpdatingId] = useState(null);
+
+  const navigate = useNavigate();
 
   const filteredAlerts = useMemo(() => {
     const normalizedSearch = searchTerm.toLowerCase();
@@ -51,21 +57,28 @@ const Alerts = () => {
 
         const data = await response.json();
 
+        /* ---------------- DISASTER ALERTS ---------------- */
+
         if (isDisaster) {
           const mappedAlerts = (Array.isArray(data) ? data : []).map((a) => ({
             id: a.id,
-            title: `${a.disaster_type} risk`,
+            title: formatTitle(`${a.disaster_type} risk`),
             description: `Stage: ${a.stage} | Health: ${a.health}`,
             status: "Open",
             priority: "High",
             field: a.district,
+            health: a.health, // IMPORTANT
             timestamp: a.timestamp,
             lat: a.lat,
             lon: a.lon,
           }));
 
           setAlerts(mappedAlerts);
-        } else {
+        }
+
+        /* ---------------- PEST ALERTS ---------------- */
+
+        else {
           const mappedAlerts = (Array.isArray(data) ? data : [])
             .filter((a) => a.risky_pixels > 0)
             .map((a, index) => ({
@@ -75,6 +88,7 @@ const Alerts = () => {
               status: "Open",
               priority: "High",
               field: a.district,
+              health: a.health || "Not Applicable", // IMPORTANT
               count: a.risky_pixels,
               locations: a.risky_pixel_locations || [],
               timestamp: new Date().toISOString(),
@@ -133,6 +147,36 @@ const Alerts = () => {
 
   const handleResolve = (id) => updateStatus(id, "Resolved");
   const handleDeny = (id) => updateStatus(id, "Denied");
+
+  /* ---------------- MAP NAVIGATION ---------------- */
+
+  const handleViewInMap = (alert) => {
+    /* Pest risk */
+    if (activeTab === "Pest Risks" && alert.locations?.length > 0) {
+      navigate("/field-map", {
+        state: {
+          type: "pest",
+          district: alert.field,
+          locations: alert.locations,
+          health: alert.health, // send health
+        },
+      });
+    }
+
+    /* Disaster risk */
+    else if (alert.lat != null && alert.lon != null) {
+      navigate("/field-map", {
+        state: {
+          type: "disaster",
+          district: alert.field,
+          disasterType: alert.title,
+          health: alert.health,
+          lat: alert.lat,
+          lon: alert.lon,
+        },
+      });
+    }
+  };
 
   const formatTimestamp = (iso) => new Date(iso).toLocaleString();
 
@@ -201,7 +245,7 @@ const Alerts = () => {
           </div>
         </div>
 
-        {/* Alerts List */}
+        {/* Alerts */}
         <div className="space-y-6">
 
           {filteredAlerts.length === 0 && (
@@ -221,7 +265,16 @@ const Alerts = () => {
 
                 <div>
                   <h2 className="text-xl font-black text-emerald-400">
-                    {alert.title}
+                    {activeTab === "Pest Risks" && alert.count != null ? (
+                      <>
+                        {alert.field} •{" "}
+                        <span className="text-red-500">
+                          {alert.count} RISKS
+                        </span>
+                      </>
+                    ) : (
+                      alert.title
+                    )}
                   </h2>
 
                   <p className="text-white/60 text-sm mt-1">
@@ -249,7 +302,10 @@ const Alerts = () => {
                       Deny
                     </button>
 
-                    <button className="px-6 py-2 bg-white/10 text-white/60 rounded-xl text-xs font-bold">
+                    <button
+                      onClick={() => handleViewInMap(alert)}
+                      className="px-6 py-2 bg-white/10 text-white/60 rounded-xl text-xs font-bold"
+                    >
                       View in Map
                     </button>
                   </div>

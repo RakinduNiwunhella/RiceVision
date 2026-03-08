@@ -1,4 +1,4 @@
-import { MapContainer, TileLayer, CircleMarker, GeoJSON, Tooltip } from "react-leaflet";
+import { MapContainer, TileLayer, CircleMarker, Circle, GeoJSON, Tooltip, useMap } from "react-leaflet";
 import { useEffect, useState, useRef } from "react";
 import L from "leaflet";
 import { fetchMapFields, fetchGEETileUrl } from "../../api/api";
@@ -57,10 +57,13 @@ const OVERLAY_META = {
 /* ---------- HEALTH COLOR ---------- */
 
 function getHealthColor(health) {
-  if (health === "Normal") return "#16a34a";
-  if (health === "Mild Stress") return "#facc15";
-  if (health === "Severe Stress") return "#dc2626";
-  return "#2563eb";
+
+  if (health === "Healthy" || health === "Normal") return "#22c55e";      // bright green
+  if (health === "Mild Stress") return "#facc15";  // yellow
+  if (health === "Severe Stress") return "#dc2626"; // red
+  if (health === "Not Applicable") return "#696969"; // ash color
+
+  return "#2563eb"; // fallback
 }
 
 /* ---------- STYLES ---------- */
@@ -78,7 +81,67 @@ const districtBoundaryStyle = {
   fillOpacity: 0,
 };
 
-export default function RiceMap({ filters, layers }) {
+/* ---------- FLY-TO CONTROLLER ---------- */
+
+function FlyToController({ flyTo }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!flyTo) return;
+
+    if (flyTo.type === "pest" && flyTo.locations?.length > 0) {
+      const first = flyTo.locations[0];
+      map.flyTo([first.lat, first.lon], 13, { animate: true, duration: 1.5 });
+    } else if (flyTo.type === "disaster") {
+      map.flyTo([flyTo.lat, flyTo.lon], 13, { animate: true, duration: 1.5 });
+    }
+  }, [flyTo, map]);
+
+  return null;
+}
+
+/* ---------- ALERT MARKER ---------- */
+
+function AlertMarker({ flyTo }) {
+  if (!flyTo) return null;
+
+  // Pest risk — one small circle per risky pixel
+  if (flyTo.type === "pest") {
+    return (
+      <>
+        {flyTo.locations.map((loc, idx) => (
+          <CircleMarker
+            key={idx}
+            center={[loc.lat, loc.lon]}
+            radius={5}
+            pathOptions={{
+              color: "#ef4444",
+              fillColor: "#ef4444",
+              fillOpacity: 0.6,
+              weight: 1.5,
+            }}
+          />
+        ))}
+      </>
+    );
+  }
+
+  // Disaster — circular zone centred on the event location
+  return (
+    <Circle
+      center={[flyTo.lat, flyTo.lon]}
+      radius={2000}
+      pathOptions={{
+        color: "#ef4444",
+        fillColor: "#ef4444",
+        fillOpacity: 0.25,
+        weight: 2,
+      }}
+    />
+  );
+}
+
+export default function RiceMap({ filters, layers, flyTo }) {
 
   const [points, setPoints] = useState([]);
   const [paddyGeo, setPaddyGeo] = useState(null);
@@ -224,11 +287,20 @@ export default function RiceMap({ filters, layers }) {
 
     const loadPoints = async () => {
       try {
-
-        const data = await fetchMapFields({
+        let data = await fetchMapFields({
           districts: [selectedDistrict],
           health: selectedHealth,
         });
+
+        // defensive client-side filtering: ensure only the chosen
+        // health status is shown, since backend filtering may sometimes
+        // misfire or be case-sensitive.
+        if (selectedHealth && selectedHealth.length === 1) {
+          const wanted = selectedHealth[0].toLowerCase();
+          data = data.filter(
+            (p) => String(p.paddy_health).toLowerCase() === wanted
+          );
+        }
 
         setPoints(data);
 
@@ -259,6 +331,10 @@ export default function RiceMap({ filters, layers }) {
   preferCanvas={true}
   className="h-full w-full rounded-3xl"
 >
+
+{/* ---------- FLY-TO (alert navigation) ---------- */}
+<FlyToController flyTo={flyTo} />
+<AlertMarker flyTo={flyTo} />
 
 {/* ---------- DEFAULT MAP ---------- */}
 
@@ -364,20 +440,114 @@ export default function RiceMap({ filters, layers }) {
   showCoverageOnHover={false}
   maxClusterRadius={30}
   chunkedLoading
+  iconCreateFunction={(cluster) => {
+
+    const markers = cluster.getAllChildMarkers();
+    const selectedFilter = filters.health?.[0];   // current filter
+
+    let healthy = 0;
+    let mild = 0;
+    let severe = 0;
+
+    markers.forEach(m => {
+
+      const health = m.options.health;
+
+      if (health === "Healthy" || health === "Normal") healthy++;
+      else if (health === "Mild Stress") mild++;
+      else if (health === "Severe Stress") severe++;
+
+    });
+
+    const total = markers.length;
+
+    /* ------------------------------
+       CASE 1: SPECIFIC FILTER ACTIVE
+       ------------------------------ */
+
+    if (selectedFilter) {
+
+      const color = getHealthColor(selectedFilter);
+
+      return L.divIcon({
+        html: `
+          <div style="
+            background:${color};
+            width:40px;
+            height:40px;
+            border-radius:50%;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            color:white;
+            font-weight:bold;
+            border:2px solid white;
+          ">
+            ${cluster.getChildCount()}
+          </div>
+        `,
+        className: "cluster-health",
+        iconSize: L.point(40,40)
+      });
+
+    }
+
+    /* ------------------------------
+       CASE 2: ALL SELECTED
+       MIXED COLOR GRADIENT
+       ------------------------------ */
+
+    const healthyPct = (healthy / total) * 100;
+    const mildPct = (mild / total) * 100;
+    const severePct = (severe / total) * 100;
+
+    const gradient = `
+      conic-gradient(
+        #22c55e 0% ${healthyPct}%,
+        #facc15 ${healthyPct}% ${healthyPct + mildPct}%,
+        #dc2626 ${healthyPct + mildPct}% 100%
+      )
+    `;
+
+    return L.divIcon({
+      html: `
+        <div style="
+          background:${gradient};
+          width:40px;
+          height:40px;
+          border-radius:50%;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          color:white;
+          font-weight:bold;
+          border:2px solid white;
+        ">
+          ${cluster.getChildCount()}
+        </div>
+      `,
+      className: "cluster-health",
+      iconSize: L.point(40,40)
+    });
+
+  }}
 >
-  {points.map((p, idx) => (
-    <CircleMarker
-      key={idx}
-      center={[p.lat, p.lng]}
-      radius={5}
-      pathOptions={{
-        color: getHealthColor(p.paddy_health),
-        fillColor: getHealthColor(p.paddy_health),
-        fillOpacity: 0.8,
-        weight: 1,
-      }}
-    />
-  ))}
+{points.map((p, idx) => (
+<CircleMarker
+  key={idx}
+  center={[p.lat, p.lng]}
+  radius={5}
+  pathOptions={{
+    color: getHealthColor(p.paddy_health),
+    fillColor: getHealthColor(p.paddy_health),
+    fillOpacity: 0.8,
+    weight: 1,
+  }}
+  ref={(ref) => {
+    if (ref) ref.options.health = p.paddy_health;
+  }}
+/>
+))}
 </MarkerClusterGroup>
 )}
 
