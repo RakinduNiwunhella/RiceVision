@@ -423,61 +423,163 @@ export default function RiceVisionWeather() {
         )}
 
         {/* ════ 24-HOUR ════ */}
-        {activeTab === "hourly" && (
-          <div className="space-y-6">
-            <SectionHeading>Next 24 Hours</SectionHeading>
-            <div className="overflow-x-auto pb-2">
-              <div className="flex gap-3 min-w-max">
-                {next24.map((idx, i) => {
-                  const info = wmoLabel(h.weather_code[idx]);
-                  return (
-                    <div key={idx} className={`glass glass-hover p-4 rounded-2xl border text-center flex flex-col gap-2 min-w-24 transition-all hover:-translate-y-1 ${i === 0 ? "border-emerald-500/30 bg-emerald-500/5" : "border-white/10"}`}>
-                      <p className="text-[9px] font-black text-white/50 uppercase">{new Date(h.time[idx]).toLocaleTimeString("en-US", { hour: "2-digit", hour12: true })}</p>
-                      <span className="text-2xl">{info.icon}</span>
-                      <p className="text-xl font-black text-white">{Math.round(h.temperature_2m[idx])}°</p>
-                      <p className="text-[9px] text-blue-400 font-black">{h.precipitation_probability[idx]}%</p>
-                      <p className="text-[8px] text-cyan-400 font-bold">{h.wind_speed_10m[idx]}km/h</p>
-                      {h.uv_index[idx] > 0 && <p className="text-[8px] text-amber-400 font-bold">UV {h.uv_index[idx]}</p>}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+{activeTab === "hourly" && (
+  <div className="space-y-6">
 
-            <SectionHeading>Hourly Detail Table</SectionHeading>
-            <div className="overflow-x-auto">
-              <table className="w-full text-[10px] font-bold">
-                <thead>
-                  <tr className="text-white/30 uppercase tracking-widest border-b border-white/10">
-                    {["Time","Cond","Temp","Feels","Humid","Rain%","Rain mm","Wind","UV","ET₀","Visibility"].map((col) => (
-                      <th key={col} className="px-3 py-3 text-left whitespace-nowrap">{col}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {next24.map((idx, i) => {
-                    const info = wmoLabel(h.weather_code[idx]);
-                    return (
-                      <tr key={idx} className={`border-b border-white/5 hover:bg-white/[0.03] transition-colors ${i === 0 ? "bg-emerald-500/5" : ""}`}>
-                        <td className="px-3 py-3 text-white/70 whitespace-nowrap">{new Date(h.time[idx]).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true })}</td>
-                        <td className="px-3 py-3 whitespace-nowrap">{info.icon} {info.label}</td>
-                        <td className="px-3 py-3 text-amber-400">{Math.round(h.temperature_2m[idx])}°C</td>
-                        <td className="px-3 py-3 text-white/50">{Math.round(h.apparent_temperature[idx])}°C</td>
-                        <td className="px-3 py-3 text-blue-400">{h.relative_humidity_2m[idx]}%</td>
-                        <td className="px-3 py-3 text-blue-300">{h.precipitation_probability[idx]}%</td>
-                        <td className="px-3 py-3 text-blue-400">{h.precipitation[idx]} mm</td>
-                        <td className="px-3 py-3 text-cyan-400 whitespace-nowrap">{h.wind_speed_10m[idx]} {windDir(h.wind_direction_10m[idx])}</td>
-                        <td className="px-3 py-3 text-amber-400">{h.uv_index[idx]}</td>
-                        <td className="px-3 py-3 text-emerald-400">{h.et0_fao_evapotranspiration[idx].toFixed(2)} mm</td>
-                        <td className="px-3 py-3 text-sky-400 whitespace-nowrap">{h.visibility[idx] != null ? (h.visibility[idx]/1000).toFixed(1)+" km" : "—"}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+    <SectionHeading>Next 24 Hours</SectionHeading>
+
+    <div className="overflow-x-auto pb-2">
+      <div className="flex gap-3 min-w-max">
+        {next24.map((idx, i) => {
+          const info = wmoLabel(h.weather_code[idx]);
+
+          return (
+            <div
+              key={idx}
+              className={`glass glass-hover p-4 rounded-2xl border text-center flex flex-col gap-2 min-w-24 transition-all hover:-translate-y-1 ${
+                i === 0
+                  ? "border-emerald-500/30 bg-emerald-500/5"
+                  : "border-white/10"
+              }`}
+            >
+              <p className="text-[9px] font-black text-white/50 uppercase">
+                {new Date(h.time[idx]).toLocaleTimeString("en-US", {
+                  hour: "2-digit",
+                  hour12: true,
+                })}
+              </p>
+
+              <span className="text-2xl">{info.icon}</span>
+
+              <p className="text-xl font-black text-white">
+                {Math.round(h.temperature_2m[idx])}°
+              </p>
+
+              <p className="text-[9px] text-blue-400 font-black">
+                {h.precipitation_probability[idx]}%
+              </p>
+
+              <p className="text-[8px] text-cyan-400 font-bold">
+                {h.wind_speed_10m[idx]}km/h
+              </p>
+
+              {h.uv_index[idx] > 0 && (
+                <p className="text-[8px] text-amber-400 font-bold">
+                  UV {h.uv_index[idx]}
+                </p>
+              )}
             </div>
-          </div>
-        )}
+          );
+        })}
+      </div>
+    </div>
+
+    {/* ─── HOURLY TABLE PANEL ─── */}
+    <SectionHeading>Hourly Detail Table</SectionHeading>
+
+    <div className="glass bg-black/40 backdrop-blur-md border border-white/10 rounded-3xl p-6 shadow-xl">
+
+      <div className="overflow-x-auto">
+
+        <table className="w-full text-[10px] font-bold">
+
+          <thead>
+            <tr className="text-white/40 uppercase tracking-widest border-b border-white/10">
+              {[
+                "Time",
+                "Cond",
+                "Temp",
+                "Feels",
+                "Humid",
+                "Rain%",
+                "Rain mm",
+                "Wind",
+                "UV",
+                "ET₀",
+                "Visibility",
+              ].map((col) => (
+                <th
+                  key={col}
+                  className="px-3 py-3 text-left whitespace-nowrap"
+                >
+                  {col}
+                </th>
+              ))}
+            </tr>
+          </thead>
+
+          <tbody>
+            {next24.map((idx, i) => {
+              const info = wmoLabel(h.weather_code[idx]);
+
+              return (
+                <tr
+                  key={idx}
+                  className={`border-b border-white/5 hover:bg-white/[0.05] transition-colors ${
+                    i === 0 ? "bg-emerald-500/10" : ""
+                  }`}
+                >
+                  <td className="px-3 py-3 text-white/80 whitespace-nowrap">
+                    {new Date(h.time[idx]).toLocaleTimeString("en-US", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      hour12: true,
+                    })}
+                  </td>
+
+                  <td className="px-3 py-3 whitespace-nowrap">
+                    {info.icon} {info.label}
+                  </td>
+
+                  <td className="px-3 py-3 text-amber-400">
+                    {Math.round(h.temperature_2m[idx])}°C
+                  </td>
+
+                  <td className="px-3 py-3 text-white/60">
+                    {Math.round(h.apparent_temperature[idx])}°C
+                  </td>
+
+                  <td className="px-3 py-3 text-blue-400">
+                    {h.relative_humidity_2m[idx]}%
+                  </td>
+
+                  <td className="px-3 py-3 text-blue-300">
+                    {h.precipitation_probability[idx]}%
+                  </td>
+
+                  <td className="px-3 py-3 text-blue-400">
+                    {h.precipitation[idx]} mm
+                  </td>
+
+                  <td className="px-3 py-3 text-cyan-400 whitespace-nowrap">
+                    {h.wind_speed_10m[idx]}{" "}
+                    {windDir(h.wind_direction_10m[idx])}
+                  </td>
+
+                  <td className="px-3 py-3 text-amber-400">
+                    {h.uv_index[idx]}
+                  </td>
+
+                  <td className="px-3 py-3 text-emerald-400">
+                    {h.et0_fao_evapotranspiration[idx].toFixed(2)} mm
+                  </td>
+
+                  <td className="px-3 py-3 text-sky-400 whitespace-nowrap">
+                    {h.visibility[idx] != null
+                      ? (h.visibility[idx] / 1000).toFixed(1) + " km"
+                      : "—"}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+
+        </table>
+
+      </div>
+    </div>
+  </div>
+)}
 
         {/* ════ SOIL & AGRO ════ */}
         {activeTab === "soil" && (
@@ -579,122 +681,286 @@ export default function RiceVisionWeather() {
         )}
 
         {/* ════ 14-DAY FORECAST ════ */}
-        {activeTab === "forecast" && (
-          <div className="space-y-6">
-            <SectionHeading>14-Day Outlook</SectionHeading>
-            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
-              {forecastIdx.map((idx) => {
-                const info = wmoLabel(d.weather_code[idx]);
-                return (
-                  <div key={idx} className="glass glass-hover p-5 rounded-3xl border border-white/10 text-center hover:-translate-y-1 transition-all duration-300">
-                    <p className="text-[9px] text-white/40 font-black mb-3 uppercase">{fmtDay(d.time[idx], true)}</p>
-                    <div className="text-4xl mb-3">{info.icon}</div>
-                    <p className="text-xs font-black text-white/60 mb-3">{info.label}</p>
-                    <p className="text-2xl font-black text-white">{Math.round(d.temperature_2m_max[idx])}°</p>
-                    <p className="text-sm text-white/40 font-bold">{Math.round(d.temperature_2m_min[idx])}°</p>
-                    <div className="mt-4 space-y-1">
-                      <p className="text-[9px] font-black text-blue-400">{d.precipitation_probability_max[idx]}% Rain</p>
-                      <p className="text-[8px] text-blue-300">{d.rain_sum[idx]?.toFixed(1)} mm</p>
-                      <p className="text-[8px] text-amber-400">UV {d.uv_index_max[idx]}</p>
-                      <p className="text-[8px] text-emerald-400">ET₀ {d.et0_fao_evapotranspiration[idx]?.toFixed(1)} mm</p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+{activeTab === "forecast" && (
+  <div className="space-y-6">
 
-            <SectionHeading>Weekly Agro Forecast Detail</SectionHeading>
-            <div className="overflow-x-auto">
-              <table className="w-full text-[10px] font-bold">
-                <thead>
-                  <tr className="text-white/30 uppercase tracking-widest border-b border-white/10">
-                    {["Date","Cond","Max°C","Min°C","Rain%","Rain mm","Wind Max","UV Max","ET₀","Radiation","Sunrise","Sunset"].map((col) => (
-                      <th key={col} className="px-3 py-3 text-left whitespace-nowrap">{col}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {forecastIdx.map((idx) => {
-                    const info = wmoLabel(d.weather_code[idx]);
-                    return (
-                      <tr key={idx} className="border-b border-white/5 hover:bg-white/[0.03] transition-colors">
-                        <td className="px-3 py-3 text-white/70 whitespace-nowrap">{fmtDay(d.time[idx], true)}</td>
-                        <td className="px-3 py-3 whitespace-nowrap">{info.icon} {info.label}</td>
-                        <td className="px-3 py-3 text-amber-400">{Math.round(d.temperature_2m_max[idx])}°C</td>
-                        <td className="px-3 py-3 text-sky-400">{Math.round(d.temperature_2m_min[idx])}°C</td>
-                        <td className="px-3 py-3 text-blue-300">{d.precipitation_probability_max[idx]}%</td>
-                        <td className="px-3 py-3 text-blue-400">{d.rain_sum[idx]?.toFixed(1)} mm</td>
-                        <td className="px-3 py-3 text-cyan-400">{d.wind_speed_10m_max[idx]} km/h</td>
-                        <td className="px-3 py-3 text-amber-400">{d.uv_index_max[idx]}</td>
-                        <td className="px-3 py-3 text-emerald-400">{d.et0_fao_evapotranspiration[idx]?.toFixed(1)} mm</td>
-                        <td className="px-3 py-3 text-orange-400">{d.shortwave_radiation_sum[idx]?.toFixed(1)} MJ/m²</td>
-                        <td className="px-3 py-3 text-amber-300 whitespace-nowrap">{fmtTime(d.sunrise[idx])}</td>
-                        <td className="px-3 py-3 text-orange-300 whitespace-nowrap">{fmtTime(d.sunset[idx])}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+    <SectionHeading>14-Day Outlook</SectionHeading>
+
+    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+      {forecastIdx.map((idx) => {
+        const info = wmoLabel(d.weather_code[idx]);
+
+        return (
+          <div key={idx} className="glass glass-hover p-5 rounded-3xl border border-white/10 text-center hover:-translate-y-1 transition-all duration-300">
+            <p className="text-[9px] text-white/40 font-black mb-3 uppercase">
+              {fmtDay(d.time[idx], true)}
+            </p>
+
+            <div className="text-4xl mb-3">{info.icon}</div>
+
+            <p className="text-xs font-black text-white/60 mb-3">
+              {info.label}
+            </p>
+
+            <p className="text-2xl font-black text-white">
+              {Math.round(d.temperature_2m_max[idx])}°
+            </p>
+
+            <p className="text-sm text-white/40 font-bold">
+              {Math.round(d.temperature_2m_min[idx])}°
+            </p>
+
+            <div className="mt-4 space-y-1">
+              <p className="text-[9px] font-black text-blue-400">
+                {d.precipitation_probability_max[idx]}% Rain
+              </p>
+
+              <p className="text-[8px] text-blue-300">
+                {d.rain_sum[idx]?.toFixed(1)} mm
+              </p>
+
+              <p className="text-[8px] text-amber-400">
+                UV {d.uv_index_max[idx]}
+              </p>
+
+              <p className="text-[8px] text-emerald-400">
+                ET₀ {d.et0_fao_evapotranspiration[idx]?.toFixed(1)} mm
+              </p>
             </div>
           </div>
-        )}
+        );
+      })}
+    </div>
+
+    <SectionHeading>Weekly Agro Forecast Detail</SectionHeading>
+
+    <div className="glass bg-black/40 backdrop-blur-md border border-white/10 rounded-3xl p-6 shadow-xl">
+      <div className="overflow-x-auto">
+
+        <table className="w-full text-[10px] font-bold">
+
+          <thead>
+            <tr className="text-white/40 uppercase tracking-widest border-b border-white/10">
+              {[
+                "Date",
+                "Cond",
+                "Max°C",
+                "Min°C",
+                "Rain%",
+                "Rain mm",
+                "Wind Max",
+                "UV Max",
+                "ET₀",
+                "Radiation",
+                "Sunrise",
+                "Sunset",
+              ].map((col) => (
+                <th key={col} className="px-3 py-3 text-left whitespace-nowrap">
+                  {col}
+                </th>
+              ))}
+            </tr>
+          </thead>
+
+          <tbody>
+            {forecastIdx.map((idx) => {
+              const info = wmoLabel(d.weather_code[idx]);
+
+              return (
+                <tr key={idx} className="border-b border-white/5 hover:bg-white/[0.05] transition-colors">
+
+                  <td className="px-3 py-3 text-white/80 whitespace-nowrap">
+                    {fmtDay(d.time[idx], true)}
+                  </td>
+
+                  <td className="px-3 py-3 whitespace-nowrap">
+                    {info.icon} {info.label}
+                  </td>
+
+                  <td className="px-3 py-3 text-amber-400">
+                    {Math.round(d.temperature_2m_max[idx])}°C
+                  </td>
+
+                  <td className="px-3 py-3 text-sky-400">
+                    {Math.round(d.temperature_2m_min[idx])}°C
+                  </td>
+
+                  <td className="px-3 py-3 text-blue-300">
+                    {d.precipitation_probability_max[idx]}%
+                  </td>
+
+                  <td className="px-3 py-3 text-blue-400">
+                    {d.rain_sum[idx]?.toFixed(1)} mm
+                  </td>
+
+                  <td className="px-3 py-3 text-cyan-400">
+                    {d.wind_speed_10m_max[idx]} km/h
+                  </td>
+
+                  <td className="px-3 py-3 text-amber-400">
+                    {d.uv_index_max[idx]}
+                  </td>
+
+                  <td className="px-3 py-3 text-emerald-400">
+                    {d.et0_fao_evapotranspiration[idx]?.toFixed(1)} mm
+                  </td>
+
+                  <td className="px-3 py-3 text-orange-400">
+                    {d.shortwave_radiation_sum[idx]?.toFixed(1)} MJ/m²
+                  </td>
+
+                  <td className="px-3 py-3 text-amber-300 whitespace-nowrap">
+                    {fmtTime(d.sunrise[idx])}
+                  </td>
+
+                  <td className="px-3 py-3 text-orange-300 whitespace-nowrap">
+                    {fmtTime(d.sunset[idx])}
+                  </td>
+
+                </tr>
+              );
+            })}
+          </tbody>
+
+        </table>
+
+      </div>
+    </div>
+  </div>
+)}
 
         {/* ════ HISTORY ════ */}
-        {activeTab === "history" && (
-          <div className="space-y-6">
-            <SectionHeading>Past 7 Days — Field History</SectionHeading>
-            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
-              {pastIdx.map((date, idx) => {
-                const info = wmoLabel(d.weather_code[idx]);
-                return (
-                  <div key={idx} className="glass p-5 rounded-3xl border border-white/5 text-center opacity-80 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300">
-                    <p className="text-[9px] text-white/30 font-bold mb-3 uppercase">{fmtDay(date, true)}</p>
-                    <div className="text-3xl mb-3">{info.icon}</div>
-                    <p className="text-xl font-bold text-white/80">{Math.round(d.temperature_2m_max[idx])}°</p>
-                    <p className="text-sm text-white/30 font-bold">{Math.round(d.temperature_2m_min[idx])}°</p>
-                    <div className="mt-4 space-y-1">
-                      <p className="text-[8px] font-black text-white/30">{d.precipitation_sum[idx]?.toFixed(1)} mm</p>
-                      <p className="text-[8px] text-white/20">UV {d.uv_index_max[idx]}</p>
-                      <p className="text-[8px] text-white/20">ET₀ {d.et0_fao_evapotranspiration[idx]?.toFixed(1)} mm</p>
-                    </div>
-                  </div>
-                );
-              })}
+{activeTab === "history" && (
+  <div className="space-y-6">
+
+    <SectionHeading>Past 7 Days — Field History</SectionHeading>
+
+    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+      {pastIdx.map((date, idx) => {
+        const info = wmoLabel(d.weather_code[idx]);
+
+        return (
+          <div key={idx} className="glass p-5 rounded-3xl border border-white/5 text-center opacity-80 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300">
+
+            <p className="text-[9px] text-white/30 font-bold mb-3 uppercase">
+              {fmtDay(date, true)}
+            </p>
+
+            <div className="text-3xl mb-3">{info.icon}</div>
+
+            <p className="text-xl font-bold text-white/80">
+              {Math.round(d.temperature_2m_max[idx])}°
+            </p>
+
+            <p className="text-sm text-white/30 font-bold">
+              {Math.round(d.temperature_2m_min[idx])}°
+            </p>
+
+            <div className="mt-4 space-y-1">
+              <p className="text-[8px] font-black text-white/30">
+                {d.precipitation_sum[idx]?.toFixed(1)} mm
+              </p>
+
+              <p className="text-[8px] text-white/20">
+                UV {d.uv_index_max[idx]}
+              </p>
+
+              <p className="text-[8px] text-white/20">
+                ET₀ {d.et0_fao_evapotranspiration[idx]?.toFixed(1)} mm
+              </p>
             </div>
 
-            <SectionHeading>Historical Detail Table</SectionHeading>
-            <div className="overflow-x-auto">
-              <table className="w-full text-[10px] font-bold">
-                <thead>
-                  <tr className="text-white/30 uppercase tracking-widest border-b border-white/10">
-                    {["Date","Conditions","Max°C","Min°C","Rain Sum","Rain Hrs","Wind Max","UV Max","ET₀","Radiation"].map((col) => (
-                      <th key={col} className="px-3 py-3 text-left whitespace-nowrap">{col}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {pastIdx.map((date, idx) => {
-                    const info = wmoLabel(d.weather_code[idx]);
-                    return (
-                      <tr key={idx} className="border-b border-white/5 hover:bg-white/[0.03] transition-colors opacity-70 hover:opacity-100">
-                        <td className="px-3 py-3 text-white/70 whitespace-nowrap">{fmtDay(date)}</td>
-                        <td className="px-3 py-3 whitespace-nowrap">{info.icon} {info.label}</td>
-                        <td className="px-3 py-3 text-amber-400">{Math.round(d.temperature_2m_max[idx])}°C</td>
-                        <td className="px-3 py-3 text-sky-400">{Math.round(d.temperature_2m_min[idx])}°C</td>
-                        <td className="px-3 py-3 text-blue-400">{d.precipitation_sum[idx]?.toFixed(1)} mm</td>
-                        <td className="px-3 py-3 text-blue-300">{d.precipitation_hours[idx]}h</td>
-                        <td className="px-3 py-3 text-cyan-400">{d.wind_speed_10m_max[idx]} km/h</td>
-                        <td className="px-3 py-3 text-amber-400">{d.uv_index_max[idx]}</td>
-                        <td className="px-3 py-3 text-emerald-400">{d.et0_fao_evapotranspiration[idx]?.toFixed(1)} mm</td>
-                        <td className="px-3 py-3 text-orange-400">{d.shortwave_radiation_sum[idx]?.toFixed(1)} MJ/m²</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
           </div>
-        )}
+        );
+      })}
+    </div>
+
+    <SectionHeading>Historical Detail Table</SectionHeading>
+
+    <div className="glass bg-black/40 backdrop-blur-md border border-white/10 rounded-3xl p-6 shadow-xl">
+      <div className="overflow-x-auto">
+
+        <table className="w-full text-[10px] font-bold">
+
+          <thead>
+            <tr className="text-white/40 uppercase tracking-widest border-b border-white/10">
+              {[
+                "Date",
+                "Conditions",
+                "Max°C",
+                "Min°C",
+                "Rain Sum",
+                "Rain Hrs",
+                "Wind Max",
+                "UV Max",
+                "ET₀",
+                "Radiation",
+              ].map((col) => (
+                <th key={col} className="px-3 py-3 text-left whitespace-nowrap">
+                  {col}
+                </th>
+              ))}
+            </tr>
+          </thead>
+
+          <tbody>
+            {pastIdx.map((date, idx) => {
+              const info = wmoLabel(d.weather_code[idx]);
+
+              return (
+                <tr key={idx} className="border-b border-white/5 hover:bg-white/[0.05] transition-colors">
+
+                  <td className="px-3 py-3 text-white/80 whitespace-nowrap">
+                    {fmtDay(date)}
+                  </td>
+
+                  <td className="px-3 py-3 whitespace-nowrap">
+                    {info.icon} {info.label}
+                  </td>
+
+                  <td className="px-3 py-3 text-amber-400">
+                    {Math.round(d.temperature_2m_max[idx])}°C
+                  </td>
+
+                  <td className="px-3 py-3 text-sky-400">
+                    {Math.round(d.temperature_2m_min[idx])}°C
+                  </td>
+
+                  <td className="px-3 py-3 text-blue-400">
+                    {d.precipitation_sum[idx]?.toFixed(1)} mm
+                  </td>
+
+                  <td className="px-3 py-3 text-blue-300">
+                    {d.precipitation_hours[idx]}h
+                  </td>
+
+                  <td className="px-3 py-3 text-cyan-400">
+                    {d.wind_speed_10m_max[idx]} km/h
+                  </td>
+
+                  <td className="px-3 py-3 text-amber-400">
+                    {d.uv_index_max[idx]}
+                  </td>
+
+                  <td className="px-3 py-3 text-emerald-400">
+                    {d.et0_fao_evapotranspiration[idx]?.toFixed(1)} mm
+                  </td>
+
+                  <td className="px-3 py-3 text-orange-400">
+                    {d.shortwave_radiation_sum[idx]?.toFixed(1)} MJ/m²
+                  </td>
+
+                </tr>
+              );
+            })}
+          </tbody>
+
+        </table>
+
+      </div>
+    </div>
+  </div>
+)}
 
         <footer className="text-center text-[9px] text-white/20 font-bold uppercase tracking-widest py-6 border-t border-white/5">
           Data sourced from Open-Meteo · Free & No API Key · Updates every 15 min · {district?.name} · {district?.lat}°N {district?.lon}°E
