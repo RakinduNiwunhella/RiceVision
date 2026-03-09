@@ -316,7 +316,7 @@ export default function RiceVisionWeather() {
               </button>
 
               {dropdownOpen && (
-                <div className="absolute right-0 top-full mt-2 w-52 glass border border-white/10 rounded-2xl !overflow-x-hidden !overflow-y-auto overscroll-contain shadow-2xl z-50 max-h-72">
+                <div className="absolute right-0 top-full mt-2 w-52 glass border border-white/10 rounded-2xl !overflow-x-hidden !overflow-y-auto overscroll-contain shadow-2xl z-50 max-h-72 custom-scrollbar">
                   {DISTRICTS.map((dst) => (
                     <button
                       key={dst.name}
