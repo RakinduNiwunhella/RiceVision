@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { supabase } from "../../supabaseClient";
 import { useNavigate, Link } from "react-router-dom";
 import { FaSun, FaMoon } from "react-icons/fa";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function SignupPage() {
-  const [theme, setTheme] = useState("light");
+  const { isDark, toggleTheme } = useTheme();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,13 +17,6 @@ export default function SignupPage() {
   const [passwordLengthError, setPasswordLengthError] = useState("");
 
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const root = window.document.documentElement;
-    theme === "dark"
-      ? root.classList.add("dark")
-      : root.classList.remove("dark");
-  }, [theme]);
 
   const validateEmail = (value) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -91,10 +85,10 @@ export default function SignupPage() {
       {/* Theme Toggle */}
       <button
         type="button"
-        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+        onClick={toggleTheme}
         className="fixed top-6 right-6 p-3 rounded-full bg-slate-100 dark:bg-slate-800 hover:rotate-12 transition-all shadow-md z-50"
       >
-        {theme === "dark" ? (
+        {isDark ? (
           <FaSun className="text-yellow-400 text-xl" />
         ) : (
           <FaMoon className="text-indigo-600 text-xl" />

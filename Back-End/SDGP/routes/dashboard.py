@@ -53,3 +53,11 @@ def get_district_health():
         .order("normal_pct", desc=True) \
         .execute()
     return response.data
+
+@router.get("/stage-distribution")
+def get_stage_distribution():
+    response = supabase.table("stage_name_counts_view") \
+        .select("stage_name, stage_count") \
+        .execute()
+
+    return response.data

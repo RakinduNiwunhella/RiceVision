@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import ReactDOM from "react-dom";
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import jsPDF from 'jspdf';
@@ -83,11 +84,13 @@ const CustomSelect = ({ value, onChange, options, className = "" }) => {
 };
 
 const Report = () => {
+  const location = useLocation();
+  const selectedDistrict = location.state?.district;
   const districts = ["Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle", "Gampaha", "Hambantota", "Jaffna", "Kalutara", "Kandy", "Kegalle", "Kilinochchi", "Kurunegala", "Mannar", "Matale", "Matara", "Monaragala", "Mullaitivu", "Nuwara Eliya", "Polonnaruwa", "Puttalam", "Ratnapura", "Trincomalee", "Vavuniya"];
 
   const [mode, setMode] = useState("single");
   const [availableDates, setAvailableDates] = useState([]);
-  const [configA, setConfigA] = useState({ district: "Anuradhapura", date: "", season: "Maha" });
+  const [configA, setConfigA] = useState({ district: selectedDistrict || "Anuradhapura", date: "", season: "Maha" });
   const [configB, setConfigB] = useState({ district: "Gampaha", date: "", season: "Maha" });
   const [dataA, setDataA] = useState(null);
   const [dataB, setDataB] = useState(null);

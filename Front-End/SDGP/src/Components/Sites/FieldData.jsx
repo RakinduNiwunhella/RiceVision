@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { supabase } from "../../supabaseClient"; // adjust path if needed
+import { supabase } from "../../supabaseClient";
+import { useLanguage } from "../../context/LanguageContext";
+import { useNavigate } from "react-router-dom";
 
 const healthColor = (health) => {
   switch (health) {
@@ -15,9 +17,17 @@ const healthColor = (health) => {
 };
 
 const FieldData = () => {
+  const navigate = useNavigate();
+  const { t } = useLanguage();
+
   const [stats, setStats] = useState([]);
   const [districtData, setDistrictData] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const handleViewMap = (district) => {
+    // navigate to map page and filter/zoom to the selected district
+    navigate("/field-map", { state: { district } });
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -34,10 +44,10 @@ const FieldData = () => {
       }
 
       setStats([
-        { label: "Total Fields", value: summary.total_fields, icon: "analytics" },
-        { label: "Healthy Fields", value: summary.healthy_fields, icon: "check_circle", color: "text-emerald-400" },
-        { label: "Stressed Fields", value: summary.stressed_fields, icon: "potted_plant", color: "text-amber-400" },
-        { label: "Critical Alerts", value: summary.critical_alerts, icon: "warning", color: "text-red-400" },
+        { label: t('colTotalFields'), value: summary.total_fields, icon: "analytics" },
+        { label: t('colHealthy'), value: summary.healthy_fields, icon: "check_circle", color: "text-emerald-400" },
+        { label: t('colStressed'), value: summary.stressed_fields, icon: "potted_plant", color: "text-amber-400" },
+        { label: t('colCritical'), value: summary.critical_alerts, icon: "warning", color: "text-red-400" },
       ]);
 
       const { data: districts, error: districtError } = await supabase
@@ -63,7 +73,7 @@ const FieldData = () => {
       <div className="min-h-full flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
-          <p className="text-white/40 font-black uppercase tracking-widest text-xs animate-pulse">Decrypting Field Intelligence...</p>
+          <p className="text-white/40 font-black uppercase tracking-widest text-xs animate-pulse">{t('decryptingIntel')}</p>
         </div>
       </div>
     );
@@ -77,18 +87,13 @@ const FieldData = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
             <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
-              Field Intelligence
+              Field Data
             </h1>
             <p className="text-white/40 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em]">
-              Aggregated Satellite-derived insights on Crop Health & Yield Performance
+              {t('liveStream')}
             </p>
           </div>
-
-          <div className="glass px-6 py-3 rounded-2xl border-white/10 flex items-center gap-3">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-white/60">Live Sentinel Stream</span>
-          </div>
-        </div>
+                  </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -117,7 +122,7 @@ const FieldData = () => {
           <div className="p-8 border-b border-white/10 flex justify-between items-center">
             <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/40 flex items-center gap-3">
               <span className="material-symbols-outlined text-emerald-400">dataset</span>
-              District-wise Performance Summary
+              {t('districtPerformance')}
             </h2>
             <div className="flex gap-2">
               <div className="w-2 h-2 rounded-full bg-white/10" />
@@ -127,16 +132,17 @@ const FieldData = () => {
           </div>
 
           <div className="overflow-x-auto no-scrollbar">
-            <table className="w-full text-sm border-collapse">
+            <table className="w-full text-xs border-collapse">
               <thead>
-                <tr className="text-white/30 uppercase text-[10px] font-black tracking-widest border-b border-white/5">
-                  <th className="px-8 py-6 text-left font-black">District</th>
-                  <th className="px-6 py-6 text-left font-black">Total Fields</th>
-                  <th className="px-6 py-6 text-left font-black">Healthy</th>
-                  <th className="px-6 py-6 text-left font-black">Stressed</th>
-                  <th className="px-6 py-6 text-left font-black">Critical</th>
-                  <th className="px-6 py-6 text-left font-black">Avg Yield (kg/ha)</th>
-                  <th className="px-8 py-6 text-right font-black">Total Yield (kg)</th>
+                <tr className="text-white/30 uppercase text-[10px] font-black tracking-widest border-b border-white/5 whitespace-nowrap">
+                  <th className="px-8 py-5 text-left font-black whitespace-nowrap">District</th>
+                  <th className="px-6 py-5 text-left font-black whitespace-nowrap">Total Fields</th>
+                  <th className="px-6 py-5 text-left font-black whitespace-nowrap">Healthy</th>
+                  <th className="px-6 py-5 text-left font-black whitespace-nowrap">Stressed</th>
+                  <th className="px-6 py-5 text-left font-black whitespace-nowrap">Critical</th>
+                  <th className="px-6 py-5 text-left font-black whitespace-nowrap">Avg Yield</th>
+                  <th className="px-8 py-5 text-right font-black whitespace-nowrap">Total Yield</th>
+                  <th className="px-6 py-5 text-center font-black whitespace-nowrap">Action</th>
                 </tr>
               </thead>
 
@@ -144,41 +150,58 @@ const FieldData = () => {
                 {districtData.map((d) => (
                   <tr
                     key={d.district}
-                    className="hover:bg-white/5 transition-all duration-300 group/row"
+                    className="hover:bg-white/5 transition-all duration-300 group/row whitespace-nowrap"
                   >
                     <td className="px-8 py-5">
-                      <div className="flex items-center gap-3">
+                      <div className="text-center flex items-center gap-3">
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/50 group-hover/row:bg-emerald-400 transition-colors" />
                         <span className="font-black text-white group-hover/row:translate-x-1 transition-transform inline-block">
                           {d.district}
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-5 text-white/60 font-bold">{d.total_fields}</td>
-                    <td className="px-6 py-5">
+                    <td className="px-6 py-5 text-center text-white/60 font-bold">{d.total_fields}</td>
+                    <td className="px-6 py-5 text-center">
                       <span className="px-3 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[11px] font-black uppercase">
                         {d.healthy_fields}
                       </span>
                     </td>
-                    <td className="px-6 py-5">
+                    <td className="px-6 py-5 text-center">
                       <span className="px-3 py-1 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[11px] font-black uppercase">
                         {d.stressed_fields}
                       </span>
                     </td>
-                    <td className="px-6 py-5">
+                    <td className="px-6 py-5 text-center">
                       <span className="px-3 py-1 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 text-[11px] font-black uppercase">
                         {d.critical_fields}
                       </span>
                     </td>
-                    <td className="px-6 py-5">
+                    <td className="px-6 py-5 text-center">
                       <div className="flex flex-col">
                         <span className="text-white/80">{d.avg_yield_kg_ha}</span>
                         <span className="text-[10px] text-white/20 uppercase font-black tracking-tighter">kg/Ha</span>
                       </div>
                     </td>
-                    <td className="px-8 py-5 text-right">
-                      <span className="text-lg font-black text-white">{Number(d.total_yield_kg).toLocaleString()}</span>
+                    <td className="px-8 py-5 text-center">
+                      <span className="font-black text-center text-white">{Number(d.total_yield_kg).toLocaleString()}</span>
                       <span className="ml-1 text-[10px] text-white/40 uppercase font-black">kg</span>
+                    </td>
+                    <td className="px-6 py-5 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <button
+                          onClick={() => handleViewMap(d.district)}
+                          className="glass-btn text-[10px] px-3 py-1 tracking-widest bg-white/10 hover:bg-white/20"
+                        >
+                          View Map
+                        </button>
+
+                        <button
+                          onClick={() => navigate("/reports", { state: { district: d.district } })}
+                          className="glass-btn text-[10px] px-3 py-1 tracking-widest bg-white/10 hover:bg-white/20"
+                        >
+                          View Report
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
