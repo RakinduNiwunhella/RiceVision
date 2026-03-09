@@ -12,14 +12,9 @@
  */
 
 import { useState, useRef, useEffect } from "react";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { supabase } from "./supabaseClient"; // adjust path if needed
 
-
-// 🔁 Replace with your Gemini API key (get it from https://aistudio.google.com/app/apikey)
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-
-const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+const API_BASE = "https://ricevision-cakt.onrender.com";
 
 // ─── Schema + behaviour prompt ────────────────────────────────────────────────
 const SYSTEM_PROMPT = `
@@ -69,30 +64,19 @@ async function fetchYieldData() {
     return data;
 }
 
-// ─── Ask Gemini ───────────────────────────────────────────────────────────────
+// ─── Ask Gemini (via backend) ─────────────────────────────────────────────────
 async function askGemini(question, yieldData, chatHistory) {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
-
-    const history = chatHistory
-        .map((m) => `${m.role === "user" ? "User" : "Assistant"}: ${m.content}`)
-        .join("\n");
-
-    const prompt = `
-${SYSTEM_PROMPT}
-
---- LIVE DATA (${yieldData.length} districts) ---
-${JSON.stringify(yieldData, null, 2)}
-
---- CONVERSATION HISTORY ---
-${history || "None yet."}
-
---- NEW QUESTION ---
-User: ${question}
-
-Answer:`;
-
-    const result = await model.generateContent(prompt);
-    return result.response.text();
+    const res = await fetch(`${API_BASE}/api/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question, yieldData, chatHistory }),
+    });
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.detail || `Server error ${res.status}`);
+    }
+    const { reply } = await res.json();
+    return reply;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────

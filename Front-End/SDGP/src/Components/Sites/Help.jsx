@@ -6,10 +6,11 @@ import {
   ExclamationTriangleIcon,
   ChevronDownIcon,
 } from "@heroicons/react/24/outline";
-
 import { fetchFaqs, submitComplaint } from "../../api/api";
+import { useLanguage } from "../../context/LanguageContext";
 
 const Help = () => {
+  const { t } = useLanguage();
   const [form, setForm] = useState({
     full_name: "",
     position: "",
@@ -89,7 +90,7 @@ const Help = () => {
           <div>
             <h1 className="flex items-center gap-3 text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
               <QuestionMarkCircleIcon className="w-8 h-8 md:w-12 md:h-12 text-emerald-400" />
-              Help & Support
+              {t('helpSupport')}
             </h1>
             <p className="text-white/40 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em] max-w-2xl">
 
@@ -102,16 +103,16 @@ const Help = () => {
           {[
             {
               icon: <PhoneIcon className="w-5 h-5 text-emerald-400" />,
-              title: "Quick Assistance",
-              desc: "Immediate tactical assistance for critical infrastructure failures.",
-              action: "Dial Concierge",
+              title: t('quickAssistance'),
+              desc: t('quickAssistanceDesc'),
+              action: t('dialConcierge'),
               color: "emerald"
             },
             {
               icon: <EnvelopeIcon className="w-5 h-5 text-cyan-400" />,
-              title: "Ask Our Team",
-              desc: "Submit non-urgent data requests or detailed system feedback.",
-              action: "Transmit Email",
+              title: t('askTeam'),
+              desc: t('askTeamDesc'),
+              action: t('transmitEmail'),
               color: "cyan"
             },
           ].map((card, idx) => (
@@ -145,17 +146,17 @@ const Help = () => {
             <div className="glass p-8 md:p-10 rounded-[2.5rem] border border-white/10 shadow-2xl space-y-8">
               <div className="flex items-center gap-3 border-b border-white/10 pb-6">
                 <ExclamationTriangleIcon className="w-6 h-6 text-amber-400" />
-                <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/40">Intelligence Feedback Loop</h2>
+                <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/40">{t('feedbackLoop')}</h2>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2 ml-1">Full Operator Name</label>
+                    <label className="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2 ml-1">{t('fullOperatorName')}</label>
                     <input name="full_name" value={form.full_name} onChange={handleChange} className={inputClass} placeholder="John Doe" />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2 ml-1">Assigned Position</label>
+                    <label className="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2 ml-1">{t('assignedPosition')}</label>
                     <input name="position" value={form.position} onChange={handleChange} className={inputClass} placeholder="Field Supervisor" />
                   </div>
                 </div>
@@ -163,23 +164,23 @@ const Help = () => {
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2 ml-1">Province</label>
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2 ml-1">{t('province')}</label>
                       <input name="province" value={form.province} onChange={handleChange} className={inputClass} />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2 ml-1">District</label>
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2 ml-1">{t('district')}</label>
                       <input name="district" value={form.district} onChange={handleChange} className={inputClass} />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2 ml-1">Anomaly Type</label>
+                    <label className="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2 ml-1">{t('anomalyType')}</label>
                     <select
                       name="complaint_type"
                       value={form.complaint_type}
                       onChange={handleChange}
                       className={inputClass + " appearance-none cursor-pointer"}
                     >
-                      <option value="" className="bg-slate-900">Select Severity</option>
+                      <option value="" className="bg-slate-900">{t('selectSeverity')}</option>
                       <option className="bg-slate-900">Technical Intelligence Failure</option>
                       <option className="bg-slate-900">Spectral Data Inconsistency</option>
                       <option className="bg-slate-900">Credential Access Hub Issue</option>
@@ -190,14 +191,14 @@ const Help = () => {
               </div>
 
               <div className="space-y-4">
-                <label className="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2 ml-1">Detailed Diagnostic Message</label>
+                <label className="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2 ml-1">{t('detailedMessage')}</label>
                 <textarea
                   name="message"
                   value={form.message}
                   onChange={handleChange}
                   rows="6"
                   className={inputClass + " resize-none"}
-                  placeholder="Describe the issue in detail so we can help you...."
+                  placeholder={t('describeIssue')}
                 />
               </div>
 
@@ -206,7 +207,7 @@ const Help = () => {
                 disabled={loading}
                 className="w-full glass bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-400 py-4 rounded-2xl font-black uppercase tracking-widest transition-all active:scale-[0.98] border border-emerald-500/30 shadow-xl shadow-emerald-500/10 disabled:opacity-50"
               >
-                {loading ? "Transmitting..." : "Submit Your Report"}
+                {loading ? t('transmitting') : t('submitReport')}
               </button>
             </div>
           </div>
@@ -214,15 +215,15 @@ const Help = () => {
           {/* Dynamic Knowledge Base (FAQs) */}
           <div className="xl:col-span-2 space-y-6">
             <div className="glass p-8 rounded-[2.5rem] border border-white/10 shadow-xl h-fit">
-              <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/40 mb-8 flex items-center gap-2">
+                <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/40 mb-8 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-                Quick Help
+                {t('quickHelp')}
               </h2>
 
               {faqLoading && (
                 <div className="flex items-center gap-3 py-10 justify-center">
                   <div className="w-4 h-4 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin" />
-                  <span className="text-xs font-black uppercase text-white/20">Decrypting FAQs...</span>
+                  <span className="text-xs font-black uppercase text-white/20">{t('decryptingFaqs')}</span>
                 </div>
               )}
 

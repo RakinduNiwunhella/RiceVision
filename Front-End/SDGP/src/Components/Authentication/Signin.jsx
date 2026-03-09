@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { supabase } from "../../supabaseClient";
 import { useNavigate, Link } from "react-router-dom";
 import {
@@ -9,10 +9,10 @@ import {
   FaEye,
   FaEyeSlash,
 } from "react-icons/fa";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function LoginPage() {
-  // 1. Changed initial state to 'light'
-  const [theme, setTheme] = useState("light");
+  const { isDark, toggleTheme } = useTheme();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -23,16 +23,6 @@ export default function LoginPage() {
   const [resetLoading, setResetLoading] = useState(false);
   const [resetSuccess, setResetSuccess] = useState(false);
   const [resetError, setResetError] = useState("");
-
-  // Theme Logic
-  useEffect(() => {
-    const root = window.document.documentElement;
-    if (theme === "dark") {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
-  }, [theme]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -100,10 +90,10 @@ export default function LoginPage() {
       {/* Theme Toggle */}
       <button
         type="button"
-        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+        onClick={toggleTheme}
         className="fixed top-6 right-6 p-3 rounded-full bg-slate-100 dark:bg-slate-800 hover:rotate-12 transition-all shadow-md z-50"
       >
-        {theme === "dark" ? (
+        {isDark ? (
           <FaSun className="text-yellow-400 text-xl" />
         ) : (
           <FaMoon className="text-indigo-600 text-xl" />

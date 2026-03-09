@@ -21,7 +21,7 @@ class Complaint(BaseModel):
 @router.get("/faqs")
 def get_faqs():
     try:
-        response = supabase.table("faqs") \
+        response = supabase.table("faq") \
             .select("id, question, answer") \
             .execute()
 
