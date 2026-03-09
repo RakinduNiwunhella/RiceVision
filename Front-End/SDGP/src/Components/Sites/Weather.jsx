@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
+import { getDSDivision } from "../../utils/geoUtils";
 
 // ─────────────────────────────────────────────
 // All 25 Sri Lankan Districts + coordinates
@@ -168,6 +169,25 @@ export default function RiceVisionWeather() {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
+  const resolveLocation = async (lat, lon) => {
+    const geoInfo = await getDSDivision(lat, lon);
+    if (geoInfo) {
+      // Create a custom district object merging real coordinates with exact names
+      // Adding ", [District]" to name and setting district scope.
+      setDistrict({
+        name: geoInfo.ds,
+        district: geoInfo.dist,
+        lat: lat,
+        lon: lon,
+        isCustom: true
+      });
+    } else {
+      // Fallback
+      setDistrict(nearestDistrict(lat, lon));
+    }
+    setGeoStatus("done");
+  };
+
   // Auto-detect location on mount
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -176,11 +196,7 @@ export default function RiceVisionWeather() {
     }
     setGeoStatus("locating");
     navigator.geolocation.getCurrentPosition(
-      ({ coords }) => {
-        const nearest = nearestDistrict(coords.latitude, coords.longitude);
-        setDistrict(nearest);
-        setGeoStatus("done");
-      },
+      ({ coords }) => resolveLocation(coords.latitude, coords.longitude),
       () => {
         setDistrict(DISTRICTS.find((d) => d.name === "Colombo"));
         setGeoStatus("denied");
@@ -270,19 +286,29 @@ export default function RiceVisionWeather() {
 
         {/* ─── HEADER ─── */}
         <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 flex-wrap">
-          <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-400 mb-1 flex items-center gap-2">
+          <div className="mb-6">
+
+            {/* System label */}
+            <p className="text-[10px] font-black uppercase tracking-[0.45em] text-emerald-400 mb-2 flex items-center gap-2">
               <span className="material-symbols-outlined text-sm">partly_cloudy_day</span>
               Paddy Field Weather Intelligence
             </p>
-            <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight leading-none">
-              {district?.name} Station
+
+            {/* Main Location */}
+            <h1 className="text-4xl md:text-6xl font-black text-white leading-tight tracking-tight">
+              {district?.name}
             </h1>
-            <p className="text-white/40 text-[10px] mt-1 font-bold uppercase tracking-widest">
-              {district?.lat.toFixed(4)}°N · {district?.lon.toFixed(4)}°E
-              {geoStatus === "done" && " · Auto-detected"}
-              {geoStatus === "denied" && " · Default Location"}
+
+            {/* Admin hierarchy */}
+            <p className="text-sm md:text-base text-white/70 font-semibold mt-1">
+              {district?.name} DS Division · {district?.district || "Colombo"} District
             </p>
+
+            {/* Meta info */}
+            <p className="text-[10px] text-white/30 mt-2 font-bold uppercase tracking-widest">
+              {district?.lat.toFixed(4)}°N · {district?.lon.toFixed(4)}°E · Auto-detected
+            </p>
+
           </div>
 
           <div className="flex items-center gap-3 flex-wrap">
@@ -291,10 +317,7 @@ export default function RiceVisionWeather() {
                 if (!navigator.geolocation) return;
                 setGeoStatus("locating");
                 navigator.geolocation.getCurrentPosition(
-                  ({ coords }) => {
-                    setDistrict(nearestDistrict(coords.latitude, coords.longitude));
-                    setGeoStatus("done");
-                  },
+                  ({ coords }) => resolveLocation(coords.latitude, coords.longitude),
                   () => setGeoStatus("denied"),
                   { timeout: 8000 }
                 );
