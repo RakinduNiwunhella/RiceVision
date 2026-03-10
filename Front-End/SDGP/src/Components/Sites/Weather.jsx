@@ -984,8 +984,7 @@ export default function RiceVisionWeather() {
           </div>
         )}
 
-        <footer className="text-center text-[9px] text-white/20 font-bold uppercase tracking-widest py-6 border-t border-white/5">
-          Data sourced from Open-Meteo · Free & No API Key · Updates every 15 min · {district?.name} · {district?.lat}°N {district?.lon}°E
+        <footer className="hidden">
         </footer>
       </div>
     </div>
