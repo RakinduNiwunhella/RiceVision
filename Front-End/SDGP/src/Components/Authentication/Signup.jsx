@@ -57,10 +57,7 @@ export default function SignupPage() {
     if (error) {
       alert(error.message);
     } else {
-      alert(
-        "Signup successful! Please check your email for a confirmation link.",
-      );
-      navigate("/");
+      navigate("/field-setup", { state: { fromSignup: true } });
     }
     setLoading(false);
   };
