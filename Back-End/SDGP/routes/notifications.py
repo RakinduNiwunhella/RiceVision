@@ -6,9 +6,10 @@ router = APIRouter()
 # ------------------ GET ALL NOTIFICATIONS ------------------
 @router.get("/notifications")
 def get_notifications():
+    # pull from the notificationpanel table, which holds the messages
     response = (
         supabase
-        .table("notifications")
+        .table("notificationpanel")
         .select("*")
         .order("created_at", desc=True)
         .execute()
@@ -22,7 +23,7 @@ def get_notifications():
 def mark_notification_read(notification_id: int):
     response = (
         supabase
-        .table("notifications")
+        .table("notificationpanel")
         .update({"is_read": True})
         .eq("id", notification_id)
         .execute()

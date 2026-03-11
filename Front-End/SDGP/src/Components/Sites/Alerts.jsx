@@ -1,14 +1,17 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { updateAlertStatus } from "../../api/api";
+import { useLanguage } from "../../context/LanguageContext";
 
 const API_BASE = "https://ricevision-cakt.onrender.com";
-const tabOptions = ["Disasters", "Pest Risks", "Past Alerts"];
+const TAB_KEYS = ["Disasters", "Pest Risks", "Past Alerts"];
 
 const formatTitle = (text) =>
   text.replace(/\b\w/g, (char) => char.toUpperCase());
 
 const Alerts = () => {
+  const { t } = useLanguage();
+  const tabLabels = [t('disasters'), t('pestRisks'), t('pastAlerts')];
   const [alerts, setAlerts] = useState([]);
   const [activeTab, setActiveTab] = useState("Disasters");
   const [searchTerm, setSearchTerm] = useState("");
@@ -188,28 +191,28 @@ const Alerts = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
             <h1 className="text-3xl md:text-5xl font-black text-white">
-              Field Risk Alerts
+              {t('fieldRiskAlerts')}
             </h1>
             <p className="text-white/40 text-xs mt-1 font-bold uppercase tracking-[0.2em]">
-              Automated Sentinel Monitoring
+              Real-time Field Health intelligence
             </p>
           </div>
 
           <div className="flex gap-3">
             <div className="glass px-4 py-2 rounded-xl border-white/10">
               <span className="text-[10px] font-black uppercase text-white/30 block">
-                Active
+                {t('active')}
               </span>
-              <span className="text-xl font-black text-red-400">
+              <span className="text-lg font-black text-red-400">
                 {counts.Open}
               </span>
             </div>
 
             <div className="glass px-4 py-2 rounded-xl border-white/10">
               <span className="text-[10px] font-black uppercase text-white/30 block">
-                Resolved
+                {t('resolved')}
               </span>
-              <span className="text-xl font-black text-emerald-400">
+              <span className="text-lg font-black text-emerald-400">
                 {counts.Resolved}
               </span>
             </div>
@@ -221,23 +224,23 @@ const Alerts = () => {
           <div className="flex flex-col lg:flex-row gap-6 justify-between">
 
             <div className="flex p-1 rounded-2xl bg-white/5 border border-white/10 w-fit">
-              {tabOptions.map((tab) => (
+              {TAB_KEYS.map((key, idx) => (
                 <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`px-5 py-2 rounded-xl text-xs font-bold transition-all ${activeTab === tab
+                  key={key}
+                  onClick={() => setActiveTab(key)}
+                  className={`px-5 py-2 rounded-xl text-xs font-bold transition-all ${activeTab === key
                     ? "bg-white/15 text-white"
                     : "text-white/40 hover:text-white/70"
                     }`}
                 >
-                  {tab}
+                  {tabLabels[idx]}
                 </button>
               ))}
             </div>
 
             <input
               type="text"
-              placeholder="Find specific anomaly..."
+              placeholder={t('findAnomaly')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="bg-white/5 border border-white/10 rounded-2xl py-3 px-6 text-sm text-white placeholder:text-white/20"
@@ -251,7 +254,7 @@ const Alerts = () => {
           {filteredAlerts.length === 0 && (
             <div className="glass p-20 rounded-[2rem] text-center">
               <p className="text-white/30 font-bold uppercase">
-                No active threats detected
+                No Past threats detected
               </p>
             </div>
           )}
@@ -268,8 +271,8 @@ const Alerts = () => {
                     {activeTab === "Pest Risks" && alert.count != null ? (
                       <>
                         {alert.field} •{" "}
-                        <span className="text-red-500">
-                          {alert.count} RISKS
+                        <span className="text-rose-700">
+                          {alert.count} Risks
                         </span>
                       </>
                     ) : (
@@ -292,21 +295,21 @@ const Alerts = () => {
                       onClick={() => handleResolve(alert.id)}
                       className="px-6 py-2 bg-emerald-500/30 text-emerald-300 rounded-xl text-xs font-bold"
                     >
-                      Resolve
+                      {t('resolveBtn')}
                     </button>
 
                     <button
-                      onClick={() => handleIgnore(alert.id)}
-                      className="px-6 py-2 bg-white/10 text-white/60 rounded-xl text-xs font-bold"
+                      onClick={() => handleDeny(alert.id)}
+                      className="glass-btn text-[10px] px-3 py-1 tracking-widest bg-white/10 hover:bg-white/20"
                     >
                       Ignore
                     </button>
 
                     <button
                       onClick={() => handleViewInMap(alert)}
-                      className="px-6 py-2 bg-white/10 text-white/60 rounded-xl text-xs font-bold"
+                      className="glass-btn text-[10px] px-3 py-1 tracking-widest bg-white/10 hover:bg-white/20"
                     >
-                      View in Map
+                      View Map
                     </button>
                   </div>
                 )}
