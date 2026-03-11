@@ -50,16 +50,26 @@ function getDisasterColor(risk) {
 /* ---------- POINT POPUP ---------- */
 
 function PointPopup({ p }) {
+  const { isDark } = useTheme();
   const healthColor = getHealthColor(p.paddy_health);
   const pestInfo = getPestRiskLabel(p.pest_risk);
   const disasterColor = getDisasterColor(p.disaster_risk);
 
+  const bg = isDark ? "#0f172a" : "#ffffff";
+  const textPrimary = isDark ? "#f1f5f9" : "#0f172a";
+  const textSecondary = isDark ? "#94a3b8" : "#64748b";
+  const textMuted = isDark ? "#64748b" : "#94a3b8";
+  const textValue = isDark ? "#e2e8f0" : "#1e293b";
+  const border = isDark ? "#1e293b" : "#f1f5f9";
+  const headerBorder = isDark ? "#334155" : "#e2e8f0";
+  const sectionColor = isDark ? "#64748b" : "#94a3b8";
+
   const row = (label, value, unit = "", color = null) => {
     if (value == null || value === "") return null;
     return (
-      <div style={{ display: "flex", justifyContent: "space-between", padding: "3px 0", borderBottom: "1px solid #f1f5f9" }}>
-        <span style={{ color: "#64748b", fontSize: 11, fontWeight: 500 }}>{label}</span>
-        <span style={{ fontWeight: 600, fontSize: 11, color: color || "#1e293b" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", padding: "3px 0", borderBottom: `1px solid ${border}` }}>
+        <span style={{ color: textSecondary, fontSize: 11, fontWeight: 500 }}>{label}</span>
+        <span style={{ fontWeight: 600, fontSize: 11, color: color || textValue }}>
           {value}{unit}
         </span>
       </div>
@@ -67,47 +77,47 @@ function PointPopup({ p }) {
   };
 
   return (
-    <div style={{ minWidth: 220, fontFamily: "'Inter', system-ui, sans-serif", lineHeight: 1.5 }}>
+    <div style={{ minWidth: 220, fontFamily: "'Inter', system-ui, sans-serif", lineHeight: 1.5, backgroundColor: bg, color: textPrimary, borderRadius: 12, margin: -10, marginBottom: -14, padding: "10px 14px" }}>
       {/* Header */}
-      <div style={{ borderBottom: "2px solid #e2e8f0", paddingBottom: 6, marginBottom: 6 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: "#0f172a" }}>
+      <div style={{ borderBottom: `2px solid ${headerBorder}`, paddingBottom: 6, marginBottom: 6 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: textPrimary }}>
           {p.district}
         </div>
         {p.date && (
-          <div style={{ fontSize: 10, color: "#94a3b8" }}>{p.date}</div>
+          <div style={{ fontSize: 10, color: textMuted }}>{p.date}</div>
         )}
       </div>
 
       {/* Crop Status */}
-      <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: "#94a3b8", marginBottom: 2, marginTop: 4 }}>Crop Status</div>
+      <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: sectionColor, marginBottom: 2, marginTop: 4 }}>Crop Status</div>
       {row("Health", p.paddy_health, "", healthColor)}
       {row("Growth Stage", p.stage)}
       {row("Season", p.season)}
 
       {/* Risk */}
-      <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: "#94a3b8", marginBottom: 2, marginTop: 8 }}>Risk Assessment</div>
+      <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: sectionColor, marginBottom: 2, marginTop: 8 }}>Risk Assessment</div>
       {row("Pest Risk", pestInfo.text, "", pestInfo.color)}
       {row("Disaster Risk", p.disaster_risk || "N/A", "", disasterColor)}
 
       {/* Vegetation */}
-      <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: "#94a3b8", marginBottom: 2, marginTop: 8 }}>Vegetation Indices</div>
+      <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: sectionColor, marginBottom: 2, marginTop: 8 }}>Vegetation Indices</div>
       {row("NDVI", p.ndvi)}
       {row("EVI", p.evi)}
 
       {/* Weather */}
-      <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: "#94a3b8", marginBottom: 2, marginTop: 8 }}>Weather</div>
+      <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: sectionColor, marginBottom: 2, marginTop: 8 }}>Weather</div>
       {row("Rainfall (7d)", p.rain_7d, " mm")}
       {row("Rainfall (14d)", p.rain_14d, " mm")}
       {row("Temperature", p.temp, " °C")}
       {row("Humidity", p.humidity, " %")}
 
       {/* Terrain */}
-      <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: "#94a3b8", marginBottom: 2, marginTop: 8 }}>Terrain</div>
+      <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: sectionColor, marginBottom: 2, marginTop: 8 }}>Terrain</div>
       {row("Elevation", p.elevation, " m")}
       {row("Slope", p.slope, " °")}
 
       {/* Coordinates */}
-      <div style={{ marginTop: 8, fontSize: 9, color: "#94a3b8", textAlign: "center" }}>
+      <div style={{ marginTop: 8, fontSize: 9, color: textMuted, textAlign: "center" }}>
         {p.lat?.toFixed(5)}, {p.lng?.toFixed(5)}
       </div>
     </div>
@@ -454,7 +464,7 @@ useEffect(() => {
     weight: 1,
   }}
 >
-  <Popup maxWidth={280} className="point-popup">
+  <Popup maxWidth={280} className={`point-popup ${isDark ? "point-popup-dark" : ""}`}>
     <PointPopup p={p} />
   </Popup>
 </CircleMarker>

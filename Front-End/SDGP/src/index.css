@@ -194,3 +194,29 @@
 .point-popup .leaflet-popup-tip {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
+
+/* Dark mode popup */
+.point-popup-dark .leaflet-popup-content-wrapper {
+  background: #0f172a;
+  color: #f1f5f9;
+  border: none;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+}
+
+.point-popup-dark .leaflet-popup-tip-container .leaflet-popup-tip {
+  background: #0f172a;
+  border: none;
+  box-shadow: none;
+}
+
+.point-popup-dark.leaflet-popup {
+  background: transparent;
+}
+
+.point-popup-dark .leaflet-popup-close-button {
+  color: #94a3b8;
+}
+
+.point-popup-dark .leaflet-popup-close-button:hover {
+  color: #f1f5f9;
+}
