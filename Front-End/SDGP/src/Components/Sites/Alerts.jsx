@@ -16,13 +16,18 @@ const formatTitle = (text) =>
 
 const Alerts = () => {
   const { t } = useLanguage();
-  const tabLabels = [t('disasters'), t('pestRisks'), t('pastAlerts')];
+  const tabLabels = [t("disasters"), t("pestRisks"), t("pastAlerts")];
+
   const [alerts, setAlerts] = useState([]);
+  const [globalAlerts, setGlobalAlerts] = useState([]);
   const [activeTab, setActiveTab] = useState("Disasters");
   const [searchTerm, setSearchTerm] = useState("");
   const [updatingId, setUpdatingId] = useState(null);
 
+
   const navigate = useNavigate();
+
+  /* ---------------- FILTERED ALERTS ---------------- */
 
   const filteredAlerts = useMemo(() => {
     const normalizedSearch = searchTerm.toLowerCase();
@@ -46,6 +51,8 @@ const Alerts = () => {
     });
   }, [alerts, searchTerm, activeTab]);
 
+  /* ---------------- LOAD TAB ALERTS ---------------- */
+
   useEffect(() => {
     const loadAlerts = async () => {
       try {
@@ -53,11 +60,9 @@ const Alerts = () => {
 
         if (activeTab === "Disasters") {
           endpoint = `${API_BASE}/api/alerts/disasters`;
-        }
-        else if (activeTab === "Pest Risks") {
+        } else if (activeTab === "Pest Risks") {
           endpoint = `${API_BASE}/api/alerts/pest-risk`;
-        }
-        else if (activeTab === "Past Alerts") {
+        } else if (activeTab === "Past Alerts") {
           endpoint = `${API_BASE}/api/alerts/past`;
         }
 
@@ -93,7 +98,7 @@ const Alerts = () => {
         else if (activeTab === "Pest Risks") {
           const mappedAlerts = (Array.isArray(data) ? data : [])
             .filter((a) => a.risky_pixels > 0)
-            .map((a, index) => ({
+            .map((a) => ({
               id: a.district,
               title: `${a.district} • ${a.risky_pixels} RISKS`,
               description: "Multiple pest risks detected in this district.",
@@ -130,7 +135,6 @@ const Alerts = () => {
 
           setAlerts(mappedAlerts);
         }
-
       } catch (err) {
         console.error("Error fetching alerts:", err);
       }
@@ -139,18 +143,52 @@ const Alerts = () => {
     loadAlerts();
   }, [activeTab]);
 
+  /* ---------------- LOAD GLOBAL ALERT COUNTS ---------------- */
+
+  useEffect(() => {
+    const loadAllAlerts = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/alerts/all`);
+        const data = await res.json();
+        setGlobalAlerts(data);
+      } catch (err) {
+        console.error("Failed to load alert counters", err);
+      }
+    };
+
+    loadAllAlerts();
+  }, []);
+
+  /* ---------------- COUNTERS ---------------- */
+
   const counts = useMemo(() => {
+
     const countObj = { Open: 0, Resolved: 0, Ignored: 0 };
 
-    filteredAlerts.forEach((alert) => {
-      if (countObj[alert.status] !== undefined) {
-        countObj[alert.status]++;
+    const grouped = new Set();
+
+    globalAlerts.forEach((alert) => {
+
+      const status = alert.status || "Open";
+
+      // group by district + status
+      const key = `${alert.field}-${status}`;
+
+      if (!grouped.has(key)) {
+        grouped.add(key);
+
+        if (countObj[status] !== undefined) {
+          countObj[status]++;
+        }
       }
+
     });
 
-    countObj.All = filteredAlerts.length;
     return countObj;
-  }, [filteredAlerts]);
+
+  }, [globalAlerts]);
+
+  /* ---------------- STATUS UPDATE ---------------- */
 
   const updateStatus = async (id, newStatus) => {
     try {
@@ -190,20 +228,16 @@ const Alerts = () => {
   /* ---------------- MAP NAVIGATION ---------------- */
 
   const handleViewInMap = (alert) => {
-    /* Pest risk */
     if (activeTab === "Pest Risks" && alert.locations?.length > 0) {
       navigate("/field-map", {
         state: {
           type: "pest",
           district: alert.field,
           locations: alert.locations,
-          health: alert.health, // send health
+          health: alert.health,
         },
       });
-    }
-
-    /* Disaster risk */
-    else if (alert.lat != null && alert.lon != null) {
+    } else if (alert.lat != null && alert.lon != null) {
       navigate("/field-map", {
         state: {
           type: "disaster",
@@ -227,7 +261,7 @@ const Alerts = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
             <h1 className="text-3xl md:text-5xl font-black text-white">
-              {t('fieldRiskAlerts')}
+              {t("fieldRiskAlerts")}
             </h1>
             <p className="text-white/40 text-xs mt-1 font-bold uppercase tracking-[0.2em]">
               Real-time Field Health intelligence
@@ -235,9 +269,10 @@ const Alerts = () => {
           </div>
 
           <div className="flex gap-3">
+
             <div className="glass px-4 py-2 rounded-xl border-white/10">
               <span className="text-[10px] font-black uppercase text-white/30 block">
-                {t('active')}
+                {t("active")}
               </span>
               <span className="text-lg font-black text-red-400">
                 {counts.Open}
@@ -246,16 +281,17 @@ const Alerts = () => {
 
             <div className="glass px-4 py-2 rounded-xl border-white/10">
               <span className="text-[10px] font-black uppercase text-white/30 block">
-                {t('resolved')}
+                {t("resolved")}
               </span>
               <span className="text-lg font-black text-emerald-400">
                 {counts.Resolved}
               </span>
             </div>
+
           </div>
         </div>
 
-        {/* Tabs + Search */}
+        {/* Tabs */}
         <div className="glass p-6 rounded-[2rem] border-white/20">
           <div className="flex flex-col lg:flex-row gap-6 justify-between">
 
@@ -276,7 +312,7 @@ const Alerts = () => {
 
             <input
               type="text"
-              placeholder={t('findAnomaly')}
+              placeholder={t("findAnomaly")}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="bg-white/5 border border-white/10 rounded-2xl py-3 px-6 text-sm text-white placeholder:text-white/20"
@@ -284,7 +320,8 @@ const Alerts = () => {
           </div>
         </div>
 
-        {/* Alerts */}
+        {/* Alerts List */}
+
         <div className="space-y-6">
 
           {filteredAlerts.length === 0 && (
@@ -304,16 +341,7 @@ const Alerts = () => {
 
                 <div>
                   <h2 className="text-xl font-black text-emerald-400">
-                    {activeTab === "Pest Risks" && alert.count != null ? (
-                      <>
-                        {alert.field} •{" "}
-                        <span className="text-rose-700">
-                          {alert.count} Risks
-                        </span>
-                      </>
-                    ) : (
-                      alert.title
-                    )}
+                    {alert.title}
                   </h2>
 
                   <p className="text-white/60 text-sm mt-1">
@@ -327,11 +355,12 @@ const Alerts = () => {
 
                 {alert.status === "Open" && activeTab !== "Past Alerts" && (
                   <div className="flex gap-3">
+
                     <button
                       onClick={() => handleResolve(alert.id)}
                       className="px-6 py-2 bg-emerald-500/30 text-emerald-300 rounded-xl text-xs font-bold"
                     >
-                      {t('resolveBtn')}
+                      {t("resolveBtn")}
                     </button>
 
                     <button
@@ -347,13 +376,16 @@ const Alerts = () => {
                     >
                       View Map
                     </button>
+
                   </div>
                 )}
+
               </div>
             </div>
           ))}
 
         </div>
+
       </div>
     </div>
   );

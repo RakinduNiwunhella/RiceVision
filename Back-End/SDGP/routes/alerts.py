@@ -17,7 +17,7 @@ async def get_all_alerts():
     try:
         response = (
             supabase
-            .table("alerts_overview_view")
+            .table("alerts")
             .select("*")
             .order("date", desc=True)
             .execute()
