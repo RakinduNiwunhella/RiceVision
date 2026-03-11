@@ -204,46 +204,34 @@ export default function RiceMap({ filters, layers, flyTo }) {
 
   /* ---------- FETCH ML POINTS ---------- */
 
-  useEffect(() => {
+useEffect(() => {
 
-    if (!selectedDistrict || !layers.showCircles) {
-      setPoints([]);
-      return;
-    }
+  if (!selectedDistrict || !layers.showCircles) {
+    setPoints([]);
+    return;
+  }
 
-    const loadPoints = async () => {
+const loadPoints = async () => {
+  try {
 
-      try {
+    const data = await fetchMapFields({
+      districts: [selectedDistrict],
+      health: selectedHealth,
+    });
 
-        let data = await fetchMapFields({
-          districts: [selectedDistrict],
-          health: selectedHealth,
-        });
+    setPoints(data);   // NOT response.data
 
-        if (selectedHealth && selectedHealth.length === 1) {
+  } catch (err) {
 
-          const wanted = selectedHealth[0].toLowerCase();
+    console.error(err);
+    setPoints([]);
 
-          data = data.filter(
-            (p) => String(p.paddy_health).toLowerCase() === wanted
-          );
+  }
+};
 
-        }
+  loadPoints();
 
-        setPoints(data);
-
-      } catch (err) {
-
-        console.error(err);
-        setPoints([]);
-
-      }
-
-    };
-
-    loadPoints();
-
-  }, [selectedDistrict, selectedHealth, layers.showCircles]);
+}, [selectedDistrict, selectedHealth, layers.showCircles]);
 
   /* ---------- RENDER ---------- */
 
@@ -345,8 +333,8 @@ export default function RiceMap({ filters, layers, flyTo }) {
   <TileLayer url={vhTileUrl} opacity={overlayOpacity} />
 )}
 
-{layers.showCircles && points.length > 0 && (
-<MarkerClusterGroup
+{layers.showCircles && points && points.length > 0 && (
+  <MarkerClusterGroup
   disableClusteringAtZoom={10}
   spiderfyOnMaxZoom={false}
   showCoverageOnHover={false}
