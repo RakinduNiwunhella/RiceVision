@@ -190,59 +190,20 @@ const Header = () => {
 
             {/* Actions */}
             <div className="flex items-center gap-1.5 border-l border-white/10 pl-3">
-
-              {/* Language Selector */}
-              <div ref={langRef}>
-                <button
-                  ref={langBtnRef}
-                  onClick={() => {
-                    if (!langOpen && langBtnRef.current) {
-                      const rect = langBtnRef.current.getBoundingClientRect()
-                      setLangDropdownPos({ top: rect.bottom + 8, right: window.innerWidth - rect.right })
-                    }
-                    setLangOpen(prev => !prev)
-                  }}
-                  className="h-8 px-2 rounded-lg flex items-center gap-1 text-white/50 hover:text-white hover:bg-white/10 transition text-[11px] font-semibold"
-                  title="Change Language"
-                >
-                  <span className="material-symbols-outlined text-[16px]">language</span>
-                  <span>{currentLang.short}</span>
-                </button>
-                {langOpen && createPortal(
-                  <div
-                    style={{ position: 'fixed', top: langDropdownPos.top, right: langDropdownPos.right, zIndex: 9999, minWidth: 130 }}
-                    className="bg-[#0f1a12]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl overflow-hidden"
-                  >
-                    {LANGUAGES.map(lang => (
-                      <button
-                        key={lang.code}
-                        onMouseDown={() => { setLanguage(lang.code); setLangOpen(false) }}
-                        className={`w-full flex items-center gap-2 px-4 py-2.5 text-left text-xs transition ${
-                          language === lang.code
-                            ? 'bg-emerald-500/20 text-emerald-300 font-semibold'
-                            : 'text-white/70 hover:bg-white/5 hover:text-white'
-                        }`}
-                      >
-                        {lang.label}
-                      </button>
-                    ))}
-                  </div>,
-                  document.body
-                )}
-              </div>
-
-              {/* Dark mode toggle */}
               <button
-                onClick={toggleTheme}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition"
-                title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                className="h-8 px-2 rounded-lg flex items-center gap-1 text-white/50 hover:text-white hover:bg-white/10 transition"
+                title="Language"
               >
-                <span className="material-symbols-outlined text-[20px]">
-                  {isDark ? 'light_mode' : 'dark_mode'}
-                </span>
+                <span className="material-symbols-outlined text-[20px]">language</span>
+                <span className="text-xs font-semibold">EN</span>
               </button>
-
-              <NotificationPanelButton />
+              <button
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition"
+                title="Toggle Dark Mode"
+              >
+                <span className="material-symbols-outlined text-[20px]">dark_mode</span>
+              </button>
+              <NotificationButton />
             </div>
 
             {/* Avatar */}
