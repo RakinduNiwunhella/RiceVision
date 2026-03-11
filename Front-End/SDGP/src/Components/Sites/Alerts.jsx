@@ -14,6 +14,22 @@ const TAB_KEYS = ["Disasters", "Pest Risks", "Past Alerts"];
 const formatTitle = (text) =>
   text.replace(/\b\w/g, (char) => char.toUpperCase());
 
+// Groups pest alert rows by district, returns one card per district.
+// Used for both active Pest Risks tab and Past Alerts rendering.
+const groupPestAlertsByDistrict = (rows) => {
+  const groups = {};
+  rows.forEach((a) => {
+    const key = `${a.field}-${a.status}`;
+    if (!groups[key]) {
+      groups[key] = { ...a, count: a.count || 1 };
+    } else {
+      groups[key].count += a.count || 1;
+      if (!groups[key].note && a.note) groups[key].note = a.note;
+    }
+  });
+  return Object.values(groups);
+};
+
 /* ─────────────────────────────────────────
    RESOLVE MODAL
 ───────────────────────────────────────── */
@@ -166,19 +182,20 @@ const Alerts = () => {
         /* ---------------- PAST ALERTS ---------------- */
 
         else if (activeTab === "Past Alerts") {
+          // Backend already groups pest rows by district and returns
+          // { is_pest, district, risk_count, disaster_type, status, note, timestamp, ... }
           const mappedAlerts = (Array.isArray(data) ? data : []).map((a) => ({
             id: a.id,
-            title: formatTitle(
-              a.disaster_risk && a.disaster_risk !== "Not Applicable"
-                ? `${a.disaster_risk.replace("hazard_", "")} risk`
-                : "Pest Risk"
-            ),
+            title: a.is_pest
+              ? `${a.district} \u2022 ${a.risk_count} RISKS`
+              : formatTitle(`${a.disaster_type} risk`),
             description: `Stage: ${a.stage_name} | Health: ${a.paddy_health}`,
             status: a.status,
             field: a.district,
             health: a.paddy_health,
-            timestamp: a.date,
+            timestamp: a.timestamp,
             note: a.note || null,
+            isPest: a.is_pest,
             lat: a.lat,
             lon: a.lon,
           }));
@@ -212,28 +229,20 @@ const Alerts = () => {
   /* ---------------- COUNTERS ---------------- */
 
   const counts = useMemo(() => {
-    // Disasters counted individually; pest alerts grouped by district.
-    // globalAlerts (from /api/alerts/all) has one row per alert record.
-    // We de-dupe pest rows by district+status so one district = one count.
-    const seenPestDistricts = new Set();
+    const seenPest = new Set();
     const countObj = { Open: 0, Resolved: 0, Ignored: 0 };
 
     globalAlerts.forEach((alert) => {
       const status = alert.status || "Open";
-      const isPest = alert.title === "Pest Risk" || alert.field?.includes("pest");
+      if (!(status in countObj)) return;
 
-      let key;
-      if (isPest) {
-        key = `pest-${alert.field}-${status}`;
-        if (seenPestDistricts.has(key)) return;
-        seenPestDistricts.add(key);
-      } else {
-        key = `disaster-${alert.id}`;
+      if (alert.is_pest) {
+        const key = `${alert.field}-${status}`;
+        if (seenPest.has(key)) return;
+        seenPest.add(key);
       }
 
-      if (countObj[status] !== undefined) {
-        countObj[status]++;
-      }
+      countObj[status]++;
     });
 
     return countObj;
@@ -242,24 +251,32 @@ const Alerts = () => {
   /* ---------------- STATUS UPDATE (optimistic) ---------------- */
 
   const updateStatus = async (id, newStatus, note = null) => {
-    // snapshot for rollback
     const snapshot = alerts.find((a) => a.id === id);
     if (!snapshot) return;
 
-    // optimistic removal
+    const isPest = activeTab === "Pest Risks";
+
+    // Snapshot globalAlerts for counter rollback
+    const globalSnapshot = globalAlerts;
+
+    // Optimistic: remove from tab list
     setAlerts((prev) => prev.filter((a) => a.id !== id));
 
+    // Optimistic: update matching rows in globalAlerts so counts recalculate
+    setGlobalAlerts((prev) =>
+      prev.map((a) => {
+        const matches = isPest ? a.field === id : a.id === id;
+        return matches ? { ...a, status: newStatus } : a;
+      })
+    );
+
     try {
-      await updateAlertStatus(
-        id,
-        newStatus,
-        activeTab === "Pest Risks" ? "pest" : "normal",
-        note
-      );
+      await updateAlertStatus(id, newStatus, isPest ? "pest" : "normal", note);
     } catch (err) {
       console.error("Error updating alert:", err);
-      // restore on failure
+      // Rollback both slices
       setAlerts((prev) => [snapshot, ...prev]);
+      setGlobalAlerts(globalSnapshot);
     }
   };
 
