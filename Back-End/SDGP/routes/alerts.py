@@ -91,7 +91,7 @@ async def get_disasters():
     try:
         response = (
             supabase
-            .table("alerts_overview_view")
+            .table("disaster_risk_view")
             .select("*")
             .neq("disaster_risk", "Not Applicable")
             .order("date", desc=True)
