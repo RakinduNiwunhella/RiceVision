@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { supabase } from "../../supabaseClient";
+import { useLanguage } from "../../context/LanguageContext";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../../supabaseClient"; // adjust path if needed
 
 const healthColor = (health) => {
   switch (health) {
@@ -17,6 +18,7 @@ const healthColor = (health) => {
 
 const FieldData = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const [stats, setStats] = useState([]);
   const [districtData, setDistrictData] = useState([]);
@@ -42,10 +44,10 @@ const FieldData = () => {
       }
 
       setStats([
-        { label: "Total Fields", value: summary.total_fields, icon: "analytics" },
-        { label: "Healthy Fields", value: summary.healthy_fields, icon: "check_circle", color: "text-emerald-400" },
-        { label: "Stressed Fields", value: summary.stressed_fields, icon: "potted_plant", color: "text-amber-400" },
-        { label: "Critical Alerts", value: summary.critical_alerts, icon: "warning", color: "text-red-400" },
+        { label: t('colTotalFields'), value: summary.total_fields, icon: "analytics" },
+        { label: t('colHealthy'), value: summary.healthy_fields, icon: "check_circle", color: "text-emerald-400" },
+        { label: t('colStressed'), value: summary.stressed_fields, icon: "potted_plant", color: "text-amber-400" },
+        { label: t('colCritical'), value: summary.critical_alerts, icon: "warning", color: "text-red-400" },
       ]);
 
       const { data: districts, error: districtError } = await supabase
@@ -71,7 +73,7 @@ const FieldData = () => {
       <div className="min-h-full flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
-          <p className="text-white/40 font-black uppercase tracking-widest text-xs animate-pulse">Decrypting Field Intelligence...</p>
+          <p className="text-white/40 font-black uppercase tracking-widest text-xs animate-pulse">{t('decryptingIntel')}</p>
         </div>
       </div>
     );
@@ -88,7 +90,7 @@ const FieldData = () => {
               Field Data
             </h1>
             <p className="text-white/40 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em]">
-              Aggregated Satellite-derived insights on Crop Health & Yield Performance
+              {t('liveStream')}
             </p>
           </div>
                   </div>
@@ -120,7 +122,7 @@ const FieldData = () => {
           <div className="p-8 border-b border-white/10 flex justify-between items-center">
             <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/40 flex items-center gap-3">
               <span className="material-symbols-outlined text-emerald-400">dataset</span>
-              District-wise Performance Summary
+              {t('districtPerformance')}
             </h2>
             <div className="flex gap-2">
               <div className="w-2 h-2 rounded-full bg-white/10" />
@@ -148,7 +150,7 @@ const FieldData = () => {
                 {districtData.map((d) => (
                   <tr
                     key={d.district}
-                    className="hover:bg-white/5 transition-all duration-300 group/row"
+                    className="hover:bg-white/5 transition-all duration-300 group/row whitespace-nowrap"
                   >
                     <td className="px-8 py-5">
                       <div className="text-center flex items-center gap-3">

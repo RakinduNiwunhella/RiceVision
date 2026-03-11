@@ -1,33 +1,30 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
-
-const navItems = [
-  { id: 'dashboard', label: 'My Dashboard', icon: 'apps' },
-  { id: 'field-map', label: 'Field Map', icon: 'map' },
-  { id: 'field-data', label: 'Field Data', icon: 'agriculture' },
-  { id: 'alerts', label: 'Alerts', icon: 'notification_important' },
-  { id: 'weather', label: 'Weather', icon: 'cloud' },
-  { id: 'report', label: 'Report', icon: 'bar_chart' },
-]
-
-const bottomItems = [
-  { id: 'profile', label: 'My Profile', icon: 'person' },
-  { id: 'help', label: 'Help & FAQ', icon: 'help_outline' },
-  { id: '#', label: 'Logout', icon: 'logout' },
-]
-
-const linkBase =
-  'flex items-center gap-3 py-2.5 px-3 rounded-xl transition-all duration-200 group'
-
-const linkActive =
-  'text-white bg-gradient-to-r from-emerald-600/80 to-cyan-600/60 shadow-lg shadow-emerald-900/20 border border-emerald-500/20'
-
-const linkInactive =
-  'text-slate-400 hover:text-white hover:bg-white/[0.05]'
+import { useLanguage } from '../../context/LanguageContext'
 
 const Sidebar = () => {
+  const { t } = useLanguage()
+
+  const navItems = [
+    { id: 'dashboard', labelKey: 'myDashboard', icon: 'apps' },
+    { id: 'field-map', labelKey: 'fieldMap',    icon: 'map' },
+    { id: 'field-data', labelKey: 'fieldData',  icon: 'agriculture' },
+    { id: 'alerts',    labelKey: 'alerts',      icon: 'notification_important' },
+    { id: 'weather',   labelKey: 'weather',     icon: 'cloud' },
+    { id: 'report',    labelKey: 'report',      icon: 'bar_chart' },
+  ]
+
+  const bottomItems = [
+    { id: 'profile',  labelKey: 'myProfile', icon: 'person' },
+    { id: 'help',     labelKey: 'helpFAQ',   icon: 'help_outline' },
+    { id: '#',        labelKey: 'logout',    icon: 'logout' },
+  ]
   const isActive = (isActiveRoute, itemId) =>
     isActiveRoute || (location.pathname === '/' && itemId === 'dashboard')
+
+  const linkBase = 'flex items-center gap-3 py-2.5 px-3 rounded-xl transition-all duration-200 group'
+  const linkActive = 'text-white bg-gradient-to-r from-emerald-600/80 to-cyan-600/60 shadow-lg shadow-emerald-900/20 border border-emerald-500/20'
+  const linkInactive = 'text-slate-400 hover:text-white hover:bg-white/[0.05]'
 
   return (
     <aside className="h-full w-60 bg-slate-900/60 backdrop-blur-xl px-4 py-5 flex flex-col justify-between border-r border-white/[0.06]">
@@ -47,12 +44,7 @@ const Sidebar = () => {
             >
               {item.icon}
             </span>
-            <span className="text-sm font-medium">{item.label}</span>
-
-            {/* Active indicator dot */}
-            {item.id === 'dashboard' && (
-              <span className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-400 opacity-0 group-[.active]:opacity-100" />
-            )}
+            <span className="text-sm font-medium">{t(item.labelKey)}</span>
           </NavLink>
         ))}
       </nav>
@@ -74,7 +66,7 @@ const Sidebar = () => {
             >
               {item.icon}
             </span>
-            <span className="text-sm font-medium">{item.label}</span>
+            <span className="text-sm font-medium">{t(item.labelKey)}</span>
           </NavLink>
         ))}
       </nav>

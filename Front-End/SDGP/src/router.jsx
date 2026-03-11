@@ -12,6 +12,7 @@ import Signin from "./Components/Authentication/Signin";
 import Signup from "./Components/Authentication/Signup";
 import ForgotPassword from "./Components/Authentication/ForgotPassword";
 import ResetPassword from "./Components/Authentication/ResetPassword";
+import FieldSetupPage from "./Components/FieldSetup/FieldSetupPage";
 
 const router = createBrowserRouter([
   {
@@ -34,6 +35,10 @@ const router = createBrowserRouter([
   {
     path: "/reset-password",
     element: <ResetPassword />,
+  },
+  {
+    path: "/field-setup",
+    element: <FieldSetupPage />,
   },
   {
     // 2. Dashboard Layout starts here (No "/app" prefix)
