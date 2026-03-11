@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
+from typing import Optional
 from ..db import supabase
 
 router = APIRouter(prefix="/alerts", tags=["Alerts"])
@@ -7,6 +8,7 @@ router = APIRouter(prefix="/alerts", tags=["Alerts"])
 
 class AlertStatusUpdate(BaseModel):
     status: str
+    note: Optional[str] = None
 
 
 # -----------------------------
@@ -134,10 +136,14 @@ async def get_disasters():
 @router.put("/{alert_id}")
 async def update_alert_status(alert_id: int, body: AlertStatusUpdate):
     try:
+        payload = {"status": body.status}
+        if body.note is not None:
+            payload["note"] = body.note
+
         response = (
             supabase
             .table("alerts")
-            .update({"status": body.status})
+            .update(payload)
             .eq("id", alert_id)
             .execute()
         )
@@ -157,10 +163,14 @@ async def update_alert_status(alert_id: int, body: AlertStatusUpdate):
 @router.put("/pest/{district}")
 async def update_pest_status(district: str, body: AlertStatusUpdate):
     try:
+        payload = {"status": body.status}
+        if body.note is not None:
+            payload["note"] = body.note
+
         response = (
             supabase
             .table("alerts")
-            .update({"status": body.status})
+            .update(payload)
             .ilike("district", district)
             .eq("pest_risk", 1)
             .execute()
@@ -180,8 +190,9 @@ async def get_past_alerts():
     try:
         response = (
             supabase
-            .table("past_alerts_view")
-            .select("*")
+            .table("alerts")
+            .select("id, district, disaster_risk, stage_name, paddy_health, status, note, date, lat, lon")
+            .in_("status", ["Resolved", "Ignored"])
             .order("date", desc=True)
             .execute()
         )

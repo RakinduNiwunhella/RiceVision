@@ -14,6 +14,56 @@ const TAB_KEYS = ["Disasters", "Pest Risks", "Past Alerts"];
 const formatTitle = (text) =>
   text.replace(/\b\w/g, (char) => char.toUpperCase());
 
+/* ─────────────────────────────────────────
+   RESOLVE MODAL
+───────────────────────────────────────── */
+const ResolveModal = ({ onConfirm, onCancel }) => {
+  const [note, setNote] = useState("");
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      style={{ background: "rgba(0,0,0,0.6)" }}
+    >
+      <div className="glass rounded-3xl border border-white/20 p-8 w-full max-w-md mx-4 flex flex-col gap-5">
+        <h3 className="text-lg font-black text-white">Resolve Alert</h3>
+
+        <div className="flex flex-col gap-2">
+          <label className="text-xs font-bold uppercase text-white/40">
+            Resolution Note (optional)
+          </label>
+          <textarea
+            autoFocus
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder="Describe how this was resolved…"
+            rows={4}
+            className="bg-white/5 border border-white/10 rounded-2xl py-3 px-4 text-sm text-white placeholder:text-white/20 resize-none focus:outline-none focus:border-white/30"
+          />
+        </div>
+
+        <div className="flex gap-3 justify-end">
+          <button
+            onClick={onCancel}
+            className="glass-btn text-[10px] px-4 py-2 tracking-widest bg-white/10 hover:bg-white/20"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => onConfirm(note.trim() || null)}
+            className="px-6 py-2 bg-emerald-500/30 text-emerald-300 rounded-xl text-xs font-bold hover:bg-emerald-500/50 transition-colors"
+          >
+            Confirm
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ─────────────────────────────────────────
+   MAIN COMPONENT
+───────────────────────────────────────── */
 const Alerts = () => {
   const { t } = useLanguage();
   const tabLabels = [t("disasters"), t("pestRisks"), t("pastAlerts")];
@@ -22,8 +72,7 @@ const Alerts = () => {
   const [globalAlerts, setGlobalAlerts] = useState([]);
   const [activeTab, setActiveTab] = useState("Disasters");
   const [searchTerm, setSearchTerm] = useState("");
-  const [updatingId, setUpdatingId] = useState(null);
-
+  const [resolveModal, setResolveModal] = useState({ open: false, alertId: null, alertType: null });
 
   const navigate = useNavigate();
 
@@ -120,7 +169,7 @@ const Alerts = () => {
           const mappedAlerts = (Array.isArray(data) ? data : []).map((a) => ({
             id: a.id,
             title: formatTitle(
-              a.disaster_risk !== "Not Applicable"
+              a.disaster_risk && a.disaster_risk !== "Not Applicable"
                 ? `${a.disaster_risk.replace("hazard_", "")} risk`
                 : "Pest Risk"
             ),
@@ -129,6 +178,7 @@ const Alerts = () => {
             field: a.district,
             health: a.paddy_health,
             timestamp: a.date,
+            note: a.note || null,
             lat: a.lat,
             lon: a.lon,
           }));
@@ -162,67 +212,77 @@ const Alerts = () => {
   /* ---------------- COUNTERS ---------------- */
 
   const counts = useMemo(() => {
-
+    // Disasters counted individually; pest alerts grouped by district.
+    // globalAlerts (from /api/alerts/all) has one row per alert record.
+    // We de-dupe pest rows by district+status so one district = one count.
+    const seenPestDistricts = new Set();
     const countObj = { Open: 0, Resolved: 0, Ignored: 0 };
 
-    const grouped = new Set();
-
     globalAlerts.forEach((alert) => {
-
       const status = alert.status || "Open";
+      const isPest = alert.title === "Pest Risk" || alert.field?.includes("pest");
 
-      // group by district + status
-      const key = `${alert.field}-${status}`;
-
-      if (!grouped.has(key)) {
-        grouped.add(key);
-
-        if (countObj[status] !== undefined) {
-          countObj[status]++;
-        }
+      let key;
+      if (isPest) {
+        key = `pest-${alert.field}-${status}`;
+        if (seenPestDistricts.has(key)) return;
+        seenPestDistricts.add(key);
+      } else {
+        key = `disaster-${alert.id}`;
       }
 
+      if (countObj[status] !== undefined) {
+        countObj[status]++;
+      }
     });
 
     return countObj;
-
   }, [globalAlerts]);
 
-  /* ---------------- STATUS UPDATE ---------------- */
+  /* ---------------- STATUS UPDATE (optimistic) ---------------- */
 
-  const updateStatus = async (id, newStatus) => {
+  const updateStatus = async (id, newStatus, note = null) => {
+    // snapshot for rollback
+    const snapshot = alerts.find((a) => a.id === id);
+    if (!snapshot) return;
+
+    // optimistic removal
+    setAlerts((prev) => prev.filter((a) => a.id !== id));
+
     try {
-      setUpdatingId(id);
-
-      setAlerts((prev) =>
-        prev.map((alert) =>
-          alert.id === id ? { ...alert, _justUpdated: true } : alert
-        )
+      await updateAlertStatus(
+        id,
+        newStatus,
+        activeTab === "Pest Risks" ? "pest" : "normal",
+        note
       );
-
-      setTimeout(async () => {
-        setAlerts((prev) =>
-          prev.map((alert) =>
-            alert.id === id
-              ? { ...alert, status: newStatus, _justUpdated: false }
-              : alert
-          )
-        );
-
-        await updateAlertStatus(
-          id,
-          newStatus,
-          activeTab === "Pest Risks" ? "pest" : "normal"
-        );
-      }, 300);
     } catch (err) {
       console.error("Error updating alert:", err);
-    } finally {
-      setTimeout(() => setUpdatingId(null), 300);
+      // restore on failure
+      setAlerts((prev) => [snapshot, ...prev]);
     }
   };
 
-  const handleResolve = (id) => updateStatus(id, "Resolved");
+  /* ---------------- MODAL HANDLERS ---------------- */
+
+  const handleResolve = (id) => {
+    setResolveModal({
+      open: true,
+      alertId: id,
+      alertType: activeTab === "Pest Risks" ? "pest" : "normal",
+    });
+  };
+
+  const handleModalConfirm = (note) => {
+    const { alertId } = resolveModal;
+    setResolveModal({ open: false, alertId: null, alertType: null });
+    updateStatus(alertId, "Resolved", note);
+  };
+
+  const handleModalCancel = () => {
+    setResolveModal({ open: false, alertId: null, alertType: null });
+  };
+
   const handleIgnore = (id) => updateStatus(id, "Ignored");
 
   /* ---------------- MAP NAVIGATION ---------------- */
@@ -255,6 +315,13 @@ const Alerts = () => {
 
   return (
     <div className="min-h-full p-6 lg:p-10 text-white font-sans">
+      {resolveModal.open && (
+        <ResolveModal
+          onConfirm={handleModalConfirm}
+          onCancel={handleModalCancel}
+        />
+      )}
+
       <div className="max-w-7xl mx-auto space-y-8 pb-12">
 
         {/* Header */}
@@ -351,6 +418,12 @@ const Alerts = () => {
                   <span className="text-xs text-white/40">
                     {formatTimestamp(alert.timestamp)}
                   </span>
+
+                  {activeTab === "Past Alerts" && alert.note && (
+                    <p className="text-white/40 text-xs mt-1">
+                      Note: {alert.note}
+                    </p>
+                  )}
                 </div>
 
                 {alert.status === "Open" && activeTab !== "Past Alerts" && (
