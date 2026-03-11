@@ -65,7 +65,10 @@ async def get_map_fields(
 
         while True:
             page_query = supabase.table("Final_Dataset_Points").select(
-                "lat, lon, paddy_health, district"
+                "lat, lon, paddy_health, district, date, stage_name, "
+                "pest_risk, disaster_risk, season, elevation, slope, "
+                "ndvi_median_smooth, evi_median_smooth, "
+                "rain_7d_mean, rain_14d_mean, tmean_mean, rh_mean_mean"
             ).order("lat").order("lon")
 
             if districts:
@@ -83,12 +86,34 @@ async def get_map_fields(
 
             offset += PAGE_SIZE
 
+        def _fmt(val, decimals=2):
+            """Round numeric value or return None."""
+            if val is None:
+                return None
+            try:
+                return round(float(val), decimals)
+            except (TypeError, ValueError):
+                return None
+
         data = [
             {
                 "lat": r["lat"],
                 "lng": r["lon"],
                 "paddy_health": r["paddy_health"],
                 "district": r["district"],
+                "date": r.get("date"),
+                "stage": r.get("stage_name"),
+                "pest_risk": r.get("pest_risk"),
+                "disaster_risk": r.get("disaster_risk"),
+                "season": r.get("season"),
+                "elevation": _fmt(r.get("elevation"), 1),
+                "slope": _fmt(r.get("slope"), 1),
+                "ndvi": _fmt(r.get("ndvi_median_smooth"), 3),
+                "evi": _fmt(r.get("evi_median_smooth"), 3),
+                "rain_7d": _fmt(r.get("rain_7d_mean"), 1),
+                "rain_14d": _fmt(r.get("rain_14d_mean"), 1),
+                "temp": _fmt(r.get("tmean_mean"), 1),
+                "humidity": _fmt(r.get("rh_mean_mean"), 1),
             }
             for r in all_rows
         ]

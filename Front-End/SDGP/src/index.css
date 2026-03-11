@@ -178,3 +178,19 @@
 .animate-fade {
   animation: fade 0.9s ease-in-out;
 }
+
+/* ── Leaflet Popup Overrides ── */
+.point-popup .leaflet-popup-content-wrapper {
+  border-radius: 12px;
+  padding: 0;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.point-popup .leaflet-popup-content {
+  margin: 10px 14px;
+  line-height: 1.5;
+}
+
+.point-popup .leaflet-popup-tip {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
