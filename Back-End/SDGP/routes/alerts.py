@@ -40,7 +40,8 @@ async def get_all_alerts():
                 "field": a.get("district"),
                 "timestamp": a.get("date"),
                 "lat": a.get("lat"),
-                "lon": a.get("lon")
+                "lon": a.get("lon"),
+                "status": a.get("status")
             }
             for a in response.data
         ]
@@ -115,7 +116,8 @@ async def get_disasters():
                 "health": a.get("paddy_health"),
                 "timestamp": a.get("date"),
                 "lat": a.get("lat"),
-                "lon": a.get("lon")
+                "lon": a.get("lon"),
+                "status": a.get("status")
             }
             for a in response.data
         ]

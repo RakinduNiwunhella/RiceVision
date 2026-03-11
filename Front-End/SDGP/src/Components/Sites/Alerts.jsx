@@ -3,7 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { updateAlertStatus } from "../../api/api";
 import { useLanguage } from "../../context/LanguageContext";
 
-const API_BASE = "https://ricevision-cakt.onrender.com";
+//PRODUCTION
+// const API_BASE = "https://ricevision-cakt.onrender.com";
+
+//LOCAL
+const API_BASE = "http://localhost:8000";
+
 const TAB_KEYS = ["Disasters", "Pest Risks", "Past Alerts"];
 
 const formatTitle = (text) =>
@@ -42,15 +47,19 @@ const Alerts = () => {
   }, [alerts, searchTerm, activeTab]);
 
   useEffect(() => {
-    if (activeTab === "Past Alerts") return;
-
     const loadAlerts = async () => {
       try {
-        const isDisaster = activeTab === "Disasters";
+        let endpoint = "";
 
-        const endpoint = isDisaster
-          ? `${API_BASE}/api/alerts/disasters`
-          : `${API_BASE}/api/alerts/pest-risk`;
+        if (activeTab === "Disasters") {
+          endpoint = `${API_BASE}/api/alerts/disasters`;
+        }
+        else if (activeTab === "Pest Risks") {
+          endpoint = `${API_BASE}/api/alerts/pest-risk`;
+        }
+        else if (activeTab === "Past Alerts") {
+          endpoint = `${API_BASE}/api/alerts/past`;
+        }
 
         const response = await fetch(endpoint);
 
@@ -62,15 +71,15 @@ const Alerts = () => {
 
         /* ---------------- DISASTER ALERTS ---------------- */
 
-        if (isDisaster) {
+        if (activeTab === "Disasters") {
           const mappedAlerts = (Array.isArray(data) ? data : []).map((a) => ({
             id: a.id,
             title: formatTitle(`${a.disaster_type} risk`),
             description: `Stage: ${a.stage} | Health: ${a.health}`,
-            status: "Open",
+            status: a.status || "Open",
             priority: "High",
             field: a.district,
-            health: a.health, // IMPORTANT
+            health: a.health,
             timestamp: a.timestamp,
             lat: a.lat,
             lon: a.lon,
@@ -81,17 +90,17 @@ const Alerts = () => {
 
         /* ---------------- PEST ALERTS ---------------- */
 
-        else {
+        else if (activeTab === "Pest Risks") {
           const mappedAlerts = (Array.isArray(data) ? data : [])
             .filter((a) => a.risky_pixels > 0)
             .map((a, index) => ({
               id: index,
               title: `${a.district} • ${a.risky_pixels} RISKS`,
               description: "Multiple pest risks detected in this district.",
-              status: "Open",
+              status: a.status || "Open",
               priority: "High",
               field: a.district,
-              health: a.health || "Not Applicable", // IMPORTANT
+              health: a.health || "Not Applicable",
               count: a.risky_pixels,
               locations: a.risky_pixel_locations || [],
               timestamp: new Date().toISOString(),
@@ -99,6 +108,29 @@ const Alerts = () => {
 
           setAlerts(mappedAlerts);
         }
+
+        /* ---------------- PAST ALERTS ---------------- */
+
+        else if (activeTab === "Past Alerts") {
+          const mappedAlerts = (Array.isArray(data) ? data : []).map((a) => ({
+            id: a.id,
+            title: formatTitle(
+              a.disaster_risk !== "Not Applicable"
+                ? `${a.disaster_risk.replace("hazard_", "")} risk`
+                : "Pest Risk"
+            ),
+            description: `Stage: ${a.stage_name} | Health: ${a.paddy_health}`,
+            status: a.status,
+            field: a.district,
+            health: a.paddy_health,
+            timestamp: a.date,
+            lat: a.lat,
+            lon: a.lon,
+          }));
+
+          setAlerts(mappedAlerts);
+        }
+
       } catch (err) {
         console.error("Error fetching alerts:", err);
       }
@@ -299,7 +331,7 @@ const Alerts = () => {
                     </button>
 
                     <button
-                      onClick={() => handleDeny(alert.id)}
+                      onClick={() => handleIgnore(alert.id)}
                       className="glass-btn text-[10px] px-3 py-1 tracking-widest bg-white/10 hover:bg-white/20"
                     >
                       Ignore
