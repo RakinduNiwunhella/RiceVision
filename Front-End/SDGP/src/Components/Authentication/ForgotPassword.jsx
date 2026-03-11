@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { supabase } from "../../supabaseClient";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function ForgotPassword() {
+  const { t } = useLanguage();
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -29,12 +31,12 @@ export default function ForgotPassword() {
         onSubmit={handleReset}
         className="w-full max-w-md space-y-6 p-8 bg-white dark:bg-slate-900 rounded-2xl shadow-lg"
       >
-        <h2 className="text-2xl font-bold">Reset Password</h2>
+        <h2 className="text-2xl font-bold">{t('resetPassword')}</h2>
 
         <input
           type="email"
           required
-          placeholder="Enter your email"
+          placeholder={t('emailAddress')}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800"
@@ -45,7 +47,7 @@ export default function ForgotPassword() {
           disabled={loading}
           className="w-full py-3 bg-indigo-600 text-white rounded-xl"
         >
-          {loading ? "Sending..." : "Send Reset Link"}
+          {loading ? t('sending') : t('sendResetLink')}
         </button>
 
         {message && (

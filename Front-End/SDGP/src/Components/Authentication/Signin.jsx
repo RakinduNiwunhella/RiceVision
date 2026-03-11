@@ -10,9 +10,11 @@ import {
   FaEyeSlash,
 } from "react-icons/fa";
 import { useTheme } from "../../context/ThemeContext";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function LoginPage() {
   const { isDark, toggleTheme } = useTheme();
+  const { t } = useLanguage();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -115,17 +117,17 @@ export default function LoginPage() {
           </div>
 
           <h2 className="text-4xl font-extrabold mb-3 tracking-tight">
-            Welcome Back
+            {t('welcomeBack')}
           </h2>
           <p className="text-slate-500 dark:text-slate-400 mb-6">
-            Please enter your details to access your dashboard.
+            {t('signInDetails')}
           </p>
 
           <form onSubmit={handleLogin} className="space-y-4">
             {/* Email Input */}
             <div>
               <label className="block text-sm font-semibold mb-2">
-                Email Address
+                {t('emailAddress')}
               </label>
               <input
                 type="email"
@@ -143,7 +145,7 @@ export default function LoginPage() {
             {/* Password Input */}
             <div>
               <label className="block text-sm font-semibold mb-2">
-                Password
+                {t('password')}
               </label>
 
               <div className="relative">
@@ -176,7 +178,7 @@ export default function LoginPage() {
                   onClick={() => setShowForgot(true)}
                   className="text-sm text-indigo-500 hover:text-indigo-400"
                 >
-                  Forgot password?
+                  {t('forgotPassword')}
                 </button>
               </div>
             </div>
@@ -199,7 +201,7 @@ export default function LoginPage() {
                 htmlFor="remember"
                 className="text-sm text-slate-500 dark:text-slate-400 cursor-pointer"
               >
-                Keep me logged in
+                {t('keepLoggedIn')}
               </label>
             </div>
 
@@ -231,17 +233,17 @@ export default function LoginPage() {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg>
-                  Signing in...
+                  {t('signingIn')}
                 </span>
               ) : (
-                "Sign In to Account"
+                t('signInBtn')
               )}
             </button>
 
             {/* Divider */}
             <div className="flex items-center">
               <div className="flex-grow h-px bg-slate-300 dark:bg-slate-700"></div>
-              <span className="px-4 text-sm text-slate-500">OR</span>
+              <span className="px-4 text-sm text-slate-500">{t('orDivider')}</span>
               <div className="flex-grow h-px bg-slate-300 dark:bg-slate-700"></div>
             </div>
 
@@ -256,17 +258,17 @@ export default function LoginPage() {
                 alt="Google"
                 className="h-5 w-5"
               />
-              Continue with Google
+              {t('continueGoogle')}
             </button>
           </form>
 
           <p className="mt-3 text-center text-sm text-slate-500 dark:text-slate-400">
-            Don't have an account?{" "}
+            {t('noAccount')}{" "}
             <Link
               to="/signup"
               className="text-indigo-500 hover:text-indigo-400 font-bold underline-offset-4 hover:underline"
             >
-              Sign up here
+              {t('signUpLink')}
             </Link>
           </p>
         </div>
@@ -292,13 +294,13 @@ export default function LoginPage() {
 
           {/* Modal */}
           <div className="relative z-10 w-full max-w-md p-8 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl">
-            <h2 className="text-2xl font-bold mb-6">Reset Password</h2>
+            <h2 className="text-2xl font-bold mb-6">{t('resetPassword')}</h2>
 
             <form onSubmit={handleResetPassword} className="space-y-4">
               <input
                 type="email"
                 required
-                placeholder="Enter your email"
+                placeholder={t('emailAddress')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800"
@@ -330,10 +332,10 @@ export default function LoginPage() {
                         d="M4 12a8 8 0 018-8V0C5.37 0 0 5.37 0 12h4z"
                       />
                     </svg>
-                    <span>Sending...</span>
+                    <span>{t('sending')}</span>
                   </>
                 ) : (
-                  "Send Reset Link"
+                  t('sendResetLink')
                 )}
               </button>
 
@@ -343,7 +345,7 @@ export default function LoginPage() {
 
               {resetSuccess && (
                 <p className="text-sm text-green-600 text-center">
-                  ✅ Password reset email sent! Check your inbox.
+                  {t('resetEmailSent')}
                 </p>
               )}
             </form>
