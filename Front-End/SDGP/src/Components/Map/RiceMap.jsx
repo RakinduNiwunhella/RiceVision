@@ -211,25 +211,39 @@ useEffect(() => {
     return;
   }
 
-const loadPoints = async () => {
-  try {
+  let cancelled = false;
 
-    const data = await fetchMapFields({
-      districts: [selectedDistrict],
-      health: selectedHealth,
-    });
+  const loadPoints = async () => {
+    try {
 
-    setPoints(data);   // NOT response.data
+      const result = await fetchMapFields({
+        districts: [selectedDistrict],
+        health: selectedHealth,
+      });
 
-  } catch (err) {
+      console.log(`[MAP] Backend count: ${result.count}`);
+      console.log(`[MAP] Data array length: ${result.data.length}`);
+      const valid = result.data.filter(p => p.lat != null && p.lng != null);
+      console.log(`[MAP] Valid points (non-null lat/lng): ${valid.length}`);
+      if (valid.length !== result.data.length) {
+        console.warn(`[MAP] ${result.data.length - valid.length} points dropped due to null lat/lng`);
+      }
 
-    console.error(err);
-    setPoints([]);
+      if (!cancelled) setPoints(valid);
 
-  }
-};
+    } catch (err) {
+
+      if (!cancelled) {
+        console.error(err);
+        setPoints([]);
+      }
+
+    }
+  };
 
   loadPoints();
+
+  return () => { cancelled = true; };
 
 }, [selectedDistrict, selectedHealth, layers.showCircles]);
 
@@ -335,11 +349,11 @@ const loadPoints = async () => {
 
 {layers.showCircles && points && points.length > 0 && (
   <MarkerClusterGroup
+  key={`cluster-${selectedDistrict}-${selectedHealth.join(",")}-${points.length}`}
   disableClusteringAtZoom={10}
   spiderfyOnMaxZoom={false}
   showCoverageOnHover={false}
   maxClusterRadius={30}
-  chunkedLoading
 >
 
 {points.map((p, idx) => (
