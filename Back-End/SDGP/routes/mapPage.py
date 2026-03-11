@@ -53,19 +53,35 @@ async def get_map_fields(
 ):
     try:
 
-        query = supabase.table("Final_Dataset_Points").select(
-            "lat, lon, paddy_health, district"
-        )
+        # Paginate using .limit().offset() instead of .range() because
+        # Supabase's .range() uses the HTTP Range header which operates on
+        # the already-capped result set (default 1000 rows), making offset
+        # pagination silently return 0 rows for page 2+.
+        # .limit().offset() translates to SQL LIMIT/OFFSET which bypasses
+        # the row-cap issue entirely.
+        PAGE_SIZE = 1000
+        all_rows = []
+        offset = 0
 
-        # district filter
-        if districts:
-            query = query.in_("district", districts)
+        while True:
+            page_query = supabase.table("Final_Dataset_Points").select(
+                "lat, lon, paddy_health, district"
+            ).order("lat").order("lon")
 
-        # health filter (direct DB values)
-        if health:
-            query = query.in_("paddy_health", health)
+            if districts:
+                page_query = page_query.in_("district", districts)
 
-        response = query.execute()
+            if health:
+                page_query = page_query.in_("paddy_health", health)
+
+            page_response = page_query.limit(PAGE_SIZE).offset(offset).execute()
+            page_rows = page_response.data or []
+            all_rows.extend(page_rows)
+
+            if len(page_rows) < PAGE_SIZE:
+                break
+
+            offset += PAGE_SIZE
 
         data = [
             {
@@ -74,7 +90,7 @@ async def get_map_fields(
                 "paddy_health": r["paddy_health"],
                 "district": r["district"],
             }
-            for r in response.data
+            for r in all_rows
         ]
 
         return {

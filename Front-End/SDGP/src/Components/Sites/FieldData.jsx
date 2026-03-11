@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { supabase } from "../../supabaseClient";
 import { useLanguage } from "../../context/LanguageContext";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../../supabaseClient"; // adjust path if needed
 
 const healthColor = (health) => {
   switch (health) {
@@ -19,6 +18,7 @@ const healthColor = (health) => {
 
 const FieldData = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const [stats, setStats] = useState([]);
   const [districtData, setDistrictData] = useState([]);
@@ -150,7 +150,7 @@ const FieldData = () => {
                 {districtData.map((d) => (
                   <tr
                     key={d.district}
-                    className="hover:bg-white/5 transition-all duration-300 group/row"
+                    className="hover:bg-white/5 transition-all duration-300 group/row whitespace-nowrap"
                   >
                     <td className="px-8 py-5">
                       <div className="text-center flex items-center gap-3">
