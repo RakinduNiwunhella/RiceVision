@@ -63,7 +63,7 @@ async def get_map_fields(
 
         # health filter (direct DB values)
         if health and len(health) > 0:
-    query = query.in_("paddy_health", health)
+            query = query.in_("paddy_health", health)
 
         response = query.execute()
 

@@ -147,3 +147,22 @@ async def update_alert_status(alert_id: int, body: AlertStatusUpdate):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/past")
+async def get_past_alerts():
+    try:
+        response = (
+            supabase
+            .table("past_alerts_view")
+            .select("*")
+            .order("date", desc=True)
+            .execute()
+        )
+
+        if not response.data:
+            return []
+
+        return response.data
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
