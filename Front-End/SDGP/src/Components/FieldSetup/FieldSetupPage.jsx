@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { FaSun, FaMoon } from "react-icons/fa";
 import { useTheme } from "../../context/ThemeContext";
+import { useLanguage } from "../../context/LanguageContext";
 import { supabase } from "../../supabaseClient";
 import FieldDrawMap from "./FieldDrawMap";
 import { PRICE_PER_ACRE_LKR } from "./fieldConstants";
@@ -16,6 +17,7 @@ import { PRICE_PER_ACRE_LKR } from "./fieldConstants";
  */
 export default function FieldSetupPage() {
   const { isDark, toggleTheme } = useTheme();
+  const { t } = useLanguage();
   const navigate  = useNavigate();
   const location  = useLocation();
   const fromSignup = location.state?.fromSignup ?? false;
@@ -107,16 +109,16 @@ export default function FieldSetupPage() {
           <Link to="/" className="flex items-center gap-3 shrink-0 group">
             <img src="/logoSDGP.webp" alt="RiceVision" className="h-8 w-auto" />
             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400 hidden sm:block">
-              Field Registration
+              {t('fieldRegistration')}
             </span>
           </Link>
 
           {/* Step indicator */}
           <div className="flex items-center gap-2 flex-1 sm:justify-end">
             {[
-              { n: 1, label: "Introduction" },
-              { n: 2, label: "Draw Field"   },
-              { n: 3, label: "Payment"      },
+              { n: 1, label: t('introductionStep') },
+              { n: 2, label: t('drawFieldStep')    },
+              { n: 3, label: t('paymentStep')      },
             ].map(({ n, label }, i) => (
               <React.Fragment key={n}>
                 <div className="flex items-center gap-2">
@@ -161,7 +163,7 @@ export default function FieldSetupPage() {
           <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-blue-500/10 border border-blue-500/30 text-blue-300 text-sm">
             <span className="material-symbols-outlined text-base">mark_email_unread</span>
             <span>
-              A confirmation email has been sent. Please verify before completing payment — you can still preview the map now.
+              {t('confirmEmailBanner')}
             </span>
           </div>
         </div>
@@ -179,13 +181,10 @@ export default function FieldSetupPage() {
 
             <div className="max-w-2xl">
               <h1 className="text-5xl font-black tracking-tight mb-5 leading-tight">
-                Register Your<br />
-                <span className="text-emerald-400">Paddy Field</span>
+                {t('registerPaddyTitle')}
               </h1>
               <p className="text-white/55 text-lg leading-relaxed">
-                Draw your paddy field boundary on the map to unlock satellite‑powered
-                health monitoring, disease alerts, yield predictions, and disaster
-                reports — all personalised to your exact location.
+                {t('registerPaddySubtitle')}
               </p>
             </div>
 
@@ -194,31 +193,31 @@ export default function FieldSetupPage() {
               {[
                 {
                   icon: "draw",
-                  title: "Draw Freely",
-                  desc:  "Use the polygon or rectangle tool to outline the exact boundary of your paddy area on a live satellite map.",
+                  titleKey: "drawFreely",
+                  descKey:  "drawFreelyDesc",
                   accent: "text-emerald-400",
                 },
                 {
                   icon: "satellite_alt",
-                  title: "Satellite Insights",
-                  desc:  "Receive NDVI, EVI, VV / VH SAR overlays and health classifications updated from Sentinel imagery.",
+                  titleKey: "satelliteInsightsTitle",
+                  descKey:  "satelliteInsightsDesc",
                   accent: "text-cyan-400",
                 },
                 {
                   icon: "paid",
-                  title: "Rs. 1,000 / acre",
-                  desc:  "Simple transparent pricing — you only pay for the area you actually register. Billed annually.",
+                  titleKey: "pricingCardTitle",
+                  descKey:  "pricingCardDesc",
                   accent: "text-amber-400",
                 },
-              ].map(({ icon, title, desc, accent }) => (
+              ].map(({ icon, titleKey, descKey, accent }) => (
                 <div
                   key={icon}
                   className="flex gap-4 p-5 rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 transition-all"
                 >
                   <span className={`material-symbols-outlined text-2xl mt-0.5 ${accent}`}>{icon}</span>
                   <div>
-                    <h3 className="font-bold text-sm mb-1.5">{title}</h3>
-                    <p className="text-white/45 text-xs leading-relaxed">{desc}</p>
+                    <h3 className="font-bold text-sm mb-1.5">{t(titleKey)}</h3>
+                    <p className="text-white/45 text-xs leading-relaxed">{t(descKey)}</p>
                   </div>
                 </div>
               ))}
@@ -227,13 +226,13 @@ export default function FieldSetupPage() {
             <div className="flex flex-col items-center gap-4">
               <button onClick={() => setStep(2)} className={btnPrimary}>
                 <span className="material-symbols-outlined text-[18px]">map</span>
-                Get Started — Draw My Field
+                {t('getStartedBtn')}
               </button>
               <button
                 onClick={() => navigate("/dashboard")}
                 className="text-white/35 hover:text-white/60 text-sm transition-colors"
               >
-                Skip for now — set up later in Profile →
+                {t('skipForNow')}
               </button>
             </div>
           </div>
@@ -243,11 +242,9 @@ export default function FieldSetupPage() {
         {step === 2 && (
           <div className="flex flex-col gap-5">
             <div>
-              <h2 className="text-3xl font-black mb-2">Draw Your Paddy Field</h2>
+              <h2 className="text-3xl font-black mb-2">{t('drawYourPaddyField')}</h2>
               <p className="text-white/50 text-sm leading-relaxed max-w-2xl">
-                Select your <strong className="text-white/80">district</strong> to load paddy zone boundaries (amber),
-                then pick a base map and use the <strong className="text-white/80">draw tools (top‑right of map)</strong> to
-                outline your field. Search by place name to navigate quickly.
+                {t('drawYourPaddyDesc')}
               </p>
             </div>
 
@@ -261,14 +258,14 @@ export default function FieldSetupPage() {
 
             <div className="flex justify-between gap-3 pt-1">
               <button onClick={() => setStep(1)} className={btnSecondary}>
-                ← Back
+                {t('back')}
               </button>
               <button
                 disabled={!drawnFeature}
                 onClick={() => setStep(3)}
                 className={btnPrimary}
               >
-                Review Selection →
+                {t('reviewSelection')}
               </button>
             </div>
           </div>
@@ -278,8 +275,8 @@ export default function FieldSetupPage() {
         {step === 3 && (
           <div className="flex flex-col gap-6">
             <div>
-              <h2 className="text-3xl font-black mb-2">Review & Payment</h2>
-              <p className="text-white/50 text-sm">Confirm your field details and complete registration.</p>
+              <h2 className="text-3xl font-black mb-2">{t('reviewPaymentTitle')}</h2>
+              <p className="text-white/50 text-sm">{t('reviewPaymentDesc')}</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -287,31 +284,31 @@ export default function FieldSetupPage() {
               {/* ── Field summary card ── */}
               <div className="p-6 rounded-2xl bg-white/5 border border-white/10 space-y-5">
                 <h3 className="text-[11px] font-black uppercase tracking-[0.35em] text-white/50">
-                  Field Summary
+                  {t('fieldSummaryTitle')}
                 </h3>
 
                 <div className="space-y-3">
                   {fieldName && (
-                    <SummaryRow label="Field Name"  value={fieldName} />
+                    <SummaryRow label={t('fieldNameLabel')}  value={fieldName} />
                   )}
                   {district && (
-                    <SummaryRow label="District"     value={district} />
+                    <SummaryRow label={t('district')}     value={district} />
                   )}
                   <SummaryRow
-                    label="Total Area"
+                    label={t('totalAreaLabel')}
                     value={`${acres.toFixed(4)} acres`}
                   />
                   <SummaryRow
-                    label="Area (m²)"
+                    label={t('areaSqmLabel')}
                     value={`${(acres * 4046.86).toFixed(0)} m²`}
                   />
                 </div>
 
                 <div className="border-t border-white/10 pt-4 space-y-2">
-                  <SummaryRow label="Rate"       value={`Rs. ${PRICE_PER_ACRE_LKR.toLocaleString()} / acre / year`} />
+                  <SummaryRow label={t('rateLabel')}       value={`Rs. ${PRICE_PER_ACRE_LKR.toLocaleString()} / acre / year`} />
                   <div className="flex justify-between items-center">
                     <span className="text-[11px] font-black uppercase tracking-widest text-emerald-400">
-                      Annual Cost
+                      {t('annualCostLabel')}
                     </span>
                     <span className="text-2xl font-black text-emerald-400">
                       Rs. {price.toLocaleString()}
@@ -335,10 +332,10 @@ export default function FieldSetupPage() {
               <div className="p-6 rounded-2xl bg-white/5 border border-white/10 space-y-5">
                 <div className="flex items-center justify-between">
                   <h3 className="text-[11px] font-black uppercase tracking-[0.35em] text-white/50">
-                    Secure Payment
+                    {t('securePaymentTitle')}
                   </h3>
                   <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30 uppercase tracking-widest">
-                    Preview Only
+                    {t('previewOnlyBadge')}
                   </span>
                 </div>
 
@@ -355,7 +352,7 @@ export default function FieldSetupPage() {
                 <div className="space-y-3 opacity-50 pointer-events-none select-none">
                   <div>
                     <label className="block text-[10px] text-white/50 uppercase tracking-wider mb-1.5">
-                      Card Number
+                      {t('cardNumberLabel')}
                     </label>
                     <input
                       disabled
@@ -365,11 +362,11 @@ export default function FieldSetupPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-[10px] text-white/50 uppercase tracking-wider mb-1.5">Expiry</label>
+                      <label className="block text-[10px] text-white/50 uppercase tracking-wider mb-1.5">{t('expiryLabel')}</label>
                       <input disabled value="MM / YY" className="w-full px-4 py-3 text-sm rounded-xl bg-white/5 border border-white/10 text-white cursor-not-allowed" />
                     </div>
                     <div>
-                      <label className="block text-[10px] text-white/50 uppercase tracking-wider mb-1.5">CVV</label>
+                      <label className="block text-[10px] text-white/50 uppercase tracking-wider mb-1.5">{t('cvvLabel')}</label>
                       <input disabled value="•••" className="w-full px-4 py-3 text-sm rounded-xl bg-white/5 border border-white/10 text-white font-mono cursor-not-allowed" />
                     </div>
                   </div>
@@ -386,14 +383,14 @@ export default function FieldSetupPage() {
                 {payClicked && (
                   <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs">
                     <span className="material-symbols-outlined text-base">construction</span>
-                    <span>Payment gateway integration coming soon. Save your field now to reserve your slot.</span>
+                    <span>{t('paymentComingSoon')}</span>
                   </div>
                 )}
 
                 {/* Security note */}
                 <div className="flex items-center gap-2 text-white/25 text-[10px]">
                   <span className="material-symbols-outlined text-base">lock</span>
-                  <span>Secured by SSL · Powered by PayHere · Your card data is never stored</span>
+                  <span>{t('securedSSL')}</span>
                 </div>
               </div>
             </div>
@@ -401,7 +398,7 @@ export default function FieldSetupPage() {
             {/* Action row */}
             <div className="flex justify-between gap-3 pt-1">
               <button onClick={() => setStep(2)} className={btnSecondary}>
-                ← Back to Map
+                {t('backToMapBtn')}
               </button>
               <button
                 onClick={saveAndFinish}
@@ -411,12 +408,12 @@ export default function FieldSetupPage() {
                 {saving ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Saving…
+                    {t('savingField')}
                   </>
                 ) : (
                   <>
                     <span className="material-symbols-outlined text-[18px]">check_circle</span>
-                    Complete Registration
+                    {t('completeRegistrationBtn')}
                   </>
                 )}
               </button>

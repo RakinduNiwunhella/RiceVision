@@ -1,13 +1,15 @@
 import { useState, useRef } from "react";
 import ProfileForm from "./ProfileForm";
 import MyFieldTab from "./MyFieldTab";
-
-const TABS = [
-  { id: "identity", label: "Identity Profile", icon: "verified_user" },
-  { id: "field",    label: "My Paddy Field",   icon: "landscape"      },
-];
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function Profile() {
+  const { t } = useLanguage();
+
+  const TABS = [
+    { id: "identity", labelKey: "identityProfile", icon: "verified_user" },
+    { id: "field",    labelKey: "myPaddyField",    icon: "landscape"     },
+  ];
   const [activeTab, setActiveTab] = useState("identity");
   const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
   const containerRef = useRef(null);
@@ -49,17 +51,17 @@ export default function Profile() {
         <div className="mb-8 relative">
           <p className="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-400 mb-3 flex items-center gap-2">
             <span className="material-symbols-outlined text-sm">verified_user</span>
-            Operator Authorization
+            {t('operatorAuth')}
           </p>
 
           <h1 className="text-4xl font-black text-white tracking-tighter uppercase mb-4">
-            {activeTab === "identity" ? "Identity Profile" : "My Paddy Field"}
+            {activeTab === "identity" ? t('identityProfile') : t('myPaddyField')}
           </h1>
 
           <p className="text-white/60 text-sm font-medium max-w-xl leading-relaxed">
             {activeTab === "identity"
-              ? "Synthesize and finalize your operator credentials within the RiceVision network. All modifications are recorded permanently in the regional registry."
-              : "View, draw, or update your registered paddy field boundary. Pricing is Rs. 1,000 per acre per year."}
+              ? t('profileDesc')
+              : t('paddyFieldDesc')}
           </p>
         </div>
 
@@ -76,7 +78,7 @@ export default function Profile() {
               }`}
             >
               <span className="material-symbols-outlined text-sm">{tab.icon}</span>
-              {tab.label}
+              {t(tab.labelKey)}
             </button>
           ))}
           {/* Active tab bottom line indicator */}

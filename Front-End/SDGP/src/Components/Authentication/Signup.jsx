@@ -3,9 +3,11 @@ import { supabase } from "../../supabaseClient";
 import { useNavigate, Link } from "react-router-dom";
 import { FaSun, FaMoon } from "react-icons/fa";
 import { useTheme } from "../../context/ThemeContext";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function SignupPage() {
   const { isDark, toggleTheme } = useTheme();
+  const { t } = useLanguage();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -107,17 +109,17 @@ export default function SignupPage() {
           </div>
 
           <h2 className="text-4xl font-extrabold mb-3 tracking-tight">
-            Create Account
+            {t('createAccount')}
           </h2>
           <p className="text-slate-500 dark:text-slate-400 mb-6">
-            Join us and monitor your paddy fields using satellite intelligence.
+            {t('registerPaddySubtitle')}
           </p>
 
           <form onSubmit={handleSignup} className="space-y-4">
             {/* Full Name */}
             <div>
               <label className="block text-sm font-semibold mb-2">
-                Full Name
+                {t('fullName')}
               </label>
               <input
                 type="text"
@@ -131,7 +133,7 @@ export default function SignupPage() {
             {/* Email */}
             <div>
               <label className="block text-sm font-semibold mb-2">
-                Email Address
+                {t('emailAddress')}
               </label>
               <input
                 type="email"
@@ -156,7 +158,7 @@ export default function SignupPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-semibold mb-2">
-                  Password
+                  {t('password')}
                 </label>
                 <input
                   type="password"
@@ -181,7 +183,7 @@ export default function SignupPage() {
 
               <div>
                 <label className="block text-sm font-semibold mb-2">
-                  Confirm
+                  {t('confirmPassword')}
                 </label>
                 <input
                   type="password"
@@ -209,7 +211,7 @@ export default function SignupPage() {
               disabled={loading}
               className="w-full py-4 px-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-xl shadow-indigo-500/20 transition-all active:scale-[0.97] disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              {loading ? "Creating Account..." : "Create Free Account"}
+              {loading ? t('signingUp') : t('signUpBtn')}
             </button>
 
             {/* Divider */}
@@ -230,17 +232,17 @@ export default function SignupPage() {
                 alt="Google"
                 className="h-5 w-5"
               />
-              Continue with Google
+              {t('continueGoogle')}
             </button>
           </form>
 
           <p className="mt-3 text-center text-sm text-slate-500 dark:text-slate-400">
-            Already have an account?{" "}
+            {t('alreadyAccount')}{" "}
             <Link
               to="/"
               className="text-indigo-500 hover:text-indigo-400 font-bold underline-offset-4 hover:underline"
             >
-              Sign in here
+              {t('signInLink')}
             </Link>
           </p>
         </div>

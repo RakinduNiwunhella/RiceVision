@@ -6,6 +6,7 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import autoTable from 'jspdf-autotable';
 import logoImg from '../assets/logo.png';
+import { useLanguage } from "../../context/LanguageContext";
 
 const CustomSelect = ({ value, onChange, options, className = "" }) => {
   const [open, setOpen] = useState(false);
@@ -85,6 +86,7 @@ const CustomSelect = ({ value, onChange, options, className = "" }) => {
 
 const Report = () => {
   const location = useLocation();
+  const { t } = useLanguage();
   const selectedDistrict = location.state?.district;
   const districts = ["Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle", "Gampaha", "Hambantota", "Jaffna", "Kalutara", "Kandy", "Kegalle", "Kilinochchi", "Kurunegala", "Mannar", "Matale", "Matara", "Monaragala", "Mullaitivu", "Nuwara Eliya", "Polonnaruwa", "Puttalam", "Ratnapura", "Trincomalee", "Vavuniya"];
 
@@ -636,10 +638,10 @@ const Report = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
             <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
-              Yield Reports
+              {t('yieldReports')}
             </h1>
             <p className="text-white/40 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em]">
-              Satellite-derived analytics & district yield forecasts
+              {t('satelliteDerivedAnalytics')}
             </p>
           </div>
 
@@ -650,18 +652,18 @@ const Report = () => {
                 onClick={() => setMode("single")}
                 className={`px-6 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${mode === "single" ? "glass bg-white/15 text-white shadow-lg border-white/20" : "text-white/40 hover:text-white/70"}`}
               >
-                Single
+                {t('single')}
               </button>
               <button
                 onClick={() => setMode("compare")}
                 className={`px-6 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${mode === "compare" ? "glass bg-white/15 text-white shadow-lg border-white/20" : "text-white/40 hover:text-white/70"}`}
               >
-                Compare
+                {t('compare')}
               </button>
             </div>
             <div className="glass px-4 py-2 rounded-xl border-white/10 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-white/60">Live Data</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-white/60">{t('liveData')}</span>
             </div>
           </div>
         </div>

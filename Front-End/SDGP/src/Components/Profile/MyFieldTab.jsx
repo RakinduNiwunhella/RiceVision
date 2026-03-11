@@ -9,8 +9,10 @@ import React, { useState, useEffect, useCallback } from "react";
 import { supabase } from "../../supabaseClient";
 import FieldDrawMap from "../FieldSetup/FieldDrawMap";
 import { PRICE_PER_ACRE_LKR } from "../FieldSetup/fieldConstants";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function MyFieldTab() {
+  const { t } = useLanguage();
   const [user,          setUser]          = useState(null);
   const [existing,      setExisting]      = useState(null);   // row from user_fields
   const [loading,       setLoading]       = useState(true);
@@ -122,7 +124,7 @@ export default function MyFieldTab() {
       <div className="flex flex-col items-center gap-4 py-20">
         <div className="w-10 h-10 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
         <p className="text-white/30 text-xs font-black uppercase tracking-widest animate-pulse">
-          Loading Field Data
+          {t('loadingFieldData')}
         </p>
       </div>
     );
@@ -156,12 +158,12 @@ export default function MyFieldTab() {
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-white/50 mb-1">
-            Field Registry
+            {t('fieldRegistry')}
           </h3>
           <p className="text-white/40 text-xs max-w-xl leading-relaxed">
             {existing
-              ? "Your registered paddy field. Use Edit to update the boundary, or draw a new polygon to replace it."
-              : "You have not registered a paddy field yet. Draw your field boundary below."}
+              ? t('fieldRegistryExisting')
+              : t('fieldRegistryNew')}
           </p>
         </div>
 
@@ -172,14 +174,14 @@ export default function MyFieldTab() {
               className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-400 text-xs font-black uppercase tracking-widest transition-all hover:scale-105"
             >
               <span className="material-symbols-outlined text-sm">edit</span>
-              Edit
+              {t('editBtn')}
             </button>
             <button
               onClick={deleteField}
               className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/25 text-red-400 text-xs font-black uppercase tracking-widest transition-all hover:scale-105"
             >
               <span className="material-symbols-outlined text-sm">delete</span>
-              Remove
+              {t('removeBtn')}
             </button>
           </div>
         )}
@@ -191,11 +193,11 @@ export default function MyFieldTab() {
           {/* Stats row */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
             {[
-              { icon: "badge",        label: "Field Name", value: existing.field_name || "—"                                },
-              { icon: "location_on",  label: "District",   value: existing.district || "—"                                 },
-              { icon: "straighten",   label: "Area",       value: `${parseFloat(existing.area_acres).toFixed(3)} ac`        },
-              { icon: "crop_square",  label: "Area (m²)",  value: `${(existing.area_acres * 4046.86).toFixed(0)} m²`        },
-              { icon: "paid",         label: "Annual Fee", value: `Rs. ${existing.price_lkr.toLocaleString()}`              },
+              { icon: "badge",        label: t('fieldNameStat'),  value: existing.field_name || "—"                                },
+              { icon: "location_on",  label: t('districtStat') || t('district'),   value: existing.district || "—"                                 },
+              { icon: "straighten",   label: t('areaStat'),       value: `${parseFloat(existing.area_acres).toFixed(3)} ac`        },
+              { icon: "crop_square",  label: t('areaSqmLabel'),   value: `${(existing.area_acres * 4046.86).toFixed(0)} m²`        },
+              { icon: "paid",         label: t('annualFeeStat'),  value: `Rs. ${existing.price_lkr.toLocaleString()}`              },
             ].map(({ icon, label, value }) => (
               <div
                 key={label}
@@ -227,7 +229,7 @@ export default function MyFieldTab() {
           {editMode && existing && (
             <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-500/10 border border-blue-500/25 text-blue-300 text-xs">
               <span className="material-symbols-outlined text-sm">info</span>
-              Draw a new polygon to replace your existing boundary. The dashed blue outline shows your current field.
+              {t('editModeInfo')}
             </div>
           )}
 
@@ -244,32 +246,32 @@ export default function MyFieldTab() {
           {drawnFeature && (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="sm:col-span-2 p-4 rounded-2xl bg-white/5 border border-white/10 space-y-3">
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Selection Summary</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">{t('selectionSummary')}</p>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   {fieldName && (
                     <div className="col-span-2">
-                      <span className="text-white/40 block text-xs mb-0.5">Field Name</span>
+                      <span className="text-white/40 block text-xs mb-0.5">{t('fieldNameLabel')}</span>
                       <span className="font-bold text-white">{fieldName}</span>
                     </div>
                   )}
                   {district && (
                     <div>
-                      <span className="text-white/40 block text-xs mb-0.5">District</span>
+                      <span className="text-white/40 block text-xs mb-0.5">{t('district')}</span>
                       <span className="font-bold text-white">{district}</span>
                     </div>
                   )}
                   <div>
-                    <span className="text-white/40 block text-xs mb-0.5">Area</span>
+                    <span className="text-white/40 block text-xs mb-0.5">{t('areaStat')}</span>
                     <span className="font-bold text-white">{acres.toFixed(4)} acres</span>
                   </div>
                   <div>
-                    <span className="text-white/40 block text-xs mb-0.5">Area (m²)</span>
+                    <span className="text-white/40 block text-xs mb-0.5">{t('areaSqmLabel')}</span>
                     <span className="font-bold text-white">{(acres * 4046.86).toFixed(0)} m²</span>
                   </div>
                 </div>
               </div>
               <div className="flex flex-col items-center justify-center gap-1 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30">
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400/70">Annual Cost</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400/70">{t('annualCostLabel')}</span>
                 <span className="text-3xl font-black text-emerald-400">Rs. {price.toLocaleString()}</span>
                 <span className="text-[10px] text-white/30">Rs. {PRICE_PER_ACRE_LKR.toLocaleString()} / acre</span>
               </div>
@@ -287,7 +289,7 @@ export default function MyFieldTab() {
                 }}
                 className="px-6 py-3 rounded-2xl bg-white/10 hover:bg-white/15 text-white font-semibold transition-all text-sm"
               >
-                Cancel
+                {t('cancelBtn')}
               </button>
             )}
             <button
@@ -298,12 +300,12 @@ export default function MyFieldTab() {
               {saving ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Saving…
+                  {t('savingField')}
                 </>
               ) : (
                 <>
                   <span className="material-symbols-outlined text-[18px]">save</span>
-                  Save Field
+                  {t('saveFieldBtn')}
                 </>
               )}
             </button>

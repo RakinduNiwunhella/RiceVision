@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../../supabaseClient";
+import { useLanguage } from "../../context/LanguageContext";
 
 const Notifications = ({ onRead, style }) => {
+  const { t } = useLanguage();
   const [notifications, setNotifications] = useState([]);
 
   const fetchNotifications = async () => {
@@ -47,12 +49,12 @@ const Notifications = ({ onRead, style }) => {
 
       <div className="mb-4">
         <h3 className="text-lg font-semibold text-white">
-          Notifications
+          {t('notifications')}
         </h3>
       </div>
 
       {notifications.length === 0 ? (
-        <p className="text-white/60 text-sm">No notifications</p>
+        <p className="text-white/60 text-sm">{t('noNotifications')}</p>
       ) : (
         notifications.map((note) => (
           <div

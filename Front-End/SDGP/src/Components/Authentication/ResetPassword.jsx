@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { supabase } from "../../supabaseClient";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function ResetPassword() {
+  const { t } = useLanguage();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
@@ -17,12 +19,12 @@ export default function ResetPassword() {
     setErrorMessage("");
 
     if (password.length < 6) {
-      setErrorMessage("Password must be at least 6 characters long.");
+      setErrorMessage(t('passwordMinLengthError'));
       return;
     }
 
     if (password !== confirmPassword) {
-      setErrorMessage("Passwords do not match.");
+      setErrorMessage(t('passwordsNoMatchError'));
       return;
     }
 
@@ -51,17 +53,17 @@ export default function ResetPassword() {
         onSubmit={handleUpdate}
         className="w-full max-w-md space-y-6 p-8 bg-white dark:bg-slate-900 rounded-2xl shadow-xl"
       >
-        <h2 className="text-2xl font-bold text-center">Set New Password</h2>
+        <h2 className="text-2xl font-bold text-center">{t('setNewPassword')}</h2>
 
         {/* New Password */}
         <div>
           <label className="block text-sm font-semibold mb-2">
-            New Password
+            {t('newPassword')}
           </label>
           <input
             type="password"
             required
-            placeholder="Enter new password"
+            placeholder={t('enterNewPassword')}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none"
@@ -71,12 +73,12 @@ export default function ResetPassword() {
         {/* Confirm Password */}
         <div>
           <label className="block text-sm font-semibold mb-2">
-            Confirm Password
+            {t('confirmPassword')}
           </label>
           <input
             type="password"
             required
-            placeholder="Re-enter new password"
+            placeholder={t('reEnterNewPassword')}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none"
@@ -114,7 +116,7 @@ export default function ResetPassword() {
               Updating...
             </>
           ) : (
-            "Update Password"
+            t('updatePasswordBtn')
           )}
         </button>
 
@@ -126,7 +128,7 @@ export default function ResetPassword() {
         {/* Success Message */}
         {success && (
           <p className="text-sm text-green-600 text-center">
-            ✅ Password updated successfully! Redirecting to login...
+            {t('passwordUpdatedMsg')}
           </p>
         )}
       </form>
