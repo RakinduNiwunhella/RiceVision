@@ -27,6 +27,7 @@ export default function FieldSetupPage() {
   const [district,       setDistrict]       = useState("");
   const [saving,         setSaving]         = useState(false);
   const [payClicked,     setPayClicked]     = useState(false);
+  const [fieldName,      setFieldName]      = useState("");
 
   /* fetch current auth user */
   useEffect(() => {
@@ -59,6 +60,7 @@ export default function FieldSetupPage() {
     const { error } = await supabase.from("user_fields").upsert(
       {
         user_id:    user.id,
+        field_name: fieldName || null,
         geojson:    drawnFeature,
         area_acres: acres,
         price_lkr,
@@ -252,6 +254,8 @@ export default function FieldSetupPage() {
             <FieldDrawMap
               onDraw={handleDraw}
               onClear={handleClear}
+              fieldName={fieldName}
+              onFieldNameChange={setFieldName}
               height="calc(100vh - 380px)"
             />
 
@@ -287,6 +291,9 @@ export default function FieldSetupPage() {
                 </h3>
 
                 <div className="space-y-3">
+                  {fieldName && (
+                    <SummaryRow label="Field Name"  value={fieldName} />
+                  )}
                   {district && (
                     <SummaryRow label="District"     value={district} />
                   )}

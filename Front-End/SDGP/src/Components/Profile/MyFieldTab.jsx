@@ -18,6 +18,7 @@ export default function MyFieldTab() {
   const [drawnFeature,  setDrawnFeature]  = useState(null);
   const [acres,         setAcres]         = useState(0);
   const [district,      setDistrict]      = useState("");
+  const [fieldName,     setFieldName]     = useState("");
   const [saving,        setSaving]        = useState(false);
   const [status,        setStatus]        = useState(null);    // { type, message }
 
@@ -41,7 +42,10 @@ export default function MyFieldTab() {
         .eq("user_id", user.id)
         .maybeSingle();
 
-      if (!error && data) setExisting(data);
+      if (!error && data) {
+        setExisting(data);
+        if (data.field_name) setFieldName(data.field_name);
+      }
       setLoading(false);
     })();
   }, []);
@@ -68,6 +72,7 @@ export default function MyFieldTab() {
       .upsert(
         {
           user_id:    user.id,
+          field_name: fieldName || null,
           geojson:    drawnFeature,
           area_acres: acres,
           price_lkr,
@@ -108,6 +113,7 @@ export default function MyFieldTab() {
     setExisting(null);
     setEditMode(false);
     setDrawnFeature(null);
+    setFieldName("");
     setStatus({ type: "success", message: "Field registration removed." });
   };
 
@@ -183,8 +189,9 @@ export default function MyFieldTab() {
       {existing && !editMode && (
         <div className="space-y-4">
           {/* Stats row */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
             {[
+              { icon: "badge",        label: "Field Name", value: existing.field_name || "—"                                },
               { icon: "location_on",  label: "District",   value: existing.district || "—"                                 },
               { icon: "straighten",   label: "Area",       value: `${parseFloat(existing.area_acres).toFixed(3)} ac`        },
               { icon: "crop_square",  label: "Area (m²)",  value: `${(existing.area_acres * 4046.86).toFixed(0)} m²`        },
@@ -227,6 +234,8 @@ export default function MyFieldTab() {
           <FieldDrawMap
             onDraw={handleDraw}
             onClear={handleClear}
+            fieldName={fieldName}
+            onFieldNameChange={setFieldName}
             initialFeature={editMode ? existing?.geojson : null}
             height="440px"
           />
@@ -237,6 +246,12 @@ export default function MyFieldTab() {
               <div className="sm:col-span-2 p-4 rounded-2xl bg-white/5 border border-white/10 space-y-3">
                 <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Selection Summary</p>
                 <div className="grid grid-cols-2 gap-3 text-sm">
+                  {fieldName && (
+                    <div className="col-span-2">
+                      <span className="text-white/40 block text-xs mb-0.5">Field Name</span>
+                      <span className="font-bold text-white">{fieldName}</span>
+                    </div>
+                  )}
                   {district && (
                     <div>
                       <span className="text-white/40 block text-xs mb-0.5">District</span>
@@ -268,6 +283,7 @@ export default function MyFieldTab() {
                 onClick={() => {
                   setEditMode(false);
                   setDrawnFeature(null);
+                  setFieldName(existing?.field_name || "");
                 }}
                 className="px-6 py-3 rounded-2xl bg-white/10 hover:bg-white/15 text-white font-semibold transition-all text-sm"
               >

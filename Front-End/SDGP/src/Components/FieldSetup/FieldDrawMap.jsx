@@ -15,6 +15,7 @@
  * CREATE TABLE IF NOT EXISTS user_fields (
  *   id          uuid DEFAULT gen_random_uuid() PRIMARY KEY,
  *   user_id     uuid REFERENCES auth.users(id) ON DELETE CASCADE UNIQUE NOT NULL,
+ *   field_name  text,
  *   geojson     jsonb   NOT NULL,
  *   area_acres  float   NOT NULL,
  *   price_lkr   integer NOT NULL,
@@ -41,24 +42,45 @@ import { DISTRICTS, BASE_MAPS, SQM_PER_ACRE, PRICE_PER_ACRE_LKR } from "./fieldC
 /* ── Constants ─────────────────────────────────────────────────────────────── */
 const SL_CENTER = [7.8731, 80.7718];
 
+/* ── geodesic area helper (provided by leaflet-draw) ─────────────────────── */
+function calcAreaM2(layer) {
+  try {
+    if (L.GeometryUtil && L.GeometryUtil.geodesicArea) {
+      const latlngs = layer.getLatLngs();
+      // polygon rings are nested arrays; rectangle returns a flat array
+      const ring = Array.isArray(latlngs[0]) ? latlngs[0] : latlngs;
+      return L.GeometryUtil.geodesicArea(ring);
+    }
+  } catch (e) {
+    void e;
+  }
+  return 0;
+}
+
 /* ── Inner map helpers ─────────────────────────────────────────────────────── */
 
 /**
- * Mounts leaflet-draw controls on the map and fires onDraw / onClear.
- * Uses refs for callbacks to avoid tearing down/rebuilding on every render.
+ * Mounts leaflet-draw controls once. Uses a stable FeatureGroup ref so the
+ * drawn polygon survives parent re-renders. Callbacks are stored in refs so
+ * the effect never needs to re-run just because a callback changed.
  */
 function DrawControl({ onDraw, onClear }) {
-  const map = useMap();
+  const map        = useMap();
   const onDrawRef  = useRef(onDraw);
   const onClearRef = useRef(onClear);
+  // stable container for drawn layers — NOT recreated on re-render
+  const drawnRef   = useRef(null);
 
+  // keep callback refs current without re-running the setup effect
   useEffect(() => { onDrawRef.current  = onDraw;  }, [onDraw]);
   useEffect(() => { onClearRef.current = onClear; }, [onClear]);
 
   useEffect(() => {
     if (!L.Control || !L.Control.Draw) return;
 
+    // create the FeatureGroup once and keep it in a ref
     const drawnItems = new L.FeatureGroup();
+    drawnRef.current = drawnItems;
     map.addLayer(drawnItems);
 
     const drawCtrl = new L.Control.Draw({
@@ -69,18 +91,20 @@ function DrawControl({ onDraw, onClear }) {
           allowIntersection: false,
           showArea: true,
           shapeOptions: {
-            color: "#10b981",
-            fillColor: "#10b981",
-            fillOpacity: 0.25,
-            weight: 2,
+            color:       "#10b981",
+            fillColor:   "#10b981",
+            fillOpacity: 0.3,
+            weight:      2,
           },
+          guidelineDistance: 20,
+          metric: true,
         },
         rectangle: {
           shapeOptions: {
-            color: "#10b981",
-            fillColor: "#10b981",
-            fillOpacity: 0.25,
-            weight: 2,
+            color:       "#10b981",
+            fillColor:   "#10b981",
+            fillOpacity: 0.3,
+            weight:      2,
           },
         },
         polyline:     false,
@@ -92,46 +116,41 @@ function DrawControl({ onDraw, onClear }) {
 
     map.addControl(drawCtrl);
 
-    /* ── geodesic area helper (provided by leaflet-draw) ── */
-    const calcAreaM2 = (layer) => {
-      try {
-        if (L.GeometryUtil && L.GeometryUtil.geodesicArea) {
-          const latlngs = layer.getLatLngs();
-          const ring    = Array.isArray(latlngs[0]) ? latlngs[0] : latlngs;
-          return L.GeometryUtil.geodesicArea(ring);
-        }
-      } catch (e) {
-        void e;
-      }
-      return 0;
-    };
-
     const onCreate = (e) => {
+      // only one polygon allowed — clear previous before adding
       drawnItems.clearLayers();
       drawnItems.addLayer(e.layer);
       onDrawRef.current(e.layer.toGeoJSON(), calcAreaM2(e.layer));
     };
 
-    const onEdit = (e) => {
-      e.layers.eachLayer((layer) => {
+    const onEdited = () => {
+      // after edit, read the single layer still in drawnItems
+      const layers = drawnItems.getLayers();
+      if (layers.length > 0) {
+        const layer = layers[0];
         onDrawRef.current(layer.toGeoJSON(), calcAreaM2(layer));
-      });
+      }
     };
 
-    const onDelete = () => onClearRef.current();
+    const onDeleted = () => {
+      if (drawnItems.getLayers().length === 0) {
+        onClearRef.current();
+      }
+    };
 
-    map.on(L.Draw.Event.CREATED, onCreate);
-    map.on(L.Draw.Event.EDITED,  onEdit);
-    map.on(L.Draw.Event.DELETED, onDelete);
+    map.on(L.Draw.Event.CREATED,  onCreate);
+    map.on(L.Draw.Event.EDITED,   onEdited);
+    map.on(L.Draw.Event.DELETED,  onDeleted);
 
     return () => {
-      map.removeLayer(drawnItems);
       map.removeControl(drawCtrl);
-      map.off(L.Draw.Event.CREATED, onCreate);
-      map.off(L.Draw.Event.EDITED,  onEdit);
-      map.off(L.Draw.Event.DELETED, onDelete);
+      map.removeLayer(drawnItems);
+      drawnRef.current = null;
+      map.off(L.Draw.Event.CREATED,  onCreate);
+      map.off(L.Draw.Event.EDITED,   onEdited);
+      map.off(L.Draw.Event.DELETED,  onDeleted);
     };
-  }, [map]);
+  }, [map]); // intentionally only [map] — callbacks are in refs
 
   return null;
 }
@@ -188,6 +207,8 @@ function ReadOnlyFeature({ feature: geoFeature }) {
 export default function FieldDrawMap({
   onDraw,
   onClear,
+  onFieldNameChange,
+  fieldName = "",
   initialFeature,
   readOnly = false,
   height   = "480px",
@@ -300,7 +321,7 @@ export default function FieldDrawMap({
             </div>
 
             {showDistrictMenu && (
-              <div className="absolute top-full left-0 mt-1 z-1002 w-56 bg-slate-900 border border-white/15 rounded-xl shadow-2xl overflow-hidden">
+              <div className="absolute top-full left-0 mt-1 w-56 bg-slate-900 border border-white/15 rounded-xl shadow-2xl overflow-hidden" style={{ zIndex: 1002 }}>
                 <div className="p-2 border-b border-white/10">
                   <input
                     autoFocus
@@ -356,7 +377,7 @@ export default function FieldDrawMap({
               )}
             </div>
             {locResults.length > 0 && (
-              <ul className="absolute top-full left-0 mt-1 z-1002 w-full bg-slate-900 border border-white/15 rounded-xl shadow-2xl max-h-44 overflow-y-auto">
+              <ul className="absolute top-full left-0 mt-1 w-full bg-slate-900 border border-white/15 rounded-xl shadow-2xl max-h-44 overflow-y-auto" style={{ zIndex: 1002 }}>
                 {locResults.map((r) => (
                   <li
                     key={r.place_id}
@@ -386,6 +407,20 @@ export default function FieldDrawMap({
               </button>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* ── Field name input ── */}
+      {!readOnly && (
+        <div className="flex items-center gap-2">
+          <span className="material-symbols-outlined text-white/40 text-base shrink-0">badge</span>
+          <input
+            type="text"
+            value={fieldName}
+            onChange={(e) => onFieldNameChange?.(e.target.value)}
+            placeholder="Name your field (e.g. North Paddy, Home Field…)"
+            className="flex-1 px-3 py-2 rounded-xl border border-white/15 bg-white/5 text-white text-sm placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500/50 transition-all"
+          />
         </div>
       )}
 
