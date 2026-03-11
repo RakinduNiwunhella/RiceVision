@@ -40,8 +40,7 @@ async def get_all_alerts():
                 "field": a.get("district"),
                 "timestamp": a.get("date"),
                 "lat": a.get("lat"),
-                "lon": a.get("lon"),
-                "status": a.get("status")
+                "lon": a.get("lon")
             }
             for a in response.data
         ]
@@ -60,7 +59,7 @@ async def get_pest_risk_by_district():
     try:
         response = (
             supabase
-            .table("pest_risk_by_district")
+            .table("pest_risk_view")
             .select("*")
             .execute()
         )
@@ -73,7 +72,8 @@ async def get_pest_risk_by_district():
                 "district": r.get("district"),
                 "total_pixels": r.get("total_pixels"),
                 "risky_pixels": r.get("risky_pixels"),
-                "risky_pixel_locations": r.get("risky_pixel_locations")
+                "status": r.get("status") or "Open",
+                "risky_pixel_locations": r.get("risky_pixel_locations") or []
             }
             for r in response.data
         ]
@@ -117,7 +117,7 @@ async def get_disasters():
                 "timestamp": a.get("date"),
                 "lat": a.get("lat"),
                 "lon": a.get("lon"),
-                "status": a.get("status")
+                "status": a.get("status") or "Open"
             }
             for a in response.data
         ]
@@ -129,7 +129,7 @@ async def get_disasters():
 
 
 # -----------------------------
-# 4️⃣ UPDATE ALERT STATUS
+# 4️⃣ UPDATE DISASTER ALERT STATUS (by ID)
 # -----------------------------
 @router.put("/{alert_id}")
 async def update_alert_status(alert_id: int, body: AlertStatusUpdate):
@@ -150,6 +150,31 @@ async def update_alert_status(alert_id: int, body: AlertStatusUpdate):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
+# -----------------------------
+# 5️⃣ UPDATE PEST ALERT STATUS (by district)
+# -----------------------------
+@router.put("/pest/{district}")
+async def update_pest_status(district: str, body: AlertStatusUpdate):
+    try:
+        response = (
+            supabase
+            .table("alerts")
+            .update({"status": body.status})
+            .ilike("district", district)
+            .eq("pest_risk", 1)
+            .execute()
+        )
+
+        return {"message": f"Pest alerts in {district} updated"}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# -----------------------------
+# 6️⃣ GET PAST ALERTS
+# -----------------------------
 @router.get("/past")
 async def get_past_alerts():
     try:

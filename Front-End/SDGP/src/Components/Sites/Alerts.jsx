@@ -94,7 +94,7 @@ const Alerts = () => {
           const mappedAlerts = (Array.isArray(data) ? data : [])
             .filter((a) => a.risky_pixels > 0)
             .map((a, index) => ({
-              id: index,
+              id: a.district,
               title: `${a.district} • ${a.risky_pixels} RISKS`,
               description: "Multiple pest risks detected in this district.",
               status: a.status || "Open",
@@ -142,15 +142,15 @@ const Alerts = () => {
   const counts = useMemo(() => {
     const countObj = { Open: 0, Resolved: 0, Ignored: 0 };
 
-    alerts.forEach((alert) => {
+    filteredAlerts.forEach((alert) => {
       if (countObj[alert.status] !== undefined) {
         countObj[alert.status]++;
       }
     });
 
-    countObj.All = alerts.length;
+    countObj.All = filteredAlerts.length;
     return countObj;
-  }, [alerts]);
+  }, [filteredAlerts]);
 
   const updateStatus = async (id, newStatus) => {
     try {
@@ -171,7 +171,11 @@ const Alerts = () => {
           )
         );
 
-        await updateAlertStatus(id, newStatus);
+        await updateAlertStatus(
+          id,
+          newStatus,
+          activeTab === "Pest Risks" ? "pest" : "normal"
+        );
       }, 300);
     } catch (err) {
       console.error("Error updating alert:", err);
