@@ -7,7 +7,7 @@ import { useLanguage } from "../../context/LanguageContext";
 const API_BASE = "https://ricevision-cakt.onrender.com";
 
 //LOCAL
-// const API_BASE = "http://localhost:8000";
+//const API_BASE = "http://localhost:8000";
 
 const TAB_KEYS = ["Disasters", "Pest Risks", "Past Alerts"];
 
@@ -23,7 +23,11 @@ const renderTitle = (title, isPest, isPast) => {
   if (!match) return title;
   return (
     <span>
-      {match[1]}<span className={`risk-count ${isPast ? "!text-white/40" : ""}`}>{match[2]}{match[3]}</span>
+      {match[1]}
+      <span className={`risk-count ${isPast ? "!text-white/40" : ""}`}>
+        {match[2]}
+        {match[3]}
+      </span>
     </span>
   );
 };
@@ -101,10 +105,14 @@ const Alerts = () => {
   const [alerts, setAlerts] = useState([]);
   const [globalAlerts, setGlobalAlerts] = useState([]);
   const [activeTab, setActiveTab] = useState(
-    () => localStorage.getItem("alerts_tab") || "Disasters"
+    () => localStorage.getItem("alerts_tab") || "Disasters",
   );
   const [searchTerm, setSearchTerm] = useState("");
-  const [resolveModal, setResolveModal] = useState({ open: false, alertId: null, alertType: null });
+  const [resolveModal, setResolveModal] = useState({
+    open: false,
+    alertId: null,
+    alertType: null,
+  });
   const [exitingId, setExitingId] = useState(null);
 
   const navigate = useNavigate();
@@ -130,7 +138,11 @@ const Alerts = () => {
       }
 
       // Hide resolved/ignored alerts from active tabs
-      return matchesSearch && alert.status !== "Resolved" && alert.status !== "Ignored";
+      return (
+        matchesSearch &&
+        alert.status !== "Resolved" &&
+        alert.status !== "Ignored"
+      );
     });
   }, [alerts, searchTerm, activeTab]);
 
@@ -174,11 +186,8 @@ const Alerts = () => {
           }));
 
           setAlerts(mappedAlerts);
-        }
-
-        /* ---------------- PEST ALERTS ---------------- */
-
-        else if (activeTab === "Pest Risks") {
+        } else if (activeTab === "Pest Risks") {
+          /* ---------------- PEST ALERTS ---------------- */
           const mappedAlerts = (Array.isArray(data) ? data : [])
             .filter((a) => a.risky_pixels > 0)
             .map((a) => ({
@@ -195,11 +204,8 @@ const Alerts = () => {
             }));
 
           setAlerts(mappedAlerts);
-        }
-
-        /* ---------------- PAST ALERTS ---------------- */
-
-        else if (activeTab === "Past Alerts") {
+        } else if (activeTab === "Past Alerts") {
+          /* ---------------- PAST ALERTS ---------------- */
           // Backend already groups pest rows by district and returns
           // { is_pest, district, risk_count, disaster_type, status, note, timestamp, ... }
           const mappedAlerts = (Array.isArray(data) ? data : []).map((a) => ({
@@ -287,7 +293,7 @@ const Alerts = () => {
       prev.map((a) => {
         const matches = isPest ? a.field === id : a.id === id;
         return matches ? { ...a, status: newStatus } : a;
-      })
+      }),
     );
 
     try {
@@ -359,7 +365,6 @@ const Alerts = () => {
       )}
 
       <div className="max-w-7xl mx-auto space-y-8 pb-12">
-
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
@@ -372,7 +377,6 @@ const Alerts = () => {
           </div>
 
           <div className="flex gap-3">
-
             <div className="glass px-4 py-2 rounded-xl border-white/10">
               <span className="text-[10px] font-black uppercase text-white/30 block">
                 {t("active")}
@@ -390,14 +394,12 @@ const Alerts = () => {
                 {counts.Resolved}
               </span>
             </div>
-
           </div>
         </div>
 
         {/* Tabs */}
         <div className="glass p-6 rounded-[2rem] border-white/20">
           <div className="flex flex-col lg:flex-row gap-6 justify-between">
-
             <div className="flex p-1 rounded-2xl bg-white/5 border border-white/10 w-full sm:w-fit overflow-x-auto no-scrollbar">
               {TAB_KEYS.map((key, idx) => (
                 <button
@@ -406,10 +408,11 @@ const Alerts = () => {
                     setActiveTab(key);
                     localStorage.setItem("alerts_tab", key);
                   }}
-                  className={`px-5 py-2 rounded-xl text-xs font-bold transition-all ${activeTab === key
-                    ? "bg-white/15 text-white"
-                    : "text-white/40 hover:text-white/70"
-                    }`}
+                  className={`px-5 py-2 rounded-xl text-xs font-bold transition-all ${
+                    activeTab === key
+                      ? "bg-white/15 text-white"
+                      : "text-white/40 hover:text-white/70"
+                  }`}
                 >
                   {tabLabels[idx]}
                 </button>
@@ -429,7 +432,6 @@ const Alerts = () => {
         {/* Alerts List */}
 
         <div className="space-y-6">
-
           {filteredAlerts.length === 0 && (
             <div className="glass p-8 sm:p-12 md:p-20 rounded-2xl sm:rounded-[2rem] text-center">
               <p className="text-white/30 font-bold uppercase">
@@ -444,10 +446,15 @@ const Alerts = () => {
               className={`glass p-6 rounded-3xl border border-white/10${exitingId === alert.id ? " alert-exit" : ""}`}
             >
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-
                 <div>
-                  <h2 className={`text-xl font-black ${activeTab === "Past Alerts" ? "text-white/40" : "text-emerald-400"}`}>
-                    {renderTitle(alert.title, alert.isPest || activeTab === "Pest Risks", activeTab === "Past Alerts")}
+                  <h2
+                    className={`text-xl font-black ${activeTab === "Past Alerts" ? "text-white/40" : "text-emerald-400"}`}
+                  >
+                    {renderTitle(
+                      alert.title,
+                      alert.isPest || activeTab === "Pest Risks",
+                      activeTab === "Past Alerts",
+                    )}
                   </h2>
 
                   <p className="text-white/60 text-sm mt-1">
@@ -467,7 +474,6 @@ const Alerts = () => {
 
                 {alert.status === "Open" && activeTab !== "Past Alerts" && (
                   <div className="flex gap-3">
-
                     <button
                       onClick={() => handleResolve(alert.id)}
                       className="px-4 sm:px-6 py-2 bg-emerald-500/30 text-emerald-300 rounded-xl text-xs font-bold"
@@ -488,16 +494,12 @@ const Alerts = () => {
                     >
                       View Map
                     </button>
-
                   </div>
                 )}
-
               </div>
             </div>
           ))}
-
         </div>
-
       </div>
     </div>
   );
