@@ -1,4 +1,4 @@
-import { MapContainer, TileLayer, CircleMarker, Circle, GeoJSON, Tooltip, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, CircleMarker, Circle, GeoJSON, Tooltip, Popup, useMap } from "react-leaflet";
 import { useEffect, useState, useRef } from "react";
 import { useTheme } from "../../context/ThemeContext";
 import L from "leaflet";
@@ -26,6 +26,102 @@ function getHealthColor(health) {
   if (health === "Severe Stress") return "#dc2626";
   if (health === "Not Applicable") return "#696969";
   return "#2563eb";
+}
+
+/* ---------- PEST RISK LABEL ---------- */
+
+function getPestRiskLabel(level) {
+  if (level === 0) return { text: "None", color: "#22c55e" };
+  if (level === 1) return { text: "Low", color: "#facc15" };
+  if (level === 2) return { text: "Medium", color: "#f97316" };
+  if (level >= 3) return { text: "High", color: "#dc2626" };
+  return { text: "N/A", color: "#9ca3af" };
+}
+
+function getDisasterColor(risk) {
+  if (!risk) return "#9ca3af";
+  const r = risk.toLowerCase();
+  if (r === "low" || r === "none") return "#22c55e";
+  if (r === "medium" || r === "moderate") return "#f97316";
+  if (r === "high" || r === "severe") return "#dc2626";
+  return "#9ca3af";
+}
+
+/* ---------- POINT POPUP ---------- */
+
+function PointPopup({ p }) {
+  const { isDark } = useTheme();
+  const healthColor = getHealthColor(p.paddy_health);
+  const pestInfo = getPestRiskLabel(p.pest_risk);
+  const disasterColor = getDisasterColor(p.disaster_risk);
+
+  const bg = isDark ? "#0f172a" : "#ffffff";
+  const textPrimary = isDark ? "#f1f5f9" : "#0f172a";
+  const textSecondary = isDark ? "#94a3b8" : "#64748b";
+  const textMuted = isDark ? "#64748b" : "#94a3b8";
+  const textValue = isDark ? "#e2e8f0" : "#1e293b";
+  const border = isDark ? "#1e293b" : "#f1f5f9";
+  const headerBorder = isDark ? "#334155" : "#e2e8f0";
+  const sectionColor = isDark ? "#64748b" : "#94a3b8";
+
+  const row = (label, value, unit = "", color = null) => {
+    if (value == null || value === "") return null;
+    return (
+      <div style={{ display: "flex", justifyContent: "space-between", padding: "3px 0", borderBottom: `1px solid ${border}` }}>
+        <span style={{ color: textSecondary, fontSize: 11, fontWeight: 500 }}>{label}</span>
+        <span style={{ fontWeight: 600, fontSize: 11, color: color || textValue }}>
+          {value}{unit}
+        </span>
+      </div>
+    );
+  };
+
+  return (
+    <div style={{ minWidth: 220, fontFamily: "'Inter', system-ui, sans-serif", lineHeight: 1.5, backgroundColor: bg, color: textPrimary, borderRadius: 12, margin: -10, marginBottom: -14, padding: "10px 14px" }}>
+      {/* Header */}
+      <div style={{ borderBottom: `2px solid ${headerBorder}`, paddingBottom: 6, marginBottom: 6 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: textPrimary }}>
+          {p.district}
+        </div>
+        {p.date && (
+          <div style={{ fontSize: 10, color: textMuted }}>{p.date}</div>
+        )}
+      </div>
+
+      {/* Crop Status */}
+      <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: sectionColor, marginBottom: 2, marginTop: 4 }}>Crop Status</div>
+      {row("Health", p.paddy_health, "", healthColor)}
+      {row("Growth Stage", p.stage)}
+      {row("Season", p.season)}
+
+      {/* Risk */}
+      <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: sectionColor, marginBottom: 2, marginTop: 8 }}>Risk Assessment</div>
+      {row("Pest Risk", pestInfo.text, "", pestInfo.color)}
+      {row("Disaster Risk", p.disaster_risk || "N/A", "", disasterColor)}
+
+      {/* Vegetation */}
+      <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: sectionColor, marginBottom: 2, marginTop: 8 }}>Vegetation Indices</div>
+      {row("NDVI", p.ndvi)}
+      {row("EVI", p.evi)}
+
+      {/* Weather */}
+      <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: sectionColor, marginBottom: 2, marginTop: 8 }}>Weather</div>
+      {row("Rainfall (7d)", p.rain_7d, " mm")}
+      {row("Rainfall (14d)", p.rain_14d, " mm")}
+      {row("Temperature", p.temp, " °C")}
+      {row("Humidity", p.humidity, " %")}
+
+      {/* Terrain */}
+      <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: sectionColor, marginBottom: 2, marginTop: 8 }}>Terrain</div>
+      {row("Elevation", p.elevation, " m")}
+      {row("Slope", p.slope, " °")}
+
+      {/* Coordinates */}
+      <div style={{ marginTop: 8, fontSize: 9, color: textMuted, textAlign: "center" }}>
+        {p.lat?.toFixed(5)}, {p.lng?.toFixed(5)}
+      </div>
+    </div>
+  );
 }
 
 /* ---------- STYLES ---------- */
@@ -211,25 +307,39 @@ useEffect(() => {
     return;
   }
 
-const loadPoints = async () => {
-  try {
+  let cancelled = false;
 
-    const data = await fetchMapFields({
-      districts: [selectedDistrict],
-      health: selectedHealth,
-    });
+  const loadPoints = async () => {
+    try {
 
-    setPoints(data);   // NOT response.data
+      const result = await fetchMapFields({
+        districts: [selectedDistrict],
+        health: selectedHealth,
+      });
 
-  } catch (err) {
+      console.log(`[MAP] Backend count: ${result.count}`);
+      console.log(`[MAP] Data array length: ${result.data.length}`);
+      const valid = result.data.filter(p => p.lat != null && p.lng != null);
+      console.log(`[MAP] Valid points (non-null lat/lng): ${valid.length}`);
+      if (valid.length !== result.data.length) {
+        console.warn(`[MAP] ${result.data.length - valid.length} points dropped due to null lat/lng`);
+      }
 
-    console.error(err);
-    setPoints([]);
+      if (!cancelled) setPoints(valid);
 
-  }
-};
+    } catch (err) {
+
+      if (!cancelled) {
+        console.error(err);
+        setPoints([]);
+      }
+
+    }
+  };
 
   loadPoints();
+
+  return () => { cancelled = true; };
 
 }, [selectedDistrict, selectedHealth, layers.showCircles]);
 
@@ -335,11 +445,11 @@ const loadPoints = async () => {
 
 {layers.showCircles && points && points.length > 0 && (
   <MarkerClusterGroup
+  key={`cluster-${selectedDistrict}-${selectedHealth.join(",")}-${points.length}`}
   disableClusteringAtZoom={10}
   spiderfyOnMaxZoom={false}
   showCoverageOnHover={false}
   maxClusterRadius={30}
-  chunkedLoading
 >
 
 {points.map((p, idx) => (
@@ -353,7 +463,11 @@ const loadPoints = async () => {
     fillOpacity: 0.8,
     weight: 1,
   }}
-/>
+>
+  <Popup maxWidth={280} className={`point-popup ${isDark ? "point-popup-dark" : ""}`}>
+    <PointPopup p={p} />
+  </Popup>
+</CircleMarker>
 ))}
 
 </MarkerClusterGroup>

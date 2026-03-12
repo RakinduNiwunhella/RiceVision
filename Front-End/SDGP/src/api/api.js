@@ -91,7 +91,9 @@ export const fetchMapFields = async ({ districts = [], health = [] }) => {
     throw new Error(result.message || "Map fetch failed");
   }
 
-  return result.data;
+  console.log(`[API] Backend says count=${result.count}, actual data.length=${result.data.length}`);
+
+  return result;
 };
 
 /**

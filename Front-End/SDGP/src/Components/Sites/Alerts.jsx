@@ -398,7 +398,7 @@ const Alerts = () => {
         <div className="glass p-6 rounded-[2rem] border-white/20">
           <div className="flex flex-col lg:flex-row gap-6 justify-between">
 
-            <div className="flex p-1 rounded-2xl bg-white/5 border border-white/10 w-fit">
+            <div className="flex p-1 rounded-2xl bg-white/5 border border-white/10 w-full sm:w-fit overflow-x-auto no-scrollbar">
               {TAB_KEYS.map((key, idx) => (
                 <button
                   key={key}
@@ -431,7 +431,7 @@ const Alerts = () => {
         <div className="space-y-6">
 
           {filteredAlerts.length === 0 && (
-            <div className="glass p-20 rounded-[2rem] text-center">
+            <div className="glass p-8 sm:p-12 md:p-20 rounded-2xl sm:rounded-[2rem] text-center">
               <p className="text-white/30 font-bold uppercase">
                 No Past threats detected
               </p>
@@ -470,7 +470,7 @@ const Alerts = () => {
 
                     <button
                       onClick={() => handleResolve(alert.id)}
-                      className="px-6 py-2 bg-emerald-500/30 text-emerald-300 rounded-xl text-xs font-bold"
+                      className="px-4 sm:px-6 py-2 bg-emerald-500/30 text-emerald-300 rounded-xl text-xs font-bold"
                     >
                       {t("resolveBtn")}
                     </button>

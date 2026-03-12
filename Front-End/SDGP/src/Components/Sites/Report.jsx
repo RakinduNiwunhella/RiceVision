@@ -6,6 +6,7 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import autoTable from 'jspdf-autotable';
 import logoImg from '../assets/logo.png';
+import { useLanguage } from "../../context/LanguageContext";
 
 const CustomSelect = ({ value, onChange, options, className = "" }) => {
   const [open, setOpen] = useState(false);
@@ -103,6 +104,7 @@ const CustomSelect = ({ value, onChange, options, className = "" }) => {
 
 const Report = () => {
   const location = useLocation();
+  const { t } = useLanguage();
   const selectedDistrict = location.state?.district;
   const districts = ["Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle", "Gampaha", "Hambantota", "Jaffna", "Kalutara", "Kandy", "Kegalle", "Kilinochchi", "Kurunegala", "Mannar", "Matale", "Matara", "Monaragala", "Mullaitivu", "Nuwara Eliya", "Polonnaruwa", "Puttalam", "Ratnapura", "Trincomalee", "Vavuniya"];
 
@@ -777,7 +779,7 @@ const Report = () => {
 
   const ReportPane = ({ report, config, setConfig, title }) => {
     if (report?.error) return (
-      <div className="flex-1 glass p-12 rounded-[3rem] text-center border border-red-500/20">
+      <div className="flex-1 glass p-6 sm:p-12 rounded-2xl sm:rounded-[3rem] text-center border border-red-500/20">
         <span className="material-symbols-outlined text-5xl text-red-400/40 mb-4 block">signal_disconnected</span>
         <h3 className="text-red-400 font-black uppercase tracking-widest mb-3 text-sm">Data Unavailable</h3>
         <p className="text-xs text-white/30 mb-6">{report.message}</p>
@@ -792,7 +794,7 @@ const Report = () => {
     );
 
     if (!report) return (
-      <div className="flex-1 glass rounded-[3rem] p-20 text-center animate-pulse">
+      <div className="flex-1 glass rounded-2xl sm:rounded-[3rem] p-8 sm:p-20 text-center animate-pulse">
         <p className="text-white/20 font-black uppercase tracking-widest text-xs">Fetching Satellite Data...</p>
       </div>
     );
@@ -803,7 +805,7 @@ const Report = () => {
     ];
 
     return (
-<div className="flex-1 glass glass-hover rounded-[3rem] p-8 border border-white/10 shadow-2xl relative">        
+<div className="flex-1 glass glass-hover rounded-[2rem] sm:rounded-[3rem] p-5 sm:p-8 border border-white/10 shadow-2xl relative">        
 {/* Pane header */}
         <div className="grid grid-cols-2 gap-3 mb-6">
           <div className="col-span-2 flex justify-between items-center mb-2">
@@ -840,7 +842,7 @@ className="flex items-center gap-2 text-[10px] font-black px-4 py-1.5 rounded-xl
         </div>
 
         {/* Yield Hero */}
-        <div className="glass p-5 rounded-[2rem] border border-emerald-500/20 shadow-xl mb-6 relative overflow-hidden">
+        <div className="glass p-3 sm:p-5 rounded-xl sm:rounded-[2rem] border border-emerald-500/20 shadow-xl mb-6 relative overflow-hidden">
           {/* subtle glow */}
           <div className="absolute top-0 right-0 w-36 h-36 bg-emerald-500/10 blur-[50px] -mr-8 -mt-8 pointer-events-none rounded-full" />
           <div className="relative z-10">
@@ -848,7 +850,7 @@ className="flex items-center gap-2 text-[10px] font-black px-4 py-1.5 rounded-xl
               <span className="material-symbols-outlined text-emerald-400 text-sm">monitoring</span>
               Predicted Average
             </p>
-            <h2 className="text-4xl font-black tracking-tighter text-white">
+            <h2 className="text-2xl sm:text-4xl font-black tracking-tighter text-white">
               {Math.round(report.summary.yield).toLocaleString()}
               <span className="text-base font-normal text-white/50 ml-2">kg/ha</span>
             </h2>
@@ -908,39 +910,39 @@ className="flex items-center gap-2 text-[10px] font-black px-4 py-1.5 rounded-xl
   };
 
   return (
-    <div className="min-h-full p-6 lg:p-10 text-white font-sans transition-all duration-500">
+    <div className="min-h-full p-4 sm:p-6 lg:p-10 text-white font-sans transition-all duration-500">
       <div className="max-w-7xl mx-auto space-y-10 pb-20">
 
         {/* Page Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
-            <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
-              Yield Reports
+            <h1 className="text-xl sm:text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
+              {t('yieldReports')}
             </h1>
             <p className="text-white/40 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em]">
-              Satellite-derived analytics & district yield forecasts
+              {t('satelliteDerivedAnalytics')}
             </p>
           </div>
 
           {/* Mode Toggle */}
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4">
             <div className="flex p-1 rounded-2xl bg-white/5 border border-white/10 w-fit">
               <button
                 onClick={() => setMode("single")}
-                className={`px-6 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${mode === "single" ? "glass bg-white/15 text-white shadow-lg border-white/20" : "text-white/40 hover:text-white/70"}`}
+                className={`px-4 sm:px-6 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${mode === "single" ? "glass bg-white/15 text-white shadow-lg border-white/20" : "text-white/40 hover:text-white/70"}`}
               >
-                Single
+                {t('single')}
               </button>
               <button
                 onClick={() => setMode("compare")}
-                className={`px-6 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${mode === "compare" ? "glass bg-white/15 text-white shadow-lg border-white/20" : "text-white/40 hover:text-white/70"}`}
+                className={`px-4 sm:px-6 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${mode === "compare" ? "glass bg-white/15 text-white shadow-lg border-white/20" : "text-white/40 hover:text-white/70"}`}
               >
-                Compare
+                {t('compare')}
               </button>
             </div>
             <div className="glass px-4 py-2 rounded-xl border-white/10 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-white/60">Live Data</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-white/60">{t('liveData')}</span>
             </div>
           </div>
         </div>

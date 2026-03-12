@@ -3,9 +3,11 @@ import { supabase } from "../../supabaseClient";
 import { useNavigate, Link } from "react-router-dom";
 import { FaSun, FaMoon } from "react-icons/fa";
 import { useTheme } from "../../context/ThemeContext";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function SignupPage() {
   const { isDark, toggleTheme } = useTheme();
+  const { t } = useLanguage();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -57,10 +59,7 @@ export default function SignupPage() {
     if (error) {
       alert(error.message);
     } else {
-      alert(
-        "Signup successful! Please check your email for a confirmation link.",
-      );
-      navigate("/");
+      navigate("/field-setup", { state: { fromSignup: true } });
     }
     setLoading(false);
   };
@@ -96,7 +95,7 @@ export default function SignupPage() {
       </button>
 
       {/* Left Side: Form Container */}
-      <div className="flex flex-col w-full px-8 pt-3 pb-6 lg:w-1/2 md:px-24 lg:px-32 z-10">
+      <div className="flex flex-col w-full px-5 sm:px-8 pt-3 pb-6 md:w-3/4 lg:w-1/2 md:px-12 lg:px-20 z-10 mx-auto md:mx-0">
         <div className="w-full max-w-md mx-auto">
           {/* Logo */}
           <div className="flex items-center mb-0 space-x-3">
@@ -104,29 +103,29 @@ export default function SignupPage() {
               <img
                 src="/logoSDGP.webp"
                 alt="SDGP Logo"
-                className="h-18 w-auto"
+                className="h-12 sm:h-16 md:h-18 w-auto"
               />
             </div>
           </div>
 
-          <h2 className="text-4xl font-extrabold mb-3 tracking-tight">
-            Create Account
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold mb-3 tracking-tight">
+            {t('createAccount')}
           </h2>
           <p className="text-slate-500 dark:text-slate-400 mb-6">
-            Join us and monitor your paddy fields using satellite intelligence.
+            {t('registerPaddySubtitle')}
           </p>
 
           <form onSubmit={handleSignup} className="space-y-4">
             {/* Full Name */}
             <div>
               <label className="block text-sm font-semibold mb-2">
-                Full Name
+                {t('fullName')}
               </label>
               <input
                 type="text"
                 required
                 placeholder="John Doe"
-                className="w-full px-4 py-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                className="w-full px-4 py-2.5 sm:py-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                 onChange={(e) => setFullName(e.target.value)}
               />
             </div>
@@ -134,13 +133,13 @@ export default function SignupPage() {
             {/* Email */}
             <div>
               <label className="block text-sm font-semibold mb-2">
-                Email Address
+                {t('emailAddress')}
               </label>
               <input
                 type="email"
                 required
                 placeholder="name@company.com"
-                className={`w-full px-4 py-3.5 rounded-xl border bg-slate-50 dark:bg-slate-900/50 outline-none transition-all focus:ring-2 ${
+                className={`w-full px-4 py-2.5 sm:py-3.5 rounded-xl border bg-slate-50 dark:bg-slate-900/50 outline-none transition-all focus:ring-2 ${
                   emailError
                     ? "border-red-500 focus:ring-red-500/20"
                     : "border-slate-200 dark:border-slate-800 focus:ring-indigo-500"
@@ -159,13 +158,13 @@ export default function SignupPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-semibold mb-2">
-                  Password
+                  {t('password')}
                 </label>
                 <input
                   type="password"
                   required
                   placeholder="••••••••"
-                  className={`w-full px-4 py-3.5 rounded-xl border bg-slate-50 dark:bg-slate-900/50 outline-none transition-all focus:ring-2 ${
+                  className={`w-full px-4 py-2.5 sm:py-3.5 rounded-xl border bg-slate-50 dark:bg-slate-900/50 outline-none transition-all focus:ring-2 ${
                     passwordLengthError
                       ? "border-red-500 focus:ring-red-500/20"
                       : "border-slate-200 dark:border-slate-800 focus:ring-indigo-500"
@@ -184,13 +183,13 @@ export default function SignupPage() {
 
               <div>
                 <label className="block text-sm font-semibold mb-2">
-                  Confirm
+                  {t('confirmPassword')}
                 </label>
                 <input
                   type="password"
                   required
                   placeholder="••••••••"
-                  className={`w-full px-4 py-3.5 rounded-xl border bg-slate-50 dark:bg-slate-900/50 outline-none transition-all focus:ring-2 ${
+                  className={`w-full px-4 py-2.5 sm:py-3.5 rounded-xl border bg-slate-50 dark:bg-slate-900/50 outline-none transition-all focus:ring-2 ${
                     passwordError
                       ? "border-red-500 focus:ring-red-500/20"
                       : "border-slate-200 dark:border-slate-800 focus:ring-indigo-500"
@@ -210,9 +209,9 @@ export default function SignupPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 px-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-xl shadow-indigo-500/20 transition-all active:scale-[0.97] disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full py-3 sm:py-4 px-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-xl shadow-indigo-500/20 transition-all active:scale-[0.97] disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              {loading ? "Creating Account..." : "Create Free Account"}
+              {loading ? t('signingUp') : t('signUpBtn')}
             </button>
 
             {/* Divider */}
@@ -233,24 +232,24 @@ export default function SignupPage() {
                 alt="Google"
                 className="h-5 w-5"
               />
-              Continue with Google
+              {t('continueGoogle')}
             </button>
           </form>
 
           <p className="mt-3 text-center text-sm text-slate-500 dark:text-slate-400">
-            Already have an account?{" "}
+            {t('alreadyAccount')}{" "}
             <Link
               to="/"
               className="text-indigo-500 hover:text-indigo-400 font-bold underline-offset-4 hover:underline"
             >
-              Sign in here
+              {t('signInLink')}
             </Link>
           </p>
         </div>
       </div>
 
       {/* Right Side */}
-      <div className="hidden lg:block lg:w-1/2 relative">
+      <div className="hidden md:block md:w-1/4 lg:w-1/2 relative">
         <img
           src="/paddy_signup.png"
           alt="Rice Field"

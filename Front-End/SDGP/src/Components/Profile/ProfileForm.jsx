@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "../../supabaseClient";
 import { FaCamera } from "react-icons/fa";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function ProfileForm() {
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
@@ -199,7 +201,7 @@ export default function ProfileForm() {
 
           {uploading && (
             <p className="text-[10px] text-emerald-400 mt-6 font-black uppercase tracking-[0.3em] animate-pulse">
-              Uploading Matrix...
+              {t('uploadingMatrix')}
             </p>
           )}
         </div>
@@ -209,16 +211,16 @@ export default function ProfileForm() {
           <div className="space-y-8">
             <div className="flex items-center gap-4">
               <span className="h-px flex-1 bg-white/10"></span>
-              <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-white/60">Personal Identification</h3>
+              <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-white/60">{t('personalId')}</h3>
               <span className="h-px flex-1 bg-white/10"></span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {[
-                { label: "Given Name", key: "firstName", type: "text", placeholder: "SENTINEL" },
-                { label: "Surname", key: "lastName", type: "text", placeholder: "OPERATOR" },
-                { label: "Identification (NIC)", key: "nic", type: "text", placeholder: "XXXXXXXXXV" },
-                { label: "Tactical Phone", key: "phone", type: "text", placeholder: "+94 77 XXX XXXX" },
+              { label: t('givenName'),          key: "firstName", type: "text", placeholder: "SENTINEL" },
+                { label: t('surname'),            key: "lastName",  type: "text", placeholder: "OPERATOR" },
+                { label: t('identification'),     key: "nic",       type: "text", placeholder: "XXXXXXXXXV" },
+                { label: t('tacticalPhone'),      key: "phone",     type: "text", placeholder: "+94 77 XXX XXXX" },
               ].map((field) => (
                 <div key={field.key} className="group/field space-y-2">
                   <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/50 ml-2 transition-colors duration-200 group-hover/field:text-emerald-400/70">
@@ -240,14 +242,14 @@ export default function ProfileForm() {
           <div className="space-y-8">
             <div className="flex items-center gap-4">
               <span className="h-px flex-1 bg-white/10"></span>
-              <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-white/60">Sector Registration</h3>
+              <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-white/60">{t('sectorReg')}</h3>
               <span className="h-px flex-1 bg-white/10"></span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="group/field space-y-2">
                 <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/50 ml-2 transition-colors duration-200 group-hover/field:text-emerald-400/70">
-                  Encryption Endpoint (Email)
+                  {t('emailEndpoint')}
                 </label>
                 <input
                   type="email"
@@ -258,7 +260,7 @@ export default function ProfileForm() {
               </div>
               <div className="group/field space-y-2">
                 <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/50 ml-2 transition-colors duration-200 group-hover/field:text-emerald-400/70">
-                  District Sector
+                  {t('districtSector')}
                 </label>
                 <input
                   type="text"
@@ -270,7 +272,7 @@ export default function ProfileForm() {
               </div>
               <div className="group/field md:col-span-2 space-y-2">
                 <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/50 ml-2 transition-colors duration-200 group-hover/field:text-emerald-400/70">
-                  Physical Registry Address
+                  {t('physicalAddress')}
                 </label>
                 <textarea
                   rows="3"
@@ -299,7 +301,7 @@ export default function ProfileForm() {
                     {status?.type === 'success' ? 'verified' : 'shield_with_heart'}
                   </span>
                 )}
-                {loading ? "Synchronizing..." : status?.type === 'success' ? "Synchronized" : "Registry Identity"}
+                {loading ? "Synchronizing..." : status?.type === 'success' ? t('synchronized') : t('registryIdentity')}
               </div>
             </button>
           </div>
