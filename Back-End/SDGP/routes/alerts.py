@@ -79,6 +79,7 @@ async def get_pest_risk_by_district():
                 "risky_pixel_locations": r.get("risky_pixel_locations") or []
             }
             for r in response.data
+            if r.get("status") not in ["Resolved", "Ignored"]
         ]
 
         return mapped_data
@@ -123,6 +124,7 @@ async def get_disasters():
                 "status": a.get("status") or "Open"
             }
             for a in response.data
+            if a.get("status") not in ["Resolved", "Ignored"]
         ]
 
         return mapped_data

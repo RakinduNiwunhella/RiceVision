@@ -14,6 +14,20 @@ const TAB_KEYS = ["Disasters", "Pest Risks", "Past Alerts"];
 const formatTitle = (text) =>
   text.replace(/\b\w/g, (char) => char.toUpperCase());
 
+// Renders a pest title like "Kurunegala • 32 RISKS" with the number in red.
+// Returns a plain string for disaster titles.
+const renderTitle = (title, isPest, isPast) => {
+  if (!isPest) return title;
+  // Match: "District : NUMBER RISKS"
+  const match = title.match(/^(.+?:\s*)(\d+)(\s*RISKS)$/);
+  if (!match) return title;
+  return (
+    <span>
+      {match[1]}<span className={`risk-count ${isPast ? "!text-white/40" : ""}`}>{match[2]}{match[3]}</span>
+    </span>
+  );
+};
+
 // Groups pest alert rows by district, returns one card per district.
 // Used for both active Pest Risks tab and Past Alerts rendering.
 const groupPestAlertsByDistrict = (rows) => {
@@ -86,9 +100,12 @@ const Alerts = () => {
 
   const [alerts, setAlerts] = useState([]);
   const [globalAlerts, setGlobalAlerts] = useState([]);
-  const [activeTab, setActiveTab] = useState("Disasters");
+  const [activeTab, setActiveTab] = useState(
+    () => localStorage.getItem("alerts_tab") || "Disasters"
+  );
   const [searchTerm, setSearchTerm] = useState("");
   const [resolveModal, setResolveModal] = useState({ open: false, alertId: null, alertType: null });
+  const [exitingId, setExitingId] = useState(null);
 
   const navigate = useNavigate();
 
@@ -112,7 +129,8 @@ const Alerts = () => {
         );
       }
 
-      return matchesSearch;
+      // Hide resolved/ignored alerts from active tabs
+      return matchesSearch && alert.status !== "Resolved" && alert.status !== "Ignored";
     });
   }, [alerts, searchTerm, activeTab]);
 
@@ -165,7 +183,7 @@ const Alerts = () => {
             .filter((a) => a.risky_pixels > 0)
             .map((a) => ({
               id: a.district,
-              title: `${a.district} • ${a.risky_pixels} RISKS`,
+              title: `${a.district} : ${a.risky_pixels} RISKS`,
               description: "Multiple pest risks detected in this district.",
               status: a.status || "Open",
               priority: "High",
@@ -187,7 +205,7 @@ const Alerts = () => {
           const mappedAlerts = (Array.isArray(data) ? data : []).map((a) => ({
             id: a.id,
             title: a.is_pest
-              ? `${a.district} \u2022 ${a.risk_count} RISKS`
+              ? `${a.district} : ${a.risk_count} RISKS`
               : formatTitle(`${a.disaster_type} risk`),
             description: `Stage: ${a.stage_name} | Health: ${a.paddy_health}`,
             status: a.status,
@@ -255,14 +273,16 @@ const Alerts = () => {
     if (!snapshot) return;
 
     const isPest = activeTab === "Pest Risks";
-
-    // Snapshot globalAlerts for counter rollback
     const globalSnapshot = globalAlerts;
 
-    // Optimistic: remove from tab list
-    setAlerts((prev) => prev.filter((a) => a.id !== id));
+    // Kick off exit animation, then remove after it completes
+    setExitingId(id);
+    setTimeout(() => {
+      setExitingId(null);
+      setAlerts((prev) => prev.filter((a) => a.id !== id));
+    }, 260);
 
-    // Optimistic: update matching rows in globalAlerts so counts recalculate
+    // Optimistic counter update
     setGlobalAlerts((prev) =>
       prev.map((a) => {
         const matches = isPest ? a.field === id : a.id === id;
@@ -274,7 +294,6 @@ const Alerts = () => {
       await updateAlertStatus(id, newStatus, isPest ? "pest" : "normal", note);
     } catch (err) {
       console.error("Error updating alert:", err);
-      // Rollback both slices
       setAlerts((prev) => [snapshot, ...prev]);
       setGlobalAlerts(globalSnapshot);
     }
@@ -383,7 +402,10 @@ const Alerts = () => {
               {TAB_KEYS.map((key, idx) => (
                 <button
                   key={key}
-                  onClick={() => setActiveTab(key)}
+                  onClick={() => {
+                    setActiveTab(key);
+                    localStorage.setItem("alerts_tab", key);
+                  }}
                   className={`px-5 py-2 rounded-xl text-xs font-bold transition-all ${activeTab === key
                     ? "bg-white/15 text-white"
                     : "text-white/40 hover:text-white/70"
@@ -419,13 +441,13 @@ const Alerts = () => {
           {filteredAlerts.map((alert) => (
             <div
               key={alert.id}
-              className="glass p-6 rounded-3xl border border-white/10"
+              className={`glass p-6 rounded-3xl border border-white/10${exitingId === alert.id ? " alert-exit" : ""}`}
             >
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
 
                 <div>
-                  <h2 className="text-xl font-black text-emerald-400">
-                    {alert.title}
+                  <h2 className={`text-xl font-black ${activeTab === "Past Alerts" ? "text-white/40" : "text-emerald-400"}`}>
+                    {renderTitle(alert.title, alert.isPest || activeTab === "Pest Risks", activeTab === "Past Alerts")}
                   </h2>
 
                   <p className="text-white/60 text-sm mt-1">
@@ -455,7 +477,7 @@ const Alerts = () => {
 
                     <button
                       onClick={() => handleIgnore(alert.id)}
-                      className="glass-btn text-[10px] px-3 py-1 tracking-widest bg-white/10 hover:bg-white/20"
+                      className="btn-ignore glass-btn text-[10px] px-3 py-1 tracking-widest bg-white/10 hover:bg-white/20"
                     >
                       Ignore
                     </button>

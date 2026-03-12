@@ -154,27 +154,62 @@
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
 }
+
 .custom-scrollbar::-webkit-scrollbar {
     width: 6px;
     height: 6px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-track {
     background: transparent;
     border-radius: 10px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.15);
     border-radius: 10px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.3);
 }
 
 @keyframes fade {
-  from { opacity: 0; }
-  to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 .animate-fade {
-  animation: fade 0.9s ease-in-out;
+    animation: fade 0.9s ease-in-out;
+}
+
+/* ── Alert slide-out animation ── */
+.alert-exit {
+    transform: translateX(60px);
+    opacity: 0;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+    pointer-events: none;
+}
+
+/* ── Ignore button — secondary visual weight ── */
+.btn-ignore {
+    opacity: 0.55;
+    filter: saturate(0.6);
+    transition: opacity 0.2s ease, filter 0.2s ease;
+}
+
+.btn-ignore:hover {
+    opacity: 1;
+    filter: saturate(1);
+}
+
+/* ── Pest risk count highlight ── */
+.risk-count {
+    color: #b00707;
+    font-weight: 700;
 }
