@@ -36,11 +36,16 @@ export const fetchFaqs = () => get("/api/help/faqs");
 /* ------------------ ALERTS ------------------ */
 export const fetchAlerts = () => get("/api/alerts/all");
 
-export const updateAlertStatus = async (id, status) => {
-  const res = await fetch(`${API_BASE}/api/alerts/${id}`, {
+export const updateAlertStatus = async (id, status, type = "normal", note = null) => {
+  const endpoint =
+    type === "pest"
+      ? `${API_BASE}/api/alerts/pest/${id}`
+      : `${API_BASE}/api/alerts/${id}`;
+
+  const res = await fetch(endpoint, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ status }),
+    body: JSON.stringify({ status, note }),
   });
 
   if (!res.ok) throw new Error("Failed to update alert");
