@@ -41,11 +41,10 @@ const Mission = ({ onOpenRegister }) => {
                   Our Mission
                 </p>
                 <h2 className="mt-2 text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
-                  Turning space-driven insights into healthier fields, empowered farmers, and a resilient Sri Lankan future.
+                  Improving agricultural decisions through satellite data, machine learning, and real-time crop insights.
                 </h2>
                 <p className="mt-4 text-gray-700 dark:text-slate-300">
-                  RiceVision's mission is to revolutionise rice cultivation and national food planning in Sri Lanka by delivering an
-                  integrated, satellite-powered decision-support system.
+                  RiceVision combines satellite imagery, vegetation index analysis, and predictive models to monitor crop health, detect risks like floods and drought, and forecast rice yields — supporting sustainable food production and better policy planning.
                 </p>
                 <button
                   onClick={onOpenRegister}

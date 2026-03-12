@@ -29,8 +29,7 @@ export default function Footer() {
             RiceVision
           </h2>
           <p className="mt-4 text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-            Intelligent rice monitoring and analytics platform supporting
-            sustainable agriculture through satellite-driven insights.
+            Satellite-based rice monitoring and yield forecasting system combining remote sensing, vegetation index analysis, and machine learning for sustainable agriculture.
           </p>
 
           <div className="flex gap-4 mt-6">

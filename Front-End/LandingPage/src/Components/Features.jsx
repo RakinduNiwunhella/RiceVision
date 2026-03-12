@@ -3,27 +3,27 @@ import React from "react";
 export default function Features() {
   const features = [
     {
-      title: "Real-time Statistics",
+      title: "Vegetation Index Analysis",
       description:
-        "Up-to-date data on paddy cultivation metrics across all regions with comprehensive dashboards showing yield predictions, growth stages, and regional comparisons.",
+        "Calculates NDVI, EVI, NDWI, and LSWI from Sentinel-2 multispectral imagery to measure plant greenness, biomass, water content, and soil moisture across rice fields.",
       img: "/images/Real-timeStatistics.webp",
     },
     {
-      title: "Interactive Visualisation",
+      title: "Interactive Dashboard",
       description:
-        "Dynamic maps showing paddy land distribution with zoom capabilities, layer controls, and real-time updates for accurate field monitoring.",
+        "Crop health maps, growth stage tracking, yield forecasts, and risk alerts presented through an interactive visual interface for easy decision-making.",
       img: "/images/InteractiveVisualization.webp",
     },
     {
-      title: "Boundary Delineation",
+      title: "Yield Forecasting",
       description:
-        "Precise mapping of paddy field boundaries using high-resolution satellite imagery with accuracy up to 1 meter for perfect land management.",
+        "Machine learning models analyze vegetation indices and historical data to estimate rice production levels before harvest, supporting food security planning.",
       img: "/images/BoundaryDelineation.webp",
     },
     {
-      title: "Crop Health Monitoring",
+      title: "Crop Health & Risk Detection",
       description:
-        "NDVI and other vegetation indices calculated weekly to assess paddy health, with alerts for potential issues like disease or nutrient deficiencies.",
+        "Detects rice growth stages, classifies crop health conditions, and identifies anomalies such as floods, drought, or nutrient deficiency at early stages.",
       img: "/images/CropHealthMonitoring.webp",
     },
   ];
@@ -35,7 +35,7 @@ export default function Features() {
           What <span className="text-green-600">We</span> Provide
         </h2>
         <p className="text-gray-600 dark:text-gray-300">
-          Comprehensive solutions for modern agriculture
+          Satellite-powered insights for smarter rice farming
         </p>
       </div>
 
