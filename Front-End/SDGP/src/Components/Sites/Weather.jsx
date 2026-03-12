@@ -283,7 +283,7 @@ export default function RiceVisionWeather() {
   ];
 
   return (
-    <div className="min-h-screen -mx-6 -mt-6 p-6 lg:p-10 font-sans text-white">
+    <div className="min-h-screen -mx-6 -mt-6 p-4 sm:p-6 lg:p-10 font-sans text-white">
       <div className="max-w-7xl mx-auto space-y-8">
 
         {/* ─── HEADER ─── */}
@@ -297,7 +297,7 @@ export default function RiceVisionWeather() {
             </p>
 
             {/* Main Location */}
-            <h1 className="text-4xl md:text-6xl font-black text-white leading-tight tracking-tight">
+            <h1 className="text-2xl sm:text-4xl md:text-6xl font-black text-white leading-tight tracking-tight">
               {district?.name}
             </h1>
 
@@ -360,16 +360,16 @@ export default function RiceVisionWeather() {
         </header>
 
         {/* ─── HERO CARD ─── */}
-        <div className="glass bg-linear-to-br from-emerald-500/30 to-teal-700/30 p-8 md:p-10 rounded-[2.5rem] relative overflow-hidden shadow-2xl">
+        <div className="glass bg-linear-to-br from-emerald-500/30 to-teal-700/30 p-5 sm:p-8 md:p-10 rounded-[1.5rem] sm:rounded-[2.5rem] relative overflow-hidden shadow-2xl">
           <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-8">
             <div>
               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/50 block mb-3">
                 {c.is_day ? "☀️ Daytime" : "🌙 Night"} · {new Date(c.time).toLocaleString("en-US", { weekday: "long", hour: "2-digit", minute: "2-digit" })}
               </span>
               <div className="flex items-end gap-4">
-                <h2 className="text-8xl md:text-[10rem] font-black text-white leading-none">{Math.round(c.temperature_2m)}°</h2>
+                <h2 className="text-6xl sm:text-8xl md:text-[10rem] font-black text-white leading-none">{Math.round(c.temperature_2m)}°</h2>
                 <div className="mb-4">
-                  <p className="text-2xl font-black text-white/80">{cond.icon} {cond.label}</p>
+                  <span className="text-base sm:text-2xl font-black text-white/80">{cond.icon} {cond.label}</span>
                   <p className="text-white/40 text-sm mt-1">Feels like {Math.round(c.apparent_temperature)}°C</p>
                 </div>
               </div>
@@ -400,12 +400,12 @@ export default function RiceVisionWeather() {
         </div>
 
         {/* ─── TABS ─── */}
-        <div className="flex gap-1 glass p-1 rounded-2xl border border-white/10 w-fit flex-wrap">
+        <div className="flex gap-1 glass p-1 rounded-2xl border border-white/10 w-full sm:w-fit flex-wrap overflow-x-auto no-scrollbar">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-200 ${activeTab === tab.id
+              className={`px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all duration-200 whitespace-nowrap ${activeTab === tab.id
                 ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
                 : "text-white/40 hover:text-white/70"
                 }`}

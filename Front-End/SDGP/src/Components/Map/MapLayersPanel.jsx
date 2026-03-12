@@ -73,7 +73,7 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
 
   return (
 
-    <div className="relative w-full lg:w-72 glass p-6 shadow-xl">
+    <div className="relative w-full md:w-72 lg:w-72 glass p-4 sm:p-6 shadow-xl">
 
       {/* BLURRED PANEL CONTENT */}
 

@@ -80,7 +80,7 @@ const FieldData = () => {
   }
 
   return (
-    <div className="min-h-full p-6 lg:p-10 text-white font-sans transition-all duration-500">
+    <div className="min-h-full p-4 sm:p-6 lg:p-10 text-white font-sans transition-all duration-500">
       <div className="max-w-7xl mx-auto space-y-10 pb-20">
 
         {/* Page Header */}
@@ -96,11 +96,11 @@ const FieldData = () => {
                   </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {stats.map((item) => (
             <div
               key={item.label}
-              className="glass glass-hover p-6 rounded-[2.5rem] border border-white/10 shadow-xl group transition-all duration-500"
+              className="glass glass-hover p-4 sm:p-6 rounded-[1.5rem] sm:rounded-[2.5rem] border border-white/10 shadow-xl group transition-all duration-500"
             >
               <div className="flex justify-between items-start mb-4">
                 <span className={`material-symbols-outlined ${item.color || 'text-white/40'} text-3xl group-hover:scale-110 transition-transform duration-500`}>
@@ -118,8 +118,8 @@ const FieldData = () => {
         </div>
 
         {/* Table Section */}
-        <div className="glass p-1 rounded-[3rem] border border-white/10 shadow-2xl overflow-hidden group">
-          <div className="p-8 border-b border-white/10 flex justify-between items-center">
+        <div className="glass p-1 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl overflow-hidden group">
+          <div className="p-4 sm:p-8 border-b border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/40 flex items-center gap-3">
               <span className="material-symbols-outlined text-emerald-400">dataset</span>
               {t('districtPerformance')}

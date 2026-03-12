@@ -82,7 +82,7 @@ const Help = () => {
     "w-full rounded-xl border border-white/10 bg-white/5 text-white px-4 py-2.5 focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all duration-300 placeholder:text-white/20 font-medium";
 
   return (
-    <div className="min-h-full p-6 lg:p-10 text-white font-sans">
+    <div className="min-h-full p-4 sm:p-6 lg:p-10 text-white font-sans">
       <div className="max-w-7xl mx-auto space-y-10 pb-20">
 
         {/* Header Section */}
@@ -139,10 +139,10 @@ const Help = () => {
         </div>
 
         {/* Main Interface: Form & FAQs */}
-        <div className="grid grid-cols-1 xl:grid-cols-5 gap-10">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-10">
 
           {/* Complaint Console */}
-          <div className="xl:col-span-3">
+          <div className="lg:col-span-3">
             <div className="glass p-8 md:p-10 rounded-[2.5rem] border border-white/10 shadow-2xl space-y-8">
               <div className="flex items-center gap-3 border-b border-white/10 pb-6">
                 <ExclamationTriangleIcon className="w-6 h-6 text-amber-400" />
@@ -213,7 +213,7 @@ const Help = () => {
           </div>
 
           {/* Dynamic Knowledge Base (FAQs) */}
-          <div className="xl:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-6">
             <div className="glass p-8 rounded-[2.5rem] border border-white/10 shadow-xl h-fit">
                 <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/40 mb-8 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />

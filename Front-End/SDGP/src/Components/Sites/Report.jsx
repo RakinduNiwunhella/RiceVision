@@ -805,7 +805,7 @@ const Report = () => {
     ];
 
     return (
-<div className="flex-1 glass glass-hover rounded-[3rem] p-8 border border-white/10 shadow-2xl relative">        
+<div className="flex-1 glass glass-hover rounded-[2rem] sm:rounded-[3rem] p-5 sm:p-8 border border-white/10 shadow-2xl relative">        
 {/* Pane header */}
         <div className="grid grid-cols-2 gap-3 mb-6">
           <div className="col-span-2 flex justify-between items-center mb-2">
@@ -910,7 +910,7 @@ className="flex items-center gap-2 text-[10px] font-black px-4 py-1.5 rounded-xl
   };
 
   return (
-    <div className="min-h-full p-6 lg:p-10 text-white font-sans transition-all duration-500">
+    <div className="min-h-full p-4 sm:p-6 lg:p-10 text-white font-sans transition-all duration-500">
       <div className="max-w-7xl mx-auto space-y-10 pb-20">
 
         {/* Page Header */}
@@ -925,17 +925,17 @@ className="flex items-center gap-2 text-[10px] font-black px-4 py-1.5 rounded-xl
           </div>
 
           {/* Mode Toggle */}
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4">
             <div className="flex p-1 rounded-2xl bg-white/5 border border-white/10 w-fit">
               <button
                 onClick={() => setMode("single")}
-                className={`px-6 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${mode === "single" ? "glass bg-white/15 text-white shadow-lg border-white/20" : "text-white/40 hover:text-white/70"}`}
+                className={`px-4 sm:px-6 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${mode === "single" ? "glass bg-white/15 text-white shadow-lg border-white/20" : "text-white/40 hover:text-white/70"}`}
               >
                 {t('single')}
               </button>
               <button
                 onClick={() => setMode("compare")}
-                className={`px-6 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${mode === "compare" ? "glass bg-white/15 text-white shadow-lg border-white/20" : "text-white/40 hover:text-white/70"}`}
+                className={`px-4 sm:px-6 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${mode === "compare" ? "glass bg-white/15 text-white shadow-lg border-white/20" : "text-white/40 hover:text-white/70"}`}
               >
                 {t('compare')}
               </button>

@@ -95,7 +95,7 @@ export default function SignupPage() {
       </button>
 
       {/* Left Side: Form Container */}
-      <div className="flex flex-col w-full px-8 pt-3 pb-6 lg:w-1/2 md:px-24 lg:px-32 z-10">
+      <div className="flex flex-col w-full px-5 sm:px-8 pt-3 pb-6 md:w-3/4 lg:w-1/2 md:px-12 lg:px-20 z-10 mx-auto md:mx-0">
         <div className="w-full max-w-md mx-auto">
           {/* Logo */}
           <div className="flex items-center mb-0 space-x-3">
@@ -108,7 +108,7 @@ export default function SignupPage() {
             </div>
           </div>
 
-          <h2 className="text-4xl font-extrabold mb-3 tracking-tight">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold mb-3 tracking-tight">
             {t('createAccount')}
           </h2>
           <p className="text-slate-500 dark:text-slate-400 mb-6">
@@ -249,7 +249,7 @@ export default function SignupPage() {
       </div>
 
       {/* Right Side */}
-      <div className="hidden lg:block lg:w-1/2 relative">
+      <div className="hidden md:block md:w-1/4 lg:w-1/2 relative">
         <img
           src="/paddy_signup.png"
           alt="Rice Field"

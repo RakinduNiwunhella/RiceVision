@@ -184,7 +184,7 @@ const Alerts = () => {
   const formatTimestamp = (iso) => new Date(iso).toLocaleString();
 
   return (
-    <div className="min-h-full p-6 lg:p-10 text-white font-sans">
+    <div className="min-h-full p-4 sm:p-6 lg:p-10 text-white font-sans">
       <div className="max-w-7xl mx-auto space-y-8 pb-12">
 
         {/* Header */}
@@ -220,15 +220,15 @@ const Alerts = () => {
         </div>
 
         {/* Tabs + Search */}
-        <div className="glass p-6 rounded-[2rem] border-white/20">
-          <div className="flex flex-col lg:flex-row gap-6 justify-between">
+        <div className="glass p-4 sm:p-6 rounded-[1.5rem] sm:rounded-[2rem] border-white/20">
+          <div className="flex flex-col gap-4 sm:gap-6 justify-between">
 
-            <div className="flex p-1 rounded-2xl bg-white/5 border border-white/10 w-fit">
+            <div className="flex p-1 rounded-2xl bg-white/5 border border-white/10 w-full sm:w-fit overflow-x-auto no-scrollbar">
               {TAB_KEYS.map((key, idx) => (
                 <button
                   key={key}
                   onClick={() => setActiveTab(key)}
-                  className={`px-5 py-2 rounded-xl text-xs font-bold transition-all ${activeTab === key
+                  className={`px-3 sm:px-5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex-1 sm:flex-none ${activeTab === key
                     ? "bg-white/15 text-white"
                     : "text-white/40 hover:text-white/70"
                     }`}
@@ -290,7 +290,7 @@ const Alerts = () => {
                 </div>
 
                 {alert.status === "Open" && activeTab !== "Past Alerts" && (
-                  <div className="flex gap-3">
+                  <div className="flex flex-wrap gap-2 sm:gap-3">
                     <button
                       onClick={() => handleResolve(alert.id)}
                       className="px-6 py-2 bg-emerald-500/30 text-emerald-300 rounded-xl text-xs font-bold"

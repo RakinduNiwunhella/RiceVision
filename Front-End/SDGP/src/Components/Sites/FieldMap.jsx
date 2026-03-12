@@ -62,15 +62,15 @@ export default function FieldMap() {
   }, [state?.district, state?.health]);
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6 min-h-[calc(100vh-4rem)] p-6">
+    <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 min-h-[calc(100vh-4rem)] p-3 sm:p-6">
 
       {/* Filters Panel */}
-      <div className="flex flex-col gap-6 w-full lg:w-auto">
+      <div className="flex flex-col gap-4 sm:gap-6 w-full lg:w-auto">
         <FiltersPanel filters={filters} setFilters={setFilters} />
       </div>
 
       {/* Map */}
-      <div className="flex-1 rounded-3xl overflow-hidden glass border-white/20 shadow-2xl h-[80vh]">
+      <div className="flex-1 rounded-2xl sm:rounded-3xl overflow-hidden glass border-white/20 shadow-2xl h-[50vh] sm:h-[60vh] lg:h-[80vh]">
         <RiceMap
           filters={filters}
           layers={layers}
@@ -79,7 +79,7 @@ export default function FieldMap() {
       </div>
 
       {/* Map Layers */}
-      <div className="flex flex-col gap-6 w-full lg:w-auto">
+      <div className="flex flex-col gap-4 sm:gap-6 w-full lg:w-auto">
         <MapLayersPanel
           layers={layers}
           setLayers={setLayers}
