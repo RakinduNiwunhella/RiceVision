@@ -192,18 +192,50 @@ const Header = () => {
 
               {/* Actions */}
               <div className="hidden sm:flex items-center gap-1.5 border-l border-white/10 pl-3">
-                <button
-                  className="h-8 px-2 rounded-lg flex items-center gap-1 text-white/50 hover:text-white hover:bg-white/10 transition"
-                  title="Language"
-                >
-                  <span className="material-symbols-outlined text-[20px]">language</span>
-                  <span className="text-xs font-semibold">EN</span>
-                </button>
+                {/* Language Selector */}
+                <div className="relative" ref={langBtnRef}>
+                  <button
+                    className="h-8 px-2 rounded-lg flex items-center gap-1 text-white/50 hover:text-white hover:bg-white/10 transition"
+                    title="Language"
+                    onClick={() => {
+                      if (langBtnRef.current) {
+                        const rect = langBtnRef.current.getBoundingClientRect()
+                        setLangDropdownPos({ top: rect.bottom + 8, right: window.innerWidth - rect.right })
+                      }
+                      setLangOpen(o => !o)
+                    }}
+                  >
+                    <span className="material-symbols-outlined text-[20px]">language</span>
+                    <span className="text-xs font-semibold">{currentLang.short}</span>
+                  </button>
+                  {langOpen && createPortal(
+                    <div
+                      ref={langRef}
+                      style={{ position: 'fixed', top: langDropdownPos.top, right: langDropdownPos.right, zIndex: 9999 }}
+                      className="bg-[#0f1a12]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl overflow-hidden min-w-[140px]"
+                    >
+                      {LANGUAGES.map((lang) => (
+                        <button
+                          key={lang.code}
+                          onMouseDown={() => { setLanguage(lang.code); setLangOpen(false) }}
+                          className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition hover:bg-white/10 ${
+                            language === lang.code ? 'bg-emerald-500/20 text-white' : 'text-white/60'
+                          }`}
+                        >
+                          <span className="text-xs font-semibold">{lang.short}</span>
+                          <span className="text-xs">{lang.label}</span>
+                        </button>
+                      ))}
+                    </div>,
+                    document.body
+                  )}
+                </div>
                 <button
                   className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition"
                   title="Toggle Dark Mode"
+                  onClick={toggleTheme}
                 >
-                  <span className="material-symbols-outlined text-[20px]">dark_mode</span>
+                  <span className="material-symbols-outlined text-[20px]">{isDark ? 'light_mode' : 'dark_mode'}</span>
                 </button>
                 <NotificationPanelButton />
               </div>
@@ -284,25 +316,43 @@ const Header = () => {
               )
             })}
             {/* Mobile-only actions */}
-            <div className="border-t border-white/10 pt-3 mt-2 flex items-center justify-between">
+            <div className="border-t border-white/10 pt-3 mt-2 flex flex-col gap-3">
+              {/* Language options */}
               <div className="flex items-center gap-2">
-                <button className="h-9 px-3 rounded-lg flex items-center gap-1.5 text-white/50 hover:text-white hover:bg-white/10 transition text-sm">
-                  <span className="material-symbols-outlined text-[18px]">language</span>
-                  EN
-                </button>
-                <button className="w-9 h-9 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition">
-                  <span className="material-symbols-outlined text-[18px]">dark_mode</span>
-                </button>
-                <NotificationPanelButton />
+                {LANGUAGES.map((lang) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => setLanguage(lang.code)}
+                    className={`h-9 px-3 rounded-lg flex items-center gap-1.5 transition text-sm font-semibold ${
+                      language === lang.code
+                        ? 'bg-emerald-500/20 text-white border border-white/20'
+                        : 'text-white/50 hover:text-white hover:bg-white/10'
+                    }`}
+                  >
+                    <span className="material-symbols-outlined text-[18px]">language</span>
+                    {lang.short}
+                  </button>
+                ))}
               </div>
-              <Link
-                to="/profile"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition text-sm font-semibold"
-              >
-                <span className="material-symbols-outlined text-[18px]">person</span>
-                Profile
-              </Link>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <button
+                    className="w-9 h-9 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition"
+                    onClick={toggleTheme}
+                  >
+                    <span className="material-symbols-outlined text-[18px]">{isDark ? 'light_mode' : 'dark_mode'}</span>
+                  </button>
+                  <NotificationPanelButton />
+                </div>
+                <Link
+                  to="/profile"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition text-sm font-semibold"
+                >
+                  <span className="material-symbols-outlined text-[18px]">person</span>
+                  Profile
+                </Link>
+              </div>
             </div>
           </div>
         </div>
