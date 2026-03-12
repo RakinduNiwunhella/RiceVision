@@ -204,7 +204,7 @@ const Header = () => {
             {/* Logo Section */}
             <div className="flex items-center gap-3">
               <Link
-                to="/"
+                to="/dashboard"
                 className="flex items-center gap-3 active:scale-95 transition-transform"
               >
                 <img
@@ -274,7 +274,7 @@ const Header = () => {
                   }}
                   onKeyDown={handleKeyDown}
                   placeholder={t("searchPlaceholder")}
-                  className="w-24 xl:w-36 bg-white/5 border border-white/10 rounded-xl py-1 pl-9 pr-3 text-xs text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:bg-white/10 focus:border-white/20 transition-all shadow-inner"
+                  className="w-24 xl:w-36 bg-white/5 border border-white/10 rounded-xl py-1 pl-9 pr-3 text-xs text-white text-center placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:bg-white/10 focus:border-white/20 transition-all shadow-inner"
                   autoComplete="off"
                 />
                 {showResults &&
