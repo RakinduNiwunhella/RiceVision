@@ -203,7 +203,7 @@ const Header = () => {
               >
                 <span className="material-symbols-outlined text-[20px]">dark_mode</span>
               </button>
-              <NotificationButton />
+              <Notifications />
             </div>
 
             {/* Avatar */}
