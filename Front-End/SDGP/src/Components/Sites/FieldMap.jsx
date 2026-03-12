@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import FiltersPanel from "../Map/FiltersPanel";
 import MapLayersPanel from "../Map/MapLayersPanel";
 import RiceMap from "../Map/RiceMap";
+import { useSearchParams } from "react-router-dom";
 
 /* Normalize health values so they match checkbox labels exactly */
 function normalizeHealth(value) {
@@ -22,6 +23,9 @@ function normalizeHealth(value) {
 export default function FieldMap() {
   const location = useLocation();
   const state = location.state || {};
+  const [searchParams] = useSearchParams();
+  const districtFromURL = searchParams.get("district");
+  const navigate = useNavigate();
 
   /* Used to zoom map to alert location */
   const flyTo = state?.type ? state : null;
@@ -58,12 +62,25 @@ export default function FieldMap() {
       districts: state.district ? [state.district] : prev.districts,
       health: normalizedHealth ? [normalizedHealth] : prev.health,
     }));
-
   }, [state?.district, state?.health]);
+
+  useEffect(() => {
+    if (!districtFromURL) return;
+
+    const formattedDistrict =
+      districtFromURL.charAt(0).toUpperCase() + districtFromURL.slice(1);
+
+    setFilters((prev) => ({
+      ...prev,
+      districts: [formattedDistrict],
+    }));
+
+    // Clear query param after applying filter
+    navigate("/field-map", { replace: true });
+  }, [districtFromURL]);
 
   return (
     <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 min-h-[calc(100vh-4rem)] p-3 sm:p-6">
-
       {/* Filters Panel */}
       <div className="flex flex-col gap-4 sm:gap-6 w-full lg:w-auto">
         <FiltersPanel filters={filters} setFilters={setFilters} />
@@ -71,11 +88,7 @@ export default function FieldMap() {
 
       {/* Map */}
       <div className="flex-1 rounded-2xl sm:rounded-3xl overflow-hidden glass border-white/20 shadow-2xl h-[50vh] sm:h-[60vh] md:h-[65vh] lg:h-[80vh]">
-        <RiceMap
-          filters={filters}
-          layers={layers}
-          flyTo={flyTo}
-        />
+        <RiceMap filters={filters} layers={layers} flyTo={flyTo} />
       </div>
 
       {/* Map Layers */}
@@ -86,7 +99,6 @@ export default function FieldMap() {
           districtSelected={filters.districts.length > 0}
         />
       </div>
-
     </div>
   );
 }
