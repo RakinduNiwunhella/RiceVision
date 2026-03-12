@@ -4,6 +4,7 @@ import { Outlet } from 'react-router-dom'
 import bgImage from '/src/Components/assets/field1.jpg'
 import YieldChatbot from './Components/chatbot/Yieldchatbot'
 import { useTheme } from './context/ThemeContext'
+import ScrollToTop from './Components/ScrollToTop'
 
 const App = () => {
   const { isDark } = useTheme()
@@ -28,6 +29,7 @@ const App = () => {
       {/* Fixed Header */}
       <Header />
 
+      <ScrollToTop />
       <YieldChatbot />
 
       {/* Main content (scrolls) */}
