@@ -15,7 +15,8 @@ export const fetchOutbreaks = () => get("/outbreaks");
 export const fetchNDVITrend = () => get("/ndvi-trend");
 export const fetchDistrictHealth = () => get("/district-health");
 export const fetchStageDistribution = () => get("/stage-distribution");
-export const fetchReportData = (districts, month) => get(`/api/report-data?districts=${districts}&month=${month}`);
+export const fetchReportData = (districts, month) =>
+  get(`/api/report-data?districts=${districts}&month=${month}`);
 
 // Called directly from the browser — Open-Meteo is free, no API key needed
 export const fetchWeather = async () => {
@@ -36,7 +37,12 @@ export const fetchFaqs = () => get("/api/help/faqs");
 /* ------------------ ALERTS ------------------ */
 export const fetchAlerts = () => get("/api/alerts/all");
 
-export const updateAlertStatus = async (id, status, type = "normal", note = null) => {
+export const updateAlertStatus = async (
+  id,
+  status,
+  type = "normal",
+  note = null,
+) => {
   const endpoint =
     type === "pest"
       ? `${API_BASE}/api/alerts/pest/${id}`
@@ -91,7 +97,9 @@ export const fetchMapFields = async ({ districts = [], health = [] }) => {
     throw new Error(result.message || "Map fetch failed");
   }
 
-  console.log(`[API] Backend says count=${result.count}, actual data.length=${result.data.length}`);
+  console.log(
+    `[API] Backend says count=${result.count}, actual data.length=${result.data.length}`,
+  );
 
   return result;
 };
@@ -108,7 +116,8 @@ export const fetchMapOverlay = async ({ type, districts = [] }) => {
   if (!res.ok) throw new Error("Failed to fetch overlay data");
 
   const result = await res.json();
-  if (result.status !== "success") throw new Error(result.message || "Overlay fetch failed");
+  if (result.status !== "success")
+    throw new Error(result.message || "Overlay fetch failed");
 
   return result; // { overlay, vmin, vmax, data }
 };
@@ -117,11 +126,16 @@ export const fetchMapOverlay = async ({ type, districts = [] }) => {
  * Request a GEE XYZ tile URL for Sentinel-1 VV or VH.
  * Returns { tile_url, vmin, vmax } or throws if GEE is not configured.
  */
-export const fetchGEETileUrl = async ({ type, district, startDate, endDate }) => {
+export const fetchGEETileUrl = async ({
+  type,
+  district,
+  startDate,
+  endDate,
+}) => {
   const params = new URLSearchParams({ type });
   if (district) params.set("district", district);
   if (startDate) params.set("start_date", startDate);
-  if (endDate)   params.set("end_date", endDate);
+  if (endDate) params.set("end_date", endDate);
 
   const res = await fetch(`${API_BASE}/map-gee-tiles?${params.toString()}`);
   if (!res.ok) {
