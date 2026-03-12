@@ -28,13 +28,13 @@ export default function Profile() {
   };
 
   return (
-    <div className="w-full px-6 pb-10">
+    <div className="w-full px-2 sm:px-4 md:px-6 pb-6 sm:pb-10">
 
       <div
         ref={containerRef}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        className="w-full max-w-6xl mx-auto glass px-12 pt-10 pb-12 rounded-[3rem] border border-white/10 shadow-2xl overflow-hidden relative"
+        className="w-full max-w-6xl mx-auto glass px-4 sm:px-8 md:px-12 pt-6 sm:pt-8 md:pt-10 pb-6 sm:pb-8 md:pb-12 rounded-2xl sm:rounded-[2rem] md:rounded-[3rem] border border-white/10 shadow-2xl overflow-hidden relative"
       >
         {/* Ambient glow */}
         <div
@@ -54,7 +54,7 @@ export default function Profile() {
             {t('operatorAuth')}
           </p>
 
-          <h1 className="text-4xl font-black text-white tracking-tighter uppercase mb-4">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tighter uppercase mb-3 sm:mb-4">
             {activeTab === "identity" ? t('identityProfile') : t('myPaddyField')}
           </h1>
 
@@ -66,12 +66,12 @@ export default function Profile() {
         </div>
 
         {/* Tab switcher */}
-        <div className="flex gap-2 mb-8 relative">
+        <div className="flex gap-2 mb-6 sm:mb-8 relative overflow-x-auto no-scrollbar">
           {TABS.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-black uppercase tracking-[0.25em] transition-all ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl text-[10px] sm:text-xs font-black uppercase tracking-[0.15em] sm:tracking-[0.25em] transition-all whitespace-nowrap ${
                 activeTab === tab.id
                   ? "bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 shadow-lg shadow-emerald-500/10"
                   : "bg-white/5 border border-white/10 text-white/40 hover:bg-white/10 hover:text-white/70"

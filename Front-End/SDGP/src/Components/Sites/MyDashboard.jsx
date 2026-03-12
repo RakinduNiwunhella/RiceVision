@@ -32,13 +32,13 @@ import YieldChatbot from "../chatbot/Yieldchatbot";
 /* ------------------ Components ------------------ */
 
 const StatWidget = ({ title, value, subtitle, icon }) => (
-  <div className="glass glass-hover p-8 text-center relative overflow-hidden group">
+  <div className="glass glass-hover p-4 sm:p-6 md:p-8 text-center relative overflow-hidden group">
     <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none">
-      <span className="material-symbols-outlined text-6xl">{icon}</span>
+      <span className="material-symbols-outlined text-4xl sm:text-6xl">{icon}</span>
     </div>
-    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-3">{title}</p>
-    <p className="text-5xl font-black text-white tracking-tighter drop-shadow-2xl">{value}</p>
-    {subtitle && <p className="text-[10px] font-bold text-emerald-400/60 mt-3 uppercase tracking-widest">{subtitle}</p>}
+    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-2 sm:mb-3">{title}</p>
+    <p className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tighter drop-shadow-2xl">{value}</p>
+    {subtitle && <p className="text-[10px] font-bold text-emerald-400/60 mt-2 sm:mt-3 uppercase tracking-widest">{subtitle}</p>}
   </div>
 );
 
@@ -135,14 +135,13 @@ const MyDashboard = () => {
   /* ------------------ RENDER ------------------ */
 
   return (
-    <div className="min-h-full p-6 lg:p-10 text-white font-sans transition-all duration-500">
+    <div className="min-h-full p-4 sm:p-6 lg:p-10 text-white font-sans transition-all duration-500">
       <div className="max-w-7xl mx-auto space-y-12 pb-20">
 
         {/* ── Page Header ── */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
-            <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
-              {t('welcomeTitle')}
+            <h1 className="text-xl sm:text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
             </h1>
             <p className="text-white/40 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em]">
               {t('welcomeSubtitle')}
@@ -156,10 +155,10 @@ const MyDashboard = () => {
         </div>
 
         {/* ── Row 1: Stat Widgets ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-10">
 
           {/* Field Health Distribution */}
-          <div className="glass glass-hover p-8 rounded-[3rem] border border-white/10 shadow-2xl flex flex-col items-center">
+          <div className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col items-center">
             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-8 self-start flex items-center gap-2">
               <span className="material-symbols-outlined text-emerald-400 text-sm">radiology</span>
               {t('cropHealthDist')}
@@ -214,13 +213,13 @@ const MyDashboard = () => {
           </div>
 
           {/* Yield Forecast */}
-          <div className="glass glass-hover p-8 rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
+          <div className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-6 flex items-center gap-2">
               <span className="material-symbols-outlined text-cyan-400 text-sm">trending_up</span>
               {t('outputProjection')}
             </p>
             <div className="flex-1 flex flex-col justify-center py-4">
-              <p className="text-6xl font-black text-white tracking-tighter leading-none mb-2" style={{ textShadow: "0 10px 40px rgba(0,0,0,0.5)" }}>
+              <p className="text-4xl sm:text-5xl md:text-6xl font-black text-white tracking-tighter leading-none mb-2" style={{ textShadow: "0 10px 40px rgba(0,0,0,0.5)" }}>
                 {yieldForecast ? formatMT(yieldForecast.total_yield_kgs) : "---"}
               </p>
               <div className="flex items-center gap-2">
@@ -246,14 +245,14 @@ const MyDashboard = () => {
           </div>
 
           {/* Expected Shortfall */}
-          <div className="glass glass-hover p-8 rounded-[3rem] border border-white/10 shadow-2xl flex flex-col justify-between">
+          <div className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col justify-between md:col-span-2 lg:col-span-1">
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-6 flex items-center gap-2">
                 <span className="material-symbols-outlined text-amber-500 text-sm">error</span>
                 Supply Stability
               </p>
               <div className="py-2">
-                <p className="text-5xl font-black text-white tracking-tighter mb-1" style={{ textShadow: "0 10px 40px rgba(0,0,0,0.5)" }}>220K</p>
+                <p className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tighter mb-1" style={{ textShadow: "0 10px 40px rgba(0,0,0,0.5)" }}>220K</p>
                 <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest">{t('expectedShortfall')}</p>
               </div>
             </div>
@@ -275,8 +274,8 @@ const MyDashboard = () => {
         </div>
 
         {/* ── Active Threats Section (Wider) ── */}
-        <div className="glass p-1 rounded-[3rem] border border-white/10 shadow-2xl overflow-hidden">
-          <div className="p-8 border-b border-white/10 flex justify-between items-center">
+        <div className="glass p-1 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl overflow-hidden">
+          <div className="p-4 sm:p-8 border-b border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/40 flex items-center gap-3">
               <span className="material-symbols-outlined text-rose-500">sensors</span>
               {t('diseaseOutbreak')}
@@ -293,7 +292,7 @@ const MyDashboard = () => {
             {(showAllOutbreaks ? outbreaks : outbreaks.slice(0, 5)).map((o) => (
               <div
                 key={o.id}
-                className="group flex justify-between items-center px-6 py-4 rounded-2xl bg-white/5 hover:bg-white/10 transition-all border border-white/5 hover:border-white/20"
+                className="group flex flex-col sm:flex-row justify-between items-start sm:items-center px-4 sm:px-6 py-4 rounded-2xl bg-white/5 hover:bg-white/10 transition-all border border-white/5 hover:border-white/20 gap-3"
               >
                 <div className="flex items-center gap-5">
                   <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -329,10 +328,10 @@ const MyDashboard = () => {
         </div>
 
         {/* ── Analytical Depth Row ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8 pb-12">
 
           {/* Stage Distribution */}
-          <div className="glass glass-hover p-8 rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
+          <div className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-2 flex items-center gap-2">
               <span className="material-symbols-outlined text-purple-400 text-sm">bar_chart</span>
               {t('growthAnalysis')}
@@ -417,7 +416,7 @@ const MyDashboard = () => {
           </div>
 
           {/* Regional Health Overview */}
-          <div className="glass glass-hover p-8 rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
+          <div className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-2 flex items-center gap-2">
               <span className="material-symbols-outlined text-cyan-400 text-sm">map</span>
               District Overview
