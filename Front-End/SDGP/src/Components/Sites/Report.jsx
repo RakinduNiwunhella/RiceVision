@@ -6,6 +6,7 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import autoTable from 'jspdf-autotable';
 import logoImg from '../assets/logo.png';
+import { useLanguage } from "../../context/LanguageContext";
 
 const CustomSelect = ({ value, onChange, options, className = "" }) => {
   const [open, setOpen] = useState(false);
@@ -15,24 +16,29 @@ const CustomSelect = ({ value, onChange, options, className = "" }) => {
 
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) setOpen(false);
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+        setOpen(false);
+      }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
   const handleToggle = () => {
     if (!open && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
+
       setDropdownStyle({
         position: "fixed",
         top: rect.bottom + 4,
         left: rect.left,
         width: rect.width,
-        zIndex: 99999,
+        zIndex: 99999
       });
     }
-    setOpen((o) => !o);
+
+    setOpen(!open);
   };
 
   return (
@@ -41,9 +47,10 @@ const CustomSelect = ({ value, onChange, options, className = "" }) => {
         ref={buttonRef}
         type="button"
         onClick={handleToggle}
-        className="w-full flex justify-between items-center bg-white/5 border border-white/10 text-[10px] px-4 py-3 rounded-xl font-bold text-white outline-none hover:bg-white/10 transition-all"
+        className="w-full flex justify-between items-center bg-white/5 border border-white/10 text-[10px] px-4 py-3 rounded-xl font-bold text-white outline-none hover:bg-white/10 transition-all cursor-pointer"
       >
         <span>{value}</span>
+
         <span
           className="material-symbols-outlined text-sm text-white/40 transition-transform duration-200"
           style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)" }}
@@ -51,40 +58,53 @@ const CustomSelect = ({ value, onChange, options, className = "" }) => {
           expand_more
         </span>
       </button>
-      {open && ReactDOM.createPortal(
-        <div
-          style={{
-            ...dropdownStyle,
-            background: "rgba(10, 22, 14, 0.95)",
-            backdropFilter: "blur(24px)",
-            WebkitBackdropFilter: "blur(24px)",
-          }}
-          className="max-h-52 overflow-y-auto rounded-xl border border-white/20 shadow-2xl"
-        >
-          {options.map((opt) => (
-            <button
-              key={opt}
-              type="button"
-              onClick={() => { onChange(opt); setOpen(false); }}
-              className={`w-full text-left px-4 py-2.5 text-[10px] font-bold flex items-center gap-2 transition-all ${
-                value === opt
-                  ? "text-emerald-400 bg-emerald-500/20"
-                  : "text-white hover:bg-white/20 hover:text-white"
-              }`}
-            >
-              <span className="material-symbols-outlined text-xs" style={{ visibility: value === opt ? "visible" : "hidden" }}>check</span>
-              {opt}
-            </button>
-          ))}
-        </div>,
-        document.body
-      )}
+
+      {open &&
+        ReactDOM.createPortal(
+          <div
+            style={{
+              ...dropdownStyle,
+              background: "rgba(10,22,14,0.95)",
+              backdropFilter: "blur(24px)"
+            }}
+            className="max-h-52 overflow-y-auto rounded-xl border border-white/20 shadow-2xl pointer-events-auto"
+          >
+            {options.map((opt) => (
+              <button
+                key={opt}
+                type="button"
+                onClick={() => {
+                  onChange(opt);
+                  setOpen(false);
+                }}
+                className={`w-full text-left px-4 py-2.5 text-[10px] font-bold flex items-center gap-2 transition-all ${
+                  value === opt
+                    ? "text-emerald-400 bg-emerald-500/20"
+                    : "text-white hover:bg-white/20"
+                }`}
+              >
+                <span
+                  className="material-symbols-outlined text-xs"
+                  style={{
+                    visibility: value === opt ? "visible" : "hidden"
+                  }}
+                >
+                  check
+                </span>
+
+                {opt}
+              </button>
+            ))}
+          </div>,
+          document.body
+        )}
     </div>
   );
 };
 
 const Report = () => {
   const location = useLocation();
+  const { t } = useLanguage();
   const selectedDistrict = location.state?.district;
   const districts = ["Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle", "Gampaha", "Hambantota", "Jaffna", "Kalutara", "Kandy", "Kegalle", "Kilinochchi", "Kurunegala", "Mannar", "Matale", "Matara", "Monaragala", "Mullaitivu", "Nuwara Eliya", "Polonnaruwa", "Puttalam", "Ratnapura", "Trincomalee", "Vavuniya"];
 
@@ -483,6 +503,268 @@ const Report = () => {
     doc.save(`RiceVision_${config.district}_${config.season}_${config.date}.pdf`);
   };
 
+  const generateComparisonPDF = async () => {
+
+  const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+
+  const PW = 210;
+  const PH = 297;
+  const M = 14;
+
+  const WHITE  = [255,255,255];
+  const OFFWH  = [248,250,252];
+  const GREEN  = [16,185,129];
+  const DARK   = [30,41,59];
+  const INK    = [15,23,42];
+  const SUBTEXT= [71,85,105];
+  const MUTED  = [148,163,184];
+  const LGRAY  = [241,245,249];
+  const BORDER = [226,232,240];
+
+  doc.setFillColor(...WHITE);
+  doc.rect(0,0,PW,PH,"F");
+
+  /* ---------------- HEADER ---------------- */
+
+  doc.setFillColor(...WHITE);
+  doc.rect(0,0,PW,40,"F");
+
+  doc.setFillColor(0,100,50);
+  doc.rect(0,40,PW,2,"F");
+
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(13);
+  doc.setTextColor(...INK);
+
+  doc.text("DISTRICT YIELD COMPARISON REPORT", PW/2, 16, {align:"center"});
+
+  doc.setFontSize(9);
+
+  doc.text(
+    `Generated ${new Date().toLocaleDateString("en-GB",{day:"2-digit",month:"long",year:"numeric"})}`,
+    PW/2,
+    26,
+    {align:"center"}
+  );
+
+  doc.text(
+    `Satellite Data ${configA.date}`,
+    PW/2,
+    36,
+    {align:"center"}
+  );
+
+  /* ---------------- DISTRICT TITLE ROW ---------------- */
+
+  doc.setFillColor(...OFFWH);
+  doc.rect(0,42,PW,20,"F");
+
+  doc.setDrawColor(...BORDER);
+  doc.line(0,62,PW,62);
+
+  doc.setFontSize(12);
+  doc.setTextColor(...INK);
+
+  doc.text(`${configA.district}  vs  ${configB.district}`, M, 53);
+
+  doc.setFontSize(7);
+  doc.setTextColor(...SUBTEXT);
+
+  doc.text("Sri Lanka · Comparative Yield Analytics", M, 59);
+
+  /* ---------------- SUMMARY CARDS ---------------- */
+
+  let y = 72;
+
+  const cardW = (PW - M*2 - 5)/2;
+  const cardH = 26;
+
+  const drawCard = (x,label,valA,valB) => {
+
+    doc.setFillColor(...OFFWH);
+    doc.roundedRect(x,y,cardW,cardH,3,3,"F");
+
+    doc.setFillColor(...GREEN);
+    doc.roundedRect(x,y,3,cardH,2,2,"F");
+
+    doc.setFontSize(6.5);
+    doc.setTextColor(...MUTED);
+    doc.text(label,x+7,y+7);
+
+    doc.setFontSize(11);
+    doc.setTextColor(...INK);
+
+    doc.text(`${valA}`,x+7,y+15);
+    doc.text(`${valB}`,x+cardW/2+7,y+15);
+
+    doc.setFontSize(6);
+    doc.setTextColor(...SUBTEXT);
+
+    doc.text(configA.district,x+7,y+21);
+    doc.text(configB.district,x+cardW/2+7,y+21);
+
+  };
+
+  drawCard(
+    M,
+    "Predicted Yield (kg/ha)",
+    Math.round(dataA.summary.yield).toLocaleString(),
+    Math.round(dataB.summary.yield).toLocaleString()
+  );
+
+  drawCard(
+    M + cardW + 5,
+    "Historical Yield (kg/ha)",
+    Math.round(dataA.summary.historical).toLocaleString(),
+    Math.round(dataB.summary.historical).toLocaleString()
+  );
+
+  y += cardH + 5;
+
+  drawCard(
+    M,
+    "Total Production (MT)",
+    Math.round(dataA.summary.total_kg/1000).toLocaleString(),
+    Math.round(dataB.summary.total_kg/1000).toLocaleString()
+  );
+
+  drawCard(
+    M + cardW + 5,
+    "Risk Score",
+    dataA.metrics.risk_score.toFixed(2),
+    dataB.metrics.risk_score.toFixed(2)
+  );
+
+  y += cardH + 10;
+
+  /* ---------------- COMPARISON TABLE ---------------- */
+
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(8);
+  doc.setTextColor(...GREEN);
+
+  doc.text("PERFORMANCE COMPARISON", M, y);
+
+  doc.setDrawColor(...GREEN);
+  doc.line(M,y+1.5,PW-M,y+1.5);
+
+  y += 6;
+
+  autoTable(doc,{
+    startY:y,
+    margin:{left:M,right:M},
+    head:[
+      ["Metric",configA.district,configB.district]
+    ],
+    body:[
+      [
+        "Predicted Yield (kg/ha)",
+        Math.round(dataA.summary.yield).toLocaleString(),
+        Math.round(dataB.summary.yield).toLocaleString()
+      ],
+      [
+        "Historical Yield (kg/ha)",
+        Math.round(dataA.summary.historical).toLocaleString(),
+        Math.round(dataB.summary.historical).toLocaleString()
+      ],
+      [
+        "Total Production (kg)",
+        Math.round(dataA.summary.total_kg).toLocaleString(),
+        Math.round(dataB.summary.total_kg).toLocaleString()
+      ],
+      [
+        "Pest Incidents",
+        dataA.metrics.pest_count,
+        dataB.metrics.pest_count
+      ],
+      [
+        "Risk Score",
+        dataA.metrics.risk_score.toFixed(2),
+        dataB.metrics.risk_score.toFixed(2)
+      ],
+      [
+        "Severe Stress %",
+        dataA.metrics.stress_pct.toFixed(2)+"%",
+        dataB.metrics.stress_pct.toFixed(2)+"%"
+      ]
+    ],
+    theme:"grid",
+    headStyles:{
+      fillColor:GREEN,
+      textColor:WHITE,
+      fontSize:7.5,
+      fontStyle:"bold"
+    },
+    styles:{
+      fontSize:7.5,
+      cellPadding:3
+    },
+    alternateRowStyles:{fillColor:LGRAY},
+    tableLineColor:BORDER,
+    tableLineWidth:0.2
+  });
+
+  y = doc.lastAutoTable.finalY + 12;
+
+  /* ---------------- WINNER INSIGHT ---------------- */
+
+  const diff = dataA.summary.yield - dataB.summary.yield;
+
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(8);
+  doc.setTextColor(...GREEN);
+
+  doc.text("KEY INSIGHT",M,y);
+
+  doc.line(M,y+1.5,PW-M,y+1.5);
+
+  y += 8;
+
+  doc.setFont("helvetica","normal");
+  doc.setFontSize(9);
+  doc.setTextColor(...INK);
+
+  const winner =
+    diff > 0 ? configA.district : configB.district;
+
+  doc.text(
+    `${winner} shows higher predicted yield by ${Math.abs(Math.round(diff))} kg/ha.`,
+    M,
+    y
+  );
+
+  /* ---------------- FOOTER ---------------- */
+
+  const totalPages = doc.getNumberOfPages();
+
+  for(let p=1;p<=totalPages;p++){
+
+    doc.setPage(p);
+
+    doc.setDrawColor(...BORDER);
+    doc.line(M,PH-13,PW-M,PH-13);
+
+    doc.setFontSize(6.5);
+    doc.setTextColor(...MUTED);
+
+    doc.text(
+      "RiceVision Analytics | Agricultural Intelligence Platform | Confidential",
+      M,
+      PH-7
+    );
+
+    doc.text(
+      `Page ${p} of ${totalPages}`,
+      PW-M,
+      PH-7,
+      {align:"right"}
+    );
+
+  }
+
+  doc.save(`RiceVision_Comparison_${configA.district}_vs_${configB.district}.pdf`);
+
+};
   const getPestStatus = (count) => {
     if (count === 0) return { label: "SAFE", color: "text-emerald-400" };
     if (count < 20) return { label: "MODERATE", color: "text-amber-400" };
@@ -523,8 +805,8 @@ const Report = () => {
     ];
 
     return (
-      <div className="flex-1 glass glass-hover rounded-[3rem] p-8 border border-white/10 shadow-2xl">
-        {/* Pane header */}
+<div className="flex-1 glass glass-hover rounded-[3rem] p-8 border border-white/10 shadow-2xl relative">        
+{/* Pane header */}
         <div className="grid grid-cols-2 gap-3 mb-6">
           <div className="col-span-2 flex justify-between items-center mb-2">
             <span className="text-[10px] font-black text-emerald-400 tracking-[0.2em] uppercase flex items-center gap-2">
@@ -533,8 +815,7 @@ const Report = () => {
             </span>
             <button
               onClick={() => generatePDF(report, config)}
-              className="flex items-center gap-2 text-[10px] font-black glass hover:bg-white/10 px-4 py-1.5 rounded-xl border border-white/10 transition-all uppercase tracking-widest"
-            >
+className="flex items-center gap-2 text-[10px] font-black px-4 py-1.5 rounded-xl border border-white/10 transition-all duration-300 hover:bg-white/10 hover:border-white/20 hover:scale-[1.02] cursor-pointer uppercase tracking-widest"            >
               <span className="material-symbols-outlined text-xs">download</span>
               Export PDF
             </button>
@@ -636,10 +917,10 @@ const Report = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
             <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
-              Yield Reports
+              {t('yieldReports')}
             </h1>
             <p className="text-white/40 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em]">
-              Satellite-derived analytics & district yield forecasts
+              {t('satelliteDerivedAnalytics')}
             </p>
           </div>
 
@@ -650,18 +931,18 @@ const Report = () => {
                 onClick={() => setMode("single")}
                 className={`px-6 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${mode === "single" ? "glass bg-white/15 text-white shadow-lg border-white/20" : "text-white/40 hover:text-white/70"}`}
               >
-                Single
+                {t('single')}
               </button>
               <button
                 onClick={() => setMode("compare")}
                 className={`px-6 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${mode === "compare" ? "glass bg-white/15 text-white shadow-lg border-white/20" : "text-white/40 hover:text-white/70"}`}
               >
-                Compare
+                {t('compare')}
               </button>
             </div>
             <div className="glass px-4 py-2 rounded-xl border-white/10 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-white/60">Live Data</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-white/60">{t('liveData')}</span>
             </div>
           </div>
         </div>
@@ -673,7 +954,19 @@ const Report = () => {
         </div>
 
       </div>
+      {mode === "compare" && dataA && dataB && (
+  <div className="flex justify-center mt-6">
+    <button
+      onClick={() => generateComparisonPDF()}
+      className="flex items-center gap-2 text-[11px] font-black px-6 py-3 rounded-2xl border border-white/10 transition-all duration-300 hover:bg-white/10 hover:border-white/20 hover:scale-[1.02] cursor-pointer uppercase tracking-widest"
+    >
+      <span className="material-symbols-outlined text-sm">compare</span>
+      Export Comparison Report
+    </button>
+  </div>
+)}
     </div>
+    
   );
 };
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { getDSDivision } from "../../utils/geoUtils";
+import { useLanguage } from "../../context/LanguageContext";
 
 // ─────────────────────────────────────────────
 // All 25 Sri Lankan Districts + coordinates
@@ -150,6 +151,7 @@ function SectionHeading({ children }) {
 // Main Component
 // ─────────────────────────────────────────────
 export default function RiceVisionWeather() {
+  const { t } = useLanguage();
   const [district, setDistrict] = useState(null);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -227,7 +229,7 @@ export default function RiceVisionWeather() {
       <div className="flex flex-col h-[80vh] items-center justify-center gap-5">
         <div className="w-14 h-14 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
         <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 animate-pulse">
-          {geoStatus === "locating" ? "Detecting Your Location..." : "Loading Weather Data..."}
+          {geoStatus === "locating" ? t('detectingLocation') : t('loadingWeatherData')}
         </p>
       </div>
     );
@@ -239,7 +241,7 @@ export default function RiceVisionWeather() {
         <span className="text-5xl">⚠️</span>
         <p className="text-red-400 font-bold text-sm">{error}</p>
         <button onClick={load} className="px-6 py-2 glass rounded-xl text-emerald-400 text-xs font-black uppercase tracking-widest hover:bg-white/10 transition-all">
-          Retry
+          {t('retry')}
         </button>
       </div>
     );
@@ -273,11 +275,11 @@ export default function RiceVisionWeather() {
   const dewPoint = h.dew_point_2m[nowIdx]?.toFixed(1);
 
   const tabs = [
-    { id: "overview", label: "Overview" },
-    { id: "hourly", label: "24-Hour" },
-    { id: "soil", label: "Soil & Agro" },
-    { id: "forecast", label: "14-Day" },
-    { id: "history", label: "History" },
+    { id: "overview", labelKey: "tabOverview" },
+    { id: "hourly", labelKey: "tab24Hour" },
+    { id: "soil", labelKey: "tabSoilAgro" },
+    { id: "forecast", labelKey: "tab14Day" },
+    { id: "history", labelKey: "tabHistory" },
   ];
 
   return (
@@ -291,7 +293,7 @@ export default function RiceVisionWeather() {
             {/* System label */}
             <p className="text-[10px] font-black uppercase tracking-[0.45em] text-emerald-400 mb-2 flex items-center gap-2">
               <span className="material-symbols-outlined text-sm">partly_cloudy_day</span>
-              Paddy Field Weather Intelligence
+              {t('paddyWeatherIntelligence')}
             </p>
 
             {/* Main Location */}
@@ -325,7 +327,7 @@ export default function RiceVisionWeather() {
               className="glass px-4 py-2.5 rounded-2xl border border-white/10 text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-emerald-400 hover:border-emerald-500/30 transition-all flex items-center gap-2"
             >
               <span className="material-symbols-outlined text-sm">my_location</span>
-              {geoStatus === "locating" ? "Locating..." : "Locate Me"}
+              {geoStatus === "locating" ? t('locating') : t('locateMe')}
             </button>
 
             <div className="relative" ref={dropdownRef}>
@@ -408,7 +410,7 @@ export default function RiceVisionWeather() {
                 : "text-white/40 hover:text-white/70"
                 }`}
             >
-              {tab.label}
+              {t(tab.labelKey)}
             </button>
           ))}
         </div>
@@ -416,32 +418,32 @@ export default function RiceVisionWeather() {
         {/* ════ OVERVIEW ════ */}
         {activeTab === "overview" && (
           <div className="space-y-8">
-            <SectionHeading>Atmospheric Conditions</SectionHeading>
+            <SectionHeading>{t('atmospheric')}</SectionHeading>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-              <StatCard label="Temperature" value={`${Math.round(c.temperature_2m)}°C`} accent="amber" icon="🌡️" sub={`Feels ${Math.round(c.apparent_temperature)}°C`} />
-              <StatCard label="Humidity" value={`${c.relative_humidity_2m}%`} accent="blue" icon="💧" sub={c.relative_humidity_2m > 85 ? "⚠️ Fungal risk" : "Normal"} />
-              <StatCard label="Dew Point" value={`${dewPoint}°C`} accent="cyan" icon="🌫️" sub="Moisture saturation threshold" />
-              <StatCard label="Cloud Cover" value={`${c.cloud_cover}%`} accent="sky" icon="☁️" sub={c.cloud_cover > 70 ? "Poor sunlight" : "Good for crops"} />
-              <StatCard label="Pressure" value={c.pressure_msl?.toFixed(0)} unit="hPa" accent="violet" icon="🔵" sub="Mean sea level" />
-              <StatCard label="Wind Speed" value={c.wind_speed_10m} unit="km/h" accent="cyan" icon="💨" sub={`${windDir(c.wind_direction_10m)} · ${c.wind_speed_10m > 15 ? "⚠️ Avoid spraying" : "Safe for spraying"}`} />
-              <StatCard label="Wind Gusts" value={c.wind_gusts_10m} unit="km/h" accent="rose" icon="🌪️" sub={c.wind_gusts_10m > 25 ? "⚠️ High gusts" : "Safe"} />
-              <StatCard label="Precipitation" value={c.precipitation} unit="mm" accent="blue" icon="🌧️" sub="Current hour" />
-              <StatCard label="UV Index" value={uvNow} accent="amber" icon="☀️" sub={uvNow >= 8 ? "⚠️ Very high" : uvNow >= 5 ? "Moderate" : "Low"} />
-              <StatCard label="Visibility" value={visibility != null ? (visibility / 1000).toFixed(1) : "—"} unit="km" accent="sky" icon="👁️" sub={visibility < 1000 ? "⚠️ Poor" : "Good"} />
+              <StatCard label={t('temperature')} value={`${Math.round(c.temperature_2m)}°C`} accent="amber" icon="🌡️" sub={`Feels ${Math.round(c.apparent_temperature)}°C`} />
+              <StatCard label={t('humidity')} value={`${c.relative_humidity_2m}%`} accent="blue" icon="💧" sub={c.relative_humidity_2m > 85 ? "⚠️ Fungal risk" : "Normal"} />
+              <StatCard label={t('dewpoint')} value={`${dewPoint}°C`} accent="cyan" icon="🌫️" sub="Moisture saturation threshold" />
+              <StatCard label={t('cloudCover')} value={`${c.cloud_cover}%`} accent="sky" icon="☁️" sub={c.cloud_cover > 70 ? "Poor sunlight" : "Good for crops"} />
+              <StatCard label={t('pressure')} value={c.pressure_msl?.toFixed(0)} unit="hPa" accent="violet" icon="🔵" sub="Mean sea level" />
+              <StatCard label={t('windSpeed')} value={c.wind_speed_10m} unit="km/h" accent="cyan" icon="💨" sub={`${windDir(c.wind_direction_10m)} · ${c.wind_speed_10m > 15 ? "⚠️ Avoid spraying" : "Safe for spraying"}`} />
+              <StatCard label={t('windGusts')} value={c.wind_gusts_10m} unit="km/h" accent="rose" icon="🌪️" sub={c.wind_gusts_10m > 25 ? "⚠️ High gusts" : "Safe"} />
+              <StatCard label={t('precipitation')} value={c.precipitation} unit="mm" accent="blue" icon="🌧️" sub="Current hour" />
+              <StatCard label={t('uvIndex')} value={uvNow} accent="amber" icon="☀️" sub={uvNow >= 8 ? "⚠️ Very high" : uvNow >= 5 ? "Moderate" : "Low"} />
+              <StatCard label={t('visibility')} value={visibility != null ? (visibility / 1000).toFixed(1) : "—"} unit="km" accent="sky" icon="👁️" sub={visibility < 1000 ? "⚠️ Poor" : "Good"} />
             </div>
 
-            <SectionHeading>Today's Field Summary</SectionHeading>
+            <SectionHeading>{t('todayFieldSummary')}</SectionHeading>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-              <StatCard label="Max Temp" value={`${Math.round(d.temperature_2m_max[todayI])}°C`} accent="amber" icon="🔥" />
-              <StatCard label="Min Temp" value={`${Math.round(d.temperature_2m_min[todayI])}°C`} accent="sky" icon="❄️" />
-              <StatCard label="UV Index Max" value={d.uv_index_max[todayI]} accent="amber" icon="🌞" />
-              <StatCard label="Daylight Rain" value={`${d.precipitation_hours[todayI]}h`} accent="blue" icon="⏱️" sub="Hours with rain" />
-              <StatCard label="Solar Radiation" value={radToday} unit="MJ/m²" accent="orange" icon="⚡" sub="Today total" />
-              <StatCard label="Evapotranspiration" value={et0Today} unit="mm" accent="emerald" icon="🌿" sub="ET₀ — irrigation guide" />
-              <StatCard label="Vapour Pressure Def." value={vpd} unit="kPa" accent="violet" icon="💨" sub={vpd > 2 ? "⚠️ Crop stress" : "Normal"} />
-              <StatCard label="Wind Max Today" value={d.wind_speed_10m_max[todayI]} unit="km/h" accent="cyan" icon="🌬️" />
-              <StatCard label="Rain Sum" value={d.rain_sum[todayI]?.toFixed(1)} unit="mm" accent="blue" icon="🌧️" sub="Total rain today" />
-              <StatCard label="Rain Probability" value={`${d.precipitation_probability_max[todayI]}%`} accent="blue" icon="🎲" sub="Max chance today" />
+              <StatCard label={t('maxTemp')} value={`${Math.round(d.temperature_2m_max[todayI])}°C`} accent="amber" icon="🔥" />
+              <StatCard label={t('minTemp')} value={`${Math.round(d.temperature_2m_min[todayI])}°C`} accent="sky" icon="❄️" />
+              <StatCard label={t('uvIndexMax')} value={d.uv_index_max[todayI]} accent="amber" icon="🌞" />
+              <StatCard label={t('daylightRain')} value={`${d.precipitation_hours[todayI]}h`} accent="blue" icon="⏱️" sub="Hours with rain" />
+              <StatCard label={t('solarRadiation')} value={radToday} unit="MJ/m²" accent="orange" icon="⚡" sub="Today total" />
+              <StatCard label={t('evapotranspiration')} value={et0Today} unit="mm" accent="emerald" icon="🌿" sub="ET₀ — irrigation guide" />
+              <StatCard label={t('vapourPressureDef')} value={vpd} unit="kPa" accent="violet" icon="💨" sub={vpd > 2 ? "⚠️ Crop stress" : "Normal"} />
+              <StatCard label={t('windMaxToday')} value={d.wind_speed_10m_max[todayI]} unit="km/h" accent="cyan" icon="🌬️" />
+              <StatCard label={t('rainSum')} value={d.rain_sum[todayI]?.toFixed(1)} unit="mm" accent="blue" icon="🌧️" sub="Total rain today" />
+              <StatCard label={t('rainProbability')} value={`${d.precipitation_probability_max[todayI]}%`} accent="blue" icon="🎲" sub="Max chance today" />
             </div>
           </div>
         )}
@@ -450,7 +452,7 @@ export default function RiceVisionWeather() {
         {activeTab === "hourly" && (
           <div className="space-y-6">
 
-            <SectionHeading>Next 24 Hours</SectionHeading>
+            <SectionHeading>{t('next24Hours')}</SectionHeading>
 
             <div className="overflow-x-auto pb-2">
               <div className="flex gap-3 min-w-max">
@@ -984,8 +986,7 @@ export default function RiceVisionWeather() {
           </div>
         )}
 
-        <footer className="text-center text-[9px] text-white/20 font-bold uppercase tracking-widest py-6 border-t border-white/5">
-          Data sourced from Open-Meteo · Free & No API Key · Updates every 15 min · {district?.name} · {district?.lat}°N {district?.lon}°E
+        <footer className="hidden">
         </footer>
       </div>
     </div>

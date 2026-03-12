@@ -126,7 +126,7 @@ const Header = () => {
                   <Link
                     key={item.label}
                     to={item.path}
-                    className={`flex items-center gap-1 lg:gap-1.5 px-2 lg:px-3 py-1.5 rounded-lg text-[10px] lg:text-[11px] font-semibold tracking-wide transition-all duration-300 ${isActive
+                    className={`flex items-center gap-1 lg:gap-1.5 px-2 lg:px-3 py-1.5 rounded-lg text-[10px] lg:text-[11px] font-semibold tracking-wide whitespace-nowrap transition-all duration-300 ${isActive
                       ? "bg-white/15 text-white shadow-xl shadow-black/5 border border-white/20"
                       : "text-white/50 hover:text-white hover:bg-white/10"
                       }`}
@@ -157,7 +157,7 @@ const Header = () => {
                 onFocus={() => { if (searchQuery) { updateDropdownPos(); setShowResults(true) } }}
                 onKeyDown={handleKeyDown}
                 placeholder={t('searchPlaceholder')}
-                className="w-32 xl:w-44 bg-white/5 border border-white/10 rounded-xl py-1 pl-9 pr-3 text-xs text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:bg-white/10 focus:border-white/20 transition-all shadow-inner"
+                className="w-24 xl:w-36 bg-white/5 border border-white/10 rounded-xl py-1 pl-9 pr-3 text-xs text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:bg-white/10 focus:border-white/20 transition-all shadow-inner"
                 autoComplete="off"
               />
               {showResults && (filteredResults.length > 0 || searchQuery) && createPortal(
@@ -190,67 +190,20 @@ const Header = () => {
 
             {/* Actions */}
             <div className="flex items-center gap-1.5 border-l border-white/10 pl-3">
-
-              {/* Language Selector */}
-              <div ref={langRef}>
-                <button
-                  ref={langBtnRef}
-                  onClick={() => {
-                    if (!langOpen && langBtnRef.current) {
-                      const rect = langBtnRef.current.getBoundingClientRect()
-                      setLangDropdownPos({ top: rect.bottom + 8, right: window.innerWidth - rect.right })
-                    }
-                    setLangOpen(prev => !prev)
-                  }}
-                  className="h-8 px-2 rounded-lg flex items-center gap-1 text-white/50 hover:text-white hover:bg-white/10 transition text-[11px] font-semibold"
-                  title="Change Language"
-                >
-                  <span className="material-symbols-outlined text-[16px]">language</span>
-                  <span>{currentLang.short}</span>
-                </button>
-                {langOpen && createPortal(
-                  <div
-                    style={{ position: 'fixed', top: langDropdownPos.top, right: langDropdownPos.right, zIndex: 9999, minWidth: 130 }}
-                    className="bg-[#0f1a12]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl overflow-hidden"
-                  >
-                    {LANGUAGES.map(lang => (
-                      <button
-                        key={lang.code}
-                        onMouseDown={() => { setLanguage(lang.code); setLangOpen(false) }}
-                        className={`w-full flex items-center gap-2 px-4 py-2.5 text-left text-xs transition ${
-                          language === lang.code
-                            ? 'bg-emerald-500/20 text-emerald-300 font-semibold'
-                            : 'text-white/70 hover:bg-white/5 hover:text-white'
-                        }`}
-                      >
-                        {lang.label}
-                      </button>
-                    ))}
-                  </div>,
-                  document.body
-                )}
-              </div>
-
-              {/* Dark mode toggle */}
               <button
-                onClick={toggleTheme}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition"
-                title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                className="h-8 px-2 rounded-lg flex items-center gap-1 text-white/50 hover:text-white hover:bg-white/10 transition"
+                title="Language"
               >
-                <span className="material-symbols-outlined text-[20px]">
-                  {isDark ? 'light_mode' : 'dark_mode'}
-                </span>
+                <span className="material-symbols-outlined text-[20px]">language</span>
+                <span className="text-xs font-semibold">EN</span>
               </button>
-
-              <Link
-                to="/alerts"
+              <button
                 className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition"
-                title="Notifications"
+                title="Toggle Dark Mode"
               >
-                <span className="material-symbols-outlined text-[20px]">
-                  notifications
-                </span>
-              </Link>
+                <span className="material-symbols-outlined text-[20px]">dark_mode</span>
+              </button>
+              <Notifications />
             </div>
 
             {/* Avatar */}
@@ -272,58 +225,58 @@ const Header = () => {
 
 
 // notification-specific button component so header stays clean
-function NotificationButton() {
+function NotificationPanelButton() {
   const [show, setShow] = useState(false);
   const [unread, setUnread] = useState(0);
   const [coords, setCoords] = useState({ top: 0, right: 0 });
   const [maxHeight, setMaxHeight] = useState(0);
-  const buttonRef = useRef(null);
 
-  // directly query supabase for unread count from notificationpanel table
+  const buttonRef = useRef(null);
+  const wrapperRef = useRef(null);
+
   const fetchCount = async () => {
     try {
-      const { data, error } = await supabase
+      const { count, error } = await supabase
         .from("notificationpanel")
-        .select("id", { count: 'exact', head: true })
+        .select("*", { count: "exact", head: true })
         .eq("is_read", false);
+
       if (error) throw error;
-      // supabase returns count via data.length when head=true so use it
-      setUnread(data?.length || 0);
+      setUnread(count || 0);
     } catch (e) {
       console.error("failed to get notifications count", e);
     }
   };
 
   useEffect(() => {
-    // fetch unread count when component mounts or panel visibility changes
     fetchCount();
   }, [show]);
 
-  const handleRead = (id) => {
-    // decrement badge and refresh from server to stay accurate
-    setUnread((u) => Math.max(0, u - 1));
+  const handleRead = () => {
     fetchCount();
   };
 
-  // close when clicking outside
-  const wrapperRef = React.useRef(null);
   useEffect(() => {
     function handleClick(e) {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
         setShow(false);
       }
     }
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
+
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  // recalc coords and available height when button toggles
   useEffect(() => {
     if (show && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
       const top = rect.bottom + 8;
-      setCoords({ top, right: window.innerWidth - rect.right });
-      // available space below the button (with some margin)
+
+      setCoords({
+        top,
+        right: window.innerWidth - rect.right,
+      });
+
       setMaxHeight(window.innerHeight - top - 16);
     }
   }, [show]);
@@ -332,13 +285,13 @@ function NotificationButton() {
     <Notifications
       onRead={handleRead}
       style={{
-        position: 'fixed',
+        position: "fixed",
         top: coords.top,
         right: coords.right,
         zIndex: 9999,
-        width: '20rem',
-        maxHeight: maxHeight > 0 ? maxHeight : '24rem',
-        overflowY: 'auto',
+        width: "20rem",
+        maxHeight: maxHeight > 0 ? maxHeight : "24rem",
+        overflowY: "auto",
       }}
     />
   );
@@ -354,12 +307,14 @@ function NotificationButton() {
         <span className="material-symbols-outlined text-[20px]">
           notifications
         </span>
+
         {unread > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-500 text-[10px] text-white rounded-full w-4 h-4 flex items-center justify-center">
             {unread}
           </span>
         )}
       </button>
+
       {show && createPortal(panel, document.body)}
     </div>
   );
