@@ -103,7 +103,7 @@ export default function LoginPage() {
       </button>
 
       {/* Left Side: Form Container */}
-      <div className="flex flex-col w-full px-8 pt-3 pb-6 lg:w-1/2 md:px-24 lg:px-32 z-10">
+      <div className="flex flex-col w-full px-5 sm:px-8 pt-3 pb-6 md:w-3/4 lg:w-1/2 md:px-12 lg:px-20 z-10 mx-auto md:mx-0">
         <div className="w-full max-w-md mx-auto">
           {/* Logo */}
           <div className="flex items-center mb-0 space-x-3">
@@ -111,12 +111,12 @@ export default function LoginPage() {
               <img
                 src="/logoSDGP.webp"
                 alt="SDGP Logo"
-                className="h-18 w-auto"
+                className="h-12 sm:h-16 md:h-18 w-auto"
               />
             </div>
           </div>
 
-          <h2 className="text-4xl font-extrabold mb-3 tracking-tight">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold mb-3 tracking-tight">
             {t('welcomeBack')}
           </h2>
           <p className="text-slate-500 dark:text-slate-400 mb-6">
@@ -134,7 +134,7 @@ export default function LoginPage() {
                 required
                 placeholder="name@company.com"
                 value={email}
-                className="w-full px-4 py-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                className="w-full px-4 py-2.5 sm:py-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                 onChange={(e) => {
                   setEmail(e.target.value);
                   if (errorMessage) setErrorMessage("");
@@ -154,7 +154,7 @@ export default function LoginPage() {
                   required
                   placeholder="••••••••"
                   value={password}
-                  className="w-full px-4 py-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                  className="w-full px-4 py-2.5 sm:py-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                   onChange={(e) => {
                     setPassword(e.target.value);
                     if (errorMessage) setErrorMessage("");
@@ -209,7 +209,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 px-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-xl shadow-indigo-500/20 transition-all active:scale-[0.97] disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full py-3 sm:py-4 px-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-xl shadow-indigo-500/20 transition-all active:scale-[0.97] disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
@@ -275,7 +275,7 @@ export default function LoginPage() {
       </div>
 
       {/* Right Side: Visuals */}
-      <div className="hidden lg:block lg:w-1/2 relative">
+      <div className="hidden md:block md:w-1/4 lg:w-1/2 relative">
         <img
           src="/paddy_signin.png"
           alt="Rice Field"

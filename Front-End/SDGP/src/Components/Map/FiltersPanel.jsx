@@ -37,7 +37,7 @@ export default function FiltersPanel({ filters, setFilters }) {
 
 
   return (
-    <div className="w-full lg:w-80 glass p-6 overflow-y-auto max-h-[calc(100vh-6rem)] shadow-xl">
+    <div className="w-full md:w-80 lg:w-80 glass p-4 sm:p-6 overflow-y-auto max-h-[50vh] sm:max-h-[60vh] lg:max-h-[calc(100vh-6rem)] shadow-xl">
       <div className="flex items-center justify-between mb-6">
   <h2 className="text-sm font-bold uppercase tracking-widest text-white/50">
     Filters

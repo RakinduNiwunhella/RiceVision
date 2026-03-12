@@ -31,7 +31,7 @@ const App = () => {
       <YieldChatbot />
 
       {/* Main content (scrolls) */}
-      <main className="relative z-10 pt-[72px] px-6 pb-6 overflow-y-auto h-screen text-white transition-colors duration-500 text-sm">
+      <main className="relative z-10 pt-16 sm:pt-[72px] px-3 sm:px-6 pb-6 overflow-y-auto h-screen text-white transition-colors duration-500 text-sm">
         <Outlet />
       </main>
     </div>
