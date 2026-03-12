@@ -104,7 +104,7 @@ const Header = () => {
 
   return (
     <>
-      <nav className="fixed top-4 left-1/2 -translate-x-1/2 w-[calc(100%-1.5rem)] sm:w-[calc(100%-3rem)] max-w-7xl z-50 glass h-14 rounded-2xl shadow-2xl border-white/20 overflow-visible">
+      <nav className="fixed top-2 sm:top-4 left-1/2 -translate-x-1/2 w-[calc(100%-1rem)] sm:w-[calc(100%-3rem)] max-w-7xl z-50 glass h-12 sm:h-14 rounded-2xl shadow-2xl border-white/20 overflow-visible">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 h-full">
           <div className="flex justify-between items-center h-full gap-2 sm:gap-4">
 

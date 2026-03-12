@@ -360,28 +360,28 @@ export default function RiceVisionWeather() {
         </header>
 
         {/* ─── HERO CARD ─── */}
-        <div className="glass bg-linear-to-br from-emerald-500/30 to-teal-700/30 p-5 sm:p-8 md:p-10 rounded-[1.5rem] sm:rounded-[2.5rem] relative overflow-hidden shadow-2xl">
+        <div className="glass bg-linear-to-br from-emerald-500/30 to-teal-700/30 p-3 sm:p-6 md:p-10 rounded-xl sm:rounded-[1.5rem] md:rounded-[2.5rem] relative overflow-hidden shadow-2xl">
           <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-8">
             <div>
               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/50 block mb-3">
                 {c.is_day ? "☀️ Daytime" : "🌙 Night"} · {new Date(c.time).toLocaleString("en-US", { weekday: "long", hour: "2-digit", minute: "2-digit" })}
               </span>
               <div className="flex items-end gap-4">
-                <h2 className="text-6xl sm:text-8xl md:text-[10rem] font-black text-white leading-none">{Math.round(c.temperature_2m)}°</h2>
+                <h2 className="text-4xl sm:text-6xl md:text-8xl lg:text-[10rem] font-black text-white leading-none">{Math.round(c.temperature_2m)}°</h2>
                 <div className="mb-4">
                   <span className="text-base sm:text-2xl font-black text-white/80">{cond.icon} {cond.label}</span>
                   <p className="text-white/40 text-sm mt-1">Feels like {Math.round(c.apparent_temperature)}°C</p>
                 </div>
               </div>
-              <div className="flex flex-wrap gap-2 mt-6">
-                <span className="bg-white/10 px-4 py-2 rounded-2xl text-[9px] font-black border border-white/20 uppercase tracking-widest">💧 {c.relative_humidity_2m}% Humidity</span>
-                <span className="bg-white/10 px-4 py-2 rounded-2xl text-[9px] font-black border border-white/20 uppercase tracking-widest">💨 {c.wind_speed_10m} km/h {windDir(c.wind_direction_10m)}</span>
-                <span className="bg-blue-500/20 px-4 py-2 rounded-2xl text-[9px] font-black border border-blue-400/20 uppercase tracking-widest">🌧️ {d.precipitation_probability_max[todayI]}% Rain Today</span>
-                <span className="bg-amber-500/20 px-4 py-2 rounded-2xl text-[9px] font-black border border-amber-400/20 uppercase tracking-widest">☀️ UV {uvNow}</span>
-                <span className="bg-white/10 px-4 py-2 rounded-2xl text-[9px] font-black border border-white/20 uppercase tracking-widest">☁️ {c.cloud_cover}% Cloud</span>
+              <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-4 sm:mt-6">
+                <span className="bg-white/10 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl text-[8px] sm:text-[9px] font-black border border-white/20 uppercase tracking-widest">💧 {c.relative_humidity_2m}% Humidity</span>
+                <span className="bg-white/10 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl text-[8px] sm:text-[9px] font-black border border-white/20 uppercase tracking-widest">💨 {c.wind_speed_10m} km/h {windDir(c.wind_direction_10m)}</span>
+                <span className="bg-blue-500/20 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl text-[8px] sm:text-[9px] font-black border border-blue-400/20 uppercase tracking-widest">🌧️ {d.precipitation_probability_max[todayI]}% Rain Today</span>
+                <span className="bg-amber-500/20 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl text-[8px] sm:text-[9px] font-black border border-amber-400/20 uppercase tracking-widest">☀️ UV {uvNow}</span>
+                <span className="bg-white/10 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl text-[8px] sm:text-[9px] font-black border border-white/20 uppercase tracking-widest">☁️ {c.cloud_cover}% Cloud</span>
               </div>
             </div>
-            <div className="flex flex-col gap-3 min-w-40">
+            <div className="flex flex-col gap-2 sm:gap-3 min-w-0 sm:min-w-40">
               <div className="glass bg-black/20 p-4 rounded-2xl text-center">
                 <p className="text-[9px] text-white/40 font-black uppercase tracking-widest mb-1">Sunrise</p>
                 <p className="text-lg font-black text-amber-400">{fmtTime(d.sunrise[todayI])}</p>
@@ -396,7 +396,7 @@ export default function RiceVisionWeather() {
               </div>
             </div>
           </div>
-          <span className="absolute -right-7 -bottom-1 text-[10rem] opacity-[0.5] pointer-events-none select-none">{cond.icon}</span>
+          <span className="absolute -right-7 -bottom-1 text-[6rem] sm:text-[8rem] md:text-[10rem] opacity-[0.5] pointer-events-none select-none">{cond.icon}</span>
         </div>
 
         {/* ─── TABS ─── */}

@@ -111,7 +111,7 @@ export default function LoginPage() {
               <img
                 src="/logoSDGP.webp"
                 alt="SDGP Logo"
-                className="h-18 w-auto"
+                className="h-12 sm:h-16 md:h-18 w-auto"
               />
             </div>
           </div>
@@ -134,7 +134,7 @@ export default function LoginPage() {
                 required
                 placeholder="name@company.com"
                 value={email}
-                className="w-full px-4 py-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                className="w-full px-4 py-2.5 sm:py-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                 onChange={(e) => {
                   setEmail(e.target.value);
                   if (errorMessage) setErrorMessage("");
@@ -154,7 +154,7 @@ export default function LoginPage() {
                   required
                   placeholder="••••••••"
                   value={password}
-                  className="w-full px-4 py-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                  className="w-full px-4 py-2.5 sm:py-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                   onChange={(e) => {
                     setPassword(e.target.value);
                     if (errorMessage) setErrorMessage("");
@@ -209,7 +209,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 px-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-xl shadow-indigo-500/20 transition-all active:scale-[0.97] disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full py-3 sm:py-4 px-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-xl shadow-indigo-500/20 transition-all active:scale-[0.97] disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">

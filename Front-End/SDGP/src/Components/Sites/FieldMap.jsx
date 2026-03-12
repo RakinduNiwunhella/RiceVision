@@ -70,7 +70,7 @@ export default function FieldMap() {
       </div>
 
       {/* Map */}
-      <div className="flex-1 rounded-2xl sm:rounded-3xl overflow-hidden glass border-white/20 shadow-2xl h-[50vh] sm:h-[60vh] lg:h-[80vh]">
+      <div className="flex-1 rounded-2xl sm:rounded-3xl overflow-hidden glass border-white/20 shadow-2xl h-[50vh] sm:h-[60vh] md:h-[65vh] lg:h-[80vh]">
         <RiceMap
           filters={filters}
           layers={layers}

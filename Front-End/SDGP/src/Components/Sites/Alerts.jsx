@@ -190,7 +190,7 @@ const Alerts = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
-            <h1 className="text-3xl md:text-5xl font-black text-white">
+            <h1 className="text-xl sm:text-3xl md:text-5xl font-black text-white">
               {t('fieldRiskAlerts')}
             </h1>
             <p className="text-white/40 text-xs mt-1 font-bold uppercase tracking-[0.2em]">
@@ -252,7 +252,7 @@ const Alerts = () => {
         <div className="space-y-6">
 
           {filteredAlerts.length === 0 && (
-            <div className="glass p-20 rounded-[2rem] text-center">
+            <div className="glass p-8 sm:p-12 md:p-20 rounded-2xl sm:rounded-[2rem] text-center">
               <p className="text-white/30 font-bold uppercase">
                 No Past threats detected
               </p>
@@ -262,7 +262,7 @@ const Alerts = () => {
           {filteredAlerts.map((alert) => (
             <div
               key={alert.id}
-              className="glass p-6 rounded-3xl border border-white/10"
+              className="glass p-3 sm:p-4 md:p-6 rounded-2xl sm:rounded-3xl border border-white/10"
             >
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
 
@@ -293,7 +293,7 @@ const Alerts = () => {
                   <div className="flex flex-wrap gap-2 sm:gap-3">
                     <button
                       onClick={() => handleResolve(alert.id)}
-                      className="px-6 py-2 bg-emerald-500/30 text-emerald-300 rounded-xl text-xs font-bold"
+                      className="px-4 sm:px-6 py-2 bg-emerald-500/30 text-emerald-300 rounded-xl text-xs font-bold"
                     >
                       {t('resolveBtn')}
                     </button>

@@ -103,7 +103,7 @@ export default function SignupPage() {
               <img
                 src="/logoSDGP.webp"
                 alt="SDGP Logo"
-                className="h-18 w-auto"
+                className="h-12 sm:h-16 md:h-18 w-auto"
               />
             </div>
           </div>
@@ -125,7 +125,7 @@ export default function SignupPage() {
                 type="text"
                 required
                 placeholder="John Doe"
-                className="w-full px-4 py-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                className="w-full px-4 py-2.5 sm:py-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                 onChange={(e) => setFullName(e.target.value)}
               />
             </div>
@@ -139,7 +139,7 @@ export default function SignupPage() {
                 type="email"
                 required
                 placeholder="name@company.com"
-                className={`w-full px-4 py-3.5 rounded-xl border bg-slate-50 dark:bg-slate-900/50 outline-none transition-all focus:ring-2 ${
+                className={`w-full px-4 py-2.5 sm:py-3.5 rounded-xl border bg-slate-50 dark:bg-slate-900/50 outline-none transition-all focus:ring-2 ${
                   emailError
                     ? "border-red-500 focus:ring-red-500/20"
                     : "border-slate-200 dark:border-slate-800 focus:ring-indigo-500"
@@ -164,7 +164,7 @@ export default function SignupPage() {
                   type="password"
                   required
                   placeholder="••••••••"
-                  className={`w-full px-4 py-3.5 rounded-xl border bg-slate-50 dark:bg-slate-900/50 outline-none transition-all focus:ring-2 ${
+                  className={`w-full px-4 py-2.5 sm:py-3.5 rounded-xl border bg-slate-50 dark:bg-slate-900/50 outline-none transition-all focus:ring-2 ${
                     passwordLengthError
                       ? "border-red-500 focus:ring-red-500/20"
                       : "border-slate-200 dark:border-slate-800 focus:ring-indigo-500"
@@ -189,7 +189,7 @@ export default function SignupPage() {
                   type="password"
                   required
                   placeholder="••••••••"
-                  className={`w-full px-4 py-3.5 rounded-xl border bg-slate-50 dark:bg-slate-900/50 outline-none transition-all focus:ring-2 ${
+                  className={`w-full px-4 py-2.5 sm:py-3.5 rounded-xl border bg-slate-50 dark:bg-slate-900/50 outline-none transition-all focus:ring-2 ${
                     passwordError
                       ? "border-red-500 focus:ring-red-500/20"
                       : "border-slate-200 dark:border-slate-800 focus:ring-indigo-500"
@@ -209,7 +209,7 @@ export default function SignupPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 px-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-xl shadow-indigo-500/20 transition-all active:scale-[0.97] disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full py-3 sm:py-4 px-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-xl shadow-indigo-500/20 transition-all active:scale-[0.97] disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {loading ? t('signingUp') : t('signUpBtn')}
             </button>

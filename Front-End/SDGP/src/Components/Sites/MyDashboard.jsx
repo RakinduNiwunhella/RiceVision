@@ -32,13 +32,13 @@ import YieldChatbot from "../chatbot/Yieldchatbot";
 /* ------------------ Components ------------------ */
 
 const StatWidget = ({ title, value, subtitle, icon }) => (
-  <div className="glass glass-hover p-8 text-center relative overflow-hidden group">
+  <div className="glass glass-hover p-4 sm:p-6 md:p-8 text-center relative overflow-hidden group">
     <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none">
-      <span className="material-symbols-outlined text-6xl">{icon}</span>
+      <span className="material-symbols-outlined text-4xl sm:text-6xl">{icon}</span>
     </div>
-    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-3">{title}</p>
-    <p className="text-5xl font-black text-white tracking-tighter drop-shadow-2xl">{value}</p>
-    {subtitle && <p className="text-[10px] font-bold text-emerald-400/60 mt-3 uppercase tracking-widest">{subtitle}</p>}
+    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-2 sm:mb-3">{title}</p>
+    <p className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tighter drop-shadow-2xl">{value}</p>
+    {subtitle && <p className="text-[10px] font-bold text-emerald-400/60 mt-2 sm:mt-3 uppercase tracking-widest">{subtitle}</p>}
   </div>
 );
 
@@ -141,8 +141,7 @@ const MyDashboard = () => {
         {/* ── Page Header ── */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
-            <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
-              {t('welcomeTitle')}
+            <h1 className="text-xl sm:text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
             </h1>
             <p className="text-white/40 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em]">
               {t('welcomeSubtitle')}
@@ -220,7 +219,7 @@ const MyDashboard = () => {
               {t('outputProjection')}
             </p>
             <div className="flex-1 flex flex-col justify-center py-4">
-              <p className="text-6xl font-black text-white tracking-tighter leading-none mb-2" style={{ textShadow: "0 10px 40px rgba(0,0,0,0.5)" }}>
+              <p className="text-4xl sm:text-5xl md:text-6xl font-black text-white tracking-tighter leading-none mb-2" style={{ textShadow: "0 10px 40px rgba(0,0,0,0.5)" }}>
                 {yieldForecast ? formatMT(yieldForecast.total_yield_kgs) : "---"}
               </p>
               <div className="flex items-center gap-2">
@@ -253,7 +252,7 @@ const MyDashboard = () => {
                 Supply Stability
               </p>
               <div className="py-2">
-                <p className="text-5xl font-black text-white tracking-tighter mb-1" style={{ textShadow: "0 10px 40px rgba(0,0,0,0.5)" }}>220K</p>
+                <p className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tighter mb-1" style={{ textShadow: "0 10px 40px rgba(0,0,0,0.5)" }}>220K</p>
                 <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest">{t('expectedShortfall')}</p>
               </div>
             </div>

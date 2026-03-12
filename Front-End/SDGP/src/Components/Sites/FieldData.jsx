@@ -86,7 +86,7 @@ const FieldData = () => {
         {/* Page Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
-            <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
+            <h1 className="text-xl sm:text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
               Field Data
             </h1>
             <p className="text-white/40 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em]">
@@ -110,7 +110,7 @@ const FieldData = () => {
               <p className="text-xs font-bold text-white/40 uppercase tracking-widest mb-1">
                 {item.label}
               </p>
-              <p className="text-4xl font-black text-white tracking-tighter">
+              <p className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tighter">
                 {item.value}
               </p>
             </div>
@@ -135,14 +135,14 @@ const FieldData = () => {
             <table className="w-full text-xs border-collapse">
               <thead>
                 <tr className="text-white/30 uppercase text-[10px] font-black tracking-widest border-b border-white/5 whitespace-nowrap">
-                  <th className="px-8 py-5 text-left font-black whitespace-nowrap">District</th>
-                  <th className="px-6 py-5 text-left font-black whitespace-nowrap">Total Fields</th>
-                  <th className="px-6 py-5 text-left font-black whitespace-nowrap">Healthy</th>
-                  <th className="px-6 py-5 text-left font-black whitespace-nowrap">Stressed</th>
-                  <th className="px-6 py-5 text-left font-black whitespace-nowrap">Critical</th>
-                  <th className="px-6 py-5 text-left font-black whitespace-nowrap">Avg Yield</th>
-                  <th className="px-8 py-5 text-right font-black whitespace-nowrap">Total Yield</th>
-                  <th className="px-6 py-5 text-center font-black whitespace-nowrap">Action</th>
+                  <th className="px-3 sm:px-6 md:px-8 py-3 sm:py-5 text-left font-black whitespace-nowrap">District</th>
+                  <th className="px-3 sm:px-6 py-3 sm:py-5 text-left font-black whitespace-nowrap">Total Fields</th>
+                  <th className="px-3 sm:px-6 py-3 sm:py-5 text-left font-black whitespace-nowrap">Healthy</th>
+                  <th className="px-3 sm:px-6 py-3 sm:py-5 text-left font-black whitespace-nowrap">Stressed</th>
+                  <th className="px-3 sm:px-6 py-3 sm:py-5 text-left font-black whitespace-nowrap">Critical</th>
+                  <th className="hidden sm:table-cell px-3 sm:px-6 py-3 sm:py-5 text-left font-black whitespace-nowrap">Avg Yield</th>
+                  <th className="hidden sm:table-cell px-3 sm:px-6 md:px-8 py-3 sm:py-5 text-right font-black whitespace-nowrap">Total Yield</th>
+                  <th className="px-3 sm:px-6 py-3 sm:py-5 text-center font-black whitespace-nowrap">Action</th>
                 </tr>
               </thead>
 
@@ -152,7 +152,7 @@ const FieldData = () => {
                     key={d.district}
                     className="hover:bg-white/5 transition-all duration-300 group/row whitespace-nowrap"
                   >
-                    <td className="px-8 py-5">
+                    <td className="px-3 sm:px-6 md:px-8 py-3 sm:py-5">
                       <div className="text-center flex items-center gap-3">
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/50 group-hover/row:bg-emerald-400 transition-colors" />
                         <span className="font-black text-white group-hover/row:translate-x-1 transition-transform inline-block">
@@ -160,33 +160,33 @@ const FieldData = () => {
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-5 text-center text-white/60 font-bold">{d.total_fields}</td>
-                    <td className="px-6 py-5 text-center">
+                    <td className="px-3 sm:px-6 py-3 sm:py-5 text-center text-white/60 font-bold">{d.total_fields}</td>
+                    <td className="px-3 sm:px-6 py-3 sm:py-5 text-center">
                       <span className="px-3 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[11px] font-black uppercase">
                         {d.healthy_fields}
                       </span>
                     </td>
-                    <td className="px-6 py-5 text-center">
+                    <td className="px-3 sm:px-6 py-3 sm:py-5 text-center">
                       <span className="px-3 py-1 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[11px] font-black uppercase">
                         {d.stressed_fields}
                       </span>
                     </td>
-                    <td className="px-6 py-5 text-center">
+                    <td className="px-3 sm:px-6 py-3 sm:py-5 text-center">
                       <span className="px-3 py-1 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 text-[11px] font-black uppercase">
                         {d.critical_fields}
                       </span>
                     </td>
-                    <td className="px-6 py-5 text-center">
+                    <td className="hidden sm:table-cell px-3 sm:px-6 py-3 sm:py-5 text-center">
                       <div className="flex flex-col">
                         <span className="text-white/80">{d.avg_yield_kg_ha}</span>
                         <span className="text-[10px] text-white/20 uppercase font-black tracking-tighter">kg/Ha</span>
                       </div>
                     </td>
-                    <td className="px-8 py-5 text-center">
+                    <td className="hidden sm:table-cell px-3 sm:px-6 md:px-8 py-3 sm:py-5 text-center">
                       <span className="font-black text-center text-white">{Number(d.total_yield_kg).toLocaleString()}</span>
                       <span className="ml-1 text-[10px] text-white/40 uppercase font-black">kg</span>
                     </td>
-                    <td className="px-6 py-5 text-center">
+                    <td className="px-3 sm:px-6 py-3 sm:py-5 text-center">
                       <div className="flex items-center justify-center gap-2">
                         <button
                           onClick={() => handleViewMap(d.district)}

@@ -88,8 +88,8 @@ const Help = () => {
         {/* Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
-            <h1 className="flex items-center gap-3 text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
-              <QuestionMarkCircleIcon className="w-8 h-8 md:w-12 md:h-12 text-emerald-400" />
+            <h1 className="flex items-center gap-2 sm:gap-3 text-xl sm:text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
+              <QuestionMarkCircleIcon className="w-6 h-6 sm:w-8 sm:h-8 md:w-12 md:h-12 text-emerald-400" />
               {t('helpSupport')}
             </h1>
             <p className="text-white/40 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em] max-w-2xl">
@@ -118,7 +118,7 @@ const Help = () => {
           ].map((card, idx) => (
             <div
               key={idx}
-              className="glass glass-hover p-8 rounded-[2rem] border border-white/10 shadow-xl group transition-all duration-500"
+              className="glass glass-hover p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl md:rounded-[2rem] border border-white/10 shadow-xl group transition-all duration-500"
             >
               <div className="flex items-center gap-4 mb-4">
                 <div className={`p-3 rounded-2xl bg-white/5 border border-white/10 group-hover:scale-110 transition-transform`}>
@@ -143,7 +143,7 @@ const Help = () => {
 
           {/* Complaint Console */}
           <div className="lg:col-span-3">
-            <div className="glass p-8 md:p-10 rounded-[2.5rem] border border-white/10 shadow-2xl space-y-8">
+            <div className="glass p-4 sm:p-6 md:p-8 lg:p-10 rounded-xl sm:rounded-2xl md:rounded-[2.5rem] border border-white/10 shadow-2xl space-y-6 sm:space-y-8">
               <div className="flex items-center gap-3 border-b border-white/10 pb-6">
                 <ExclamationTriangleIcon className="w-6 h-6 text-amber-400" />
                 <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/40">{t('feedbackLoop')}</h2>
@@ -214,7 +214,7 @@ const Help = () => {
 
           {/* Dynamic Knowledge Base (FAQs) */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="glass p-8 rounded-[2.5rem] border border-white/10 shadow-xl h-fit">
+            <div className="glass p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl md:rounded-[2.5rem] border border-white/10 shadow-xl h-fit">
                 <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/40 mb-8 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
                 {t('quickHelp')}
