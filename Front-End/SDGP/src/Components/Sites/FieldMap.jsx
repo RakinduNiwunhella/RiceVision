@@ -52,6 +52,7 @@ export default function FieldMap() {
   });
 
   /* Sync filters when arriving from Alerts page */
+  /* Sync filters when arriving from Alerts page */
   useEffect(() => {
     if (!state) return;
 
@@ -64,20 +65,28 @@ export default function FieldMap() {
     }));
   }, [state?.district, state?.health]);
 
+  /* Sync filters when arriving from Search */
   useEffect(() => {
     if (!districtFromURL) return;
 
-    const formattedDistrict =
-      districtFromURL.charAt(0).toUpperCase() + districtFromURL.slice(1);
+    const formattedDistrict = districtFromURL
+      .replace(/[-_]/g, " ")
+      .toLowerCase()
+      .split(" ")
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
+
+    console.log("District from URL:", districtFromURL);
+    console.log("Formatted district:", formattedDistrict);
 
     setFilters((prev) => ({
       ...prev,
       districts: [formattedDistrict],
     }));
 
-    // Clear query param after applying filter
+    // clear query param after applying filter
     navigate("/field-map", { replace: true });
-  }, [districtFromURL]);
+  }, [districtFromURL, navigate]);
 
   return (
     <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 min-h-[calc(100vh-4rem)] p-3 sm:p-6">

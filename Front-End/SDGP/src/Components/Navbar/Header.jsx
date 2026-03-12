@@ -126,7 +126,9 @@ const Header = () => {
 
   // Add district results dynamically
   const matchedDistricts = districts
-    .filter((d) => d.includes(query))
+    .filter((d) =>
+      d.toLowerCase().replace(/\s+/g, "").includes(query.replace(/\s+/g, "")),
+    )
     .map((d) => ({
       label: d
         .split(" ")
@@ -134,7 +136,7 @@ const Header = () => {
         .join(" "),
       description: "District analytics and field map",
       icon: "location_on",
-      path: `/field-map?district=${d}`,
+      path: `/field-map?district=${encodeURIComponent(d)}`,
     }));
 
   filteredResults = [...filteredResults, ...matchedDistricts];
