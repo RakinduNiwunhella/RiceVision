@@ -4,10 +4,10 @@ import { updateAlertStatus } from "../../api/api";
 import { useLanguage } from "../../context/LanguageContext";
 
 //PRODUCTION
-// const API_BASE = "https://ricevision-cakt.onrender.com";
+const API_BASE = "https://ricevision-cakt.onrender.com";
 
 //LOCAL
-const API_BASE = "http://localhost:8000";
+// const API_BASE = "http://localhost:8000";
 
 const TAB_KEYS = ["Disasters", "Pest Risks", "Past Alerts"];
 
