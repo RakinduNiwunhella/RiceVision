@@ -1,5 +1,5 @@
 // MyDashboard.jsx
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   LineChart,
   Line,
@@ -16,6 +16,8 @@ import {
 } from "recharts";
 import { useLanguage } from "../../context/LanguageContext";
 import { AlertTriangle, CloudRain, Bug } from "lucide-react";
+import TutorialTooltip from "../../components/TutorialTooltip";
+import { usePageTutorial } from "../../hooks/usePageTutorial";
 
 import {
   fetchHealthSummary,
@@ -78,6 +80,51 @@ const MyDashboard = () => {
   const [showAllDistricts, setShowAllDistricts] = useState(false);
   const [stageDistribution, setStageDistribution] = useState([]);
 
+  // Tutorial setup
+  const tutorialSteps = [
+    {
+      title: "Dashboard: Your Field Control Center",
+      action: "Start here to see a complete overview of all your field conditions",
+      outcome: "You'll see 5 key panels showing health, yield, threats, growth stages, and district comparison",
+    },
+    {
+      title: "Panel 1: Crop Health Distribution",
+      action: "This pie chart shows your current crop health across all fields",
+      outcome: "Green (Optimal) = Healthy crops ready for growth. Yellow (Mild Stress) = Some crops need attention. Red (Severe Stress) = Critical issues needing immediate action",
+    },
+    {
+      title: "Panel 2: Yield Forecast",
+      action: "See your expected total harvest in metric tons. Check the ranked districts below",
+      outcome: "Top districts shown = Best performers. Use this to identify which areas have ideal conditions and learn from them",
+    },
+    {
+      title: "Panel 3: Active Threats",
+      action: "Review disease outbreaks and pest risks. Shows threat count and details",
+      outcome: "Click any threat to see recommendations and view exact location on Field Map. Red = High priority action needed",
+    },
+    {
+      title: "Panel 4: Crop Stage Distribution",
+      action: "Bar chart showing percentage of crops in each growth stage (Seedling → Mature)",
+      outcome: "Use this for planning: fertilizer timing, pest control, and harvest scheduling based on stage distribution",
+    },
+    {
+      title: "Panel 5: District Health Overview",
+      action: "Compare health metrics across all your districts in one table",
+      outcome: "Shows health percentage, stress levels, and risk status for each region. Green = Healthy, Yellow = Monitor, Red = Action needed",
+    },
+  ];
+
+  const { currentStep, showTutorial, currentTutorialStep, hasMoreSteps, nextStep, prevStep, closeTutorial } =
+    usePageTutorial("dashboard", tutorialSteps);
+
+  // Refs for tutorial tooltips
+  const headerRef = useRef(null);
+  const healthCardRef = useRef(null);
+  const yieldCardRef = useRef(null);
+  const threatsCardRef = useRef(null);
+  const stageChartRef = useRef(null);
+  const districtTableRef = useRef(null);
+
   const stageColors = ["#10b981", "#06b6d4", "#8b5cf6", "#f59e0b", "#ef4444", "#f97316"];
 
   const pieColors = ["#10b981", "#f59e0b", "#ef4444"]; // Emerald-500, Amber-500, Red-500
@@ -139,7 +186,7 @@ const MyDashboard = () => {
       <div className="max-w-7xl mx-auto space-y-12 pb-20">
 
         {/* ── Page Header ── */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div ref={currentStep === 0 ? headerRef : undefined} className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
             <h1 className="text-xl sm:text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
             </h1>
@@ -158,7 +205,7 @@ const MyDashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-10">
 
           {/* Field Health Distribution */}
-          <div className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col items-center">
+          <div ref={healthCardRef} className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col items-center">
             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-8 self-start flex items-center gap-2">
               <span className="material-symbols-outlined text-emerald-400 text-sm">radiology</span>
               {t('cropHealthDist')}
@@ -213,7 +260,7 @@ const MyDashboard = () => {
           </div>
 
           {/* Yield Forecast */}
-          <div className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
+          <div ref={yieldCardRef} className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-6 flex items-center gap-2">
               <span className="material-symbols-outlined text-cyan-400 text-sm">trending_up</span>
               {t('outputProjection')}
@@ -274,7 +321,7 @@ const MyDashboard = () => {
         </div>
 
         {/* ── Active Threats Section (Wider) ── */}
-        <div className="glass p-1 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl overflow-hidden">
+        <div ref={threatsCardRef} className="glass p-1 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl overflow-hidden">
           <div className="p-4 sm:p-8 border-b border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/40 flex items-center gap-3">
               <span className="material-symbols-outlined text-rose-500">sensors</span>
@@ -331,7 +378,7 @@ const MyDashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8 pb-12">
 
           {/* Stage Distribution */}
-          <div className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
+          <div ref={stageChartRef} className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-2 flex items-center gap-2">
               <span className="material-symbols-outlined text-purple-400 text-sm">bar_chart</span>
               {t('growthAnalysis')}
@@ -416,7 +463,7 @@ const MyDashboard = () => {
           </div>
 
           {/* Regional Health Overview */}
-          <div className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
+          <div ref={districtTableRef} className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-2 flex items-center gap-2">
               <span className="material-symbols-outlined text-cyan-400 text-sm">map</span>
               District Overview
@@ -458,6 +505,102 @@ const MyDashboard = () => {
           </div>
 
         </div>
+
+        {/* Tutorial Tooltips */}
+        {showTutorial && currentTutorialStep && (
+          <>
+            {currentStep === 0 && (
+              <TutorialTooltip
+                visible={true}
+                position="bottom"
+                title={currentTutorialStep.title}
+                action={currentTutorialStep.action}
+                outcome={currentTutorialStep.outcome}
+                elementRef={headerRef}
+                step={currentStep}
+                totalSteps={tutorialSteps.length}
+                onNext={nextStep}
+                onPrevious={prevStep}
+                onDismiss={closeTutorial}
+              />
+            )}
+            {currentStep === 1 && (
+              <TutorialTooltip
+                visible={true}
+                position="bottom"
+                title={currentTutorialStep.title}
+                action={currentTutorialStep.action}
+                outcome={currentTutorialStep.outcome}
+                elementRef={healthCardRef}
+                step={currentStep}
+                totalSteps={tutorialSteps.length}
+                onNext={nextStep}
+                onPrevious={prevStep}
+                onDismiss={closeTutorial}
+              />
+            )}
+            {currentStep === 2 && (
+              <TutorialTooltip
+                visible={true}
+                position="bottom"
+                title={currentTutorialStep.title}
+                action={currentTutorialStep.action}
+                outcome={currentTutorialStep.outcome}
+                elementRef={yieldCardRef}
+                step={currentStep}
+                totalSteps={tutorialSteps.length}
+                onNext={nextStep}
+                onPrevious={prevStep}
+                onDismiss={closeTutorial}
+              />
+            )}
+            {currentStep === 3 && (
+              <TutorialTooltip
+                visible={true}
+                position="bottom"
+                title={currentTutorialStep.title}
+                action={currentTutorialStep.action}
+                outcome={currentTutorialStep.outcome}
+                elementRef={threatsCardRef}
+                step={currentStep}
+                totalSteps={tutorialSteps.length}
+                onNext={nextStep}
+                onPrevious={prevStep}
+                onDismiss={closeTutorial}
+              />
+            )}
+            {currentStep === 4 && (
+              <TutorialTooltip
+                visible={true}
+                position="bottom"
+                title={currentTutorialStep.title}
+                action={currentTutorialStep.action}
+                outcome={currentTutorialStep.outcome}
+                elementRef={stageChartRef}
+                step={currentStep}
+                totalSteps={tutorialSteps.length}
+                onNext={nextStep}
+                onPrevious={prevStep}
+                onDismiss={closeTutorial}
+              />
+            )}
+            {currentStep === 5 && (
+              <TutorialTooltip
+                visible={true}
+                position="bottom"
+                title={currentTutorialStep.title}
+                action={currentTutorialStep.action}
+                outcome={currentTutorialStep.outcome}
+                elementRef={districtTableRef}
+                step={currentStep}
+                totalSteps={tutorialSteps.length}
+                onNext={nextStep}
+                onPrevious={prevStep}
+                onDismiss={closeTutorial}
+              />
+            )}
+          </>
+        )}
       </div>
     </div>
   );
