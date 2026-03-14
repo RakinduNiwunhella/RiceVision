@@ -130,10 +130,10 @@ const TutorialTooltip = ({
   if (!visible) return null
 
   const bgColor = isDarkMode
-    ? 'bg-slate-800/75 backdrop-blur-lg border border-emerald-500/40 text-white'
-    : 'bg-white/75 backdrop-blur-lg border border-emerald-400/40 text-slate-900'
+    ? 'bg-slate-900/20 backdrop-blur-xl border border-emerald-500/60 text-white'
+    : 'bg-white/20 backdrop-blur-xl border border-emerald-400/60 text-slate-900'
 
-  const arrowColor = isDarkMode ? 'rgba(30,41,59,0.75)' : 'rgba(255,255,255,0.75)'
+  const arrowColor = isDarkMode ? 'rgba(15,23,42,0.2)' : 'rgba(255,255,255,0.2)'
   const borderColor = isDarkMode ? '#10b98166' : '#34d39966'
 
   // Arrow triangle using SVG
@@ -166,7 +166,7 @@ const TutorialTooltip = ({
   return (
     <div
       style={styles}
-      className={`${bgColor} rounded-lg px-4 py-3 shadow-lg shadow-black/30 max-w-xs animate-fadeIn relative pointer-events-auto`}
+      className={`${bgColor} rounded-lg px-4 py-3 shadow-lg shadow-black/20 max-w-xs animate-fadeIn relative pointer-events-auto`}
       data-tutorial-tooltip="true"
     >
       {/* Arrow pointer */}

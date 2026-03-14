@@ -19,6 +19,35 @@ export const translations = {
     searchPlaceholder: "Search",
     noResults: "No results for",
 
+    // ── Header Tutorials ──
+    headerTutorial: {
+      search: {
+        title: "Quick Search",
+        action: "Type a location, page, or district name",
+        outcome: "Find dashboard pages and district analytics instantly",
+      },
+      language: {
+        title: "Change Language",
+        action: "Click to select your preferred language",
+        outcome: "Interface updates to English, سيinhala, or Tamil",
+      },
+      theme: {
+        title: "Toggle Dark Mode",
+        action: "Click the sun/moon icon",
+        outcome: "Switch between light and dark themes",
+      },
+      notifications: {
+        title: "View Notifications",
+        action: "Click to open the notification panel",
+        outcome: "See system alerts, updates, and messages",
+      },
+      profile: {
+        title: "Manage Your Account",
+        action: "Click the profile icon",
+        outcome: "Edit identity, field data, and settings",
+      },
+    },
+
     // ── Dashboard ──
     welcomeTitle: "Welcome to RiceVision",
     welcomeSubtitle: "Insights of smarter farming",
@@ -318,6 +347,35 @@ export const translations = {
     searchPlaceholder: "සොයන්න...",
     noResults: "ප්‍රතිඵල නොමැත",
 
+    // ── Header Tutorials ──
+    headerTutorial: {
+      search: {
+        title: "ඉක්මන් සෙවීම",
+        action: "ස්ථානයක්, පිටුවක් හෝ දිස්ත්‍රික්කයේ නාමය ටයිප් කරන්න",
+        outcome: "උපකරණ පුවරු පිටු සහ දිස්ත්‍රික් විශ්ලේෂණ ක්ෂණිකව සොයන්න",
+      },
+      language: {
+        title: "භාෂාව වෙනස් කරන්න",
+        action: "ඔබේ අදහසඳහා භාෂාව තෝරා ගැනීමට ක්ලික් කරන්න",
+        outcome: "ඉංග්‍රීසි, සිංහල හෝ දෙමළ යෙදුම පිටුවක්",
+      },
+      theme: {
+        title: "අඳුරු ප්‍රකාශනය සබඳන්න",
+        action: "සඳ/චන්ද්‍රයා අයිකනය ක්ලික් කරන්න",
+        outcome: "ආලෝකමත් සහ අඳුරු තේමා වෙතින් මාරු වන්න",
+      },
+      notifications: {
+        title: "දැනුම්දීම් බලන්න",
+        action: "දැනුම්දීම් පුවරුව විවෘත කිරීමට ක්ලික් කරන්න",
+        outcome: "පද්ධති අනතුරු ඇඟවීම්, යාවත්කාලීනයි සහ පණිවිඩ බලන්න",
+      },
+      profile: {
+        title: "ඔබේ ගිණුම කළමනාකරණය කරන්න",
+        action: "පැතිකඩ අයිකනය ක්ලික් කරන්න",
+        outcome: "අනන්‍යතාව, කෙත් දත්ත සහ සැකසීම් සංස්කරණය කරන්න",
+      },
+    },
+
     // ── Dashboard ──
     welcomeTitle: "RiceVision වෙත සාදරයෙන් පිළිගනිමු",
     welcomeSubtitle: "දක්ෂ ගොවිතැනෙහි අවබෝධය",
@@ -615,6 +673,35 @@ export const translations = {
     help: "உதவி",
     searchPlaceholder: "தேடுங்கள்...",
     noResults: "முடிவுகள் இல்லை",
+
+    // ── Header Tutorials ──
+    headerTutorial: {
+      search: {
+        title: "விரைவு தேடல்",
+        action: "இடம், பக்கம், அல்லது மாவட்ட பெயர் தட்டச்சு செய்யவும்",
+        outcome: "டாஷ்போர்டு பக்கங்கள் மற்றும் மாவட்ட பகுப்பாய்வு உடனடியாக கண்டுபிடிக்கவும்",
+      },
+      language: {
+        title: "மொழி மாற்றவும்",
+        action: "உங்கள் விருப்ப மொழியைத் தேர்ந்தெடுக்க கிளிக் செய்யவும்",
+        outcome: "இந்த இடைமுகம் தமிழ், ஆங்கிலம் அல்லது சிங்களம்",
+      },
+      theme: {
+        title: "இருட்டு பயன்முறை மாற்ற",
+        action: "சூரியன்/சந்திர ஐகனை கிளிக் செய்யவும்",
+        outcome: "ஒளி மற்றும் இருண்ட தீம்களுக்கு இடையில் மாற்றவும்",
+      },
+      notifications: {
+        title: "அறிவிப்புகள் பார்க்கவும்",
+        action: "அறிவிப்பு பலகத்தை திறக்க கிளிக் செய்யவும்",
+        outcome: "கணினி எச்சரிக்கைகள், புதுப்பிப்புகள் மற்றும் செய்திகளைப் பார்க்கவும்",
+      },
+      profile: {
+        title: "உங்கள் கணக்கை நிர்வகிக்கவும்",
+        action: "சுயவிவர ஐகனை கிளிக் செய்யவும்",
+        outcome: "அடையாளம், வயல் தரவு மற்றும் அமைப்புகளைத் திருத்தவும்",
+      },
+    },
 
     // ── Dashboard ──
     welcomeTitle: "RiceVision-க்கு வரவேற்கிறோம்",

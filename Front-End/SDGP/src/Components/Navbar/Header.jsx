@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
@@ -6,6 +6,8 @@ import { useTheme } from "../../context/ThemeContext";
 import { useLanguage, LANGUAGES } from "../../context/LanguageContext";
 import Notifications from "../Notifications/Notifications";
 import { supabase } from "../../supabaseClient";
+import { usePageTutorial } from "../../hooks/usePageTutorial";
+import TutorialTooltip from "../../components/TutorialTooltip";
 
 const searchIndex = [
   {
@@ -102,6 +104,49 @@ const Header = () => {
   const searchRef = useRef(null);
   const inputRef = useRef(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Tutorial refs for header buttons
+  const searchInputRef = useRef(null);
+  const languageBtnRef = useRef(null);
+  const themeBtnRef = useRef(null);
+  const notificationBtnRef = useRef(null);
+  const profileBtnRef = useRef(null);
+
+  // Tutorial setup
+  const tutorialSteps = useMemo(() => t("headerTutorial") ? [
+    {
+      ref: searchInputRef,
+      title: t("headerTutorial.search.title"),
+      action: t("headerTutorial.search.action"),
+      outcome: t("headerTutorial.search.outcome"),
+    },
+    {
+      ref: languageBtnRef,
+      title: t("headerTutorial.language.title"),
+      action: t("headerTutorial.language.action"),
+      outcome: t("headerTutorial.language.outcome"),
+    },
+    {
+      ref: themeBtnRef,
+      title: t("headerTutorial.theme.title"),
+      action: t("headerTutorial.theme.action"),
+      outcome: t("headerTutorial.theme.outcome"),
+    },
+    {
+      ref: notificationBtnRef,
+      title: t("headerTutorial.notifications.title"),
+      action: t("headerTutorial.notifications.action"),
+      outcome: t("headerTutorial.notifications.outcome"),
+    },
+    {
+      ref: profileBtnRef,
+      title: t("headerTutorial.profile.title"),
+      action: t("headerTutorial.profile.action"),
+      outcome: t("headerTutorial.profile.outcome"),
+    },
+  ] : [], [t]);
+
+  const { showTutorial, currentTutorialStep } = usePageTutorial("Header", tutorialSteps.length);
 
   const updateDropdownPos = () => {
     if (inputRef.current) {
@@ -258,7 +303,10 @@ const Header = () => {
                   search
                 </span>
                 <input
-                  ref={inputRef}
+                  ref={(el) => {
+                    inputRef.current = el;
+                    searchInputRef.current = el;
+                  }}
                   type="text"
                   value={searchQuery}
                   onChange={(e) => {
@@ -328,6 +376,7 @@ const Header = () => {
                 {/* Language Selector */}
                 <div className="relative" ref={langBtnRef}>
                   <button
+                    ref={languageBtnRef}
                     className="h-8 px-2 rounded-lg flex items-center gap-1 text-white/50 hover:text-white hover:bg-white/10 transition"
                     title="Language"
                     onClick={() => {
@@ -384,6 +433,7 @@ const Header = () => {
                     )}
                 </div>
                 <button
+                  ref={themeBtnRef}
                   className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition"
                   title="Toggle Dark Mode"
                   onClick={toggleTheme}
@@ -392,11 +442,14 @@ const Header = () => {
                     {isDark ? "light_mode" : "dark_mode"}
                   </span>
                 </button>
-                <NotificationPanelButton />
+                <div ref={notificationBtnRef}>
+                  <NotificationPanelButton />
+                </div>
               </div>
 
               {/* Avatar - hidden on mobile */}
               <Link
+                ref={profileBtnRef}
                 to="/profile"
                 className="hidden sm:flex w-8 h-8 rounded-lg items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition"
                 title="View Profile"
@@ -537,6 +590,19 @@ const Header = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Tutorial Tooltips */}
+      {showTutorial && currentTutorialStep && tutorialSteps[currentTutorialStep - 1] && (
+        <TutorialTooltip
+          title={tutorialSteps[currentTutorialStep - 1].title}
+          action={tutorialSteps[currentTutorialStep - 1].action}
+          outcome={tutorialSteps[currentTutorialStep - 1].outcome}
+          targetRef={tutorialSteps[currentTutorialStep - 1].ref}
+          currentStep={currentTutorialStep}
+          totalSteps={tutorialSteps.length}
+          pageName="Header"
+        />
       )}
     </>
   );
