@@ -1,5 +1,5 @@
 // MyDashboard.jsx
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import {
   LineChart,
   Line,
@@ -80,8 +80,8 @@ const MyDashboard = () => {
   const [showAllDistricts, setShowAllDistricts] = useState(false);
   const [stageDistribution, setStageDistribution] = useState([]);
 
-  // Tutorial setup
-  const tutorialSteps = [
+  // Tutorial setup - create once and memoize
+  const tutorialSteps = useMemo(() => [
     {
       title: "Dashboard: Your Field Control Center",
       action: "Start here to see a complete overview of all your field conditions",
@@ -112,7 +112,7 @@ const MyDashboard = () => {
       action: "Compare health metrics across all your districts in one table",
       outcome: "Shows health percentage, stress levels, and risk status for each region. Green = Healthy, Yellow = Monitor, Red = Action needed",
     },
-  ];
+  ], [])
 
   const { currentStep, showTutorial, currentTutorialStep, hasMoreSteps, nextStep, prevStep, closeTutorial } =
     usePageTutorial("dashboard", tutorialSteps);

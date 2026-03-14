@@ -12,6 +12,7 @@ export const usePageTutorial = (pageName, tutorialSteps = []) => {
   // Initialize from localStorage on mount
   useEffect(() => {
     const stored = localStorage.getItem('ricevision_tutorial_pages')
+    
     if (stored) {
       try {
         const pages = JSON.parse(stored)

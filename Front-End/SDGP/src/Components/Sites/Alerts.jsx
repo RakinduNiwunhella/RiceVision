@@ -104,8 +104,8 @@ const Alerts = () => {
   const { t } = useLanguage();
   const tabLabels = [t("disasters"), t("pestRisks"), t("pastAlerts")];
 
-  // Tutorial setup
-  const tutorialSteps = [
+  // Tutorial setup - create once and memoize
+  const tutorialSteps = useMemo(() => [
     {
       title: "Alert Tabs",
       action: "Click on different tabs to view different types of alerts",
@@ -131,7 +131,7 @@ const Alerts = () => {
       action: "Click 'View Map' to see the alert location",
       outcome: "You're taken to the Field Map showing the affected area",
     },
-  ];
+  ], [])
 
   const { currentStep, showTutorial, currentTutorialStep, hasMoreSteps, nextStep, prevStep, closeTutorial } =
     usePageTutorial("alerts", tutorialSteps);
