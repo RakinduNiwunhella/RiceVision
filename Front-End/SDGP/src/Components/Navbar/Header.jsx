@@ -105,48 +105,148 @@ const Header = () => {
   const inputRef = useRef(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Tutorial refs for header buttons
+  // Tutorial refs for nav buttons
+  const dashboardBtnRef = useRef(null);
+  const fieldDataBtnRef = useRef(null);
+  const mapBtnRef = useRef(null);
+  const weatherBtnRef = useRef(null);
+  const alertsBtnRef = useRef(null);
+  const reportBtnRef = useRef(null);
+  const helpBtnRef = useRef(null);
+
+  // Tutorial refs for header action buttons
   const searchInputRef = useRef(null);
   const languageBtnRef = useRef(null);
   const themeBtnRef = useRef(null);
   const notificationBtnRef = useRef(null);
   const profileBtnRef = useRef(null);
 
-  // Tutorial setup
-  const tutorialSteps = useMemo(() => t("headerTutorial") ? [
+  // Navigation items with their tutorial refs
+  const navItems = [
+    { label: t("dashboard"), icon: "apps", path: "/dashboard", ref: dashboardBtnRef },
+    { label: t("fieldData"), icon: "table_chart", path: "/field-data", ref: fieldDataBtnRef },
+    { label: t("map"), icon: "map", path: "/field-map", ref: mapBtnRef },
+    { label: t("weather"), icon: "cloud", path: "/weather", ref: weatherBtnRef },
+    { label: t("alerts"), icon: "notification_important", path: "/alerts", ref: alertsBtnRef },
+    { label: t("report"), icon: "bar_chart", path: "/report", ref: reportBtnRef },
+    { label: t("help"), icon: "help", path: "/help", ref: helpBtnRef },
+  ];
+
+  // Tutorial setup - navbar first, then header action controls
+  const tutorialSteps = useMemo(() => [
+    {
+      ref: dashboardBtnRef,
+      title: t("dashboardTutTitle"),
+      action: t("dashboardTutAction"),
+      outcome: t("dashboardTutOutcome"),
+      position: "bottom",
+    },
+    {
+      ref: fieldDataBtnRef,
+      title: t("fieldDataTutTitle"),
+      action: t("fieldDataTutAction"),
+      outcome: t("fieldDataTutOutcome"),
+      position: "bottom",
+    },
+    {
+      ref: mapBtnRef,
+      title: t("mapTutTitle"),
+      action: t("mapTutAction"),
+      outcome: t("mapTutOutcome"),
+      position: "bottom",
+    },
+    {
+      ref: weatherBtnRef,
+      title: t("weatherTutTitle"),
+      action: t("weatherTutAction"),
+      outcome: t("weatherTutOutcome"),
+      position: "bottom",
+    },
+    {
+      ref: alertsBtnRef,
+      title: t("alertsTutTitle"),
+      action: t("alertsTutAction"),
+      outcome: t("alertsTutOutcome"),
+      position: "bottom",
+    },
+    {
+      ref: reportBtnRef,
+      title: t("reportTutTitle"),
+      action: t("reportTutAction"),
+      outcome: t("reportTutOutcome"),
+      position: "bottom",
+    },
+    {
+      ref: helpBtnRef,
+      title: t("helpTutTitle"),
+      action: t("helpTutAction"),
+      outcome: t("helpTutOutcome"),
+      position: "bottom",
+    },
     {
       ref: searchInputRef,
-      title: t("headerTutorial.search.title"),
-      action: t("headerTutorial.search.action"),
-      outcome: t("headerTutorial.search.outcome"),
+      title: t("searchHeaderTitle"),
+      action: t("searchHeaderAction"),
+      outcome: t("searchHeaderOutcome"),
+      position: "bottom",
     },
     {
       ref: languageBtnRef,
-      title: t("headerTutorial.language.title"),
-      action: t("headerTutorial.language.action"),
-      outcome: t("headerTutorial.language.outcome"),
+      title: t("languageTitle"),
+      action: t("languageAction"),
+      outcome: t("languageOutcome"),
+      position: "bottom",
     },
     {
       ref: themeBtnRef,
-      title: t("headerTutorial.theme.title"),
-      action: t("headerTutorial.theme.action"),
-      outcome: t("headerTutorial.theme.outcome"),
+      title: t("themeTitle"),
+      action: t("themeAction"),
+      outcome: t("themeOutcome"),
+      position: "bottom",
     },
     {
       ref: notificationBtnRef,
-      title: t("headerTutorial.notifications.title"),
-      action: t("headerTutorial.notifications.action"),
-      outcome: t("headerTutorial.notifications.outcome"),
+      title: t("notificationsTitle"),
+      action: t("notificationsAction"),
+      outcome: t("notificationsOutcome"),
+      position: "bottom",
     },
     {
       ref: profileBtnRef,
-      title: t("headerTutorial.profile.title"),
-      action: t("headerTutorial.profile.action"),
-      outcome: t("headerTutorial.profile.outcome"),
+      title: t("profileTitle"),
+      action: t("profileAction"),
+      outcome: t("profileOutcome"),
+      position: "bottom",
     },
-  ] : [], [t]);
+  ], [t]);
 
-  const { showTutorial, currentTutorialStep } = usePageTutorial("Header", tutorialSteps.length);
+  const { currentStep, showTutorial, currentTutorialStep, nextStep, prevStep, closeTutorial } = usePageTutorial("Header", tutorialSteps);
+
+  // Publish the current Header tutorial version so other pages wait for this exact version.
+  useEffect(() => {
+    localStorage.setItem("ricevision_header_required_steps", String(tutorialSteps.length));
+    window.dispatchEvent(new Event("ricevision:tutorial-pages-updated"));
+  }, [tutorialSteps.length]);
+
+  // Skip steps whose target controls are hidden in current responsive layout.
+  useEffect(() => {
+    if (!showTutorial) return;
+
+    const step = tutorialSteps[currentStep];
+    if (!step) return;
+
+    const timer = setTimeout(() => {
+      if (!step.ref?.current) {
+        if (currentStep < tutorialSteps.length - 1) {
+          nextStep();
+        } else {
+          closeTutorial();
+        }
+      }
+    }, 180);
+
+    return () => clearTimeout(timer);
+  }, [showTutorial, currentStep, tutorialSteps, nextStep, closeTutorial]);
 
   const updateDropdownPos = () => {
     if (inputRef.current) {
@@ -228,16 +328,6 @@ const Header = () => {
     setShowResults(false);
   };
 
-  const navItems = [
-    { label: t("dashboard"), icon: "apps", path: "/dashboard" },
-    { label: t("fieldData"), icon: "table_chart", path: "/field-data" },
-    { label: t("map"), icon: "map", path: "/field-map" },
-    { label: t("weather"), icon: "cloud", path: "/weather" },
-    { label: t("alerts"), icon: "notification_important", path: "/alerts" },
-    { label: t("report"), icon: "bar_chart", path: "/report" },
-    { label: t("help"), icon: "help", path: "/help" },
-  ];
-
   const currentLang =
     LANGUAGES.find((l) => l.code === language) || LANGUAGES[0];
 
@@ -270,6 +360,7 @@ const Header = () => {
                   return (
                     <Link
                       key={item.label}
+                      ref={item.ref}
                       to={item.path}
                       className={`flex items-center gap-1 lg:gap-1.5 px-2 lg:px-3 py-1.5 rounded-lg text-[10px] lg:text-[11px] font-semibold tracking-wide whitespace-nowrap transition-all duration-300 ${
                         isActive
@@ -528,6 +619,7 @@ const Header = () => {
               return (
                 <Link
                   key={item.label}
+                  ref={item.ref}
                   to={item.path}
                   onClick={() => setMobileMenuOpen(false)}
                   className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${
@@ -593,15 +685,19 @@ const Header = () => {
       )}
 
       {/* Tutorial Tooltips */}
-      {showTutorial && currentTutorialStep && tutorialSteps[currentTutorialStep - 1] && (
+      {showTutorial && currentTutorialStep && tutorialSteps[currentStep] && (
         <TutorialTooltip
-          title={tutorialSteps[currentTutorialStep - 1].title}
-          action={tutorialSteps[currentTutorialStep - 1].action}
-          outcome={tutorialSteps[currentTutorialStep - 1].outcome}
-          targetRef={tutorialSteps[currentTutorialStep - 1].ref}
-          currentStep={currentTutorialStep}
+          visible={true}
+          title={currentTutorialStep.title}
+          action={currentTutorialStep.action}
+          outcome={currentTutorialStep.outcome}
+          elementRef={tutorialSteps[currentStep].ref}
+          position={tutorialSteps[currentStep].position || "bottom"}
+          step={currentStep}
           totalSteps={tutorialSteps.length}
-          pageName="Header"
+          onNext={nextStep}
+          onPrevious={prevStep}
+          onDismiss={closeTutorial}
         />
       )}
     </>

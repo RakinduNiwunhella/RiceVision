@@ -1,36 +1,66 @@
 import { useState, useEffect, useCallback } from 'react'
 
+const STORAGE_KEY = 'ricevision_tutorial_pages'
+const HEADER_REQUIRED_STEPS_KEY = 'ricevision_header_required_steps'
+
+const readTutorialPages = () => {
+  const stored = localStorage.getItem(STORAGE_KEY)
+  if (!stored) return {}
+
+  try {
+    return JSON.parse(stored)
+  } catch (e) {
+    console.error('Failed to parse tutorial pages', e)
+    return {}
+  }
+}
+
+const isHeaderCurrentVersionComplete = (pages) => {
+  const requiredHeaderSteps = Number(localStorage.getItem(HEADER_REQUIRED_STEPS_KEY) || 0)
+  if (!requiredHeaderSteps || Number.isNaN(requiredHeaderSteps)) return false
+
+  return !!pages.Header && pages.Header__tutorialStepCount === requiredHeaderSteps
+}
+
 /**
  * Custom hook to manage per-page tutorial state
  * Tracks which tutorial tooltips user has seen using localStorage
+ * Header page tutorials take priority - page tutorials skip if Header not complete
  */
 export const usePageTutorial = (pageName, tutorialSteps = []) => {
   const [currentStep, setCurrentStep] = useState(0)
   const [showTutorial, setShowTutorial] = useState(false)
   const [visitedPages, setVisitedPages] = useState({})
+  const [isHeaderComplete, setIsHeaderComplete] = useState(false)
+  const pageVersionKey = `${pageName}__tutorialStepCount`
 
-  // Initialize from localStorage on mount
+  // Keep all pages in sync when Header tutorial completes in the same tab.
   useEffect(() => {
-    const stored = localStorage.getItem('ricevision_tutorial_pages')
-    
-    if (stored) {
-      try {
-        const pages = JSON.parse(stored)
-        setVisitedPages(pages)
-        // Show tutorial if this is first time on this page
-        if (!pages[pageName] && tutorialSteps.length > 0) {
-          setShowTutorial(true)
-        }
-      } catch (e) {
-        console.error('Failed to parse tutorial pages', e)
-      }
-    } else {
-      // First time ever - show tutorial if we have steps
-      if (tutorialSteps.length > 0) {
-        setShowTutorial(true)
-      }
+    const isHeaderPage = pageName === 'Header'
+
+    const syncFromStorage = () => {
+      const pages = readTutorialPages()
+      setVisitedPages(pages)
+
+      const headerDone = isHeaderCurrentVersionComplete(pages)
+      setIsHeaderComplete(headerDone)
+
+      const hasSeenCurrentVersion =
+        !!pages[pageName] && pages[pageVersionKey] === tutorialSteps.length
+      const shouldShow = tutorialSteps.length > 0 && !hasSeenCurrentVersion
+      setShowTutorial(shouldShow && (isHeaderPage || headerDone))
     }
-  }, [pageName, tutorialSteps.length])
+
+    syncFromStorage()
+
+    window.addEventListener('storage', syncFromStorage)
+    window.addEventListener('ricevision:tutorial-pages-updated', syncFromStorage)
+
+    return () => {
+      window.removeEventListener('storage', syncFromStorage)
+      window.removeEventListener('ricevision:tutorial-pages-updated', syncFromStorage)
+    }
+  }, [pageName, tutorialSteps.length, pageVersionKey])
 
   // Move to next tutorial step
   const nextStep = useCallback(() => {
@@ -52,10 +82,15 @@ export const usePageTutorial = (pageName, tutorialSteps = []) => {
   // Close tutorial and mark page as visited
   const closeTutorial = useCallback(() => {
     setShowTutorial(false)
-    const updated = { ...visitedPages, [pageName]: true }
+    const updated = {
+      ...readTutorialPages(),
+      [pageName]: true,
+      [pageVersionKey]: tutorialSteps.length,
+    }
     setVisitedPages(updated)
-    localStorage.setItem('ricevision_tutorial_pages', JSON.stringify(updated))
-  }, [pageName, visitedPages])
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
+    window.dispatchEvent(new Event('ricevision:tutorial-pages-updated'))
+  }, [pageName, pageVersionKey, tutorialSteps.length])
 
   // Skip entire tutorial
   const skipTutorial = useCallback(() => {
@@ -64,10 +99,17 @@ export const usePageTutorial = (pageName, tutorialSteps = []) => {
 
   // Reset tutorial for testing
   const resetTutorial = useCallback(() => {
-    localStorage.removeItem('ricevision_tutorial_pages')
+    localStorage.removeItem(STORAGE_KEY)
     setVisitedPages({})
+    setIsHeaderComplete(false)
     setCurrentStep(0)
-    setShowTutorial(true)
+    setShowTutorial(pageName === 'Header')
+    window.dispatchEvent(new Event('ricevision:tutorial-pages-updated'))
+  }, [pageName])
+
+  const forceShowTutorial = useCallback(() => {
+    setCurrentStep(0)
+    setShowTutorial(tutorialSteps.length > 0)
   }, [])
 
   return {
@@ -80,5 +122,8 @@ export const usePageTutorial = (pageName, tutorialSteps = []) => {
     closeTutorial,
     skipTutorial,
     resetTutorial,
+    forceShowTutorial,
+    isHeaderComplete,
+    visitedPages,
   }
 }

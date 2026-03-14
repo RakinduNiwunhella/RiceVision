@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react'
 import { X, ChevronRight, ChevronLeft } from 'lucide-react'
 
 /**
- * Inline tutorial tooltip component with pointer arrow
- * Displays helpful guidance next to interactive elements with an arrow pointing to the target
+ * Cloud/Callout tutorial tooltip component with integrated pointer
+ * Displays helpful guidance next to interactive elements with a smooth curved pointer
  */
 const TutorialTooltip = ({
   visible = false,
-  position = 'top', // 'top', 'bottom', 'left', 'right'
+  position = 'bottom', // 'top', 'bottom', 'left', 'right'
   title,
   action, // What to click
   outcome, // What happens
@@ -20,7 +20,7 @@ const TutorialTooltip = ({
   totalSteps = 1,
 }) => {
   const [styles, setStyles] = useState({})
-  const [arrowStyles, setArrowStyles] = useState({})
+  const [pointerStyle, setPointerStyle] = useState({})
 
   useEffect(() => {
     if (!visible || !elementRef?.current) return
@@ -44,56 +44,61 @@ const TutorialTooltip = ({
       if (!tooltip) return
 
       const tooltipRect = tooltip.getBoundingClientRect()
-      const arrowSize = 10 // Size of the arrow
+      const pointerSize = 14
+      const gapSize = 12
       let top = 0
       let left = 0
-      let arrowTop = 0
-      let arrowLeft = 0
-      let arrowClass = ''
+      let pointerPos = 'bottom'
 
       // Calculate tooltip position based on specified position
+      // Position tooltip centered on element when possible
+      const elementCenterX = rect.left + rect.width / 2
+      const elementCenterY = rect.top + rect.height / 2
+
       switch (position) {
-        case 'top':
-          top = rect.top - tooltipRect.height - arrowSize - 4
-          left = rect.left + rect.width / 2 - tooltipRect.width / 2
-          arrowTop = tooltipRect.height + 4
-          arrowLeft = tooltipRect.width / 2 - arrowSize / 2
-          arrowClass = 'bottom'
-          break
         case 'bottom':
-          top = rect.bottom + arrowSize + 4
-          left = rect.left + rect.width / 2 - tooltipRect.width / 2
-          arrowTop = -arrowSize - 4
-          arrowLeft = tooltipRect.width / 2 - arrowSize / 2
-          arrowClass = 'top'
+          top = rect.bottom + gapSize
+          left = elementCenterX - tooltipRect.width / 2
+          pointerPos = 'top'
           break
-        case 'left':
-          top = rect.top + rect.height / 2 - tooltipRect.height / 2
-          left = rect.left - tooltipRect.width - arrowSize - 4
-          arrowTop = tooltipRect.height / 2 - arrowSize / 2
-          arrowLeft = tooltipRect.width + 4
-          arrowClass = 'right'
+        case 'top':
+          top = rect.top - tooltipRect.height - gapSize
+          left = elementCenterX - tooltipRect.width / 2
+          pointerPos = 'bottom'
           break
         case 'right':
-          top = rect.top + rect.height / 2 - tooltipRect.height / 2
-          left = rect.right + arrowSize + 4
-          arrowTop = tooltipRect.height / 2 - arrowSize / 2
-          arrowLeft = -arrowSize - 4
-          arrowClass = 'left'
+          top = elementCenterY - tooltipRect.height / 2
+          left = rect.right + gapSize
+          pointerPos = 'left'
+          break
+        case 'left':
+          top = elementCenterY - tooltipRect.height / 2
+          left = rect.left - tooltipRect.width - gapSize
+          pointerPos = 'right'
           break
         default:
           break
       }
 
-      // Clamp to window bounds
-      left = Math.max(8, Math.min(left, window.innerWidth - tooltipRect.width - 8))
-      
-      // Allow top to go negative but ensure tooltip stays in viewport
-      if (top < 8) {
-        top = Math.max(8, rect.bottom + arrowSize + 4) // Fallback to bottom if not enough space
-      }
-      if (top + tooltipRect.height > window.innerHeight - 8) {
-        top = Math.max(8, rect.top - tooltipRect.height - arrowSize - 4) // Try top position
+      // Clamp to window bounds with padding
+      const padding = 16
+      left = Math.max(padding, Math.min(left, window.innerWidth - tooltipRect.width - padding))
+      top = Math.max(padding, Math.min(top, window.innerHeight - tooltipRect.height - padding))
+
+      // Calculate pointer position relative to tooltip
+      let pointerX = '50%'
+      let pointerY = '50%'
+
+      if (position === 'bottom' || position === 'top') {
+        // Adjust pointer horizontal position based on actual left offset
+        const tooltipCenterX = left + tooltipRect.width / 2
+        const offsetX = elementCenterX - tooltipCenterX
+        pointerX = `calc(50% + ${offsetX}px)`
+      } else {
+        // Adjust pointer vertical position based on actual top offset
+        const tooltipCenterY = top + tooltipRect.height / 2
+        const offsetY = elementCenterY - tooltipCenterY
+        pointerY = `calc(50% + ${offsetY}px)`
       }
 
       setStyles({
@@ -103,11 +108,10 @@ const TutorialTooltip = ({
         zIndex: 50,
       })
 
-      setArrowStyles({
-        position: 'absolute',
-        top: `${arrowTop}px`,
-        left: `${arrowLeft}px`,
-        zIndex: 51,
+      setPointerStyle({
+        position: pointerPos,
+        pointerX,
+        pointerY,
       })
     }
 
@@ -117,67 +121,124 @@ const TutorialTooltip = ({
     // Also recalculate after a delay to account for scroll completion
     const timer = setTimeout(calculatePosition, 300)
 
-    // Recalculate on window resize
+    // Recalculate on window resize and scroll
     const handleResize = () => calculatePosition()
     window.addEventListener('resize', handleResize)
+    window.addEventListener('scroll', handleResize, true)
 
     return () => {
       clearTimeout(timer)
       window.removeEventListener('resize', handleResize)
+      window.removeEventListener('scroll', handleResize, true)
     }
   }, [visible, elementRef, position])
 
   if (!visible) return null
 
   const bgColor = isDarkMode
-    ? 'bg-slate-900/20 backdrop-blur-xl border border-emerald-500/60 text-white'
-    : 'bg-white/20 backdrop-blur-xl border border-emerald-400/60 text-slate-900'
+    ? 'bg-slate-900/30 backdrop-blur-md border border-emerald-500/50 text-white'
+    : 'bg-white/30 backdrop-blur-md border border-emerald-400/50 text-slate-900'
 
-  const arrowColor = isDarkMode ? 'rgba(15,23,42,0.2)' : 'rgba(255,255,255,0.2)'
-  const borderColor = isDarkMode ? '#10b98166' : '#34d39966'
+  // Simple pointer using CSS borders - points directly to element
+  const CloudPointer = () => {
+    const { position, pointerX, pointerY } = pointerStyle
 
-  // Arrow triangle using SVG
-  const Arrow = ({ direction }) => {
-    const arrowMap = {
-      top: (
-        <svg width="20" height="10" viewBox="0 0 20 10" style={arrowStyles}>
-          <polygon points="10,0 20,10 0,10" fill={arrowColor} stroke={borderColor} strokeWidth="1" />
-        </svg>
-      ),
-      bottom: (
-        <svg width="20" height="10" viewBox="0 0 20 10" style={arrowStyles}>
-          <polygon points="0,0 20,0 10,10" fill={arrowColor} stroke={borderColor} strokeWidth="1" />
-        </svg>
-      ),
-      left: (
-        <svg width="10" height="20" viewBox="0 0 10 20" style={arrowStyles}>
-          <polygon points="0,10 10,0 10,20" fill={arrowColor} stroke={borderColor} strokeWidth="1" />
-        </svg>
-      ),
-      right: (
-        <svg width="10" height="20" viewBox="0 0 10 20" style={arrowStyles}>
-          <polygon points="10,10 0,0 0,20" fill={arrowColor} stroke={borderColor} strokeWidth="1" />
-        </svg>
-      ),
+    if (position === 'top') {
+      // Pointer pointing up from tooltip bottom
+      return (
+        <div
+          style={{
+            position: 'absolute',
+            bottom: `-10px`,
+            left: pointerX,
+            transform: 'translateX(-50%)',
+            width: '0',
+            height: '0',
+            borderStyle: 'solid',
+            borderWidth: `10px 10px 0 10px`,
+            borderColor: isDarkMode
+              ? 'rgba(15, 23, 42, 0.3) transparent transparent transparent'
+              : 'rgba(255, 255, 255, 0.3) transparent transparent transparent',
+          }}
+        />
+      )
+    } else if (position === 'bottom') {
+      // Pointer pointing down from tooltip top
+      return (
+        <div
+          style={{
+            position: 'absolute',
+            top: `-10px`,
+            left: pointerX,
+            transform: 'translateX(-50%)',
+            width: '0',
+            height: '0',
+            borderStyle: 'solid',
+            borderWidth: `0 10px 10px 10px`,
+            borderColor: isDarkMode
+              ? 'transparent transparent rgba(15, 23, 42, 0.3) transparent'
+              : 'transparent transparent rgba(255, 255, 255, 0.3) transparent',
+          }}
+        />
+      )
+    } else if (position === 'left') {
+      // Pointer pointing left from tooltip right
+      return (
+        <div
+          style={{
+            position: 'absolute',
+            right: `-10px`,
+            top: pointerY,
+            transform: 'translateY(-50%)',
+            width: '0',
+            height: '0',
+            borderStyle: 'solid',
+            borderWidth: `10px 0 10px 10px`,
+            borderColor: isDarkMode
+              ? 'transparent transparent transparent rgba(15, 23, 42, 0.3)'
+              : 'transparent transparent transparent rgba(255, 255, 255, 0.3)',
+          }}
+        />
+      )
+    } else if (position === 'right') {
+      // Pointer pointing right from tooltip left
+      return (
+        <div
+          style={{
+            position: 'absolute',
+            left: `-10px`,
+            top: pointerY,
+            transform: 'translateY(-50%)',
+            width: '0',
+            height: '0',
+            borderStyle: 'solid',
+            borderWidth: `10px 10px 10px 0`,
+            borderColor: isDarkMode
+              ? 'transparent rgba(15, 23, 42, 0.3) transparent transparent'
+              : 'transparent rgba(255, 255, 255, 0.3) transparent transparent',
+          }}
+        />
+      )
     }
-    return arrowMap[direction] || null
+
+    return null
   }
 
   return (
     <div
       style={styles}
-      className={`${bgColor} rounded-lg px-4 py-3 shadow-lg shadow-black/20 max-w-xs animate-fadeIn relative pointer-events-auto`}
+      className={`${bgColor} rounded-2xl px-4 py-3 shadow-2xl shadow-black/30 w-80 animate-fadeIn relative pointer-events-auto`}
       data-tutorial-tooltip="true"
     >
-      {/* Arrow pointer */}
-      <Arrow direction={position} />
+      {/* Cloud pointer */}
+      <CloudPointer />
 
       {/* Close button */}
       <button
         onClick={onDismiss}
-        className="absolute -top-2 -right-2 bg-slate-700 hover:bg-slate-600 rounded-full p-1 transition z-50"
+        className="absolute -top-2 -right-2 bg-emerald-500/80 hover:bg-emerald-600 rounded-full p-1 transition z-50 shadow-lg"
       >
-        <X size={14} />
+        <X size={14} className="text-white" />
       </button>
 
       {/* Title */}
