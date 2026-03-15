@@ -30,3 +30,22 @@ async def login(data: LoginRequest):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+class ResetPasswordRequest(BaseModel):
+    email: str
+
+
+@router.post("/reset-password")
+async def reset_password(data: ResetPasswordRequest):
+
+    try:
+        supabase.auth.reset_password_for_email(
+            data.email,
+            {"redirect_to": "http://localhost:5173/reset-password"}
+        )
+
+        return {"message": "Password reset email sent"}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
