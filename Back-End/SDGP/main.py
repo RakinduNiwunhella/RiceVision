@@ -10,6 +10,7 @@ from .routes.mapPage import router as map_router
 from .routes.alerts import router as alerts_router
 from .routes.notifications import router as notifications_router
 from .routes.chat import router as chat_router
+from .routes.signin import router as signin_router
 
 app = FastAPI()
 
@@ -37,4 +38,5 @@ app.include_router(map_router)
 app.include_router(alerts_router, prefix="/api")
 app.include_router(notifications_router)
 app.include_router(chat_router)
+app.include_router(signin_router)
 
