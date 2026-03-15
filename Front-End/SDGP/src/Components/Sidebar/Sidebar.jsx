@@ -1,37 +1,9 @@
-import React, { useRef, useMemo } from 'react'
+import React from 'react'
 import { NavLink } from 'react-router-dom'
 import { useLanguage } from '../../context/LanguageContext'
-import TutorialTooltip from '../../components/TutorialTooltip'
-import { usePageTutorial } from '../../hooks/usePageTutorial'
 
 const Sidebar = () => {
   const { t } = useLanguage()
-
-  // Tutorial setup
-  const tutorialSteps = useMemo(() => [
-    {
-      title: "Sidebar Navigation",
-      action: "Use the left sidebar to navigate between main pages",
-      outcome: "You can access Dashboard, Field Map, Alerts, Weather, Reports, and more from here",
-    },
-    {
-      title: "Top Navigation Links",
-      action: "Click Dashboard, Field Map, or other items to navigate",
-      outcome: "The highlighted item shows your current page. Active links have a green gradient background",
-    },
-    {
-      title: "Bottom Options",
-      action: "Profile: View your account settings. Help: Get support. Logout: Sign out",
-      outcome: "Quick access to user settings and account management from any page",
-    },
-  ], [])
-
-  const { currentStep, showTutorial, currentTutorialStep, nextStep, prevStep, closeTutorial } =
-    usePageTutorial("sidebar", tutorialSteps)
-
-  const sidebarRef = useRef(null)
-  const navItemsRef = useRef(null)
-  const bottomItemsRef = useRef(null)
 
   const navItems = [
     { id: 'dashboard', labelKey: 'myDashboard', icon: 'apps' },
@@ -55,9 +27,9 @@ const Sidebar = () => {
   const linkInactive = 'text-slate-400 hover:text-white hover:bg-white/[0.05]'
 
   return (
-    <aside ref={sidebarRef} className="h-full w-60 bg-slate-900/60 backdrop-blur-xl px-4 py-5 flex flex-col justify-between border-r border-white/[0.06] relative">
+    <aside className="h-full w-60 bg-slate-900/60 backdrop-blur-xl px-4 py-5 flex flex-col justify-between border-r border-white/[0.06]">
       {/* Top nav */}
-      <nav ref={navItemsRef} className="flex flex-col gap-0.5">
+      <nav className="flex flex-col gap-0.5">
         {navItems.map((item) => (
           <NavLink
             key={item.id}
@@ -78,7 +50,7 @@ const Sidebar = () => {
       </nav>
 
       {/* Bottom nav */}
-      <nav ref={bottomItemsRef} className="flex flex-col gap-0.5">
+      <nav className="flex flex-col gap-0.5">
         <div className="mb-2 border-t border-white/[0.05]" />
         {bottomItems.map((item) => (
           <NavLink
@@ -98,57 +70,6 @@ const Sidebar = () => {
           </NavLink>
         ))}
       </nav>
-
-      {/* Tutorial Tooltips */}
-      {showTutorial && currentTutorialStep && (
-        <>
-          {currentStep === 0 && (
-            <TutorialTooltip
-              visible={true}
-              position="right"
-              title={currentTutorialStep.title}
-              action={currentTutorialStep.action}
-              outcome={currentTutorialStep.outcome}
-              elementRef={sidebarRef}
-              step={currentStep}
-              totalSteps={tutorialSteps.length}
-              onNext={nextStep}
-              onPrevious={prevStep}
-              onDismiss={closeTutorial}
-            />
-          )}
-          {currentStep === 1 && (
-            <TutorialTooltip
-              visible={true}
-              position="right"
-              title={currentTutorialStep.title}
-              action={currentTutorialStep.action}
-              outcome={currentTutorialStep.outcome}
-              elementRef={navItemsRef}
-              step={currentStep}
-              totalSteps={tutorialSteps.length}
-              onNext={nextStep}
-              onPrevious={prevStep}
-              onDismiss={closeTutorial}
-            />
-          )}
-          {currentStep === 2 && (
-            <TutorialTooltip
-              visible={true}
-              position="right"
-              title={currentTutorialStep.title}
-              action={currentTutorialStep.action}
-              outcome={currentTutorialStep.outcome}
-              elementRef={bottomItemsRef}
-              step={currentStep}
-              totalSteps={tutorialSteps.length}
-              onNext={nextStep}
-              onPrevious={prevStep}
-              onDismiss={closeTutorial}
-            />
-          )}
-        </>
-      )}
     </aside>
   )
 }

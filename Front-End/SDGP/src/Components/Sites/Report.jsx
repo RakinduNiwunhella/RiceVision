@@ -7,8 +7,6 @@ import 'jspdf-autotable';
 import autoTable from 'jspdf-autotable';
 import logoImg from '../assets/logo.png';
 import { useLanguage } from "../../context/LanguageContext";
-import TutorialTooltip from "../../components/TutorialTooltip";
-import { usePageTutorial } from "../../hooks/usePageTutorial";
 
 const CustomSelect = ({ value, onChange, options, className = "" }) => {
   const [open, setOpen] = useState(false);
@@ -116,52 +114,6 @@ const Report = () => {
   const [configB, setConfigB] = useState({ district: "Gampaha", date: "", season: "Maha" });
   const [dataA, setDataA] = useState(null);
   const [dataB, setDataB] = useState(null);
-
-  // Tutorial Setup
-  const tutorialSteps = [
-    {
-      title: t("yieldReports") || "Yield Analytics Reports",
-      action: "Explore satellite-derived yield predictions and analysis",
-      outcome: "You will see detailed yield forecasts with comparative metrics and export options"
-    },
-    {
-      title: "Single vs Compare",
-      action: "Toggle between 'Single' report view and 'Compare' mode for side-by-side analysis",
-      outcome: "You can analyze one district or compare two districts' yield predictions"
-    },
-    {
-      title: "District Selection",
-      action: "Click to select a district and view its yield analytics",
-      outcome: "The report will load satellite data and yield predictions for the selected district"
-    },
-    {
-      title: "Yield Prediction",
-      action: "View the predicted yield and comparison with historical baseline",
-      outcome: "You will see the expected harvest (kg/ha) and how it compares to past years"
-    },
-    {
-      title: "Metrics & Export",
-      action: "Review pest count, risk factors, and other metrics. Use Export PDF to download the report",
-      outcome: "You get a comprehensive analysis document ready for sharing or storage"
-    }
-  ];
-
-  const {
-    currentStep,
-    showTutorial,
-    currentTutorialStep,
-    hasMoreSteps,
-    nextStep,
-    prevStep,
-    closeTutorial
-  } = usePageTutorial("report", tutorialSteps);
-
-  // Element refs for tutorial
-  const headerRef = useRef(null);
-  const modeToggleRef = useRef(null);
-  const districtSelectorRef = useRef(null);
-  const yieldHeroRef = useRef(null);
-  const metricsExportRef = useRef(null);
 
   // Fetch available S3 dates once on mount and set the latest as default
   useEffect(() => {
@@ -825,7 +777,7 @@ const Report = () => {
     return { label: "HIGH RISK", color: "text-red-400" };
   };
 
-  const ReportPane = ({ report, config, setConfig, title, districtSelectorRef, yieldHeroRef, metricsExportRef }) => {
+  const ReportPane = ({ report, config, setConfig, title }) => {
     if (report?.error) return (
       <div className="flex-1 glass p-6 sm:p-12 rounded-2xl sm:rounded-[3rem] text-center border border-red-500/20">
         <span className="material-symbols-outlined text-5xl text-red-400/40 mb-4 block">signal_disconnected</span>
@@ -862,20 +814,17 @@ const Report = () => {
               {title} VIEW
             </span>
             <button
-              ref={metricsExportRef}
               onClick={() => generatePDF(report, config)}
 className="flex items-center gap-2 text-[10px] font-black px-4 py-1.5 rounded-xl border border-white/10 transition-all duration-300 hover:bg-white/10 hover:border-white/20 hover:scale-[1.02] cursor-pointer uppercase tracking-widest"            >
               <span className="material-symbols-outlined text-xs">download</span>
               Export PDF
             </button>
           </div>
-          <div ref={districtSelectorRef}>
-            <CustomSelect
-              value={config.district}
-              onChange={(val) => setConfig({ ...config, district: val })}
-              options={districts}
-            />
-          </div>
+          <CustomSelect
+            value={config.district}
+            onChange={(val) => setConfig({ ...config, district: val })}
+            options={districts}
+          />
           <CustomSelect
             value={config.season}
             onChange={(val) => setConfig({ ...config, season: val })}
@@ -893,7 +842,7 @@ className="flex items-center gap-2 text-[10px] font-black px-4 py-1.5 rounded-xl
         </div>
 
         {/* Yield Hero */}
-        <div ref={yieldHeroRef} className="glass p-3 sm:p-5 rounded-xl sm:rounded-[2rem] border border-emerald-500/20 shadow-xl mb-6 relative overflow-hidden">
+        <div className="glass p-3 sm:p-5 rounded-xl sm:rounded-[2rem] border border-emerald-500/20 shadow-xl mb-6 relative overflow-hidden">
           {/* subtle glow */}
           <div className="absolute top-0 right-0 w-36 h-36 bg-emerald-500/10 blur-[50px] -mr-8 -mt-8 pointer-events-none rounded-full" />
           <div className="relative z-10">
@@ -965,7 +914,7 @@ className="flex items-center gap-2 text-[10px] font-black px-4 py-1.5 rounded-xl
       <div className="max-w-7xl mx-auto space-y-10 pb-20">
 
         {/* Page Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6" ref={headerRef}>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
             <h1 className="text-xl sm:text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
               {t('yieldReports')}
@@ -976,7 +925,7 @@ className="flex items-center gap-2 text-[10px] font-black px-4 py-1.5 rounded-xl
           </div>
 
           {/* Mode Toggle */}
-          <div className="flex flex-wrap items-center gap-3 sm:gap-4" ref={modeToggleRef}>
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4">
             <div className="flex p-1 rounded-2xl bg-white/5 border border-white/10 w-fit">
               <button
                 onClick={() => setMode("single")}
@@ -1000,15 +949,7 @@ className="flex items-center gap-2 text-[10px] font-black px-4 py-1.5 rounded-xl
 
         {/* Report Panes */}
         <div className={`flex flex-col ${mode === "compare" ? "lg:flex-row" : "max-w-2xl mx-auto w-full"} gap-8`}>
-          <ReportPane 
-            report={dataA} 
-            config={configA} 
-            setConfig={setConfigA} 
-            title="PRIMARY"
-            districtSelectorRef={currentStep === 2 ? districtSelectorRef : undefined}
-            yieldHeroRef={currentStep === 3 ? yieldHeroRef : undefined}
-            metricsExportRef={currentStep === 4 ? metricsExportRef : undefined}
-          />
+          <ReportPane report={dataA} config={configA} setConfig={setConfigA} title="PRIMARY" />
           {mode === "compare" && <ReportPane report={dataB} config={configB} setConfig={setConfigB} title="COMPARISON" />}
         </div>
 
@@ -1024,87 +965,6 @@ className="flex items-center gap-2 text-[10px] font-black px-4 py-1.5 rounded-xl
     </button>
   </div>
 )}
-
-      {/* ─── TUTORIAL TOOLTIPS ─── */}
-      {showTutorial && currentTutorialStep && (
-        <>
-          {currentStep === 0 && (
-            <TutorialTooltip
-              visible={true}
-              position="bottom"
-              title={currentTutorialStep.title}
-              action={currentTutorialStep.action}
-              outcome={currentTutorialStep.outcome}
-              elementRef={headerRef}
-              step={currentStep}
-              totalSteps={tutorialSteps.length}
-              onNext={nextStep}
-              onPrevious={prevStep}
-              onDismiss={closeTutorial}
-            />
-          )}
-          {currentStep === 1 && (
-            <TutorialTooltip
-              visible={true}
-              position="bottom"
-              title={currentTutorialStep.title}
-              action={currentTutorialStep.action}
-              outcome={currentTutorialStep.outcome}
-              elementRef={modeToggleRef}
-              step={currentStep}
-              totalSteps={tutorialSteps.length}
-              onNext={nextStep}
-              onPrevious={prevStep}
-              onDismiss={closeTutorial}
-            />
-          )}
-          {currentStep === 2 && (
-            <TutorialTooltip
-              visible={true}
-              position="bottom"
-              title={currentTutorialStep.title}
-              action={currentTutorialStep.action}
-              outcome={currentTutorialStep.outcome}
-              elementRef={districtSelectorRef}
-              step={currentStep}
-              totalSteps={tutorialSteps.length}
-              onNext={nextStep}
-              onPrevious={prevStep}
-              onDismiss={closeTutorial}
-            />
-          )}
-          {currentStep === 3 && (
-            <TutorialTooltip
-              visible={true}
-              position="bottom"
-              title={currentTutorialStep.title}
-              action={currentTutorialStep.action}
-              outcome={currentTutorialStep.outcome}
-              elementRef={yieldHeroRef}
-              step={currentStep}
-              totalSteps={tutorialSteps.length}
-              onNext={nextStep}
-              onPrevious={prevStep}
-              onDismiss={closeTutorial}
-            />
-          )}
-          {currentStep === 4 && (
-            <TutorialTooltip
-              visible={true}
-              position="bottom"
-              title={currentTutorialStep.title}
-              action={currentTutorialStep.action}
-              outcome={currentTutorialStep.outcome}
-              elementRef={metricsExportRef}
-              step={currentStep}
-              totalSteps={tutorialSteps.length}
-              onNext={nextStep}
-              onPrevious={prevStep}
-              onDismiss={closeTutorial}
-            />
-          )}
-        </>
-      )}
     </div>
     
   );

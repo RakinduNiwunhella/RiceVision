@@ -12,7 +12,7 @@
  */
 
 import { useState, useRef, useEffect } from "react";
-import { supabase } from "../../supabaseClient";
+import { supabase } from "./supabaseClient"; // adjust path if needed
 
 const API_BASE = "https://ricevision-cakt.onrender.com";
 

@@ -59,17 +59,12 @@ export default function SignupPage() {
     if (error) {
       alert(error.message);
     } else {
-      // Reset tutorials on signup - set to empty object instead of removing
-      localStorage.setItem('ricevision_tutorial_pages', JSON.stringify({}));
       navigate("/field-setup", { state: { fromSignup: true } });
     }
     setLoading(false);
   };
 
   const handleGoogleSignup = async () => {
-    // Reset tutorials on signup - set to empty object instead of removing
-    localStorage.setItem('ricevision_tutorial_pages', JSON.stringify({}));
-    
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {

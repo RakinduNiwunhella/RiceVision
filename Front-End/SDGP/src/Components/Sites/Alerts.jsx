@@ -1,9 +1,7 @@
-import React, { useState, useMemo, useEffect, useRef } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { updateAlertStatus } from "../../api/api";
 import { useLanguage } from "../../context/LanguageContext";
-import TutorialTooltip from "../../components/TutorialTooltip";
-import { usePageTutorial } from "../../hooks/usePageTutorial";
 
 //PRODUCTION
 const API_BASE = "https://ricevision-cakt.onrender.com";
@@ -104,38 +102,6 @@ const Alerts = () => {
   const { t } = useLanguage();
   const tabLabels = [t("disasters"), t("pestRisks"), t("pastAlerts")];
 
-  // Tutorial setup - create once and memoize
-  const tutorialSteps = useMemo(() => [
-    {
-      title: "Alert Tabs",
-      action: "Click on different tabs to view different types of alerts",
-      outcome: "You'll see disasters, pest risks, or past resolved alerts",
-    },
-    {
-      title: "Search Alerts",
-      action: "Type in the search box to find specific alerts",
-      outcome: "The alert list filters to show only matching results",
-    },
-    {
-      title: "Resolve Alert",
-      action: "Click the 'Resolve' button on any active alert",
-      outcome: "A modal opens where you can add a resolution note",
-    },
-    {
-      title: "Ignore Alert",
-      action: "Click 'Ignore' to dismiss an alert without resolving",
-      outcome: "The alert moves to 'Past Alerts' tab",
-    },
-    {
-      title: "View on Map",
-      action: "Click 'View Map' to see the alert location",
-      outcome: "You're taken to the Field Map showing the affected area",
-    },
-  ], [])
-
-  const { currentStep, showTutorial, currentTutorialStep, hasMoreSteps, nextStep, prevStep, closeTutorial } =
-    usePageTutorial("alerts", tutorialSteps);
-
   const [alerts, setAlerts] = useState([]);
   const [globalAlerts, setGlobalAlerts] = useState([]);
   const [activeTab, setActiveTab] = useState(
@@ -148,13 +114,6 @@ const Alerts = () => {
     alertType: null,
   });
   const [exitingId, setExitingId] = useState(null);
-
-  // Refs for tutorial tooltips
-  const tabsRef = useRef(null);
-  const searchRef = useRef(null);
-  const resolveRef = useRef(null);
-  const ignoreRef = useRef(null);
-  const mapRef = useRef(null);
 
   const navigate = useNavigate();
 
@@ -441,7 +400,7 @@ const Alerts = () => {
         {/* Tabs */}
         <div className="glass p-6 rounded-[2rem] border-white/20">
           <div className="flex flex-col lg:flex-row gap-6 justify-between">
-            <div className="flex p-1 rounded-2xl bg-white/5 border border-white/10 w-full sm:w-fit overflow-x-auto no-scrollbar" ref={tabsRef}>
+            <div className="flex p-1 rounded-2xl bg-white/5 border border-white/10 w-full sm:w-fit overflow-x-auto no-scrollbar">
               {TAB_KEYS.map((key, idx) => (
                 <button
                   key={key}
@@ -465,7 +424,6 @@ const Alerts = () => {
               placeholder={t("findAnomaly")}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              ref={searchRef}
               className="bg-white/5 border border-white/10 rounded-2xl py-3 px-6 text-sm text-white placeholder:text-white/20"
             />
           </div>
@@ -517,7 +475,6 @@ const Alerts = () => {
                 {alert.status === "Open" && activeTab !== "Past Alerts" && (
                   <div className="flex gap-3">
                     <button
-                      ref={currentStep === 2 && resolveRef || undefined}
                       onClick={() => handleResolve(alert.id)}
                       className="px-4 sm:px-6 py-2 bg-emerald-500/30 text-emerald-300 rounded-xl text-xs font-bold"
                     >
@@ -525,7 +482,6 @@ const Alerts = () => {
                     </button>
 
                     <button
-                      ref={currentStep === 3 && ignoreRef || undefined}
                       onClick={() => handleIgnore(alert.id)}
                       className="btn-ignore glass-btn text-[10px] px-3 py-1 tracking-widest bg-white/10 hover:bg-white/20"
                     >
@@ -533,7 +489,6 @@ const Alerts = () => {
                     </button>
 
                     <button
-                      ref={currentStep === 4 && mapRef || undefined}
                       onClick={() => handleViewInMap(alert)}
                       className="glass-btn text-[10px] px-3 py-1 tracking-widest bg-white/10 hover:bg-white/20"
                     >
@@ -545,87 +500,6 @@ const Alerts = () => {
             </div>
           ))}
         </div>
-
-        {/* Tutorial Tooltips */}
-        {showTutorial && currentTutorialStep && (
-          <>
-            {currentStep === 0 && (
-              <TutorialTooltip
-                visible={true}
-                position="bottom"
-                title={currentTutorialStep.title}
-                action={currentTutorialStep.action}
-                outcome={currentTutorialStep.outcome}
-                elementRef={tabsRef}
-                step={currentStep}
-                totalSteps={tutorialSteps.length}
-                onNext={nextStep}
-                onPrevious={prevStep}
-                onDismiss={closeTutorial}
-              />
-            )}
-            {currentStep === 1 && (
-              <TutorialTooltip
-                visible={true}
-                position="top"
-                title={currentTutorialStep.title}
-                action={currentTutorialStep.action}
-                outcome={currentTutorialStep.outcome}
-                elementRef={searchRef}
-                step={currentStep}
-                totalSteps={tutorialSteps.length}
-                onNext={nextStep}
-                onPrevious={prevStep}
-                onDismiss={closeTutorial}
-              />
-            )}
-            {currentStep === 2 && resolveRef.current && (
-              <TutorialTooltip
-                visible={true}
-                position="top"
-                title={currentTutorialStep.title}
-                action={currentTutorialStep.action}
-                outcome={currentTutorialStep.outcome}
-                elementRef={resolveRef}
-                step={currentStep}
-                totalSteps={tutorialSteps.length}
-                onNext={nextStep}
-                onPrevious={prevStep}
-                onDismiss={closeTutorial}
-              />
-            )}
-            {currentStep === 3 && ignoreRef.current && (
-              <TutorialTooltip
-                visible={true}
-                position="top"
-                title={currentTutorialStep.title}
-                action={currentTutorialStep.action}
-                outcome={currentTutorialStep.outcome}
-                elementRef={ignoreRef}
-                step={currentStep}
-                totalSteps={tutorialSteps.length}
-                onNext={nextStep}
-                onPrevious={prevStep}
-                onDismiss={closeTutorial}
-              />
-            )}
-            {currentStep === 4 && mapRef.current && (
-              <TutorialTooltip
-                visible={true}
-                position="top"
-                title={currentTutorialStep.title}
-                action={currentTutorialStep.action}
-                outcome={currentTutorialStep.outcome}
-                elementRef={mapRef}
-                step={currentStep}
-                totalSteps={tutorialSteps.length}
-                onNext={nextStep}
-                onPrevious={prevStep}
-                onDismiss={closeTutorial}
-              />
-            )}
-          </>
-        )}
       </div>
     </div>
   );
