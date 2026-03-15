@@ -19,6 +19,84 @@ export const translations = {
     searchPlaceholder: "Search",
     noResults: "No results for",
 
+    // ── Navigation Button Tutorials (FLAT KEYS) ──
+    dashboardTutTitle: "See all your fields",
+    dashboardTutAction: "View crop health, yield, threats",
+    dashboardTutOutcome: "All field information in one place",
+    
+    fieldDataTutTitle: "Your field records",
+    fieldDataTutAction: "Check field statistics and data",
+    fieldDataTutOutcome: "See all field details and history",
+    
+    mapTutTitle: "Satellite view of fields",
+    mapTutAction: "View field imagery and layers",
+    mapTutOutcome: "See health status on the map",
+    
+    weatherTutTitle: "Check weather forecast",
+    weatherTutAction: "See temperature, rain, soil",
+    weatherTutOutcome: "Plan farming based on weather",
+    
+    alertsTutTitle: "Get pest and disease warnings",
+    alertsTutAction: "See active threats to crops",
+    alertsTutOutcome: "Know about risks to your crops",
+    
+    reportTutTitle: "Analyze yield performance",
+    reportTutAction: "Compare districts and yields",
+    reportTutOutcome: "Understand yield results",
+    
+    helpTutTitle: "Get help and support",
+    helpTutAction: "Find answers and FAQs",
+    helpTutOutcome: "Get help when needed",
+    
+    chatbotTutTitle: "Get instant AI advice",
+    chatbotTutAction: "Click to open chat assistant",
+    chatbotTutOutcome: "Ask questions and get instant answers",
+    
+    // ── Header Action Button Tutorials (FLAT KEYS) ──
+    searchHeaderTitle: "Find pages quickly",
+    searchHeaderAction: "Type page or district name",
+    searchHeaderOutcome: "Jump to any page instantly",
+    
+    languageTitle: "Switch language",
+    languageAction: "Choose English, Sinhala, or Tamil",
+    languageOutcome: "App displays in your language",
+    
+    themeTitle: "Change brightness level",
+    themeAction: "Click sun/moon icon",
+    themeOutcome: "Toggle dark or light mode",
+    
+    notificationsTitle: "Check messages",
+    notificationsAction: "See alerts and updates",
+    notificationsOutcome: "Stay informed",
+    
+    profileTitle: "Your account settings",
+    profileAction: "Edit your information",
+    profileOutcome: "Update your profile details",
+
+    // ── Field Setup Tutorials ──
+    fieldSetupTutorial: {
+      getStarted: {
+        title: "Start Field Registration",
+        action: "Click 'Get Started' to begin drawing your field",
+        outcome: "You'll be guided to select district and draw field boundary on map",
+      },
+      review: {
+        title: "Review Your Field",
+        action: "After drawing, click 'Review Selection' to check details",
+        outcome: "You'll see the field area in acres and annual cost breakdown",
+      },
+      complete: {
+        title: "Complete Registration",
+        action: "Click 'Complete Registration' to save your field",
+        outcome: "Your field is registered and you can start monitoring it",
+      },
+      download: {
+        title: "Export Report",
+        action: "Click 'Download PDF' to get field analysis report",
+        outcome: "A detailed PDF document is created with field data and analytics",
+      },
+    },
+
     // ── Dashboard ──
     welcomeTitle: "Welcome to RiceVision",
     welcomeSubtitle: "Insights of smarter farming",
@@ -318,6 +396,84 @@ export const translations = {
     searchPlaceholder: "සොයන්න...",
     noResults: "ප්‍රතිඵල නොමැත",
 
+    // ── Navigation Button Tutorials (FLAT KEYS) ──
+    dashboardTutTitle: "සියලු ඔබේ ක්ෂේත්‍ර බලන්න",
+    dashboardTutAction: "බෝග සෞඛ්‍ය, අස්වැන්න, තර්ජන පරීක්ෂා කරන්න",
+    dashboardTutOutcome: "එකම ස්ථානයේ සියලු ක්ෂේත්‍ර තොරතුරු",
+    
+    fieldDataTutTitle: "ඔබේ ක්ෂේත්‍ර වාර්තා",
+    fieldDataTutAction: "ක්ෂේත්‍ර සංඛ්‍යා සහ දත්ත පරීක්ෂා කරන්න",
+    fieldDataTutOutcome: "සියලු ක්ෂේත්‍ර විස්තර සහ ඉතිහාසය බලන්න",
+    
+    mapTutTitle: "චන්ද්‍රිකා ක්ෂේත්‍ර දර්ශනය",
+    mapTutAction: "ක්ෂේත්‍ර පිතු සහ ස්ථරයන් බලන්න",
+    mapTutOutcome: "සිතියමේ සෞඛ්‍ය බලන්න",
+    
+    weatherTutTitle: "කාලගුණ අනාවැකිය පරීක්ෂා කරන්න",
+    weatherTutAction: "උෂ්ණත්වය, වර්ෂා සහ පස බලන්න",
+    weatherTutOutcome: "කාලගුණ ඉතිරි කිරීමක් මත පදනම් වී සැලසුම්",
+    
+    alertsTutTitle: "පත්කයේ සහ රෝගවල අනතුරු ප්‍රවේශ කරන්න",
+    alertsTutAction: "බෝගවලට ක්රියාශීල තර්ජන බලන්න",
+    alertsTutOutcome: "ඔබේ බෝගවලට තර්ජන ගැන දැන ගන්න",
+    
+    reportTutTitle: "අස්වැන්න කර්ම විශ්ලේෂණ කරන්න",
+    reportTutAction: "දිස්ත්‍රික් සහ අස්වැන්න සංසන්දනය කරන්න",
+    reportTutOutcome: "අස්වැන්න ප්‍රතිඵල තේරුම් ගන්න",
+    
+    helpTutTitle: "සහාය සහ ආධාර ලබා ගන්න",
+    helpTutAction: "පිළිතුරු සහ FAQ සොයන්න",
+    helpTutOutcome: "ඔබට අවශ්‍ය විට සහාය ලබා ගන්න",
+    
+    chatbotTutTitle: "তাৎক্ষণিক AI পরামর්শ পান",
+    chatbotTutAction: "চ্যাট সহায়ক খুলতে ক্লিক করুন",
+    chatbotTutOutcome: "প্রশ্ন জিজ্ঞাসা করুন এবং তাৎক্ষণিক উত্তর পান",
+    
+    // ── Header Action Button Tutorials (FLAT KEYS) ──
+    searchHeaderTitle: "පිටු ඉක්මනින් සොයන්න",
+    searchHeaderAction: "පිටුවේ හෝ දිස්ත්‍රික්කයේ නාමය ටයිප් කරන්න",
+    searchHeaderOutcome: "ඕනෑම පිටුවට ක්ෂණිකව පනින්න",
+    
+    languageTitle: "භාෂාව මාරු කරන්න",
+    languageAction: "ඉංග්‍රීසි, සිංහල හෝ දෙමළ තෝරා ගැනීමට ක්ලික් කරන්න",
+    languageOutcome: "යෙදුම ඔබේ භාෂාවින් පෙන්නුම් දෙයි",
+    
+    themeTitle: "දීප්තිමතභාවය මට්ටම වෙනස් කරන්න",
+    themeAction: "සඳ/සූර්ය අයිකනය ක්ලික් කරන්න",
+    themeOutcome: "අඳුරු හෝ ආලෝකමත් ප්‍රකාශනය ටොගල් කරන්න",
+    
+    notificationsTitle: "පණිවිඩ පරීක්ෂා කරන්න",
+    notificationsAction: "අනතුරු ඇඟවීම් සහ යාවත්කාලීනයි බලන්න",
+    notificationsOutcome: "දැනුම්දෙන්න අවුරුද්ධ",
+    
+    profileTitle: "ඔබේ ගිණුම් සැකසීම්",
+    profileAction: "ඔබේ තොරතුරු සංස්කරණය කරන්න",
+    profileOutcome: "ඔබේ පැතිකඩ විස්තර යාවත්කාල කරන්න",
+
+    // ── Field Setup Tutorials ──
+    fieldSetupTutorial: {
+      getStarted: {
+        title: "ක්ෂේත්‍ර ලියාපදිංචිය ආරම්භ කරන්න",
+        action: "'ආරම්භ කරන්න' ක්ලික් කර ඔබේ කෙත ඇඳීම ආරම්භ කරන්න",
+        outcome: "ඔබ දිස්ත්‍රික්කය තෝරා ගැනීමට සහ සිතියමේ කෙත් සීමාව ඇඳීමට පෙනෙනු ඇත",
+      },
+      review: {
+        title: "ඔබේ කෙත සමාලෝකනය කරන්න",
+        action: "ඇඳීමෙන් පසු, 'සමාලෝකනය කරන්න' ක්ලික් කර විස්තර ඉතිරි කරන්න",
+        outcome: "ඔබ acres හි කෙත් ප්‍රදේශය සහ වාර්ෂික වියදම් බිඳුම දකිනු ඇත",
+      },
+      complete: {
+        title: "ලියාපදිංචිය සම්පූර්ණ කරන්න",
+        action: "'සම්පූර්ණ ලියාපදිංචිය' ක්ලික් කර ඔබේ කෙත සුරකින්න",
+        outcome: "ඔබේ කෙත ලියාපදිංචි වී ඔබ එය නිරීක්ෂණ කිරීමට පටන් ගත හැකිය",
+      },
+      download: {
+        title: "වාර්තාව នាందු නිෂ්පාදිතය",
+        action: "'PDF බාගන්න' ක්ලික් කර කෙත් විශ්ලේෂණ වාර්තාව ලබා ගන්න",
+        outcome: "කෙත් දත්ත සහ විශ්ලේෂණ සහිත විස්තරිත PDF ឯකសារ তৈরි කරනු ලැබේ",
+      },
+    },
+
     // ── Dashboard ──
     welcomeTitle: "RiceVision වෙත සාදරයෙන් පිළිගනිමු",
     welcomeSubtitle: "දක්ෂ ගොවිතැනෙහි අවබෝධය",
@@ -615,6 +771,84 @@ export const translations = {
     help: "உதவி",
     searchPlaceholder: "தேடுங்கள்...",
     noResults: "முடிவுகள் இல்லை",
+
+    // ── Navigation Button Tutorials (FLAT KEYS) ──
+    dashboardTutTitle: "உங்கள் சகல வயல்களைப் பார்க்கவும்",
+    dashboardTutAction: "பயிர் ஆரோக்கியம், மகசூல், அச்சுறுத்தல்கள் பார்க்கவும்",
+    dashboardTutOutcome: "ஒரே இடத்தில் சகல வயல் தகவல்",
+    
+    fieldDataTutTitle: "உங்கள் வயல் பதிவுகள்",
+    fieldDataTutAction: "வயல் இலக்கங்கள் மற்றும் செயல்திறன் பரிசோதிக்கவும்",
+    fieldDataTutOutcome: "சகல வயல் விவரங்களையும் பார்க்கவும்",
+    
+    mapTutTitle: "செயற்கைக்கோள் வயல் காட்சிப்படுத்தல்",
+    mapTutAction: "வயல் பிம்பங்கள் மற்றும் சுரங்குகளை பார்க்கவும்",
+    mapTutOutcome: "வரைபடத்தில் ஆரோக்கியம் பார்க்கவும்",
+    
+    weatherTutTitle: "வானிலை முன்னிறுத்தல் சரிபார்க்கவும்",
+    weatherTutAction: "வெப்பநிலை, மழை, மண் பார்க்கவும்",
+    weatherTutOutcome: "வானிலையின் அடிப்படையில் விவசாய திட்டமிடுங்கள்",
+    
+    alertsTutTitle: "பூச்சிக்கு மற்றும் நோய் அச்சரிக்கைகளைப் பெறுங்கள்",
+    alertsTutAction: "பயிர்களுக்கான செயலில் அச்சுறுத்தல்கள் பார்க்கவும்",
+    alertsTutOutcome: "உங்கள் பயிர்களுக்கான ஆபத்து பற்றி அறிந்து கொள்ளுங்கள்",
+    
+    reportTutTitle: "மகசூல் செயல்திறனை பகுப்பாய்வு செய்யவும்",
+    reportTutAction: "மாவட்டம் மற்றும் மகசூல் ஒப்பிடுங்கள்",
+    reportTutOutcome: "மகசூல் முடிவுகளை புரிந்து கொள்ளுங்கள்",
+    
+    helpTutTitle: "உதவி மற்றும் ஆதரவு பெறுங்கள்",
+    helpTutAction: "பதில் மற்றும் FAQ கண்டுபிடிக்கவும்",
+    helpTutOutcome: "உங்களுக்கு தேவை எனில் உதவி பெறுங்கள்",
+    
+    chatbotTutTitle: "তাৎক্ষণিક AI পরামর্শ পান",
+    chatbotTutAction: "চ্যাট সহায়ক খুলতে ক্লিক করুন",
+    chatbotTutOutcome: "প্রশ্ন জিজ্ঞাসা করুন এবং তাৎক্ষণিক উত্তর পান",
+    
+    // ── Header Action Button Tutorials (FLAT KEYS) ──
+    searchHeaderTitle: "பக்கங்களை விரைவாக கண்டுபிடிக்கவும்",
+    searchHeaderAction: "பக்கம் அல்லது மாவட்ட பெயர் தட்டச்சு செய்யவும்",
+    searchHeaderOutcome: "எந்த பக்கத்திற்கும் உடனடியாக குதிக்கவும்",
+    
+    languageTitle: "மொழி மாற்றவும்",
+    languageAction: "ஆங்கிலம், சிங்களம் அல்லது தமிழ்ப் பயன்பாட்டைத் தேர்க்கவும்",
+    languageOutcome: "பயன்பாடு உங்கள் மொழியில் தோன்றும்",
+    
+    themeTitle: "பிரகாசம் நிலை மாற்றவும்",
+    themeAction: "சந்திரன்/சூரியன் ஐகனைக் கிளிக் செய்யவும்",
+    themeOutcome: "அன்பான அல்லது ஒளி பயன்முறை ஏற்ற இறக்கம் செய்யவும்",
+    
+    notificationsTitle: "செய்திகளை சரிபார்க்கவும்",
+    notificationsAction: "எச்சரிக்கைகள் மற்றும் புதுப்பிப்புகளைப் பார்க்கவும்",
+    notificationsOutcome: "தெரிந்து கொள்ளப்படுவது முக்கியமான நிகழ்வுகளைப் பற்றி",
+    
+    profileTitle: "உங்கள் கணக்கு அமைப்புகள்",
+    profileAction: "உங்கள் தகவலைத் திருத்தவும்",
+    profileOutcome: "உங்கள் சுயவிவர விவரங்களை புதுப்பிக்கவும்",
+
+    // ── Field Setup Tutorials ──
+    fieldSetupTutorial: {
+      getStarted: {
+        title: "வயல் பதிவைத் தொடங்கவும்",
+        action: "உங்கள் வயலை வரைய தொடங்க 'தொடங்குங்கள்' கிளிக் செய்யவும்",
+        outcome: "மாவட்டத்தைத் தேர்ந்தெடுக்க மற்றும் வரைபடத்தில் வயல் எல்லையை வரைய வழிகாட்டப்படுவீர்கள்",
+      },
+      review: {
+        title: "உங்கள் வயலை மதிப்பாய்வு செய்யவும்",
+        action: "வரைந்த பிறகு, விவரங்களை சரிபார்க்க 'மதிப்பாய்வு செய்யவும்' கிளிக் செய்யவும்",
+        outcome: "ஏக்கரில் வயல் பரப்பு மற்றும் வருடாந்திர செலவு முறிவு உங்கள் அறிவுக்கு வரும்",
+      },
+      complete: {
+        title: "பதிவை முடிக்கவும்",
+        action: "உங்கள் வயலை சேமிக்க 'முடிக்கவும்' கிளிக் செய்யவும்",
+        outcome: "உங்கள் வயல் பதிவுசெய்யப்பட்டு குறிப்பெடுக்கத் தொடங்கலாம்",
+      },
+      download: {
+        title: "அறிக்கை ஏற்றுமதி செய்யவும்",
+        action: "வயல் பகுப்பாய்வு அறிக்கையைப் பெற 'PDF பதிவிறக்கு' கிளிக் செய்யவும்",
+        outcome: "வயல் தரவு மற்றும் பகுப்பாய்வு கொண்ட விரிவான PDF ஆவணம் தயாரிக்கப்படுகிறது",
+      },
+    },
 
     // ── Dashboard ──
     welcomeTitle: "RiceVision-க்கு வரவேற்கிறோம்",

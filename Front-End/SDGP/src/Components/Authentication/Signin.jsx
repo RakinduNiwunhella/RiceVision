@@ -40,11 +40,16 @@ export default function LoginPage() {
       setErrorMessage(error.message);
       setLoading(false);
     } else {
+      // Reset tutorials on login - set to empty object instead of removing
+      localStorage.setItem('ricevision_tutorial_pages', JSON.stringify({}));
       navigate("/dashboard");
     }
   };
 
   const handleGoogleLogin = async () => {
+    // Reset tutorials on login - set to empty object instead of removing
+    localStorage.setItem('ricevision_tutorial_pages', JSON.stringify({}));
+    
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {

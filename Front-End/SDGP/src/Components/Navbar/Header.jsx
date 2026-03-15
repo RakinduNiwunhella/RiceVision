@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
@@ -6,6 +6,8 @@ import { useTheme } from "../../context/ThemeContext";
 import { useLanguage, LANGUAGES } from "../../context/LanguageContext";
 import Notifications from "../Notifications/Notifications";
 import { supabase } from "../../supabaseClient";
+import { usePageTutorial } from "../../hooks/usePageTutorial";
+import TutorialTooltip from "../../components/TutorialTooltip";
 
 const searchIndex = [
   {
@@ -103,6 +105,149 @@ const Header = () => {
   const inputRef = useRef(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // Tutorial refs for nav buttons
+  const dashboardBtnRef = useRef(null);
+  const fieldDataBtnRef = useRef(null);
+  const mapBtnRef = useRef(null);
+  const weatherBtnRef = useRef(null);
+  const alertsBtnRef = useRef(null);
+  const reportBtnRef = useRef(null);
+  const helpBtnRef = useRef(null);
+
+  // Tutorial refs for header action buttons
+  const searchInputRef = useRef(null);
+  const languageBtnRef = useRef(null);
+  const themeBtnRef = useRef(null);
+  const notificationBtnRef = useRef(null);
+  const profileBtnRef = useRef(null);
+
+  // Navigation items with their tutorial refs
+  const navItems = [
+    { label: t("dashboard"), icon: "apps", path: "/dashboard", ref: dashboardBtnRef },
+    { label: t("fieldData"), icon: "table_chart", path: "/field-data", ref: fieldDataBtnRef },
+    { label: t("map"), icon: "map", path: "/field-map", ref: mapBtnRef },
+    { label: t("weather"), icon: "cloud", path: "/weather", ref: weatherBtnRef },
+    { label: t("alerts"), icon: "notification_important", path: "/alerts", ref: alertsBtnRef },
+    { label: t("report"), icon: "bar_chart", path: "/report", ref: reportBtnRef },
+    { label: t("help"), icon: "help", path: "/help", ref: helpBtnRef },
+  ];
+
+  // Tutorial setup - navbar first, then header action controls
+  const tutorialSteps = useMemo(() => [
+    {
+      ref: dashboardBtnRef,
+      title: t("dashboardTutTitle"),
+      action: t("dashboardTutAction"),
+      outcome: t("dashboardTutOutcome"),
+      position: "bottom",
+    },
+    {
+      ref: fieldDataBtnRef,
+      title: t("fieldDataTutTitle"),
+      action: t("fieldDataTutAction"),
+      outcome: t("fieldDataTutOutcome"),
+      position: "bottom",
+    },
+    {
+      ref: mapBtnRef,
+      title: t("mapTutTitle"),
+      action: t("mapTutAction"),
+      outcome: t("mapTutOutcome"),
+      position: "bottom",
+    },
+    {
+      ref: weatherBtnRef,
+      title: t("weatherTutTitle"),
+      action: t("weatherTutAction"),
+      outcome: t("weatherTutOutcome"),
+      position: "bottom",
+    },
+    {
+      ref: alertsBtnRef,
+      title: t("alertsTutTitle"),
+      action: t("alertsTutAction"),
+      outcome: t("alertsTutOutcome"),
+      position: "bottom",
+    },
+    {
+      ref: reportBtnRef,
+      title: t("reportTutTitle"),
+      action: t("reportTutAction"),
+      outcome: t("reportTutOutcome"),
+      position: "bottom",
+    },
+    {
+      ref: helpBtnRef,
+      title: t("helpTutTitle"),
+      action: t("helpTutAction"),
+      outcome: t("helpTutOutcome"),
+      position: "bottom",
+    },
+    {
+      ref: searchInputRef,
+      title: t("searchHeaderTitle"),
+      action: t("searchHeaderAction"),
+      outcome: t("searchHeaderOutcome"),
+      position: "bottom",
+    },
+    {
+      ref: languageBtnRef,
+      title: t("languageTitle"),
+      action: t("languageAction"),
+      outcome: t("languageOutcome"),
+      position: "bottom",
+    },
+    {
+      ref: themeBtnRef,
+      title: t("themeTitle"),
+      action: t("themeAction"),
+      outcome: t("themeOutcome"),
+      position: "bottom",
+    },
+    {
+      ref: notificationBtnRef,
+      title: t("notificationsTitle"),
+      action: t("notificationsAction"),
+      outcome: t("notificationsOutcome"),
+      position: "bottom",
+    },
+    {
+      ref: profileBtnRef,
+      title: t("profileTitle"),
+      action: t("profileAction"),
+      outcome: t("profileOutcome"),
+      position: "bottom",
+    },
+  ], [t]);
+
+  const { currentStep, showTutorial, currentTutorialStep, nextStep, prevStep, closeTutorial } = usePageTutorial("Header", tutorialSteps);
+
+  // Publish the current Header tutorial version so other pages wait for this exact version.
+  useEffect(() => {
+    localStorage.setItem("ricevision_header_required_steps", String(tutorialSteps.length));
+    window.dispatchEvent(new Event("ricevision:tutorial-pages-updated"));
+  }, [tutorialSteps.length]);
+
+  // Skip steps whose target controls are hidden in current responsive layout.
+  useEffect(() => {
+    if (!showTutorial) return;
+
+    const step = tutorialSteps[currentStep];
+    if (!step) return;
+
+    const timer = setTimeout(() => {
+      if (!step.ref?.current) {
+        if (currentStep < tutorialSteps.length - 1) {
+          nextStep();
+        } else {
+          closeTutorial();
+        }
+      }
+    }, 180);
+
+    return () => clearTimeout(timer);
+  }, [showTutorial, currentStep, tutorialSteps, nextStep, closeTutorial]);
+
   const updateDropdownPos = () => {
     if (inputRef.current) {
       const rect = inputRef.current.getBoundingClientRect();
@@ -183,16 +328,6 @@ const Header = () => {
     setShowResults(false);
   };
 
-  const navItems = [
-    { label: t("dashboard"), icon: "apps", path: "/dashboard" },
-    { label: t("fieldData"), icon: "table_chart", path: "/field-data" },
-    { label: t("map"), icon: "map", path: "/field-map" },
-    { label: t("weather"), icon: "cloud", path: "/weather" },
-    { label: t("alerts"), icon: "notification_important", path: "/alerts" },
-    { label: t("report"), icon: "bar_chart", path: "/report" },
-    { label: t("help"), icon: "help", path: "/help" },
-  ];
-
   const currentLang =
     LANGUAGES.find((l) => l.code === language) || LANGUAGES[0];
 
@@ -225,6 +360,7 @@ const Header = () => {
                   return (
                     <Link
                       key={item.label}
+                      ref={item.ref}
                       to={item.path}
                       className={`flex items-center gap-1 lg:gap-1.5 px-2 lg:px-3 py-1.5 rounded-lg text-[10px] lg:text-[11px] font-semibold tracking-wide whitespace-nowrap transition-all duration-300 ${
                         isActive
@@ -258,7 +394,10 @@ const Header = () => {
                   search
                 </span>
                 <input
-                  ref={inputRef}
+                  ref={(el) => {
+                    inputRef.current = el;
+                    searchInputRef.current = el;
+                  }}
                   type="text"
                   value={searchQuery}
                   onChange={(e) => {
@@ -328,6 +467,7 @@ const Header = () => {
                 {/* Language Selector */}
                 <div className="relative" ref={langBtnRef}>
                   <button
+                    ref={languageBtnRef}
                     className="h-8 px-2 rounded-lg flex items-center gap-1 text-white/50 hover:text-white hover:bg-white/10 transition"
                     title="Language"
                     onClick={() => {
@@ -384,6 +524,7 @@ const Header = () => {
                     )}
                 </div>
                 <button
+                  ref={themeBtnRef}
                   className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition"
                   title="Toggle Dark Mode"
                   onClick={toggleTheme}
@@ -392,11 +533,14 @@ const Header = () => {
                     {isDark ? "light_mode" : "dark_mode"}
                   </span>
                 </button>
-                <NotificationPanelButton />
+                <div ref={notificationBtnRef}>
+                  <NotificationPanelButton />
+                </div>
               </div>
 
               {/* Avatar - hidden on mobile */}
               <Link
+                ref={profileBtnRef}
                 to="/profile"
                 className="hidden sm:flex w-8 h-8 rounded-lg items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition"
                 title="View Profile"
@@ -475,6 +619,7 @@ const Header = () => {
               return (
                 <Link
                   key={item.label}
+                  ref={item.ref}
                   to={item.path}
                   onClick={() => setMobileMenuOpen(false)}
                   className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${
@@ -537,6 +682,23 @@ const Header = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Tutorial Tooltips */}
+      {showTutorial && currentTutorialStep && tutorialSteps[currentStep] && (
+        <TutorialTooltip
+          visible={true}
+          title={currentTutorialStep.title}
+          action={currentTutorialStep.action}
+          outcome={currentTutorialStep.outcome}
+          elementRef={tutorialSteps[currentStep].ref}
+          position={tutorialSteps[currentStep].position || "bottom"}
+          step={currentStep}
+          totalSteps={tutorialSteps.length}
+          onNext={nextStep}
+          onPrevious={prevStep}
+          onDismiss={closeTutorial}
+        />
       )}
     </>
   );
