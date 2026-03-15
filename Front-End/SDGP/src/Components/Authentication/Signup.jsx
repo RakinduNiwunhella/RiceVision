@@ -48,20 +48,24 @@ export default function SignupPage() {
     if (emailError || passwordError || passwordLengthError) return;
 
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: fullName },
-      },
-    });
+    try {
+      const res = await fetch("/api/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ full_name: fullName, email, password }),
+      });
 
-    if (error) {
-      alert(error.message);
-    } else {
-      // Reset tutorials on signup - set to empty object instead of removing
-      localStorage.setItem('ricevision_tutorial_pages', JSON.stringify({}));
-      navigate("/field-setup", { state: { fromSignup: true } });
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.detail || "Signup failed");
+      } else {
+        // Reset tutorials on signup - set to empty object instead of removing
+        localStorage.setItem('ricevision_tutorial_pages', JSON.stringify({}));
+        navigate("/field-setup", { state: { fromSignup: true } });
+      }
+    } catch (err) {
+      alert("Network error. Please try again.");
     }
     setLoading(false);
   };
