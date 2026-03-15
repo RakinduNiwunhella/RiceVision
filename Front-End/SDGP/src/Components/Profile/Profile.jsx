@@ -1,10 +1,38 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import ProfileForm from "./ProfileForm";
 import MyFieldTab from "./MyFieldTab";
 import { useLanguage } from "../../context/LanguageContext";
+import TutorialTooltip from "../../components/TutorialTooltip";
+import { usePageTutorial } from "../../hooks/usePageTutorial";
 
 export default function Profile() {
   const { t } = useLanguage();
+
+  // Tutorial setup
+  const tutorialSteps = useMemo(() => [
+    {
+      title: "Your Profile",
+      action: "Manage your identity information and paddy field details",
+      outcome: "Two tabs: Identity Profile for personal info, My Paddy Field for field details",
+    },
+    {
+      title: "Identity Profile",
+      action: "Click the Identity Profile tab to update your account information",
+      outcome: "Edit your name, email, contact details, and other personal information",
+    },
+    {
+      title: "My Paddy Field",
+      action: "Click My Paddy Field tab to view and manage your field data",
+      outcome: "See your registered paddy field size, location, and other field-related details",
+    },
+  ], [])
+
+  const { currentStep, showTutorial, currentTutorialStep, nextStep, prevStep, closeTutorial } =
+    usePageTutorial("profile", tutorialSteps)
+
+  const headerRef = useRef(null)
+  const tabSwitcherRef = useRef(null)
+  const contentRef = useRef(null)
 
   const TABS = [
     { id: "identity", labelKey: "identityProfile", icon: "verified_user" },
@@ -48,7 +76,7 @@ export default function Profile() {
         />
 
         {/* Header */}
-        <div className="mb-8 relative">
+        <div ref={headerRef} className="mb-8 relative">
           <p className="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-400 mb-3 flex items-center gap-2">
             <span className="material-symbols-outlined text-sm">verified_user</span>
             {t('operatorAuth')}
@@ -66,7 +94,7 @@ export default function Profile() {
         </div>
 
         {/* Tab switcher */}
-        <div className="flex gap-2 mb-6 sm:mb-8 relative overflow-x-auto no-scrollbar">
+        <div ref={tabSwitcherRef} className="flex gap-2 mb-6 sm:mb-8 relative overflow-x-auto no-scrollbar">
           {TABS.map((tab) => (
             <button
               key={tab.id}
@@ -86,8 +114,61 @@ export default function Profile() {
         </div>
 
         {/* Tab content */}
-        {activeTab === "identity" && <ProfileForm />}
-        {activeTab === "field"    && <MyFieldTab />}
+        <div ref={contentRef}>
+          {activeTab === "identity" && <ProfileForm />}
+          {activeTab === "field"    && <MyFieldTab />}
+        </div>
+
+        {/* Tutorial Tooltips */}
+        {showTutorial && currentTutorialStep && (
+          <>
+            {currentStep === 0 && (
+              <TutorialTooltip
+                visible={true}
+                position="bottom"
+                title={currentTutorialStep.title}
+                action={currentTutorialStep.action}
+                outcome={currentTutorialStep.outcome}
+                elementRef={headerRef}
+                step={currentStep}
+                totalSteps={tutorialSteps.length}
+                onNext={nextStep}
+                onPrevious={prevStep}
+                onDismiss={closeTutorial}
+              />
+            )}
+            {currentStep === 1 && (
+              <TutorialTooltip
+               visible={true}
+                position="bottom"
+                title={currentTutorialStep.title}
+                action={currentTutorialStep.action}
+                outcome={currentTutorialStep.outcome}
+                elementRef={tabSwitcherRef}
+                step={currentStep}
+                totalSteps={tutorialSteps.length}
+                onNext={nextStep}
+                onPrevious={prevStep}
+                onDismiss={closeTutorial}
+              />
+            )}
+            {currentStep === 2 && (
+              <TutorialTooltip
+                visible={true}
+                position="top"
+                title={currentTutorialStep.title}
+                action={currentTutorialStep.action}
+                outcome={currentTutorialStep.outcome}
+                elementRef={contentRef}
+                step={currentStep}
+                totalSteps={tutorialSteps.length}
+                onNext={nextStep}
+                onPrevious={prevStep}
+                onDismiss={closeTutorial}
+              />
+            )}
+          </>
+        )}
       </div>
     </div>
   );

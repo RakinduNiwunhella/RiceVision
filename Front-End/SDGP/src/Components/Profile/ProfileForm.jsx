@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import { supabase } from "../../supabaseClient";
 import { FaCamera } from "react-icons/fa";
 import { useLanguage } from "../../context/LanguageContext";
+import { useNavigate } from "react-router-dom";
 
 export default function ProfileForm() {
+  const navigate = useNavigate();
   const { t } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -19,6 +21,11 @@ export default function ProfileForm() {
   });
 
   const [status, setStatus] = useState(null); // { type: 'success' | 'error', message: string }
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/signin");
+  };
 
   useEffect(() => {
     getProfile();
@@ -135,7 +142,7 @@ export default function ProfileForm() {
     return (
       <div className="flex flex-col items-center gap-4 py-20">
         <div className="w-12 h-12 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
-        <p className="text-white/40 font-black uppercase tracking-widest text-xs animate-pulse">Registry Identity</p>
+        <p className="text-white/40 font-black uppercase tracking-widest text-xs animate-pulse">Update Profile</p>
       </div>
     );
   }
@@ -285,7 +292,7 @@ export default function ProfileForm() {
             </div>
           </div>
 
-          <div className="flex justify-center pt-10">
+          <div className="flex justify-center pt-10 flex-col items-center gap-4">
             <button
               type="submit"
               disabled={loading || uploading}
@@ -301,7 +308,20 @@ export default function ProfileForm() {
                     {status?.type === 'success' ? 'verified' : 'shield_with_heart'}
                   </span>
                 )}
-                {loading ? "Synchronizing..." : status?.type === 'success' ? t('synchronized') : t('registryIdentity')}
+                {loading ? "Synchronizing..." : status?.type === 'success' ? t('synchronized') : "Update Profile"}
+              </div>
+            </button>
+            
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="group relative w-full md:w-80 h-16 rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.03] hover:shadow-lg hover:shadow-red-500/25 active:scale-95"
+            >
+              <div className="absolute inset-0 bg-red-500/10 group-hover:bg-red-500/20 transition-colors duration-300" />
+              <div className="absolute inset-x-0 bottom-0 h-[2px] bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.5)] group-hover:shadow-[0_0_25px_rgba(239,68,68,0.8)] transition-all duration-300" />
+              <div className="relative flex items-center justify-center gap-3 text-red-500 text-[11px] font-black uppercase tracking-[0.4em]">
+                <span className="material-symbols-outlined text-[20px]">logout</span>
+                Logout
               </div>
             </button>
           </div>

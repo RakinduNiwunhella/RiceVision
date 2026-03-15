@@ -1,4 +1,17 @@
+import { useRef, useEffect } from "react";
+
 export default function FiltersPanel({ filters, setFilters }) {
+  const selectedDistrictRef = useRef(null);
+
+  useEffect(() => {
+    if (selectedDistrictRef.current) {
+      selectedDistrictRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }, [filters.districts]);
+
   // Alphabetically sorted district list
   const districts = [
     "Ampara",
@@ -20,7 +33,7 @@ export default function FiltersPanel({ filters, setFilters }) {
     "Matara",
     "Moneragala",
     "Mullaitivu",
-    "NuwaraEliya",
+    "Nuwara Eliya",
     "Polonnaruwa",
     "Puttalam",
     "Ratnapura",
@@ -29,68 +42,81 @@ export default function FiltersPanel({ filters, setFilters }) {
   ];
 
   const healthStatuses = [
-  "Normal",
-  "Mild Stress",
-  "Severe Stress",
-  "Not Applicable",
-];
-
+    "Normal",
+    "Mild Stress",
+    "Severe Stress",
+    "Not Applicable",
+  ];
 
   return (
     <div className="w-full md:w-80 lg:w-80 glass p-4 sm:p-6 overflow-y-auto max-h-[50vh] sm:max-h-[60vh] lg:max-h-[calc(100vh-6rem)] shadow-xl">
       <div className="flex items-center justify-between mb-6">
-  <h2 className="text-sm font-bold uppercase tracking-widest text-white/50">
-    Filters
-  </h2>
+        <h2 className="text-sm font-bold uppercase tracking-widest text-white/50">
+          Filters
+        </h2>
 
-  {filters.districts.length > 0 && (
-    <button
-      className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 hover:text-emerald-300"
-      onClick={() =>
-        setFilters((prev) => ({
-          ...prev,
-          districts: [],
-        }))
-      }
-    >
-      Clear District
-    </button>
-  )}
-</div>
+        {filters.districts.length > 0 && (
+          <button
+            className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 hover:text-emerald-300"
+            onClick={() =>
+              setFilters((prev) => ({
+                ...prev,
+                districts: [],
+              }))
+            }
+          >
+            Clear District
+          </button>
+        )}
+      </div>
 
       {/* District (Single Selection) */}
       <div className="mb-8">
-        <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/40 mb-3">District Selection</p>
+        <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/40 mb-3">
+          District Selection
+        </p>
         <div className="space-y-1 text-sm max-h-60 overflow-y-auto pr-2 custom-scrollbar">
-          {districts.map((d) => (
-            <label
-              key={d}
-              className="group flex items-center justify-between px-3 py-2 rounded-xl hover:bg-white/10 border border-transparent hover:border-white/10 transition cursor-pointer"
-            >
-              <span className="text-white/80 group-hover:text-white transition">{d}</span>
-              <input
-                type="radio"
-                name="district"
-                className="w-4 h-4 accent-emerald-500 cursor-pointer"
-                checked={filters.districts[0] === d}
-                onChange={() =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    districts: [d],
-                  }))
-                }
-              />
-            </label>
-          ))}
+          {districts.map((d) => {
+            const isSelected = filters.districts[0] === d;
+
+            return (
+              <label
+                key={d}
+                ref={isSelected ? selectedDistrictRef : null}
+                className={`group flex items-center justify-between px-3 py-2 rounded-xl hover:bg-white/10 border border-transparent hover:border-white/10 transition cursor-pointer
+                ${
+                  isSelected
+                    ? "bg-emerald-500/20 border border-emerald-400"
+                    : "hover:bg-white/10 border border-transparent hover:border-white/10"
+                }`}
+              >
+                <span className="text-white/80 group-hover:text-white transition">
+                  {d}
+                </span>
+                <input
+                  type="radio"
+                  name="district"
+                  className="w-4 h-4 accent-emerald-500 cursor-pointer"
+                  checked={isSelected}
+                  onChange={() =>
+                    setFilters((prev) => ({
+                      ...prev,
+                      districts: [d],
+                    }))
+                  }
+                />
+              </label>
+            );
+          })}
         </div>
       </div>
-
-    
 
       {/* Health Status */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/40">Crop Condition</p>
+          <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/40">
+            Crop Condition
+          </p>
           {/* clear all by selecting 'All' or using button */}
           {filters.health.length > 0 && (
             <button
@@ -108,9 +134,7 @@ export default function FiltersPanel({ filters, setFilters }) {
         </div>
         <div className="grid grid-cols-1 gap-2">
           {/* explicit "All statuses" option */}
-          <label
-            className="flex items-center justify-between px-3 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20 transition cursor-pointer"
-          >
+          <label className="flex items-center justify-between px-3 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20 transition cursor-pointer">
             <span className="text-sm font-medium text-white/90">All</span>
             <input
               type="radio"
