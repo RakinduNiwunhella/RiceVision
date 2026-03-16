@@ -1,6 +1,6 @@
 import { apiFetch } from "./apiFetch";
 
-const API_BASE = "http://localhost:8000";
+const API_BASE = "https://ricevision-cakt.onrender.com";
 
 // Authenticated helper for all backend GET requests
 async function get(path) {

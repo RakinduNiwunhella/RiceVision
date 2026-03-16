@@ -1,6 +1,10 @@
 import { supabase } from "../supabaseClient";
 
-const API_BASE = "http://localhost:8000";
+// PRODUCTION
+const API_BASE = "https://ricevision-cakt.onrender.com";
+
+// DEVELOPMENT
+// const API_BASE = "http://localhost:8000";
 
 export async function apiFetch(url, options = {}) {
   const { data: { session } } = await supabase.auth.getSession();
