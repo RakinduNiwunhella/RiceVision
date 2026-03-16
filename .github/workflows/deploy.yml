@@ -8,6 +8,8 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      LAMBDA_DIR: AWS/Lambda/gee-sentinel-checker
 
     steps:
     - name: Checkout repo
@@ -20,11 +22,12 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install -r requirements.txt -t .
+        pip install -r "$LAMBDA_DIR/requirements.txt" -t "$LAMBDA_DIR"
 
     - name: Zip Lambda package
       run: |
-        zip -r lambda.zip .
+        cd "$LAMBDA_DIR"
+        zip -r ../../../lambda.zip . -x "__pycache__/*" "*.pyc" "*.pyo"
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
