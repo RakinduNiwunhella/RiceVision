@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '../supabaseClient'
 
 const REPLAY_KEY = 'ricevision_force_tutorial_replay'
@@ -11,14 +11,19 @@ const LOCAL_OVERRIDE_KEY = 'ricevision_local_onboarding_done'
 export const usePageTutorial = (pageName, tutorialSteps = []) => {
   const [currentStep, setCurrentStep] = useState(0)
   const [showTutorial, setShowTutorial] = useState(false)
-  
+  const hasInitialized = useRef(false)
+
   const isDashboard = pageName === 'dashboard'
 
   useEffect(() => {
     // Only 'dashboard' auto-starts tutorials.
+    // Ensure we trigger only when steps exist and we haven't initialized yet
     if (!isDashboard || tutorialSteps.length === 0) return
+    if (hasInitialized.current) return
 
     const initTutorialState = async () => {
+      hasInitialized.current = true;
+      
       // 1. Check for manual replay request
       if (localStorage.getItem(REPLAY_KEY) === 'true') {
         localStorage.removeItem(REPLAY_KEY)
@@ -35,13 +40,13 @@ export const usePageTutorial = (pageName, tutorialSteps = []) => {
 
       try {
         const { data: { user } } = await supabase.auth.getUser()
-        
+
         // If no user (logged out), don't show.
         if (!user) return
 
         // 3. True backend check
         const isCompleted = user.user_metadata?.onboarding_completed === true
-        
+
         if (isCompleted) {
           localStorage.setItem(LOCAL_OVERRIDE_KEY, 'true')
           setShowTutorial(false)
