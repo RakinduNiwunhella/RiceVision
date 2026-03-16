@@ -18,6 +18,7 @@ import { useLanguage } from "../../context/LanguageContext";
 import { AlertTriangle, CloudRain, Bug } from "lucide-react";
 import TutorialOverlay from "../TutorialOverlay";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
+import { useNavigate } from "react-router-dom";
 
 import {
   fetchHealthSummary,
@@ -78,6 +79,7 @@ const MyDashboard = () => {
   const [districtHealth, setDistrictHealth] = useState([]);
   const [showAllDistricts, setShowAllDistricts] = useState(false);
   const [stageDistribution, setStageDistribution] = useState([]);
+  const navigate = useNavigate();
 
   // Refs for tutorial tooltips
   const headerRef = useRef(null);
@@ -387,6 +389,7 @@ const MyDashboard = () => {
                 </div>
                 <button
                   ref={i === 0 ? threatDetailsBtnRef : undefined}
+                  onClick={() => navigate("/alerts")}
                   className="text-[10px] font-black uppercase tracking-[0.2em] rounded-xl px-6 py-2.5 border border-white/10 text-white/40 hover:text-white hover:border-white/40 hover:bg-white/5 transition-all active:scale-95"
                 >
                   {t('viewDetails')}

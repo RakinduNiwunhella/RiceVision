@@ -221,7 +221,7 @@ const FieldData = () => {
                         </button>
 
                         <button
-                          onClick={() => navigate("/reports", { state: { district: d.district } })}
+                          onClick={() => navigate("/report", { state: { district: d.district } })}
                           className="glass-btn text-[10px] px-3 py-1 tracking-widest bg-white/10 hover:bg-white/20"
                         >
                           View Report
