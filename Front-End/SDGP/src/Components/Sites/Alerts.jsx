@@ -6,11 +6,7 @@ import { useLanguage } from "../../context/LanguageContext";
 import TutorialTooltip from "../../components/TutorialTooltip";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
 
-//PRODUCTION
-const API_BASE = "https://ricevision-cakt.onrender.com";
 
-//LOCAL
-//const API_BASE = "http://localhost:8000";
 
 const TAB_KEYS = ["Disasters", "Pest Risks", "Past Alerts"];
 
@@ -196,11 +192,11 @@ const Alerts = () => {
         let endpoint = "";
 
         if (activeTab === "Disasters") {
-          endpoint = `${API_BASE}/api/alerts/disasters`;
+          endpoint = "/api/alerts/disasters";
         } else if (activeTab === "Pest Risks") {
-          endpoint = `${API_BASE}/api/alerts/pest-risk`;
+          endpoint = "/api/alerts/pest-risk";
         } else if (activeTab === "Past Alerts") {
-          endpoint = `${API_BASE}/api/alerts/past`;
+          endpoint = "/api/alerts/past";
         }
 
         const response = await apiFetch(endpoint);
@@ -281,7 +277,7 @@ const Alerts = () => {
   useEffect(() => {
     const loadAllAlerts = async () => {
       try {
-        const res = await apiFetch(`${API_BASE}/api/alerts/all`);
+        const res = await apiFetch("/api/alerts/all");
         const data = await res.json();
         setGlobalAlerts(data);
       } catch (err) {
@@ -450,11 +446,10 @@ const Alerts = () => {
                     setActiveTab(key);
                     localStorage.setItem("alerts_tab", key);
                   }}
-                  className={`px-5 py-2 rounded-xl text-xs font-bold transition-all ${
-                    activeTab === key
-                      ? "bg-white/15 text-white"
-                      : "text-white/40 hover:text-white/70"
-                  }`}
+                  className={`px-5 py-2 rounded-xl text-xs font-bold transition-all ${activeTab === key
+                    ? "bg-white/15 text-white"
+                    : "text-white/40 hover:text-white/70"
+                    }`}
                 >
                   {tabLabels[idx]}
                 </button>
