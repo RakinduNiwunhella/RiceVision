@@ -12,6 +12,14 @@ import {
 import { useTheme } from "../../context/ThemeContext";
 import { useLanguage } from "../../context/LanguageContext";
 
+
+//PRODUCTION
+const API_BASE = "https://ricevision-cakt.onrender.com";
+
+//LOCAL
+//const API_BASE = "http://localhost:8000";
+
+
 export default function LoginPage() {
   const { isDark, toggleTheme } = useTheme();
   const { t } = useLanguage();
@@ -32,7 +40,7 @@ export default function LoginPage() {
     setErrorMessage("");
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/login", {
+      const res = await fetch(`${API_BASE}/api/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -96,7 +104,7 @@ export default function LoginPage() {
     setResetError("");
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/reset-password", {
+      const res = await fetch(`${API_BASE}/api/reset-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
