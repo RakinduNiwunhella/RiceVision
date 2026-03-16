@@ -5,6 +5,14 @@ import { FaSun, FaMoon } from "react-icons/fa";
 import { useTheme } from "../../context/ThemeContext";
 import { useLanguage } from "../../context/LanguageContext";
 
+
+//PRODUCTION
+const API_BASE = "https://ricevision-cakt.onrender.com";
+
+//LOCAL
+//const API_BASE = "http://localhost:8000";
+
+
 export default function SignupPage() {
   const { isDark, toggleTheme } = useTheme();
   const { t } = useLanguage();
@@ -49,7 +57,7 @@ export default function SignupPage() {
 
     setLoading(true);
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/signup", {
+      const res = await fetch(`${API_BASE}/api/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ full_name: fullName, email, password }),
@@ -149,8 +157,8 @@ export default function SignupPage() {
                 required
                 placeholder="name@company.com"
                 className={`w-full px-4 py-2.5 sm:py-3.5 rounded-xl border bg-slate-50 dark:bg-slate-900/50 outline-none transition-all focus:ring-2 ${emailError
-                    ? "border-red-500 focus:ring-red-500/20"
-                    : "border-slate-200 dark:border-slate-800 focus:ring-indigo-500"
+                  ? "border-red-500 focus:ring-red-500/20"
+                  : "border-slate-200 dark:border-slate-800 focus:ring-indigo-500"
                   }`}
                 onChange={(e) => {
                   setEmail(e.target.value);
@@ -173,8 +181,8 @@ export default function SignupPage() {
                   required
                   placeholder="••••••••"
                   className={`w-full px-4 py-2.5 sm:py-3.5 rounded-xl border bg-slate-50 dark:bg-slate-900/50 outline-none transition-all focus:ring-2 ${passwordLengthError
-                      ? "border-red-500 focus:ring-red-500/20"
-                      : "border-slate-200 dark:border-slate-800 focus:ring-indigo-500"
+                    ? "border-red-500 focus:ring-red-500/20"
+                    : "border-slate-200 dark:border-slate-800 focus:ring-indigo-500"
                     }`}
                   onChange={(e) => {
                     setPassword(e.target.value);
@@ -197,8 +205,8 @@ export default function SignupPage() {
                   required
                   placeholder="••••••••"
                   className={`w-full px-4 py-2.5 sm:py-3.5 rounded-xl border bg-slate-50 dark:bg-slate-900/50 outline-none transition-all focus:ring-2 ${passwordError
-                      ? "border-red-500 focus:ring-red-500/20"
-                      : "border-slate-200 dark:border-slate-800 focus:ring-indigo-500"
+                    ? "border-red-500 focus:ring-red-500/20"
+                    : "border-slate-200 dark:border-slate-800 focus:ring-indigo-500"
                     }`}
                   onChange={(e) => {
                     setConfirmPassword(e.target.value);

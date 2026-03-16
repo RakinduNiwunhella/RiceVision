@@ -1,5 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from .auth import get_current_user
 from .routes.dashboard import router as yield_router
 from .routes.fieldData import router as field_data_router
 from .routes.reportPage import router as report_router
@@ -28,17 +29,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include all routers
-app.include_router(yield_router)
-app.include_router(field_data_router)
-app.include_router(report_router, prefix="/api")
-app.include_router(weather_router)
-app.include_router(help_router, prefix="/api")
-app.include_router(profile_router)
-app.include_router(map_router)
-app.include_router(alerts_router, prefix="/api")
-app.include_router(notifications_router)
-app.include_router(chat_router)
+# PROTECTED ROUTES
+app.include_router(yield_router, dependencies=[Depends(get_current_user)])
+app.include_router(field_data_router, dependencies=[Depends(get_current_user)])
+app.include_router(report_router, prefix="/api", dependencies=[Depends(get_current_user)])
+app.include_router(weather_router, dependencies=[Depends(get_current_user)])
+app.include_router(help_router, prefix="/api", dependencies=[Depends(get_current_user)])
+app.include_router(profile_router, dependencies=[Depends(get_current_user)])
+app.include_router(map_router, dependencies=[Depends(get_current_user)])
+app.include_router(alerts_router, prefix="/api", dependencies=[Depends(get_current_user)])
+app.include_router(notifications_router, dependencies=[Depends(get_current_user)])
+app.include_router(chat_router, dependencies=[Depends(get_current_user)])
+
+# PUBLIC ROUTES
 app.include_router(signin_router)
 app.include_router(signup_router)
 
