@@ -18,6 +18,7 @@ import { useLanguage } from "../../context/LanguageContext";
 import { AlertTriangle, CloudRain, Bug } from "lucide-react";
 import TutorialTooltip from "../../components/TutorialTooltip";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
+import { useNavigate } from "react-router-dom";
 
 import {
   fetchHealthSummary,
@@ -78,6 +79,7 @@ const MyDashboard = () => {
   const [districtHealth, setDistrictHealth] = useState([]);
   const [showAllDistricts, setShowAllDistricts] = useState(false);
   const [stageDistribution, setStageDistribution] = useState([]);
+  const navigate = useNavigate();
 
   // Refs for tutorial tooltips
   const headerRef = useRef(null);
@@ -95,48 +97,48 @@ const MyDashboard = () => {
   // Tutorial setup - cards, icons, and key actions on dashboard
   const tutorialSteps = useMemo(() => {
     const steps = [
-    {
-      title: "Dashboard: Your Field Control Center",
-      action: "Start here to see a complete overview of all your field conditions",
-      outcome: "You'll see 5 key panels showing health, yield, threats, growth stages, and district comparison",
-      ref: headerRef,
-      position: "bottom",
-    },
-    {
-      title: "Live Sync Status",
-      action: "Check this status indicator to confirm latest data sync",
-      outcome: "If the system is synced, your analytics and alerts are up to date",
-      ref: syncBadgeRef,
-      position: "left",
-    },
-    {
-      title: "Panel 1: Crop Health Distribution",
-      action: "This pie chart shows your current crop health across all fields",
-      outcome: "Green (Optimal) = Healthy crops ready for growth. Yellow (Mild Stress) = Some crops need attention. Red (Severe Stress) = Critical issues needing immediate action",
-      ref: healthCardRef,
-      position: "bottom",
-    },
-    {
-      title: "Panel 2: Yield Forecast",
-      action: "See your expected total harvest in metric tons. Check the ranked districts below",
-      outcome: "Top districts shown = Best performers. Use this to identify which areas have ideal conditions and learn from them",
-      ref: yieldCardRef,
-      position: "bottom",
-    },
-    {
-      title: "Supply Stability",
-      action: "Track expected shortfall and national demand saturation",
-      outcome: "Use this card to quickly spot demand pressure and supply risk",
-      ref: supplyCardRef,
-      position: "bottom",
-    },
-    {
-      title: "Panel 3: Active Threats",
-      action: "Review disease outbreaks and pest risks. Shows threat count and details",
-      outcome: "Click any threat to see recommendations and view exact location on Field Map. Red = High priority action needed",
-      ref: threatsCardRef,
-      position: "bottom",
-    },
+      {
+        title: "Dashboard: Your Field Control Center",
+        action: "Start here to see a complete overview of all your field conditions",
+        outcome: "You'll see 5 key panels showing health, yield, threats, growth stages, and district comparison",
+        ref: headerRef,
+        position: "bottom",
+      },
+      {
+        title: "Live Sync Status",
+        action: "Check this status indicator to confirm latest data sync",
+        outcome: "If the system is synced, your analytics and alerts are up to date",
+        ref: syncBadgeRef,
+        position: "left",
+      },
+      {
+        title: "Panel 1: Crop Health Distribution",
+        action: "This pie chart shows your current crop health across all fields",
+        outcome: "Green (Optimal) = Healthy crops ready for growth. Yellow (Mild Stress) = Some crops need attention. Red (Severe Stress) = Critical issues needing immediate action",
+        ref: healthCardRef,
+        position: "bottom",
+      },
+      {
+        title: "Panel 2: Yield Forecast",
+        action: "See your expected total harvest in metric tons. Check the ranked districts below",
+        outcome: "Top districts shown = Best performers. Use this to identify which areas have ideal conditions and learn from them",
+        ref: yieldCardRef,
+        position: "bottom",
+      },
+      {
+        title: "Supply Stability",
+        action: "Track expected shortfall and national demand saturation",
+        outcome: "Use this card to quickly spot demand pressure and supply risk",
+        ref: supplyCardRef,
+        position: "bottom",
+      },
+      {
+        title: "Panel 3: Active Threats",
+        action: "Review disease outbreaks and pest risks. Shows threat count and details",
+        outcome: "Click any threat to see recommendations and view exact location on Field Map. Red = High priority action needed",
+        ref: threatsCardRef,
+        position: "bottom",
+      },
     ]
 
     if (outbreaks.length > 0) {
@@ -420,6 +422,7 @@ const MyDashboard = () => {
                 </div>
                 <button
                   ref={i === 0 ? threatDetailsBtnRef : undefined}
+                  onClick={() => navigate("/alerts")}
                   className="text-[10px] font-black uppercase tracking-[0.2em] rounded-xl px-6 py-2.5 border border-white/10 text-white/40 hover:text-white hover:border-white/40 hover:bg-white/5 transition-all active:scale-95"
                 >
                   {t('viewDetails')}
