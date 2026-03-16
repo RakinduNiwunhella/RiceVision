@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { updateAlertStatus } from "../../api/api";
+import { apiFetch } from "../../api/apiFetch";
 import { useLanguage } from "../../context/LanguageContext";
 import TutorialTooltip from "../../components/TutorialTooltip";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
@@ -202,7 +203,7 @@ const Alerts = () => {
           endpoint = `${API_BASE}/api/alerts/past`;
         }
 
-        const response = await fetch(endpoint);
+        const response = await apiFetch(endpoint);
 
         if (!response.ok) {
           throw new Error("Failed to fetch alerts");
@@ -280,7 +281,7 @@ const Alerts = () => {
   useEffect(() => {
     const loadAllAlerts = async () => {
       try {
-        const res = await fetch(`${API_BASE}/api/alerts/all`);
+        const res = await apiFetch(`${API_BASE}/api/alerts/all`);
         const data = await res.json();
         setGlobalAlerts(data);
       } catch (err) {

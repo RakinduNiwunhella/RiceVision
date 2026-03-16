@@ -6,6 +6,7 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import autoTable from 'jspdf-autotable';
 import logoImg from '../assets/logo.png';
+import { apiFetch } from "../../api/apiFetch";
 import { useLanguage } from "../../context/LanguageContext";
 import TutorialTooltip from "../../components/TutorialTooltip";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
@@ -165,7 +166,7 @@ const Report = () => {
 
   // Fetch available S3 dates once on mount and set the latest as default
   useEffect(() => {
-    fetch("https://ricevision-cakt.onrender.com/api/available-dates")
+    apiFetch("https://ricevision-cakt.onrender.com/api/available-dates")
       .then((r) => r.json())
       .then((json) => {
         const dates = json.dates || [];
@@ -187,7 +188,7 @@ const Report = () => {
   const fetchData = async (conf, setter) => {
     if (!conf.date) return; // wait until date is resolved
     try {
-      const res = await fetch(`https://ricevision-cakt.onrender.com/api/detailed-report?date=${conf.date}&district=${conf.district}&season=${conf.season}`);
+      const res = await apiFetch(`https://ricevision-cakt.onrender.com/api/detailed-report?date=${conf.date}&district=${conf.district}&season=${conf.season}`);
       const json = await res.json();
       if (!res.ok) throw new Error(json.detail || "Data not found");
       setter(json);
