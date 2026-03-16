@@ -263,10 +263,10 @@ const Header = () => {
 
   let filteredResults = searchQuery.trim()
     ? searchIndex.filter(
-        (item) =>
-          item.label.toLowerCase().includes(query) ||
-          item.description.toLowerCase().includes(query),
-      )
+      (item) =>
+        item.label.toLowerCase().includes(query) ||
+        item.description.toLowerCase().includes(query),
+    )
     : [];
 
   // Add district results dynamically
@@ -362,11 +362,10 @@ const Header = () => {
                       key={item.label}
                       ref={item.ref}
                       to={item.path}
-                      className={`flex items-center gap-1 lg:gap-1.5 px-2 lg:px-3 py-1.5 rounded-lg text-[10px] lg:text-[11px] font-semibold tracking-wide whitespace-nowrap transition-all duration-300 ${
-                        isActive
+                      className={`flex items-center gap-1 lg:gap-1.5 px-2 lg:px-3 py-1.5 rounded-lg text-[10px] lg:text-[11px] font-semibold tracking-wide whitespace-nowrap transition-all duration-300 ${isActive
                           ? "bg-white/15 text-white shadow-xl shadow-black/5 border border-white/20"
                           : "text-white/50 hover:text-white hover:bg-white/10"
-                      }`}
+                        }`}
                     >
                       <span className="material-symbols-outlined text-[15px] lg:text-[16px]">
                         {item.icon}
@@ -507,11 +506,10 @@ const Header = () => {
                               setLanguage(lang.code);
                               setLangOpen(false);
                             }}
-                            className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition hover:bg-white/10 ${
-                              language === lang.code
+                            className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition hover:bg-white/10 ${language === lang.code
                                 ? "bg-emerald-500/20 text-white"
                                 : "text-white/60"
-                            }`}
+                              }`}
                           >
                             <span className="text-xs font-semibold">
                               {lang.short}
@@ -622,11 +620,10 @@ const Header = () => {
                   ref={item.ref}
                   to={item.path}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${
-                    isActive
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${isActive
                       ? "bg-white/15 text-white border border-white/20"
                       : "text-white/60 hover:text-white hover:bg-white/10"
-                  }`}
+                    }`}
                 >
                   <span className="material-symbols-outlined text-[18px]">
                     {item.icon}
@@ -643,11 +640,10 @@ const Header = () => {
                   <button
                     key={lang.code}
                     onClick={() => setLanguage(lang.code)}
-                    className={`h-9 px-3 rounded-lg flex items-center gap-1.5 transition text-sm font-semibold ${
-                      language === lang.code
+                    className={`h-9 px-3 rounded-lg flex items-center gap-1.5 transition text-sm font-semibold ${language === lang.code
                         ? "bg-emerald-500/20 text-white border border-white/20"
                         : "text-white/50 hover:text-white hover:bg-white/10"
-                    }`}
+                      }`}
                   >
                     <span className="material-symbols-outlined text-[18px]">
                       language
