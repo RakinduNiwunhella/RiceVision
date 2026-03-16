@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { FaSun, FaMoon } from "react-icons/fa";
 import { useTheme } from "../../context/ThemeContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { supabase } from "../../supabaseClient";
 import FieldDrawMap from "./FieldDrawMap";
+import TutorialTooltip from "../../components/TutorialTooltip";
+import { usePageTutorial } from "../../hooks/usePageTutorial";
 import { PRICE_PER_ACRE_LKR } from "./fieldConstants";
 
 /* ────────────────────────────────────────────────────────────────────────────
@@ -30,6 +32,47 @@ export default function FieldSetupPage() {
   const [saving,         setSaving]         = useState(false);
   const [payClicked,     setPayClicked]     = useState(false);
   const [fieldName,      setFieldName]      = useState("");
+
+  // Tutorial refs
+  const getStartedBtnRef = useRef(null);
+  const reviewBtnRef = useRef(null);
+  const completeBtnRef = useRef(null);
+  const downloadBtnRef = useRef(null);
+
+  // Tutorial setup
+  const tutorialSteps = useMemo(() => t("fieldSetupTutorial") ? [
+    {
+      ref: getStartedBtnRef,
+      title: t("fieldSetupTutorial.getStarted.title"),
+      action: t("fieldSetupTutorial.getStarted.action"),
+      outcome: t("fieldSetupTutorial.getStarted.outcome"),
+      position: "bottom",
+    },
+    {
+      ref: reviewBtnRef,
+      title: t("fieldSetupTutorial.review.title"),
+      action: t("fieldSetupTutorial.review.action"),
+      outcome: t("fieldSetupTutorial.review.outcome"),
+      position: "bottom",
+    },
+    {
+      ref: completeBtnRef,
+      title: t("fieldSetupTutorial.complete.title"),
+      action: t("fieldSetupTutorial.complete.action"),
+      outcome: t("fieldSetupTutorial.complete.outcome"),
+      position: "bottom",
+    },
+    {
+      ref: downloadBtnRef,
+      title: t("fieldSetupTutorial.download.title"),
+      action: t("fieldSetupTutorial.download.action"),
+      outcome: t("fieldSetupTutorial.download.outcome"),
+      position: "bottom",
+    },
+  ] : [], [t]);
+
+  const { currentStep, showTutorial, currentTutorialStep, nextStep, prevStep, closeTutorial } = 
+    usePageTutorial("fieldSetup", tutorialSteps);
 
   /* fetch current auth user */
   useEffect(() => {
@@ -422,6 +465,23 @@ export default function FieldSetupPage() {
         )}
 
       </div>
+
+      {/* Tutorial Tooltips */}
+      {showTutorial && currentTutorialStep && tutorialSteps[currentStep] && (
+        <TutorialTooltip
+          visible={true}
+          title={currentTutorialStep.title}
+          action={currentTutorialStep.action}
+          outcome={currentTutorialStep.outcome}
+          elementRef={tutorialSteps[currentStep].ref}
+          position={tutorialSteps[currentStep].position || "bottom"}
+          step={currentStep}
+          totalSteps={tutorialSteps.length}
+          onNext={nextStep}
+          onPrevious={prevStep}
+          onDismiss={closeTutorial}
+        />
+      )}
     </div>
   );
 }

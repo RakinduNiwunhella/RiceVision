@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { supabase } from "../../supabaseClient";
+import React, { useEffect, useState, useRef } from "react";
+import { apiFetch } from "../../api/apiFetch";
 import { useLanguage } from "../../context/LanguageContext";
 import { useNavigate } from "react-router-dom";
+import TutorialTooltip from "../../components/TutorialTooltip";
+import { usePageTutorial } from "../../hooks/usePageTutorial";
 
 const healthColor = (health) => {
   switch (health) {
@@ -24,6 +26,39 @@ const FieldData = () => {
   const [districtData, setDistrictData] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Tutorial setup
+  const tutorialSteps = [
+    {
+      title: "Field Data Overview",
+      action: "This page shows a summary of all your field statistics",
+      outcome: "You'll see total fields, healthy count, stressed crops, and critical alerts",
+    },
+    {
+      title: "Summary Statistics",
+      action: "Check the stat cards for quick field health metrics",
+      outcome: "Green = Healthy fields, Yellow = Stressed fields, Red = Critical alerts. Total count helps track overall land area",
+    },
+    {
+      title: "District Comparison Table",
+      action: "Scroll through the table to see field data for each district",
+      outcome: "Compare health percentages, total yield, and average stress levels across districts. Sort by clicking column headers",
+    },
+    {
+      title: "View on Map",
+      action: "Click 'View Map' button next to any district to navigate to Field Map",
+      outcome: "Satellite visualization zooms to that district for detailed location-based analysis",
+    },
+  ];
+
+  const { currentStep, showTutorial, currentTutorialStep, hasMoreSteps, nextStep, prevStep, closeTutorial } =
+    usePageTutorial("field-data", tutorialSteps);
+
+  // Refs for tutorial
+  const headerRef = useRef(null);
+  const statsRef = useRef(null);
+  const tableRef = useRef(null);
+  const mapButtonRef = useRef(null);
+
   const handleViewMap = (district) => {
     // navigate to map page and filter/zoom to the selected district
     navigate("/field-map", { state: { district } });
@@ -31,38 +66,28 @@ const FieldData = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
-      const { data: summary, error: summaryError } = await supabase
-        .from("field_summary_view")
-        .select("*")
-        .single();
+      try {
+        setLoading(true);
 
-      if (summaryError) {
-        console.error("Summary error:", summaryError);
+        const summaryRes = await apiFetch("/field-data/summary");
+        const summary = await summaryRes.json();
+
+        setStats([
+          { label: t("colTotalFields"), value: summary.total_fields, icon: "analytics" },
+          { label: t("colHealthy"), value: summary.healthy_fields, icon: "check_circle", color: "text-emerald-400" },
+          { label: t("colStressed"), value: summary.stressed_fields, icon: "potted_plant", color: "text-amber-400" },
+          { label: t("colCritical"), value: summary.critical_alerts, icon: "warning", color: "text-red-400" },
+        ]);
+
+        const districtRes = await apiFetch("/field-data/districts");
+        const districts = await districtRes.json();
+
+        setDistrictData(districts);
+      } catch (err) {
+        console.error("Field data error:", err);
+      } finally {
         setLoading(false);
-        return;
       }
-
-      setStats([
-        { label: t('colTotalFields'), value: summary.total_fields, icon: "analytics" },
-        { label: t('colHealthy'), value: summary.healthy_fields, icon: "check_circle", color: "text-emerald-400" },
-        { label: t('colStressed'), value: summary.stressed_fields, icon: "potted_plant", color: "text-amber-400" },
-        { label: t('colCritical'), value: summary.critical_alerts, icon: "warning", color: "text-red-400" },
-      ]);
-
-      const { data: districts, error: districtError } = await supabase
-        .from("district_health_summary")
-        .select("*")
-        .order("total_yield_kg", { ascending: false });
-
-      if (districtError) {
-        console.error("District error:", districtError);
-        setLoading(false);
-        return;
-      }
-
-      setDistrictData(districts);
-      setLoading(false);
     };
 
     fetchData();
@@ -84,7 +109,7 @@ const FieldData = () => {
       <div className="max-w-7xl mx-auto space-y-10 pb-20">
 
         {/* Page Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div ref={headerRef} className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
             <h1 className="text-xl sm:text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
               Field Data
@@ -93,10 +118,10 @@ const FieldData = () => {
               {t('liveStream')}
             </p>
           </div>
-                  </div>
+        </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div ref={currentStep === 1 ? statsRef : undefined} className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {stats.map((item) => (
             <div
               key={item.label}
@@ -118,7 +143,7 @@ const FieldData = () => {
         </div>
 
         {/* Table Section */}
-        <div className="glass p-1 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl overflow-hidden group">
+        <div ref={currentStep === 2 ? tableRef : undefined} className="glass p-1 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl overflow-hidden group">
           <div className="p-4 sm:p-8 border-b border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/40 flex items-center gap-3">
               <span className="material-symbols-outlined text-emerald-400">dataset</span>
@@ -187,7 +212,7 @@ const FieldData = () => {
                       <span className="ml-1 text-[10px] text-white/40 uppercase font-black">kg</span>
                     </td>
                     <td className="px-3 sm:px-6 py-3 sm:py-5 text-center">
-                      <div className="flex items-center justify-center gap-2">
+                      <div ref={mapButtonRef} className="flex items-center justify-center gap-2">
                         <button
                           onClick={() => handleViewMap(d.district)}
                           className="glass-btn text-[10px] px-3 py-1 tracking-widest bg-white/10 hover:bg-white/20"
@@ -196,7 +221,7 @@ const FieldData = () => {
                         </button>
 
                         <button
-                          onClick={() => navigate("/reports", { state: { district: d.district } })}
+                          onClick={() => navigate("/report", { state: { district: d.district } })}
                           className="glass-btn text-[10px] px-3 py-1 tracking-widest bg-white/10 hover:bg-white/20"
                         >
                           View Report
@@ -209,6 +234,72 @@ const FieldData = () => {
             </table>
           </div>
         </div>
+
+        {/* Tutorial Tooltips */}
+        {showTutorial && currentTutorialStep && (
+          <>
+            {currentStep === 0 && (
+              <TutorialTooltip
+                visible={true}
+                position="bottom"
+                title={currentTutorialStep.title}
+                action={currentTutorialStep.action}
+                outcome={currentTutorialStep.outcome}
+                elementRef={headerRef}
+                step={currentStep}
+                totalSteps={tutorialSteps.length}
+                onNext={nextStep}
+                onPrevious={prevStep}
+                onDismiss={closeTutorial}
+              />
+            )}
+            {currentStep === 1 && (
+              <TutorialTooltip
+                visible={true}
+                position="bottom"
+                title={currentTutorialStep.title}
+                action={currentTutorialStep.action}
+                outcome={currentTutorialStep.outcome}
+                elementRef={statsRef}
+                step={currentStep}
+                totalSteps={tutorialSteps.length}
+                onNext={nextStep}
+                onPrevious={prevStep}
+                onDismiss={closeTutorial}
+              />
+            )}
+            {currentStep === 2 && (
+              <TutorialTooltip
+                visible={true}
+                position="bottom"
+                title={currentTutorialStep.title}
+                action={currentTutorialStep.action}
+                outcome={currentTutorialStep.outcome}
+                elementRef={tableRef}
+                step={currentStep}
+                totalSteps={tutorialSteps.length}
+                onNext={nextStep}
+                onPrevious={prevStep}
+                onDismiss={closeTutorial}
+              />
+            )}
+            {currentStep === 3 && (
+              <TutorialTooltip
+                visible={true}
+                position="top"
+                title={currentTutorialStep.title}
+                action={currentTutorialStep.action}
+                outcome={currentTutorialStep.outcome}
+                elementRef={mapButtonRef}
+                step={currentStep}
+                totalSteps={tutorialSteps.length}
+                onNext={nextStep}
+                onPrevious={prevStep}
+                onDismiss={closeTutorial}
+              />
+            )}
+          </>
+        )}
       </div>
     </div>
   );

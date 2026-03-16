@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   QuestionMarkCircleIcon,
   PhoneIcon,
   EnvelopeIcon,
   ExclamationTriangleIcon,
   ChevronDownIcon,
+  PlayCircleIcon,
 } from "@heroicons/react/24/outline";
 import { fetchFaqs, submitComplaint } from "../../api/api";
 import { useLanguage } from "../../context/LanguageContext";
@@ -25,7 +27,12 @@ const Help = () => {
   const [faqs, setFaqs] = useState([]);
   const [faqLoading, setFaqLoading] = useState(true);
   const [openFaq, setOpenFaq] = useState(null);
+  const navigate = useNavigate();
 
+  const handleReplayTutorial = () => {
+    localStorage.setItem('ricevision_force_tutorial_replay', 'true');
+    navigate('/dashboard');
+  };
   /* ---------------- FETCH FAQS ---------------- */
 
   useEffect(() => {
@@ -93,9 +100,16 @@ const Help = () => {
               {t('helpSupport')}
             </h1>
             <p className="text-white/40 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em] max-w-2xl">
-
+              {/* Optional subtitle text */}
             </p>
           </div>
+          <button 
+            onClick={handleReplayTutorial}
+            className="flex items-center gap-2 glass px-4 py-2 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 rounded-xl uppercase tracking-widest text-[10px] font-black transition-all active:scale-95"
+          >
+            <PlayCircleIcon className="w-5 h-5" />
+            Replay Tutorials
+          </button>
         </div>
 
         {/* Quick Contact Grid */}
@@ -261,6 +275,8 @@ const Help = () => {
             </div>
           </div>
         </div>
+
+
       </div>
     </div>
   );

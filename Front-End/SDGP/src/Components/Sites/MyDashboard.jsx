@@ -1,5 +1,5 @@
 // MyDashboard.jsx
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import {
   LineChart,
   Line,
@@ -16,6 +16,9 @@ import {
 } from "recharts";
 import { useLanguage } from "../../context/LanguageContext";
 import { AlertTriangle, CloudRain, Bug } from "lucide-react";
+import TutorialOverlay from "../TutorialOverlay";
+import { usePageTutorial } from "../../hooks/usePageTutorial";
+import { useNavigate } from "react-router-dom";
 
 import {
   fetchHealthSummary,
@@ -25,7 +28,6 @@ import {
   fetchDistrictHealth,
   fetchStageDistribution,
 } from "../../api/api";
-import YieldChatbot from "../chatbot/Yieldchatbot";
 
 
 
@@ -77,6 +79,84 @@ const MyDashboard = () => {
   const [districtHealth, setDistrictHealth] = useState([]);
   const [showAllDistricts, setShowAllDistricts] = useState(false);
   const [stageDistribution, setStageDistribution] = useState([]);
+  const navigate = useNavigate();
+
+  // Refs for tutorial tooltips
+  const headerRef = useRef(null);
+  const syncBadgeRef = useRef(null);
+  const healthCardRef = useRef(null);
+  const yieldCardRef = useRef(null);
+  const supplyCardRef = useRef(null);
+  const threatsCardRef = useRef(null);
+  const threatDetailsBtnRef = useRef(null);
+  const outbreaksToggleBtnRef = useRef(null);
+  const stageChartRef = useRef(null);
+  const districtTableRef = useRef(null);
+  const districtToggleBtnRef = useRef(null);
+
+  // Tutorial setup - cards, icons, and key actions on dashboard
+  const tutorialSteps = useMemo(() => {
+    const steps = [
+      {
+        ref: headerRef,
+        title: "Welcome! This is your field control center overview.",
+      },
+      {
+        ref: syncBadgeRef,
+        title: "Check this icon to ensure your data is freshly synced.",
+      },
+      {
+        ref: healthCardRef,
+        title: "See crop health as a pie chart. Green means optimal.",
+      },
+      {
+        ref: yieldCardRef,
+        title: "View your expected total harvest here in metric tons.",
+      },
+      {
+        ref: supplyCardRef,
+        title: "Track expected shortfalls and national demand saturation risks quickly.",
+      },
+      {
+        ref: threatsCardRef,
+        title: "Review active disease outbreaks and critical pest risks.",
+      },
+    ]
+
+    if (outbreaks.length > 0) {
+      steps.push({
+        ref: threatDetailsBtnRef,
+        title: "Click here to open detailed recommendations for this threat.",
+      })
+    }
+
+    if (outbreaks.length > 5) {
+      steps.push({
+        ref: outbreaksToggleBtnRef,
+        title: "Click this to expand or collapse your threat list.",
+      })
+    }
+
+    steps.push(
+      {
+        ref: stageChartRef,
+        title: "Check what percentage of your crops are in each growth stage.",
+      },
+      {
+        ref: districtTableRef,
+        title: "Compare health metrics across all your districts in one table.",
+      },
+      {
+        ref: districtToggleBtnRef,
+        title: "Use this button to expand the full district list.",
+      },
+    )
+
+    return steps
+  }, [outbreaks.length])
+
+  const { currentStep, showTutorial, currentTutorialStep, hasMoreSteps, nextStep, prevStep, closeTutorial } =
+    usePageTutorial("dashboard", tutorialSteps);
 
   const stageColors = ["#10b981", "#06b6d4", "#8b5cf6", "#f59e0b", "#ef4444", "#f97316"];
 
@@ -139,7 +219,7 @@ const MyDashboard = () => {
       <div className="max-w-7xl mx-auto space-y-12 pb-20">
 
         {/* ── Page Header ── */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div ref={currentStep === 0 ? headerRef : undefined} className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
             <h1 className="text-xl sm:text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
             </h1>
@@ -148,7 +228,7 @@ const MyDashboard = () => {
             </p>
           </div>
 
-          <div className="glass px-6 py-3 rounded-2xl border-white/10 flex items-center gap-3">
+          <div ref={syncBadgeRef} className="glass px-6 py-3 rounded-2xl border-white/10 flex items-center gap-3">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <span className="text-[10px] font-black uppercase tracking-widest text-white/60">{t('systemSynced')}</span>
           </div>
@@ -158,14 +238,14 @@ const MyDashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-10">
 
           {/* Field Health Distribution */}
-          <div className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col items-center">
+          <div ref={healthCardRef} className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col items-center">
             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-8 self-start flex items-center gap-2">
               <span className="material-symbols-outlined text-emerald-400 text-sm">radiology</span>
               {t('cropHealthDist')}
             </p>
-            <div className="w-full aspect-square max-h-[240px] relative">
+            <div className="w-full h-[240px] relative">
               {healthSummary ? (
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height={240}>
                   <PieChart>
                     <Pie
                       data={healthPieData}
@@ -213,7 +293,7 @@ const MyDashboard = () => {
           </div>
 
           {/* Yield Forecast */}
-          <div className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
+          <div ref={yieldCardRef} className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-6 flex items-center gap-2">
               <span className="material-symbols-outlined text-cyan-400 text-sm">trending_up</span>
               {t('outputProjection')}
@@ -245,7 +325,7 @@ const MyDashboard = () => {
           </div>
 
           {/* Expected Shortfall */}
-          <div className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col justify-between md:col-span-2 lg:col-span-1">
+          <div ref={supplyCardRef} className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col justify-between md:col-span-2 lg:col-span-1">
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-6 flex items-center gap-2">
                 <span className="material-symbols-outlined text-amber-500 text-sm">error</span>
@@ -274,7 +354,7 @@ const MyDashboard = () => {
         </div>
 
         {/* ── Active Threats Section (Wider) ── */}
-        <div className="glass p-1 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl overflow-hidden">
+        <div ref={threatsCardRef} className="glass p-1 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl overflow-hidden">
           <div className="p-4 sm:p-8 border-b border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/40 flex items-center gap-3">
               <span className="material-symbols-outlined text-rose-500">sensors</span>
@@ -289,7 +369,7 @@ const MyDashboard = () => {
           </div>
 
           <div className="p-4 space-y-3">
-            {(showAllOutbreaks ? outbreaks : outbreaks.slice(0, 5)).map((o) => (
+            {(showAllOutbreaks ? outbreaks : outbreaks.slice(0, 5)).map((o, i) => (
               <div
                 key={o.id}
                 className="group flex flex-col sm:flex-row justify-between items-start sm:items-center px-4 sm:px-6 py-4 rounded-2xl bg-white/5 hover:bg-white/10 transition-all border border-white/5 hover:border-white/20 gap-3"
@@ -307,7 +387,11 @@ const MyDashboard = () => {
                     </div>
                   </div>
                 </div>
-                <button className="text-[10px] font-black uppercase tracking-[0.2em] rounded-xl px-6 py-2.5 border border-white/10 text-white/40 hover:text-white hover:border-white/40 hover:bg-white/5 transition-all active:scale-95">
+                <button
+                  ref={i === 0 ? threatDetailsBtnRef : undefined}
+                  onClick={() => navigate("/alerts")}
+                  className="text-[10px] font-black uppercase tracking-[0.2em] rounded-xl px-6 py-2.5 border border-white/10 text-white/40 hover:text-white hover:border-white/40 hover:bg-white/5 transition-all active:scale-95"
+                >
                   {t('viewDetails')}
                 </button>
               </div>
@@ -317,6 +401,7 @@ const MyDashboard = () => {
           {outbreaks.length > 5 && (
             <div className="px-8 py-6 bg-white/2 flex justify-center border-t border-white/5">
               <button
+                ref={outbreaksToggleBtnRef}
                 onClick={() => setShowAllOutbreaks(!showAllOutbreaks)}
                 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 hover:text-white transition-colors flex items-center gap-2"
               >
@@ -331,7 +416,7 @@ const MyDashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8 pb-12">
 
           {/* Stage Distribution */}
-          <div className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
+          <div ref={stageChartRef} className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-2 flex items-center gap-2">
               <span className="material-symbols-outlined text-purple-400 text-sm">bar_chart</span>
               {t('growthAnalysis')}
@@ -416,7 +501,7 @@ const MyDashboard = () => {
           </div>
 
           {/* Regional Health Overview */}
-          <div className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
+          <div ref={districtTableRef} className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-2 flex items-center gap-2">
               <span className="material-symbols-outlined text-cyan-400 text-sm">map</span>
               District Overview
@@ -449,6 +534,7 @@ const MyDashboard = () => {
 
             <div className="mt-8 pt-6 border-t border-white/5 text-center">
               <button
+                ref={districtToggleBtnRef}
                 onClick={() => setShowAllDistricts(!showAllDistricts)}
                 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 hover:text-white transition-colors"
               >
@@ -458,6 +544,17 @@ const MyDashboard = () => {
           </div>
 
         </div>
+
+        {/* Tutorial Overlay */}
+        <TutorialOverlay
+          visible={showTutorial}
+          steps={tutorialSteps}
+          currentStep={currentStep}
+          onNext={nextStep}
+          onBack={prevStep}
+          onSkip={closeTutorial}
+          onFinish={closeTutorial}
+        />
       </div>
     </div>
   );
