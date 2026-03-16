@@ -4,7 +4,7 @@ import FiltersPanel from "../Map/FiltersPanel";
 import MapLayersPanel from "../Map/MapLayersPanel";
 import RiceMap from "../Map/RiceMap";
 import { useSearchParams } from "react-router-dom";
-import TutorialTooltip from "../../components/TutorialTooltip";
+import TutorialOverlay from "../TutorialOverlay";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
 
 /* Normalize health values so they match checkbox labels exactly */
@@ -29,42 +29,29 @@ export default function FieldMap() {
   const districtFromURL = searchParams.get("district");
   const navigate = useNavigate();
 
-  /* Tutorial setup */
-  const tutorialSteps = [
-    {
-      title: "Field Map: Satellite View",
-      action: "This interactive satellite map shows your field locations and conditions",
-      outcome: "You'll see field boundaries, vegetation health, satellite imagery, and can apply filters",
-    },
-    {
-      title: "Filters Panel",
-      action: "Click the left panel to filter by district, season, and health status",
-      outcome: "Map updates to show only fields matching your filter criteria. Use to focus on specific areas",
-    },
-    {
-      title: "Layers Panel",
-      action: "Click the right panel to toggle different satellite layers and overlays",
-      outcome: "Choose between satellite imagery, vegetation indices (NDVI/EVI), radar data (VV/VH), and road overlays",
-    },
-    {
-      title: "Health Indicators",
-      action: "View different colors on the map showing field health status",
-      outcome: "Green = Healthy, Yellow = Mild Stress, Orange/Red = Severe Stress. Color coding helps spot problem areas",
-    },
-    {
-      title: "Interactive Features",
-      action: "Click on field markers, zoom with mouse wheel, pan by dragging",
-      outcome: "Explore detailed field information, get precise location coordinates, and measure distances",
-    },
-  ];
-
-  const { currentStep, showTutorial, currentTutorialStep, hasMoreSteps, nextStep, prevStep, closeTutorial } =
-    usePageTutorial("field-map", tutorialSteps);
-
   /* Refs for tutorial */
   const mapContainerRef = useRef(null);
   const filtersPanelRef = useRef(null);
   const layersPanelRef = useRef(null);
+
+  /* Tutorial setup */
+  const tutorialSteps = [
+    {
+      title: "View your field locations and conditions",
+      ref: mapContainerRef,
+    },
+    {
+      title: "Click to filter by district, season, and health status",
+      ref: filtersPanelRef,
+    },
+    {
+      title: "Toggle satellite layers, vegetation indices, and overlays",
+      ref: layersPanelRef,
+    },
+  ];
+
+  const { currentStep, showTutorial, nextStep, prevStep, closeTutorial } =
+    usePageTutorial("field-map", tutorialSteps);
 
   /* Used to zoom map to alert location */
   const flyTo = state?.type ? state : null;
@@ -148,99 +135,16 @@ export default function FieldMap() {
         />
       </div>
 
-      {/* Tutorial Tooltips */}
-      {showTutorial && currentTutorialStep && (
-        <>
-          {currentStep === 0 && mapContainerRef.current && (
-            <TutorialTooltip
-              visible={true}
-              position="bottom"
-              title={currentTutorialStep.title}
-              action={currentTutorialStep.action}
-              outcome={currentTutorialStep.outcome}
-              elementRef={mapContainerRef}
-              step={currentStep}
-              totalSteps={tutorialSteps.length}
-              onNext={nextStep}
-              onPrevious={prevStep}
-              onDismiss={() => {
-                if (hasMoreSteps) nextStep();
-                else closeTutorial();
-              }}
-            />
-          )}
-          {currentStep === 1 && filtersPanelRef.current && (
-            <TutorialTooltip
-              visible={true}
-              position="right"
-              title={currentTutorialStep.title}
-              action={currentTutorialStep.action}
-              outcome={currentTutorialStep.outcome}
-              elementRef={filtersPanelRef}
-              step={currentStep}
-              totalSteps={tutorialSteps.length}
-              onNext={nextStep}
-              onPrevious={prevStep}
-              onDismiss={() => {
-                if (hasMoreSteps) nextStep();
-                else closeTutorial();
-              }}
-            />
-          )}
-          {currentStep === 2 && layersPanelRef.current && (
-            <TutorialTooltip
-              visible={true}
-              position="left"
-              title={currentTutorialStep.title}
-              action={currentTutorialStep.action}
-              outcome={currentTutorialStep.outcome}
-              elementRef={layersPanelRef}
-              step={currentStep}
-              totalSteps={tutorialSteps.length}
-              onNext={nextStep}
-              onPrevious={prevStep}
-              onDismiss={() => {
-                if (hasMoreSteps) nextStep();
-                else closeTutorial();
-              }}
-            />
-          )}
-          {currentStep === 3 && (
-            <TutorialTooltip
-              visible={true}
-              position="top"
-              title={currentTutorialStep.title}
-              action={currentTutorialStep.action}
-              outcome={currentTutorialStep.outcome}
-              step={currentStep}
-              totalSteps={tutorialSteps.length}
-              onNext={nextStep}
-              onPrevious={prevStep}
-              onDismiss={() => {
-                if (hasMoreSteps) nextStep();
-                else closeTutorial();
-              }}
-            />
-          )}
-          {currentStep === 4 && (
-            <TutorialTooltip
-              visible={true}
-              position="top"
-              title={currentTutorialStep.title}
-              action={currentTutorialStep.action}
-              outcome={currentTutorialStep.outcome}
-              step={currentStep}
-              totalSteps={tutorialSteps.length}
-              onNext={nextStep}
-              onPrevious={prevStep}
-              onDismiss={() => {
-                if (hasMoreSteps) nextStep();
-                else closeTutorial();
-              }}
-            />
-          )}
-        </>
-      )}
+      {/* Tutorial Overlay */}
+      <TutorialOverlay
+        visible={showTutorial}
+        steps={tutorialSteps}
+        currentStep={currentStep}
+        onNext={nextStep}
+        onBack={prevStep}
+        onSkip={closeTutorial}
+        onFinish={closeTutorial}
+      />
     </div>
   );
 }

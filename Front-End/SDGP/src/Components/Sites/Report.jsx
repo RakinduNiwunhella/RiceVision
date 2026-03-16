@@ -8,7 +8,7 @@ import autoTable from 'jspdf-autotable';
 import logoImg from '../assets/logo.png';
 import { apiFetch } from "../../api/apiFetch";
 import { useLanguage } from "../../context/LanguageContext";
-import TutorialTooltip from "../../components/TutorialTooltip";
+import TutorialOverlay from "../TutorialOverlay";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
 
 const CustomSelect = ({ value, onChange, options, className = "" }) => {
@@ -127,51 +127,44 @@ const Report = () => {
   const [dataA, setDataA] = useState(null);
   const [dataB, setDataB] = useState(null);
 
-  // Tutorial Setup
-  const tutorialSteps = [
-    {
-      title: t("yieldReports") || "Yield Analytics Reports",
-      action: "Explore satellite-derived yield predictions and analysis",
-      outcome: "You will see detailed yield forecasts with comparative metrics and export options"
-    },
-    {
-      title: "Single vs Compare",
-      action: "Toggle between 'Single' report view and 'Compare' mode for side-by-side analysis",
-      outcome: "You can analyze one district or compare two districts' yield predictions"
-    },
-    {
-      title: "District Selection",
-      action: "Click to select a district and view its yield analytics",
-      outcome: "The report will load satellite data and yield predictions for the selected district"
-    },
-    {
-      title: "Yield Prediction",
-      action: "View the predicted yield and comparison with historical baseline",
-      outcome: "You will see the expected harvest (kg/ha) and how it compares to past years"
-    },
-    {
-      title: "Metrics & Export",
-      action: "Review pest count, risk factors, and other metrics. Use Export PDF to download the report",
-      outcome: "You get a comprehensive analysis document ready for sharing or storage"
-    }
-  ];
-
-  const {
-    currentStep,
-    showTutorial,
-    currentTutorialStep,
-    hasMoreSteps,
-    nextStep,
-    prevStep,
-    closeTutorial
-  } = usePageTutorial("report", tutorialSteps);
-
   // Element refs for tutorial
   const headerRef = useRef(null);
   const modeToggleRef = useRef(null);
   const districtSelectorRef = useRef(null);
   const yieldHeroRef = useRef(null);
   const metricsExportRef = useRef(null);
+
+  // Tutorial Setup
+  const tutorialSteps = [
+    {
+      title: "Explore satellite-derived yield predictions and analysis",
+      ref: headerRef
+    },
+    {
+      title: "Toggle between Single and Compare view modes",
+      ref: modeToggleRef
+    },
+    {
+      title: "Click to select a district for yield analysis",
+      ref: districtSelectorRef
+    },
+    {
+      title: "View predicted yield vs historical baseline",
+      ref: yieldHeroRef
+    },
+    {
+      title: "Review detailed metrics and export your report",
+      ref: metricsExportRef
+    }
+  ];
+
+  const {
+    currentStep,
+    showTutorial,
+    nextStep,
+    prevStep,
+    closeTutorial
+  } = usePageTutorial("report", tutorialSteps);
 
   // Fetch available S3 dates once on mount and set the latest as default
   useEffect(() => {
@@ -1042,86 +1035,16 @@ const Report = () => {
         </div>
       )}
 
-      {/* ─── TUTORIAL TOOLTIPS ─── */}
-      {showTutorial && currentTutorialStep && (
-        <>
-          {currentStep === 0 && (
-            <TutorialTooltip
-              visible={true}
-              position="bottom"
-              title={currentTutorialStep.title}
-              action={currentTutorialStep.action}
-              outcome={currentTutorialStep.outcome}
-              elementRef={headerRef}
-              step={currentStep}
-              totalSteps={tutorialSteps.length}
-              onNext={nextStep}
-              onPrevious={prevStep}
-              onDismiss={closeTutorial}
-            />
-          )}
-          {currentStep === 1 && (
-            <TutorialTooltip
-              visible={true}
-              position="bottom"
-              title={currentTutorialStep.title}
-              action={currentTutorialStep.action}
-              outcome={currentTutorialStep.outcome}
-              elementRef={modeToggleRef}
-              step={currentStep}
-              totalSteps={tutorialSteps.length}
-              onNext={nextStep}
-              onPrevious={prevStep}
-              onDismiss={closeTutorial}
-            />
-          )}
-          {currentStep === 2 && (
-            <TutorialTooltip
-              visible={true}
-              position="bottom"
-              title={currentTutorialStep.title}
-              action={currentTutorialStep.action}
-              outcome={currentTutorialStep.outcome}
-              elementRef={districtSelectorRef}
-              step={currentStep}
-              totalSteps={tutorialSteps.length}
-              onNext={nextStep}
-              onPrevious={prevStep}
-              onDismiss={closeTutorial}
-            />
-          )}
-          {currentStep === 3 && (
-            <TutorialTooltip
-              visible={true}
-              position="bottom"
-              title={currentTutorialStep.title}
-              action={currentTutorialStep.action}
-              outcome={currentTutorialStep.outcome}
-              elementRef={yieldHeroRef}
-              step={currentStep}
-              totalSteps={tutorialSteps.length}
-              onNext={nextStep}
-              onPrevious={prevStep}
-              onDismiss={closeTutorial}
-            />
-          )}
-          {currentStep === 4 && (
-            <TutorialTooltip
-              visible={true}
-              position="bottom"
-              title={currentTutorialStep.title}
-              action={currentTutorialStep.action}
-              outcome={currentTutorialStep.outcome}
-              elementRef={metricsExportRef}
-              step={currentStep}
-              totalSteps={tutorialSteps.length}
-              onNext={nextStep}
-              onPrevious={prevStep}
-              onDismiss={closeTutorial}
-            />
-          )}
-        </>
-      )}
+      {/* ─── TUTORIAL OVERLAY ─── */}
+      <TutorialOverlay
+        visible={showTutorial}
+        steps={tutorialSteps}
+        currentStep={currentStep}
+        onNext={nextStep}
+        onBack={prevStep}
+        onSkip={closeTutorial}
+        onFinish={closeTutorial}
+      />
     </div>
 
   );

@@ -31,6 +31,7 @@ const Help = () => {
 
   const handleReplayTutorial = () => {
     localStorage.setItem('ricevision_force_tutorial_replay', 'true');
+    localStorage.setItem('ricevision_global_tutorial_active', 'true');
     navigate('/dashboard');
   };
   /* ---------------- FETCH FAQS ---------------- */

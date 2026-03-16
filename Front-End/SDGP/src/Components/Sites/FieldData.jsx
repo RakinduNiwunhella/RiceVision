@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { apiFetch } from "../../api/apiFetch";
 import { useLanguage } from "../../context/LanguageContext";
 import { useNavigate } from "react-router-dom";
-import TutorialTooltip from "../../components/TutorialTooltip";
+import TutorialOverlay from "../TutorialOverlay";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
 
 const healthColor = (health) => {
@@ -27,37 +27,34 @@ const FieldData = () => {
   const [loading, setLoading] = useState(true);
 
   // Tutorial setup
-  const tutorialSteps = [
-    {
-      title: "Field Data Overview",
-      action: "This page shows a summary of all your field statistics",
-      outcome: "You'll see total fields, healthy count, stressed crops, and critical alerts",
-    },
-    {
-      title: "Summary Statistics",
-      action: "Check the stat cards for quick field health metrics",
-      outcome: "Green = Healthy fields, Yellow = Stressed fields, Red = Critical alerts. Total count helps track overall land area",
-    },
-    {
-      title: "District Comparison Table",
-      action: "Scroll through the table to see field data for each district",
-      outcome: "Compare health percentages, total yield, and average stress levels across districts. Sort by clicking column headers",
-    },
-    {
-      title: "View on Map",
-      action: "Click 'View Map' button next to any district to navigate to Field Map",
-      outcome: "Satellite visualization zooms to that district for detailed location-based analysis",
-    },
-  ];
-
-  const { currentStep, showTutorial, currentTutorialStep, hasMoreSteps, nextStep, prevStep, closeTutorial } =
-    usePageTutorial("field-data", tutorialSteps);
-
   // Refs for tutorial
   const headerRef = useRef(null);
   const statsRef = useRef(null);
   const tableRef = useRef(null);
   const mapButtonRef = useRef(null);
+
+  // Tutorial setup
+  const tutorialSteps = [
+    {
+      title: "View your total land health and critical alerts",
+      ref: headerRef,
+    },
+    {
+      title: "Check stat cards for quick summary metrics",
+      ref: statsRef,
+    },
+    {
+      title: "Compare crop health percentages across all districts",
+      ref: tableRef,
+    },
+    {
+      title: "Click to view precise satellite mapping for this district",
+      ref: mapButtonRef,
+    },
+  ];
+
+  const { currentStep, showTutorial, nextStep, prevStep, closeTutorial } =
+    usePageTutorial("field-data", tutorialSteps);
 
   const handleViewMap = (district) => {
     // navigate to map page and filter/zoom to the selected district
@@ -235,71 +232,16 @@ const FieldData = () => {
           </div>
         </div>
 
-        {/* Tutorial Tooltips */}
-        {showTutorial && currentTutorialStep && (
-          <>
-            {currentStep === 0 && (
-              <TutorialTooltip
-                visible={true}
-                position="bottom"
-                title={currentTutorialStep.title}
-                action={currentTutorialStep.action}
-                outcome={currentTutorialStep.outcome}
-                elementRef={headerRef}
-                step={currentStep}
-                totalSteps={tutorialSteps.length}
-                onNext={nextStep}
-                onPrevious={prevStep}
-                onDismiss={closeTutorial}
-              />
-            )}
-            {currentStep === 1 && (
-              <TutorialTooltip
-                visible={true}
-                position="bottom"
-                title={currentTutorialStep.title}
-                action={currentTutorialStep.action}
-                outcome={currentTutorialStep.outcome}
-                elementRef={statsRef}
-                step={currentStep}
-                totalSteps={tutorialSteps.length}
-                onNext={nextStep}
-                onPrevious={prevStep}
-                onDismiss={closeTutorial}
-              />
-            )}
-            {currentStep === 2 && (
-              <TutorialTooltip
-                visible={true}
-                position="bottom"
-                title={currentTutorialStep.title}
-                action={currentTutorialStep.action}
-                outcome={currentTutorialStep.outcome}
-                elementRef={tableRef}
-                step={currentStep}
-                totalSteps={tutorialSteps.length}
-                onNext={nextStep}
-                onPrevious={prevStep}
-                onDismiss={closeTutorial}
-              />
-            )}
-            {currentStep === 3 && (
-              <TutorialTooltip
-                visible={true}
-                position="top"
-                title={currentTutorialStep.title}
-                action={currentTutorialStep.action}
-                outcome={currentTutorialStep.outcome}
-                elementRef={mapButtonRef}
-                step={currentStep}
-                totalSteps={tutorialSteps.length}
-                onNext={nextStep}
-                onPrevious={prevStep}
-                onDismiss={closeTutorial}
-              />
-            )}
-          </>
-        )}
+        {/* Tutorial Overlay */}
+        <TutorialOverlay
+          visible={showTutorial}
+          steps={tutorialSteps}
+          currentStep={currentStep}
+          onNext={nextStep}
+          onBack={prevStep}
+          onSkip={closeTutorial}
+          onFinish={closeTutorial}
+        />
       </div>
     </div>
   );

@@ -130,7 +130,7 @@ const TutorialOverlay = ({
 
     return (
       <svg
-        className="fixed inset-0 z-[9990]"
+        className="fixed inset-0 z-[9000]"
         style={{ position: 'fixed', top: 0, left: 0 }}
         width={vw}
         height={vh}
@@ -144,8 +144,8 @@ const TutorialOverlay = ({
             </feMerge>
           </filter>
         </defs>
-        {/* dim backdrop */}
-        <path d={path} fill="rgba(0,0,0,0.45)" fillRule="evenodd" />
+        {/* transparent backdrop */}
+        <path d={path} fill="transparent" fillRule="evenodd" />
         {/* glowing emerald ring */}
         <rect
           x={left}
@@ -173,10 +173,10 @@ const TutorialOverlay = ({
   /* ── step card ── */
   const StepCard = () => (
     <div
-      className="fixed z-[9999] tutorial-overlay-card"
+      className="fixed z-[9001] tutorial-overlay-card"
       style={cardStyle}
     >
-      <div className="bg-slate-900/95 backdrop-blur-xl border border-emerald-500/40 rounded-2xl shadow-2xl shadow-black/50 p-5 pointer-events-auto">
+      <div className="bg-white/5 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-2xl shadow-black/60 p-5 pointer-events-auto ring-1 ring-white/5">
 
         {/* Skip (X) button */}
         <button
@@ -197,7 +197,7 @@ const TutorialOverlay = ({
 
         {/* Title */}
         {step?.title && (
-          <p className="text-sm font-bold text-white leading-snug mb-4">
+          <p className="text-sm font-bold text-white leading-snug mb-4 drop-shadow-md">
             {step.title}
           </p>
         )}

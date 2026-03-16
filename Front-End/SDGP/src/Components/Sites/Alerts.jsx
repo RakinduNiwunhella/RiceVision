@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { updateAlertStatus } from "../../api/api";
 import { apiFetch } from "../../api/apiFetch";
 import { useLanguage } from "../../context/LanguageContext";
-import TutorialTooltip from "../../components/TutorialTooltip";
+import TutorialOverlay from "../TutorialOverlay";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
 
 
@@ -101,57 +101,39 @@ const Alerts = () => {
   const { t } = useLanguage();
   const tabLabels = [t("disasters"), t("pestRisks"), t("pastAlerts")];
 
-  // Tutorial setup - create once and memoize
-  const tutorialSteps = useMemo(() => [
-    {
-      title: "Alert Tabs",
-      action: "Click on different tabs to view different types of alerts",
-      outcome: "You'll see disasters, pest risks, or past resolved alerts",
-    },
-    {
-      title: "Search Alerts",
-      action: "Type in the search box to find specific alerts",
-      outcome: "The alert list filters to show only matching results",
-    },
-    {
-      title: "Resolve Alert",
-      action: "Click the 'Resolve' button on any active alert",
-      outcome: "A modal opens where you can add a resolution note",
-    },
-    {
-      title: "Ignore Alert",
-      action: "Click 'Ignore' to dismiss an alert without resolving",
-      outcome: "The alert moves to 'Past Alerts' tab",
-    },
-    {
-      title: "View on Map",
-      action: "Click 'View Map' to see the alert location",
-      outcome: "You're taken to the Field Map showing the affected area",
-    },
-  ], [])
-
-  const { currentStep, showTutorial, currentTutorialStep, hasMoreSteps, nextStep, prevStep, closeTutorial } =
-    usePageTutorial("alerts", tutorialSteps);
-
-  const [alerts, setAlerts] = useState([]);
-  const [globalAlerts, setGlobalAlerts] = useState([]);
-  const [activeTab, setActiveTab] = useState(
-    () => localStorage.getItem("alerts_tab") || "Disasters",
-  );
-  const [searchTerm, setSearchTerm] = useState("");
-  const [resolveModal, setResolveModal] = useState({
-    open: false,
-    alertId: null,
-    alertType: null,
-  });
-  const [exitingId, setExitingId] = useState(null);
-
   // Refs for tutorial tooltips
   const tabsRef = useRef(null);
   const searchRef = useRef(null);
   const resolveRef = useRef(null);
   const ignoreRef = useRef(null);
   const mapRef = useRef(null);
+
+  // Tutorial setup - create once and memoize
+  const tutorialSteps = useMemo(() => [
+    {
+      title: "View disasters, pest risks, or past resolved alerts",
+      ref: tabsRef,
+    },
+    {
+      title: "Type in the search box to find specific alerts",
+      ref: searchRef,
+    },
+    {
+      title: "Click the Resolve button to log an alert as resolved",
+      ref: resolveRef,
+    },
+    {
+      title: "Click Ignore to dismiss an alert into Past Alerts",
+      ref: ignoreRef,
+    },
+    {
+      title: "Click View Map to see the affected area highlighted",
+      ref: mapRef,
+    },
+  ], []);
+
+  const { currentStep, showTutorial, nextStep, prevStep, closeTutorial } =
+    usePageTutorial("alerts", tutorialSteps);
 
   const navigate = useNavigate();
 
@@ -542,86 +524,16 @@ const Alerts = () => {
           ))}
         </div>
 
-        {/* Tutorial Tooltips */}
-        {showTutorial && currentTutorialStep && (
-          <>
-            {currentStep === 0 && (
-              <TutorialTooltip
-                visible={true}
-                position="bottom"
-                title={currentTutorialStep.title}
-                action={currentTutorialStep.action}
-                outcome={currentTutorialStep.outcome}
-                elementRef={tabsRef}
-                step={currentStep}
-                totalSteps={tutorialSteps.length}
-                onNext={nextStep}
-                onPrevious={prevStep}
-                onDismiss={closeTutorial}
-              />
-            )}
-            {currentStep === 1 && (
-              <TutorialTooltip
-                visible={true}
-                position="top"
-                title={currentTutorialStep.title}
-                action={currentTutorialStep.action}
-                outcome={currentTutorialStep.outcome}
-                elementRef={searchRef}
-                step={currentStep}
-                totalSteps={tutorialSteps.length}
-                onNext={nextStep}
-                onPrevious={prevStep}
-                onDismiss={closeTutorial}
-              />
-            )}
-            {currentStep === 2 && resolveRef.current && (
-              <TutorialTooltip
-                visible={true}
-                position="top"
-                title={currentTutorialStep.title}
-                action={currentTutorialStep.action}
-                outcome={currentTutorialStep.outcome}
-                elementRef={resolveRef}
-                step={currentStep}
-                totalSteps={tutorialSteps.length}
-                onNext={nextStep}
-                onPrevious={prevStep}
-                onDismiss={closeTutorial}
-              />
-            )}
-            {currentStep === 3 && ignoreRef.current && (
-              <TutorialTooltip
-                visible={true}
-                position="top"
-                title={currentTutorialStep.title}
-                action={currentTutorialStep.action}
-                outcome={currentTutorialStep.outcome}
-                elementRef={ignoreRef}
-                step={currentStep}
-                totalSteps={tutorialSteps.length}
-                onNext={nextStep}
-                onPrevious={prevStep}
-                onDismiss={closeTutorial}
-              />
-            )}
-            {currentStep === 4 && mapRef.current && (
-              <TutorialTooltip
-                visible={true}
-                position="top"
-                title={currentTutorialStep.title}
-                action={currentTutorialStep.action}
-                outcome={currentTutorialStep.outcome}
-                elementRef={mapRef}
-                step={currentStep}
-                totalSteps={tutorialSteps.length}
-                onNext={nextStep}
-                onPrevious={prevStep}
-                onDismiss={closeTutorial}
-              />
-            )}
-          </>
-        )}
+        {/* Tutorial Overlay */}
+        <TutorialOverlay
+          visible={showTutorial}
+          steps={tutorialSteps}
+          currentStep={currentStep}
+          onNext={nextStep}
+          onBack={prevStep}
+          onSkip={closeTutorial}
+          onFinish={closeTutorial}
+        />
       </div>
     </div>
   );

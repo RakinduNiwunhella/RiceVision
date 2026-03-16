@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { getDSDivision } from "../../utils/geoUtils";
 import { useLanguage } from "../../context/LanguageContext";
-import TutorialTooltip from "../../components/TutorialTooltip";
+import TutorialOverlay from "../TutorialOverlay";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
 
 // ─────────────────────────────────────────────
@@ -163,51 +163,44 @@ export default function RiceVisionWeather() {
   const [activeTab, setActiveTab] = useState("overview");
   const dropdownRef = useRef(null);
 
-  // Tutorial Setup
-  const tutorialSteps = [
-    {
-      title: t("weatherTitle") || "Weather Information",
-      action: "Explore the current weather conditions, including temperature, precipitation, and wind data",
-      outcome: "You will see real-time weather measurements for your location"
-    },
-    {
-      title: t("hourlyForecast") || "Hourly Forecast",
-      action: "Click the 'Hourly Forecast' tab to view 24-hour weather progression",
-      outcome: "You will see temperature, precipitation, and wind patterns for the next 24 hours"
-    },
-    {
-      title: t("soilAgronomic") || "Soil & Agronomic Data",
-      action: "Click the 'Soil & Agronomic' tab to view soil conditions",
-      outcome: "You will see soil temperature at different depths (0, 6, 18 cm), soil moisture %, VPD, and evapotranspiration rates for irrigation planning"
-    },
-    {
-      title: t("forecast14Day") || "14-Day Forecast",
-      action: "Click the 'Forecast' tab to see extended weather outlook",
-      outcome: "You will see daily weather predictions for the next 14 days to help plan farming activities"
-    },
-    {
-      title: t("historyData") || "Historical Data",
-      action: "Click the 'History' tab to view past weather records",
-      outcome: "You will see historical weather patterns to analyze seasonal trends and inform future planning"
-    }
-  ];
-
-  const {
-    currentStep,
-    showTutorial,
-    currentTutorialStep,
-    hasMoreSteps,
-    nextStep,
-    prevStep,
-    closeTutorial
-  } = usePageTutorial("weather", tutorialSteps);
-
   // Element refs for tutorial
   const weatherHeaderRef = useRef(null);
   const hourlyTabRef = useRef(null);
   const soilTabRef = useRef(null);
   const forecastTabRef = useRef(null);
   const historyTabRef = useRef(null);
+
+  // Tutorial Setup
+  const tutorialSteps = [
+    {
+      title: "View current weather conditions and atmospheric data",
+      ref: weatherHeaderRef
+    },
+    {
+      title: "Click to view 24-hour weather progression",
+      ref: hourlyTabRef
+    },
+    {
+      title: "Click to view soil conditions and agronomic data",
+      ref: soilTabRef
+    },
+    {
+      title: "Click to see extended 14-day weather outlook",
+      ref: forecastTabRef
+    },
+    {
+      title: "Click to view past historical weather patterns",
+      ref: historyTabRef
+    }
+  ];
+
+  const {
+    currentStep,
+    showTutorial,
+    nextStep,
+    prevStep,
+    closeTutorial
+  } = usePageTutorial("weather", tutorialSteps);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -1041,86 +1034,16 @@ export default function RiceVisionWeather() {
           </div>
         )}
 
-        {/* ─── TUTORIAL TOOLTIPS ─── */}
-        {showTutorial && currentTutorialStep && (
-          <>
-            {currentStep === 0 && (
-              <TutorialTooltip
-                visible={true}
-                position="bottom"
-                title={currentTutorialStep.title}
-                action={currentTutorialStep.action}
-                outcome={currentTutorialStep.outcome}
-                elementRef={weatherHeaderRef}
-                step={currentStep}
-                totalSteps={tutorialSteps.length}
-                onNext={nextStep}
-                onPrevious={prevStep}
-                onDismiss={closeTutorial}
-              />
-            )}
-            {currentStep === 1 && (
-              <TutorialTooltip
-                visible={true}
-                position="bottom"
-                title={currentTutorialStep.title}
-                action={currentTutorialStep.action}
-                outcome={currentTutorialStep.outcome}
-                elementRef={hourlyTabRef}
-                step={currentStep}
-                totalSteps={tutorialSteps.length}
-                onNext={nextStep}
-                onPrevious={prevStep}
-                onDismiss={closeTutorial}
-              />
-            )}
-            {currentStep === 2 && (
-              <TutorialTooltip
-                visible={true}
-                position="bottom"
-                title={currentTutorialStep.title}
-                action={currentTutorialStep.action}
-                outcome={currentTutorialStep.outcome}
-                elementRef={soilTabRef}
-                step={currentStep}
-                totalSteps={tutorialSteps.length}
-                onNext={nextStep}
-                onPrevious={prevStep}
-                onDismiss={closeTutorial}
-              />
-            )}
-            {currentStep === 3 && (
-              <TutorialTooltip
-                visible={true}
-                position="bottom"
-                title={currentTutorialStep.title}
-                action={currentTutorialStep.action}
-                outcome={currentTutorialStep.outcome}
-                elementRef={forecastTabRef}
-                step={currentStep}
-                totalSteps={tutorialSteps.length}
-                onNext={nextStep}
-                onPrevious={prevStep}
-                onDismiss={closeTutorial}
-              />
-            )}
-            {currentStep === 4 && (
-              <TutorialTooltip
-                visible={true}
-                position="bottom"
-                title={currentTutorialStep.title}
-                action={currentTutorialStep.action}
-                outcome={currentTutorialStep.outcome}
-                elementRef={historyTabRef}
-                step={currentStep}
-                totalSteps={tutorialSteps.length}
-                onNext={nextStep}
-                onPrevious={prevStep}
-                onDismiss={closeTutorial}
-              />
-            )}
-          </>
-        )}
+        {/* ─── TUTORIAL OVERLAY ─── */}
+        <TutorialOverlay
+          visible={showTutorial}
+          steps={tutorialSteps}
+          currentStep={currentStep}
+          onNext={nextStep}
+          onBack={prevStep}
+          onSkip={closeTutorial}
+          onFinish={closeTutorial}
+        />
 
         <footer className="hidden">
         </footer>

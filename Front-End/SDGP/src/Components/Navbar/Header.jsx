@@ -6,7 +6,6 @@ import { useTheme } from "../../context/ThemeContext";
 import { useLanguage, LANGUAGES } from "../../context/LanguageContext";
 import Notifications from "../Notifications/Notifications";
 import { supabase } from "../../supabaseClient";
-import { usePageTutorial } from "../../hooks/usePageTutorial";
 import TutorialTooltip from "../../components/TutorialTooltip";
 
 const searchIndex = [
@@ -220,34 +219,6 @@ const Header = () => {
     },
   ], [t]);
 
-  const { currentStep, showTutorial, currentTutorialStep, nextStep, prevStep, closeTutorial } = usePageTutorial("Header", tutorialSteps);
-
-  // Publish the current Header tutorial version so other pages wait for this exact version.
-  useEffect(() => {
-    localStorage.setItem("ricevision_header_required_steps", String(tutorialSteps.length));
-    window.dispatchEvent(new Event("ricevision:tutorial-pages-updated"));
-  }, [tutorialSteps.length]);
-
-  // Skip steps whose target controls are hidden in current responsive layout.
-  useEffect(() => {
-    if (!showTutorial) return;
-
-    const step = tutorialSteps[currentStep];
-    if (!step) return;
-
-    const timer = setTimeout(() => {
-      if (!step.ref?.current) {
-        if (currentStep < tutorialSteps.length - 1) {
-          nextStep();
-        } else {
-          closeTutorial();
-        }
-      }
-    }, 180);
-
-    return () => clearTimeout(timer);
-  }, [showTutorial, currentStep, tutorialSteps, nextStep, closeTutorial]);
-
   const updateDropdownPos = () => {
     if (inputRef.current) {
       const rect = inputRef.current.getBoundingClientRect();
@@ -333,7 +304,7 @@ const Header = () => {
 
   return (
     <>
-      <nav className="fixed top-2 sm:top-4 left-1/2 -translate-x-1/2 w-[calc(100%-1rem)] sm:w-[calc(100%-3rem)] max-w-7xl z-[9995] glass h-12 sm:h-14 rounded-2xl shadow-2xl border-white/20 overflow-visible">
+      <nav className="fixed top-2 sm:top-4 left-1/2 -translate-x-1/2 w-[calc(100%-1rem)] sm:w-[calc(100%-3rem)] max-w-7xl z-[10000] glass h-12 sm:h-14 rounded-2xl shadow-2xl border-white/20 overflow-visible">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 h-full">
           <div className="flex justify-between items-center h-full gap-2 sm:gap-4">
             {/* Logo Section */}
@@ -680,22 +651,7 @@ const Header = () => {
         </div>
       )}
 
-      {/* Tutorial Tooltips */}
-      {showTutorial && currentTutorialStep && tutorialSteps[currentStep] && (
-        <TutorialTooltip
-          visible={true}
-          title={currentTutorialStep.title}
-          action={currentTutorialStep.action}
-          outcome={currentTutorialStep.outcome}
-          elementRef={tutorialSteps[currentStep].ref}
-          position={tutorialSteps[currentStep].position || "bottom"}
-          step={currentStep}
-          totalSteps={tutorialSteps.length}
-          onNext={nextStep}
-          onPrevious={prevStep}
-          onDismiss={closeTutorial}
-        />
-      )}
+
     </>
   );
 };
