@@ -145,7 +145,7 @@ const TutorialOverlay = ({
           </filter>
         </defs>
         {/* dim backdrop */}
-        <path d={path} fill="rgba(0,0,0,0.72)" fillRule="evenodd" />
+        <path d={path} fill="rgba(0,0,0,0.45)" fillRule="evenodd" />
         {/* glowing emerald ring */}
         <rect
           x={left}
@@ -154,8 +154,8 @@ const TutorialOverlay = ({
           height={height}
           rx={r}
           fill="none"
-          stroke="rgba(52,211,153,0.75)"
-          strokeWidth="2"
+          stroke="rgba(52,211,153,0.8)"
+          strokeWidth="3"
           filter="url(#tv-glow)"
         />
         {/* clickable backdrop to skip */}
