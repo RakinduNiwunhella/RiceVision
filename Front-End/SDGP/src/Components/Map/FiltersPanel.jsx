@@ -1,6 +1,7 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 
 export default function FiltersPanel({ filters, setFilters }) {
+  const [open, setOpen] = useState(false);
   const selectedDistrictRef = useRef(null);
 
   useEffect(() => {
@@ -49,7 +50,18 @@ export default function FiltersPanel({ filters, setFilters }) {
   ];
 
   return (
-    <div className="w-full md:w-80 lg:w-80 glass p-4 sm:p-6 overflow-y-auto max-h-[50vh] sm:max-h-[60vh] lg:max-h-[calc(100vh-6rem)] shadow-xl">
+    <>
+      {/* Mobile Toggle Button */}
+      <button
+        onClick={() => setOpen(!open)}
+        className="md:hidden fixed top-20 left-4 z-[1000] bg-emerald-500 text-white p-3 rounded-full shadow-lg"
+      >
+        <span className="material-symbols-outlined">filter_list</span>
+      </button>
+
+      <div
+        className={`${open ? "block" : "hidden"} md:block fixed md:relative top-0 left-0 h-full md:h-auto w-72 md:w-80 glass p-4 sm:p-6 overflow-y-auto shadow-xl transition-transform duration-300 z-[999] md:translate-x-0`}
+      >
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-sm font-bold uppercase tracking-widest text-white/50">
           Filters
@@ -173,6 +185,7 @@ export default function FiltersPanel({ filters, setFilters }) {
           ))}
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
