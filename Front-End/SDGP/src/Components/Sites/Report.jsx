@@ -6,6 +6,7 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import autoTable from 'jspdf-autotable';
 import logoImg from '../assets/logo.png';
+import { apiFetch } from "../../api/apiFetch";
 import { useLanguage } from "../../context/LanguageContext";
 import TutorialTooltip from "../../components/TutorialTooltip";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
@@ -79,11 +80,10 @@ const CustomSelect = ({ value, onChange, options, className = "" }) => {
                   onChange(opt);
                   setOpen(false);
                 }}
-                className={`w-full text-left px-4 py-2.5 text-[10px] font-bold flex items-center gap-2 transition-all ${
-                  value === opt
-                    ? "text-emerald-400 bg-emerald-500/20"
-                    : "text-white hover:bg-white/20"
-                }`}
+                className={`w-full text-left px-4 py-2.5 text-[10px] font-bold flex items-center gap-2 transition-all ${value === opt
+                  ? "text-emerald-400 bg-emerald-500/20"
+                  : "text-white hover:bg-white/20"
+                  }`}
               >
                 <span
                   className="material-symbols-outlined text-xs"
@@ -165,7 +165,7 @@ const Report = () => {
 
   // Fetch available S3 dates once on mount and set the latest as default
   useEffect(() => {
-    fetch("https://ricevision-cakt.onrender.com/api/available-dates")
+    apiFetch("/api/available-dates")
       .then((r) => r.json())
       .then((json) => {
         const dates = json.dates || [];
@@ -185,11 +185,19 @@ const Report = () => {
   }, []);
 
   const fetchData = async (conf, setter) => {
-    if (!conf.date) return; // wait until date is resolved
+    if (!conf.date) return;
+
     try {
-      const res = await fetch(`https://ricevision-cakt.onrender.com/api/detailed-report?date=${conf.date}&district=${conf.district}&season=${conf.season}`);
+      const res = await apiFetch(
+        `/api/detailed-report?date=${conf.date}&district=${conf.district}&season=${conf.season}`
+      );
+
       const json = await res.json();
-      if (!res.ok) throw new Error(json.detail || "Data not found");
+
+      if (!res.ok) {
+        throw new Error(json.detail || "Data not found");
+      }
+
       setter(json);
     } catch (err) {
       setter({ error: true, message: err.message });
@@ -205,22 +213,22 @@ const Report = () => {
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
     const PW = 210;
     const PH = 297;
-    const M  = 14;
+    const M = 14;
 
     // ── PALETTE ───────────────────────────────────────────────────
-    const WHITE  = [255, 255, 255];
-    const OFFWH  = [248, 250, 252];
-    const GREEN  = [16, 185, 129];   // single brand green throughout
-    const NAVY   = [15,  23,  42];
-    const INK    = [15,  23,  42];
-    const DARK   = [30,  41,  59];
-    const SUBTEXT= [71,  85, 105];
-    const MUTED  = [148, 163, 184];
-    const LGRAY  = [241, 245, 249];
+    const WHITE = [255, 255, 255];
+    const OFFWH = [248, 250, 252];
+    const GREEN = [16, 185, 129];   // single brand green throughout
+    const NAVY = [15, 23, 42];
+    const INK = [15, 23, 42];
+    const DARK = [30, 41, 59];
+    const SUBTEXT = [71, 85, 105];
+    const MUTED = [148, 163, 184];
+    const LGRAY = [241, 245, 249];
     const BORDER = [226, 232, 240];
-    const ORANGE = [217, 119,   6];
-    const RED    = [220,  38,  38];
-    const REDLT  = [254, 242, 242];
+    const ORANGE = [217, 119, 6];
+    const RED = [220, 38, 38];
+    const REDLT = [254, 242, 242];
 
     // ── PAGE BACKGROUND ───────────────────────────────────────────
     doc.setFillColor(...WHITE);
@@ -232,7 +240,7 @@ const Report = () => {
     try {
       const imgEl = await new Promise((resolve, reject) => {
         const img = new Image();
-        img.onload  = () => resolve(img);
+        img.onload = () => resolve(img);
         img.onerror = reject;
         img.src = logoImg;
       });
@@ -241,7 +249,7 @@ const Report = () => {
       logoH = maxH;
       logoW = maxH * ratio;
       const canvas = document.createElement('canvas');
-      canvas.width  = imgEl.naturalWidth;
+      canvas.width = imgEl.naturalWidth;
       canvas.height = imgEl.naturalHeight;
       canvas.getContext('2d').drawImage(imgEl, 0, 0);
       logoDataUrl = canvas.toDataURL('image/png');
@@ -295,8 +303,8 @@ const Report = () => {
     doc.text('Sri Lanka  ·  District Yield Forecast', M, 59);
 
     // Chips (right-aligned)
-    const chipH  = 8;
-    const chipW  = 34;
+    const chipH = 8;
+    const chipW = 34;
     const chipY2 = 45;
     const chip2X = PW - M - chipW;
     const chip1X = chip2X - 4 - chipW;
@@ -371,8 +379,8 @@ const Report = () => {
 
     // ── KPI SUMMARY CARDS ─────────────────────────────────────────
     let y = 70;
-    const gapVal    = report.summary.gap;
-    const gapSign   = gapVal >= 0 ? '+' : '';
+    const gapVal = report.summary.gap;
+    const gapSign = gapVal >= 0 ? '+' : '';
     const gapAccent = gapVal >= 0 ? GREEN : RED;
     const pct = raw.percent_change !== undefined
       ? parseFloat(raw.percent_change).toFixed(1)
@@ -381,10 +389,10 @@ const Report = () => {
     const cW = (PW - M * 2 - 5) / 2;
     const cH = 27;
 
-    drawStatCard(M,          y, cW, cH, 'PREDICTED AVG YIELD',   `${Math.round(report.summary.yield).toLocaleString()} kg/ha`,        'Satellite-derived ML forecast');
-    drawStatCard(M + cW + 5, y, cW, cH, 'HISTORICAL BASELINE',   `${Math.round(report.summary.historical).toLocaleString()} kg/ha`,   'Long-term district average');
+    drawStatCard(M, y, cW, cH, 'PREDICTED AVG YIELD', `${Math.round(report.summary.yield).toLocaleString()} kg/ha`, 'Satellite-derived ML forecast');
+    drawStatCard(M + cW + 5, y, cW, cH, 'HISTORICAL BASELINE', `${Math.round(report.summary.historical).toLocaleString()} kg/ha`, 'Long-term district average');
     y += cH + 4;
-    drawStatCard(M,          y, cW, cH, 'YIELD GAP',             `${gapSign}${Math.round(gapVal).toLocaleString()} kg/ha`,            `${gapSign}${pct}% vs baseline`, gapAccent);
+    drawStatCard(M, y, cW, cH, 'YIELD GAP', `${gapSign}${Math.round(gapVal).toLocaleString()} kg/ha`, `${gapSign}${pct}% vs baseline`, gapAccent);
     drawStatCard(M + cW + 5, y, cW, cH, 'TOTAL PRODUCTION EST.', `${Math.round(report.summary.total_kg / 1000).toLocaleString()} MT`, 'Full district (metric tons)');
     y += cH + 10;
 
@@ -392,16 +400,16 @@ const Report = () => {
     sectionHeading('Field Overview', y);
     y += 6;
 
-    const riskScore  = report.metrics.risk_score;
-    const riskLabel  = riskScore < 1 ? 'Low' : riskScore < 4 ? 'Moderate' : 'High';
+    const riskScore = report.metrics.risk_score;
+    const riskLabel = riskScore < 1 ? 'Low' : riskScore < 4 ? 'Moderate' : 'High';
     const riskAccent = riskScore < 1 ? GREEN : riskScore < 4 ? ORANGE : RED;
-    const pestLabel  = report.metrics.pest_count === 0 ? 'Clear' : report.metrics.pest_count < 20 ? 'Moderate' : 'Critical';
+    const pestLabel = report.metrics.pest_count === 0 ? 'Clear' : report.metrics.pest_count < 20 ? 'Moderate' : 'Critical';
 
     const fieldRows = [
-      ['Growth Stage',       report.categories.current_stage,                       'Health Status',      report.categories.health_status],
-      ['Pest Incidents',     `${report.metrics.pest_count} (${pestLabel})`,          'Risk Score',         `${riskScore.toFixed(2)} / 10 (${riskLabel})`],
-      ['Severe Stress Area', `${report.metrics.stress_pct.toFixed(2)}%`,             'Est. Harvest Date',  report.metrics.harvest_date],
-      ['Season',             config.season,                                          'Data Date',          config.date],
+      ['Growth Stage', report.categories.current_stage, 'Health Status', report.categories.health_status],
+      ['Pest Incidents', `${report.metrics.pest_count} (${pestLabel})`, 'Risk Score', `${riskScore.toFixed(2)} / 10 (${riskLabel})`],
+      ['Severe Stress Area', `${report.metrics.stress_pct.toFixed(2)}%`, 'Est. Harvest Date', report.metrics.harvest_date],
+      ['Season', config.season, 'Data Date', config.date],
     ];
     if (raw.percent_change !== undefined)
       fieldRows.push(['% vs Historical', `${parseFloat(raw.percent_change).toFixed(2)}%`, 'Pixels Analysed', raw.total_pixels !== undefined ? Number(raw.total_pixels).toLocaleString() : 'N/A']);
@@ -413,7 +421,7 @@ const Report = () => {
       margin: { left: M, right: M },
       body: fieldRows,
       theme: 'plain',
-      styles:             { fontSize: 8, cellPadding: { top: 3.5, bottom: 3.5, left: 5, right: 5 }, textColor: INK, fillColor: WHITE },
+      styles: { fontSize: 8, cellPadding: { top: 3.5, bottom: 3.5, left: 5, right: 5 }, textColor: INK, fillColor: WHITE },
       alternateRowStyles: { fillColor: LGRAY },
       columnStyles: {
         0: { fontStyle: 'bold', textColor: SUBTEXT, cellWidth: 44 },
@@ -436,16 +444,16 @@ const Report = () => {
       margin: { left: M, right: M },
       head: [['Metric', 'Value', 'Unit', 'Notes']],
       body: [
-        ['Predicted Average Yield',    Math.round(report.summary.yield).toLocaleString(),            'kg/ha', 'ML satellite forecast'],
-        ['Historical Average Yield',   Math.round(report.summary.historical).toLocaleString(),       'kg/ha', 'District long-term baseline'],
-        ['Total Estimated Production', Math.round(report.summary.total_kg).toLocaleString(),         'kg',    'Full district acreage'],
-        ['Total Estimated Production', Math.round(report.summary.total_kg / 1000).toLocaleString(),  'MT',    'Metric tons (÷ 1,000)'],
-        ['Yield Gap',                  `${gapSign}${Math.round(gapVal).toLocaleString()}`,            'kg/ha', gapVal >= 0 ? 'Above historical average' : 'Below historical average'],
-        ['% Change vs Historical',     `${gapSign}${pct}%`,                                          '—',     gapVal >= 0 ? 'Out-performing baseline' : 'Under-performing vs baseline'],
+        ['Predicted Average Yield', Math.round(report.summary.yield).toLocaleString(), 'kg/ha', 'ML satellite forecast'],
+        ['Historical Average Yield', Math.round(report.summary.historical).toLocaleString(), 'kg/ha', 'District long-term baseline'],
+        ['Total Estimated Production', Math.round(report.summary.total_kg).toLocaleString(), 'kg', 'Full district acreage'],
+        ['Total Estimated Production', Math.round(report.summary.total_kg / 1000).toLocaleString(), 'MT', 'Metric tons (÷ 1,000)'],
+        ['Yield Gap', `${gapSign}${Math.round(gapVal).toLocaleString()}`, 'kg/ha', gapVal >= 0 ? 'Above historical average' : 'Below historical average'],
+        ['% Change vs Historical', `${gapSign}${pct}%`, '—', gapVal >= 0 ? 'Out-performing baseline' : 'Under-performing vs baseline'],
       ],
       theme: 'grid',
-      headStyles:         { fillColor: GREEN, textColor: WHITE, fontSize: 7.5, fontStyle: 'bold', cellPadding: 4 },
-      bodyStyles:         { fontSize: 7.5, textColor: INK, fillColor: WHITE, cellPadding: 3.5 },
+      headStyles: { fillColor: GREEN, textColor: WHITE, fontSize: 7.5, fontStyle: 'bold', cellPadding: 4 },
+      bodyStyles: { fontSize: 7.5, textColor: INK, fillColor: WHITE, cellPadding: 3.5 },
       alternateRowStyles: { fillColor: LGRAY },
       columnStyles: {
         0: { fontStyle: 'bold', textColor: DARK, cellWidth: 58 },
@@ -495,15 +503,15 @@ const Report = () => {
       margin: { left: M, right: M },
       head: [['Risk Factor', 'Value', 'Status']],
       body: [
-        ['Overall Risk Score',     riskScore.toFixed(2),                            riskLabel],
-        ['Severe Stress Coverage', `${report.metrics.stress_pct.toFixed(2)}%`,      report.metrics.stress_pct < 5 ? 'Acceptable' : 'Action Required'],
-        ['Pest Attack Incidents',  String(report.metrics.pest_count),               pestLabel],
-        ['Crop Health Status',     report.categories.health_status,                 report.categories.health_status === 'Normal' ? 'Normal' : 'Warning'],
-        ['Growth Stage',           report.categories.current_stage,                 '—'],
+        ['Overall Risk Score', riskScore.toFixed(2), riskLabel],
+        ['Severe Stress Coverage', `${report.metrics.stress_pct.toFixed(2)}%`, report.metrics.stress_pct < 5 ? 'Acceptable' : 'Action Required'],
+        ['Pest Attack Incidents', String(report.metrics.pest_count), pestLabel],
+        ['Crop Health Status', report.categories.health_status, report.categories.health_status === 'Normal' ? 'Normal' : 'Warning'],
+        ['Growth Stage', report.categories.current_stage, '—'],
       ],
       theme: 'grid',
-      headStyles:         { fillColor: riskAccent, textColor: WHITE, fontSize: 7.5, fontStyle: 'bold', cellPadding: 4 },
-      bodyStyles:         { fontSize: 7.5, textColor: INK, fillColor: WHITE, cellPadding: 3.5 },
+      headStyles: { fillColor: riskAccent, textColor: WHITE, fontSize: 7.5, fontStyle: 'bold', cellPadding: 4 },
+      bodyStyles: { fontSize: 7.5, textColor: INK, fillColor: WHITE, cellPadding: 3.5 },
       alternateRowStyles: { fillColor: LGRAY },
       columnStyles: {
         0: { fontStyle: 'bold', textColor: DARK, cellWidth: 70 },
@@ -553,266 +561,266 @@ const Report = () => {
 
   const generateComparisonPDF = async () => {
 
-  const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
 
-  const PW = 210;
-  const PH = 297;
-  const M = 14;
+    const PW = 210;
+    const PH = 297;
+    const M = 14;
 
-  const WHITE  = [255,255,255];
-  const OFFWH  = [248,250,252];
-  const GREEN  = [16,185,129];
-  const DARK   = [30,41,59];
-  const INK    = [15,23,42];
-  const SUBTEXT= [71,85,105];
-  const MUTED  = [148,163,184];
-  const LGRAY  = [241,245,249];
-  const BORDER = [226,232,240];
+    const WHITE = [255, 255, 255];
+    const OFFWH = [248, 250, 252];
+    const GREEN = [16, 185, 129];
+    const DARK = [30, 41, 59];
+    const INK = [15, 23, 42];
+    const SUBTEXT = [71, 85, 105];
+    const MUTED = [148, 163, 184];
+    const LGRAY = [241, 245, 249];
+    const BORDER = [226, 232, 240];
 
-  doc.setFillColor(...WHITE);
-  doc.rect(0,0,PW,PH,"F");
+    doc.setFillColor(...WHITE);
+    doc.rect(0, 0, PW, PH, "F");
 
-  /* ---------------- HEADER ---------------- */
+    /* ---------------- HEADER ---------------- */
 
-  doc.setFillColor(...WHITE);
-  doc.rect(0,0,PW,40,"F");
+    doc.setFillColor(...WHITE);
+    doc.rect(0, 0, PW, 40, "F");
 
-  doc.setFillColor(0,100,50);
-  doc.rect(0,40,PW,2,"F");
+    doc.setFillColor(0, 100, 50);
+    doc.rect(0, 40, PW, 2, "F");
 
-  doc.setFont("helvetica","bold");
-  doc.setFontSize(13);
-  doc.setTextColor(...INK);
-
-  doc.text("DISTRICT YIELD COMPARISON REPORT", PW/2, 16, {align:"center"});
-
-  doc.setFontSize(9);
-
-  doc.text(
-    `Generated ${new Date().toLocaleDateString("en-GB",{day:"2-digit",month:"long",year:"numeric"})}`,
-    PW/2,
-    26,
-    {align:"center"}
-  );
-
-  doc.text(
-    `Satellite Data ${configA.date}`,
-    PW/2,
-    36,
-    {align:"center"}
-  );
-
-  /* ---------------- DISTRICT TITLE ROW ---------------- */
-
-  doc.setFillColor(...OFFWH);
-  doc.rect(0,42,PW,20,"F");
-
-  doc.setDrawColor(...BORDER);
-  doc.line(0,62,PW,62);
-
-  doc.setFontSize(12);
-  doc.setTextColor(...INK);
-
-  doc.text(`${configA.district}  vs  ${configB.district}`, M, 53);
-
-  doc.setFontSize(7);
-  doc.setTextColor(...SUBTEXT);
-
-  doc.text("Sri Lanka · Comparative Yield Analytics", M, 59);
-
-  /* ---------------- SUMMARY CARDS ---------------- */
-
-  let y = 72;
-
-  const cardW = (PW - M*2 - 5)/2;
-  const cardH = 26;
-
-  const drawCard = (x,label,valA,valB) => {
-
-    doc.setFillColor(...OFFWH);
-    doc.roundedRect(x,y,cardW,cardH,3,3,"F");
-
-    doc.setFillColor(...GREEN);
-    doc.roundedRect(x,y,3,cardH,2,2,"F");
-
-    doc.setFontSize(6.5);
-    doc.setTextColor(...MUTED);
-    doc.text(label,x+7,y+7);
-
-    doc.setFontSize(11);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
     doc.setTextColor(...INK);
 
-    doc.text(`${valA}`,x+7,y+15);
-    doc.text(`${valB}`,x+cardW/2+7,y+15);
+    doc.text("DISTRICT YIELD COMPARISON REPORT", PW / 2, 16, { align: "center" });
 
-    doc.setFontSize(6);
-    doc.setTextColor(...SUBTEXT);
+    doc.setFontSize(9);
 
-    doc.text(configA.district,x+7,y+21);
-    doc.text(configB.district,x+cardW/2+7,y+21);
+    doc.text(
+      `Generated ${new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" })}`,
+      PW / 2,
+      26,
+      { align: "center" }
+    );
 
-  };
+    doc.text(
+      `Satellite Data ${configA.date}`,
+      PW / 2,
+      36,
+      { align: "center" }
+    );
 
-  drawCard(
-    M,
-    "Predicted Yield (kg/ha)",
-    Math.round(dataA.summary.yield).toLocaleString(),
-    Math.round(dataB.summary.yield).toLocaleString()
-  );
+    /* ---------------- DISTRICT TITLE ROW ---------------- */
 
-  drawCard(
-    M + cardW + 5,
-    "Historical Yield (kg/ha)",
-    Math.round(dataA.summary.historical).toLocaleString(),
-    Math.round(dataB.summary.historical).toLocaleString()
-  );
-
-  y += cardH + 5;
-
-  drawCard(
-    M,
-    "Total Production (MT)",
-    Math.round(dataA.summary.total_kg/1000).toLocaleString(),
-    Math.round(dataB.summary.total_kg/1000).toLocaleString()
-  );
-
-  drawCard(
-    M + cardW + 5,
-    "Risk Score",
-    dataA.metrics.risk_score.toFixed(2),
-    dataB.metrics.risk_score.toFixed(2)
-  );
-
-  y += cardH + 10;
-
-  /* ---------------- COMPARISON TABLE ---------------- */
-
-  doc.setFont("helvetica","bold");
-  doc.setFontSize(8);
-  doc.setTextColor(...GREEN);
-
-  doc.text("PERFORMANCE COMPARISON", M, y);
-
-  doc.setDrawColor(...GREEN);
-  doc.line(M,y+1.5,PW-M,y+1.5);
-
-  y += 6;
-
-  autoTable(doc,{
-    startY:y,
-    margin:{left:M,right:M},
-    head:[
-      ["Metric",configA.district,configB.district]
-    ],
-    body:[
-      [
-        "Predicted Yield (kg/ha)",
-        Math.round(dataA.summary.yield).toLocaleString(),
-        Math.round(dataB.summary.yield).toLocaleString()
-      ],
-      [
-        "Historical Yield (kg/ha)",
-        Math.round(dataA.summary.historical).toLocaleString(),
-        Math.round(dataB.summary.historical).toLocaleString()
-      ],
-      [
-        "Total Production (kg)",
-        Math.round(dataA.summary.total_kg).toLocaleString(),
-        Math.round(dataB.summary.total_kg).toLocaleString()
-      ],
-      [
-        "Pest Incidents",
-        dataA.metrics.pest_count,
-        dataB.metrics.pest_count
-      ],
-      [
-        "Risk Score",
-        dataA.metrics.risk_score.toFixed(2),
-        dataB.metrics.risk_score.toFixed(2)
-      ],
-      [
-        "Severe Stress %",
-        dataA.metrics.stress_pct.toFixed(2)+"%",
-        dataB.metrics.stress_pct.toFixed(2)+"%"
-      ]
-    ],
-    theme:"grid",
-    headStyles:{
-      fillColor:GREEN,
-      textColor:WHITE,
-      fontSize:7.5,
-      fontStyle:"bold"
-    },
-    styles:{
-      fontSize:7.5,
-      cellPadding:3
-    },
-    alternateRowStyles:{fillColor:LGRAY},
-    tableLineColor:BORDER,
-    tableLineWidth:0.2
-  });
-
-  y = doc.lastAutoTable.finalY + 12;
-
-  /* ---------------- WINNER INSIGHT ---------------- */
-
-  const diff = dataA.summary.yield - dataB.summary.yield;
-
-  doc.setFont("helvetica","bold");
-  doc.setFontSize(8);
-  doc.setTextColor(...GREEN);
-
-  doc.text("KEY INSIGHT",M,y);
-
-  doc.line(M,y+1.5,PW-M,y+1.5);
-
-  y += 8;
-
-  doc.setFont("helvetica","normal");
-  doc.setFontSize(9);
-  doc.setTextColor(...INK);
-
-  const winner =
-    diff > 0 ? configA.district : configB.district;
-
-  doc.text(
-    `${winner} shows higher predicted yield by ${Math.abs(Math.round(diff))} kg/ha.`,
-    M,
-    y
-  );
-
-  /* ---------------- FOOTER ---------------- */
-
-  const totalPages = doc.getNumberOfPages();
-
-  for(let p=1;p<=totalPages;p++){
-
-    doc.setPage(p);
+    doc.setFillColor(...OFFWH);
+    doc.rect(0, 42, PW, 20, "F");
 
     doc.setDrawColor(...BORDER);
-    doc.line(M,PH-13,PW-M,PH-13);
+    doc.line(0, 62, PW, 62);
 
-    doc.setFontSize(6.5);
-    doc.setTextColor(...MUTED);
+    doc.setFontSize(12);
+    doc.setTextColor(...INK);
 
-    doc.text(
-      "RiceVision Analytics | Agricultural Intelligence Platform | Confidential",
+    doc.text(`${configA.district}  vs  ${configB.district}`, M, 53);
+
+    doc.setFontSize(7);
+    doc.setTextColor(...SUBTEXT);
+
+    doc.text("Sri Lanka · Comparative Yield Analytics", M, 59);
+
+    /* ---------------- SUMMARY CARDS ---------------- */
+
+    let y = 72;
+
+    const cardW = (PW - M * 2 - 5) / 2;
+    const cardH = 26;
+
+    const drawCard = (x, label, valA, valB) => {
+
+      doc.setFillColor(...OFFWH);
+      doc.roundedRect(x, y, cardW, cardH, 3, 3, "F");
+
+      doc.setFillColor(...GREEN);
+      doc.roundedRect(x, y, 3, cardH, 2, 2, "F");
+
+      doc.setFontSize(6.5);
+      doc.setTextColor(...MUTED);
+      doc.text(label, x + 7, y + 7);
+
+      doc.setFontSize(11);
+      doc.setTextColor(...INK);
+
+      doc.text(`${valA}`, x + 7, y + 15);
+      doc.text(`${valB}`, x + cardW / 2 + 7, y + 15);
+
+      doc.setFontSize(6);
+      doc.setTextColor(...SUBTEXT);
+
+      doc.text(configA.district, x + 7, y + 21);
+      doc.text(configB.district, x + cardW / 2 + 7, y + 21);
+
+    };
+
+    drawCard(
       M,
-      PH-7
+      "Predicted Yield (kg/ha)",
+      Math.round(dataA.summary.yield).toLocaleString(),
+      Math.round(dataB.summary.yield).toLocaleString()
     );
+
+    drawCard(
+      M + cardW + 5,
+      "Historical Yield (kg/ha)",
+      Math.round(dataA.summary.historical).toLocaleString(),
+      Math.round(dataB.summary.historical).toLocaleString()
+    );
+
+    y += cardH + 5;
+
+    drawCard(
+      M,
+      "Total Production (MT)",
+      Math.round(dataA.summary.total_kg / 1000).toLocaleString(),
+      Math.round(dataB.summary.total_kg / 1000).toLocaleString()
+    );
+
+    drawCard(
+      M + cardW + 5,
+      "Risk Score",
+      dataA.metrics.risk_score.toFixed(2),
+      dataB.metrics.risk_score.toFixed(2)
+    );
+
+    y += cardH + 10;
+
+    /* ---------------- COMPARISON TABLE ---------------- */
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setTextColor(...GREEN);
+
+    doc.text("PERFORMANCE COMPARISON", M, y);
+
+    doc.setDrawColor(...GREEN);
+    doc.line(M, y + 1.5, PW - M, y + 1.5);
+
+    y += 6;
+
+    autoTable(doc, {
+      startY: y,
+      margin: { left: M, right: M },
+      head: [
+        ["Metric", configA.district, configB.district]
+      ],
+      body: [
+        [
+          "Predicted Yield (kg/ha)",
+          Math.round(dataA.summary.yield).toLocaleString(),
+          Math.round(dataB.summary.yield).toLocaleString()
+        ],
+        [
+          "Historical Yield (kg/ha)",
+          Math.round(dataA.summary.historical).toLocaleString(),
+          Math.round(dataB.summary.historical).toLocaleString()
+        ],
+        [
+          "Total Production (kg)",
+          Math.round(dataA.summary.total_kg).toLocaleString(),
+          Math.round(dataB.summary.total_kg).toLocaleString()
+        ],
+        [
+          "Pest Incidents",
+          dataA.metrics.pest_count,
+          dataB.metrics.pest_count
+        ],
+        [
+          "Risk Score",
+          dataA.metrics.risk_score.toFixed(2),
+          dataB.metrics.risk_score.toFixed(2)
+        ],
+        [
+          "Severe Stress %",
+          dataA.metrics.stress_pct.toFixed(2) + "%",
+          dataB.metrics.stress_pct.toFixed(2) + "%"
+        ]
+      ],
+      theme: "grid",
+      headStyles: {
+        fillColor: GREEN,
+        textColor: WHITE,
+        fontSize: 7.5,
+        fontStyle: "bold"
+      },
+      styles: {
+        fontSize: 7.5,
+        cellPadding: 3
+      },
+      alternateRowStyles: { fillColor: LGRAY },
+      tableLineColor: BORDER,
+      tableLineWidth: 0.2
+    });
+
+    y = doc.lastAutoTable.finalY + 12;
+
+    /* ---------------- WINNER INSIGHT ---------------- */
+
+    const diff = dataA.summary.yield - dataB.summary.yield;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setTextColor(...GREEN);
+
+    doc.text("KEY INSIGHT", M, y);
+
+    doc.line(M, y + 1.5, PW - M, y + 1.5);
+
+    y += 8;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(...INK);
+
+    const winner =
+      diff > 0 ? configA.district : configB.district;
 
     doc.text(
-      `Page ${p} of ${totalPages}`,
-      PW-M,
-      PH-7,
-      {align:"right"}
+      `${winner} shows higher predicted yield by ${Math.abs(Math.round(diff))} kg/ha.`,
+      M,
+      y
     );
 
-  }
+    /* ---------------- FOOTER ---------------- */
 
-  doc.save(`RiceVision_Comparison_${configA.district}_vs_${configB.district}.pdf`);
+    const totalPages = doc.getNumberOfPages();
 
-};
+    for (let p = 1; p <= totalPages; p++) {
+
+      doc.setPage(p);
+
+      doc.setDrawColor(...BORDER);
+      doc.line(M, PH - 13, PW - M, PH - 13);
+
+      doc.setFontSize(6.5);
+      doc.setTextColor(...MUTED);
+
+      doc.text(
+        "RiceVision Analytics | Agricultural Intelligence Platform | Confidential",
+        M,
+        PH - 7
+      );
+
+      doc.text(
+        `Page ${p} of ${totalPages}`,
+        PW - M,
+        PH - 7,
+        { align: "right" }
+      );
+
+    }
+
+    doc.save(`RiceVision_Comparison_${configA.district}_vs_${configB.district}.pdf`);
+
+  };
   const getPestStatus = (count) => {
     if (count === 0) return { label: "SAFE", color: "text-emerald-400" };
     if (count < 20) return { label: "MODERATE", color: "text-amber-400" };
@@ -853,8 +861,8 @@ const Report = () => {
     ];
 
     return (
-<div className="flex-1 glass glass-hover rounded-[2rem] sm:rounded-[3rem] p-5 sm:p-8 border border-white/10 shadow-2xl relative">        
-{/* Pane header */}
+      <div className="flex-1 glass glass-hover rounded-[2rem] sm:rounded-[3rem] p-5 sm:p-8 border border-white/10 shadow-2xl relative">
+        {/* Pane header */}
         <div className="grid grid-cols-2 gap-3 mb-6">
           <div className="col-span-2 flex justify-between items-center mb-2">
             <span className="text-[10px] font-black text-emerald-400 tracking-[0.2em] uppercase flex items-center gap-2">
@@ -864,7 +872,7 @@ const Report = () => {
             <button
               ref={metricsExportRef}
               onClick={() => generatePDF(report, config)}
-className="flex items-center gap-2 text-[10px] font-black px-4 py-1.5 rounded-xl border border-white/10 transition-all duration-300 hover:bg-white/10 hover:border-white/20 hover:scale-[1.02] cursor-pointer uppercase tracking-widest"            >
+              className="flex items-center gap-2 text-[10px] font-black px-4 py-1.5 rounded-xl border border-white/10 transition-all duration-300 hover:bg-white/10 hover:border-white/20 hover:scale-[1.02] cursor-pointer uppercase tracking-widest"            >
               <span className="material-symbols-outlined text-xs">download</span>
               Export PDF
             </button>
@@ -1000,10 +1008,10 @@ className="flex items-center gap-2 text-[10px] font-black px-4 py-1.5 rounded-xl
 
         {/* Report Panes */}
         <div className={`flex flex-col ${mode === "compare" ? "lg:flex-row" : "max-w-2xl mx-auto w-full"} gap-8`}>
-          <ReportPane 
-            report={dataA} 
-            config={configA} 
-            setConfig={setConfigA} 
+          <ReportPane
+            report={dataA}
+            config={configA}
+            setConfig={setConfigA}
             title="PRIMARY"
             districtSelectorRef={currentStep === 2 ? districtSelectorRef : undefined}
             yieldHeroRef={currentStep === 3 ? yieldHeroRef : undefined}
@@ -1014,16 +1022,16 @@ className="flex items-center gap-2 text-[10px] font-black px-4 py-1.5 rounded-xl
 
       </div>
       {mode === "compare" && dataA && dataB && (
-  <div className="flex justify-center mt-6">
-    <button
-      onClick={() => generateComparisonPDF()}
-      className="flex items-center gap-2 text-[11px] font-black px-6 py-3 rounded-2xl border border-white/10 transition-all duration-300 hover:bg-white/10 hover:border-white/20 hover:scale-[1.02] cursor-pointer uppercase tracking-widest"
-    >
-      <span className="material-symbols-outlined text-sm">compare</span>
-      Export Comparison Report
-    </button>
-  </div>
-)}
+        <div className="flex justify-center mt-6">
+          <button
+            onClick={() => generateComparisonPDF()}
+            className="flex items-center gap-2 text-[11px] font-black px-6 py-3 rounded-2xl border border-white/10 transition-all duration-300 hover:bg-white/10 hover:border-white/20 hover:scale-[1.02] cursor-pointer uppercase tracking-widest"
+          >
+            <span className="material-symbols-outlined text-sm">compare</span>
+            Export Comparison Report
+          </button>
+        </div>
+      )}
 
       {/* ─── TUTORIAL TOOLTIPS ─── */}
       {showTutorial && currentTutorialStep && (
@@ -1106,7 +1114,7 @@ className="flex items-center gap-2 text-[10px] font-black px-4 py-1.5 rounded-xl
         </>
       )}
     </div>
-    
+
   );
 };
 

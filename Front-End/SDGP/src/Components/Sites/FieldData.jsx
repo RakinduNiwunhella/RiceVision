@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { supabase } from "../../supabaseClient";
+import { apiFetch } from "../../api/apiFetch";
 import { useLanguage } from "../../context/LanguageContext";
 import { useNavigate } from "react-router-dom";
 import TutorialTooltip from "../../components/TutorialTooltip";
@@ -66,38 +66,28 @@ const FieldData = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
-      const { data: summary, error: summaryError } = await supabase
-        .from("field_summary_view")
-        .select("*")
-        .single();
+      try {
+        setLoading(true);
 
-      if (summaryError) {
-        console.error("Summary error:", summaryError);
+        const summaryRes = await apiFetch("/field-data/summary");
+        const summary = await summaryRes.json();
+
+        setStats([
+          { label: t("colTotalFields"), value: summary.total_fields, icon: "analytics" },
+          { label: t("colHealthy"), value: summary.healthy_fields, icon: "check_circle", color: "text-emerald-400" },
+          { label: t("colStressed"), value: summary.stressed_fields, icon: "potted_plant", color: "text-amber-400" },
+          { label: t("colCritical"), value: summary.critical_alerts, icon: "warning", color: "text-red-400" },
+        ]);
+
+        const districtRes = await apiFetch("/field-data/districts");
+        const districts = await districtRes.json();
+
+        setDistrictData(districts);
+      } catch (err) {
+        console.error("Field data error:", err);
+      } finally {
         setLoading(false);
-        return;
       }
-
-      setStats([
-        { label: t('colTotalFields'), value: summary.total_fields, icon: "analytics" },
-        { label: t('colHealthy'), value: summary.healthy_fields, icon: "check_circle", color: "text-emerald-400" },
-        { label: t('colStressed'), value: summary.stressed_fields, icon: "potted_plant", color: "text-amber-400" },
-        { label: t('colCritical'), value: summary.critical_alerts, icon: "warning", color: "text-red-400" },
-      ]);
-
-      const { data: districts, error: districtError } = await supabase
-        .from("district_health_summary")
-        .select("*")
-        .order("total_yield_kg", { ascending: false });
-
-      if (districtError) {
-        console.error("District error:", districtError);
-        setLoading(false);
-        return;
-      }
-
-      setDistrictData(districts);
-      setLoading(false);
     };
 
     fetchData();
@@ -128,7 +118,7 @@ const FieldData = () => {
               {t('liveStream')}
             </p>
           </div>
-                  </div>
+        </div>
 
         {/* Stats Cards */}
         <div ref={currentStep === 1 ? statsRef : undefined} className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">

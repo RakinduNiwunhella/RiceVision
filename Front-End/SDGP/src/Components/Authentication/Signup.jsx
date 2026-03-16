@@ -5,6 +5,14 @@ import { FaSun, FaMoon } from "react-icons/fa";
 import { useTheme } from "../../context/ThemeContext";
 import { useLanguage } from "../../context/LanguageContext";
 
+
+//PRODUCTION
+const API_BASE = "https://ricevision-cakt.onrender.com";
+
+//LOCAL
+//const API_BASE = "http://localhost:8000";
+
+
 export default function SignupPage() {
   const { isDark, toggleTheme } = useTheme();
   const { t } = useLanguage();
@@ -48,20 +56,24 @@ export default function SignupPage() {
     if (emailError || passwordError || passwordLengthError) return;
 
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: fullName },
-      },
-    });
+    try {
+      const res = await fetch(`${API_BASE}/api/signup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ full_name: fullName, email, password }),
+      });
 
-    if (error) {
-      alert(error.message);
-    } else {
-      // Reset tutorials on signup - set to empty object instead of removing
-      localStorage.setItem('ricevision_tutorial_pages', JSON.stringify({}));
-      navigate("/field-setup", { state: { fromSignup: true } });
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.detail || "Signup failed");
+      } else {
+        // Reset tutorials on signup - set to empty object instead of removing
+        localStorage.setItem('ricevision_tutorial_pages', JSON.stringify({}));
+        navigate("/field-setup", { state: { fromSignup: true } });
+      }
+    } catch (err) {
+      alert("Network error. Please try again.");
     }
     setLoading(false);
   };
@@ -69,7 +81,7 @@ export default function SignupPage() {
   const handleGoogleSignup = async () => {
     // Reset tutorials on signup - set to empty object instead of removing
     localStorage.setItem('ricevision_tutorial_pages', JSON.stringify({}));
-    
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
@@ -144,11 +156,10 @@ export default function SignupPage() {
                 type="email"
                 required
                 placeholder="name@company.com"
-                className={`w-full px-4 py-2.5 sm:py-3.5 rounded-xl border bg-slate-50 dark:bg-slate-900/50 outline-none transition-all focus:ring-2 ${
-                  emailError
-                    ? "border-red-500 focus:ring-red-500/20"
-                    : "border-slate-200 dark:border-slate-800 focus:ring-indigo-500"
-                }`}
+                className={`w-full px-4 py-2.5 sm:py-3.5 rounded-xl border bg-slate-50 dark:bg-slate-900/50 outline-none transition-all focus:ring-2 ${emailError
+                  ? "border-red-500 focus:ring-red-500/20"
+                  : "border-slate-200 dark:border-slate-800 focus:ring-indigo-500"
+                  }`}
                 onChange={(e) => {
                   setEmail(e.target.value);
                   validateEmail(e.target.value);
@@ -169,11 +180,10 @@ export default function SignupPage() {
                   type="password"
                   required
                   placeholder="••••••••"
-                  className={`w-full px-4 py-2.5 sm:py-3.5 rounded-xl border bg-slate-50 dark:bg-slate-900/50 outline-none transition-all focus:ring-2 ${
-                    passwordLengthError
-                      ? "border-red-500 focus:ring-red-500/20"
-                      : "border-slate-200 dark:border-slate-800 focus:ring-indigo-500"
-                  }`}
+                  className={`w-full px-4 py-2.5 sm:py-3.5 rounded-xl border bg-slate-50 dark:bg-slate-900/50 outline-none transition-all focus:ring-2 ${passwordLengthError
+                    ? "border-red-500 focus:ring-red-500/20"
+                    : "border-slate-200 dark:border-slate-800 focus:ring-indigo-500"
+                    }`}
                   onChange={(e) => {
                     setPassword(e.target.value);
                     validatePasswords(e.target.value, confirmPassword);
@@ -194,11 +204,10 @@ export default function SignupPage() {
                   type="password"
                   required
                   placeholder="••••••••"
-                  className={`w-full px-4 py-2.5 sm:py-3.5 rounded-xl border bg-slate-50 dark:bg-slate-900/50 outline-none transition-all focus:ring-2 ${
-                    passwordError
-                      ? "border-red-500 focus:ring-red-500/20"
-                      : "border-slate-200 dark:border-slate-800 focus:ring-indigo-500"
-                  }`}
+                  className={`w-full px-4 py-2.5 sm:py-3.5 rounded-xl border bg-slate-50 dark:bg-slate-900/50 outline-none transition-all focus:ring-2 ${passwordError
+                    ? "border-red-500 focus:ring-red-500/20"
+                    : "border-slate-200 dark:border-slate-800 focus:ring-indigo-500"
+                    }`}
                   onChange={(e) => {
                     setConfirmPassword(e.target.value);
                     validatePasswords(password, e.target.value);

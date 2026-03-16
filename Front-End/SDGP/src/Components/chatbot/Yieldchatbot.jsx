@@ -13,6 +13,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { supabase } from "../../supabaseClient";
+import { apiFetch } from "../../api/apiFetch";
 
 const API_BASE = "https://ricevision-cakt.onrender.com";
 
@@ -66,7 +67,7 @@ async function fetchYieldData() {
 
 // ─── Ask Gemini (via backend) ─────────────────────────────────────────────────
 async function askGemini(question, yieldData, chatHistory) {
-    const res = await fetch(`${API_BASE}/api/chat`, {
+    const res = await apiFetch(`${API_BASE}/api/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question, yieldData, chatHistory }),

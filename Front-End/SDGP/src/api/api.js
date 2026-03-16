@@ -1,8 +1,8 @@
-const API_BASE = "https://ricevision-cakt.onrender.com";
+import { apiFetch } from "./apiFetch";
 
-// helper
+// Authenticated helper for all backend GET requests
 async function get(path) {
-  const res = await fetch(`${API_BASE}${path}`);
+  const res = await apiFetch(path);
   if (!res.ok) throw new Error("API error");
   return res.json();
 }
@@ -18,7 +18,7 @@ export const fetchStageDistribution = () => get("/stage-distribution");
 export const fetchReportData = (districts, month) =>
   get(`/api/report-data?districts=${districts}&month=${month}`);
 
-// Called directly from the browser — Open-Meteo is free, no API key needed
+// Called directly from the browser — Open-Meteo is a public API, no token needed
 export const fetchWeather = async () => {
   const url =
     "https://api.open-meteo.com/v1/forecast" +
@@ -45,12 +45,11 @@ export const updateAlertStatus = async (
 ) => {
   const endpoint =
     type === "pest"
-      ? `${API_BASE}/api/alerts/pest/${id}`
-      : `${API_BASE}/api/alerts/${id}`;
+      ? `/api/alerts/pest/${id}`
+      : `/api/alerts/${id}`;
 
-  const res = await fetch(endpoint, {
+  const res = await apiFetch(endpoint, {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ status, note }),
   });
 
@@ -60,9 +59,8 @@ export const updateAlertStatus = async (
 };
 
 export const submitComplaint = async (payload) => {
-  const res = await fetch(`${API_BASE}/api/help/complaints`, {
+  const res = await apiFetch("/api/help/complaints", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
 
@@ -85,7 +83,7 @@ export const fetchMapFields = async ({ districts = [], health = [] }) => {
   districts.forEach((d) => params.append("districts", d));
   health.forEach((h) => params.append("health", h));
 
-  const res = await fetch(`${API_BASE}/map-fields?${params.toString()}`);
+  const res = await apiFetch(`/map-fields?${params.toString()}`);
 
   if (!res.ok) {
     throw new Error("Failed to fetch map fields");
@@ -112,7 +110,7 @@ export const fetchMapOverlay = async ({ type, districts = [] }) => {
   const params = new URLSearchParams({ type });
   districts.forEach((d) => params.append("districts", d));
 
-  const res = await fetch(`${API_BASE}/map-overlay?${params.toString()}`);
+  const res = await apiFetch(`/map-overlay?${params.toString()}`);
   if (!res.ok) throw new Error("Failed to fetch overlay data");
 
   const result = await res.json();
@@ -137,7 +135,7 @@ export const fetchGEETileUrl = async ({
   if (startDate) params.set("start_date", startDate);
   if (endDate) params.set("end_date", endDate);
 
-  const res = await fetch(`${API_BASE}/map-gee-tiles?${params.toString()}`);
+  const res = await apiFetch(`/map-gee-tiles?${params.toString()}`);
   if (!res.ok) {
     const data = await res.json().catch(() => ({}));
     throw new Error(data.detail || "GEE tile fetch failed");
