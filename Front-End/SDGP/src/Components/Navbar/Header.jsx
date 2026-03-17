@@ -104,6 +104,8 @@ const Header = () => {
   const searchRef = useRef(null);
   const inputRef = useRef(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileAvatarUrl, setProfileAvatarUrl] = useState("");
+  const [profileInitials, setProfileInitials] = useState("U");
 
   // Tutorial refs for nav buttons
   const dashboardBtnRef = useRef(null);
@@ -301,6 +303,44 @@ const Header = () => {
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const getInitials = (fullName, email) => {
+      const parts = (fullName || "").trim().split(/\s+/).filter(Boolean);
+      if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+      if (parts.length === 1) return parts[0][0].toUpperCase();
+      if (email) return email[0].toUpperCase();
+      return "U";
+    };
+
+    const syncProfileIcon = async (user) => {
+      if (!user) {
+        setProfileAvatarUrl("");
+        setProfileInitials("U");
+        return;
+      }
+      const fullName = user.user_metadata?.full_name || "";
+      const avatarUrl = user.user_metadata?.avatar_url || "";
+      setProfileAvatarUrl(avatarUrl);
+      setProfileInitials(getInitials(fullName, user.email));
+    };
+
+    let mounted = true;
+    supabase.auth.getUser().then(({ data }) => {
+      if (mounted) syncProfileIcon(data?.user || null);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      syncProfileIcon(session?.user || null);
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const handleKeyDown = (e) => {
@@ -543,9 +583,17 @@ const Header = () => {
                 className="hidden sm:flex w-8 h-8 rounded-lg items-center justify-center text-white/85 hover:text-white hover:bg-white/10 transition"
                 title="View Profile"
               >
-                <span className="material-symbols-outlined text-[20px]">
-                  person
-                </span>
+                {profileAvatarUrl ? (
+                  <img
+                    src={profileAvatarUrl}
+                    alt="Profile"
+                    className="w-8 h-8 rounded-lg object-cover border border-white/20"
+                  />
+                ) : (
+                  <span className="w-8 h-8 rounded-lg bg-white/10 border border-white/20 text-white text-[11px] font-black flex items-center justify-center">
+                    {profileInitials}
+                  </span>
+                )}
               </Link>
 
               {/* Mobile hamburger button */}
@@ -669,9 +717,17 @@ const Header = () => {
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex items-center gap-2 px-3 py-2 rounded-lg text-white/85 hover:text-white hover:bg-white/10 transition text-sm font-semibold"
                 >
-                  <span className="material-symbols-outlined text-[18px]">
-                    person
-                  </span>
+                  {profileAvatarUrl ? (
+                    <img
+                      src={profileAvatarUrl}
+                      alt="Profile"
+                      className="w-6 h-6 rounded-md object-cover border border-white/20"
+                    />
+                  ) : (
+                    <span className="w-6 h-6 rounded-md bg-white/10 border border-white/20 text-white text-[10px] font-black flex items-center justify-center">
+                      {profileInitials}
+                    </span>
+                  )}
                   Profile
                 </Link>
               </div>

@@ -1,22 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "../../supabaseClient";
 import { FaCamera } from "react-icons/fa";
-import { useLanguage } from "../../context/LanguageContext";
 import { useNavigate } from "react-router-dom";
 
 export default function ProfileForm() {
   const navigate = useNavigate();
-  const { t } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({
+    firstName: "",
+    lastName: "",
+    phone: "",
+    email: "",
+  });
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
     phone: "",
-    nic: "",
-    district: "",
-    address: "",
     avatarUrl: "",
   });
 
@@ -39,6 +40,53 @@ export default function ProfileForm() {
     }
   }, [status]);
 
+  const validateField = (name, value) => {
+    const text = (value || "").trim();
+
+    if (name === "firstName") {
+      if (!text) return "First name is required.";
+      if (!/^[A-Za-z][A-Za-z\s'-]{1,49}$/.test(text)) {
+        return "Use letters only for first name.";
+      }
+    }
+
+    if (name === "lastName") {
+      if (!text) return "Surname is required.";
+      if (!/^[A-Za-z][A-Za-z\s'-]{1,49}$/.test(text)) {
+        return "Use letters only for surname.";
+      }
+    }
+
+    if (name === "phone") {
+      const normalized = text.replace(/[\s-]/g, "");
+      if (!normalized) return "Phone number is required.";
+      if (!/^(\+94\d{9}|0\d{9})$/.test(normalized)) {
+        return "Use a valid phone number (e.g. +94 77 123 4567 or 0771234567).";
+      }
+    }
+
+    if (name === "email") {
+      if (!text) return "Email address is required.";
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text)) {
+        return "Email address is not valid.";
+      }
+    }
+
+    return "";
+  };
+
+  const validateForm = () => {
+    const nextErrors = {
+      firstName: validateField("firstName", formData.firstName),
+      lastName: validateField("lastName", formData.lastName),
+      phone: validateField("phone", formData.phone),
+      email: validateField("email", formData.email),
+    };
+
+    setFieldErrors(nextErrors);
+    return !Object.values(nextErrors).some(Boolean);
+  };
+
   async function getProfile() {
     try {
       setLoading(true);
@@ -55,15 +103,12 @@ export default function ProfileForm() {
           lastName: nameParts.slice(1).join(" ") || "",
           email: user.email || "",
           phone: user.user_metadata?.phone || "",
-          nic: user.user_metadata?.nic || "",
-          district: user.user_metadata?.district || "",
-          address: user.user_metadata?.address || "",
           avatarUrl: user.user_metadata?.avatar_url || "",
         });
       }
     } catch (error) {
       console.error("Error loading user data:", error.message);
-      setStatus({ type: 'error', message: `Interface Sync Failed: ${error.message}` });
+      setStatus({ type: 'error', message: `Failed to load profile: ${error.message}` });
     } finally {
       setLoading(false);
     }
@@ -75,7 +120,7 @@ export default function ProfileForm() {
       setStatus(null);
 
       if (!event.target.files || event.target.files.length === 0) {
-        throw new Error("Missing binary source for upload.");
+        throw new Error("Please select an image to upload.");
       }
 
       const {
@@ -105,9 +150,9 @@ export default function ProfileForm() {
       if (updateError) throw updateError;
 
       setFormData((prev) => ({ ...prev, avatarUrl: publicUrl }));
-      setStatus({ type: 'success', message: 'Biometric profile photo updated.' });
+      setStatus({ type: 'success', message: 'Profile photo updated successfully.' });
     } catch (error) {
-      setStatus({ type: 'error', message: `Uploader Error: ${error.message}` });
+      setStatus({ type: 'error', message: `Photo upload failed: ${error.message}` });
     } finally {
       setUploading(false);
     }
@@ -115,24 +160,27 @@ export default function ProfileForm() {
 
   const handleUpdate = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setStatus(null);
+
+    if (!validateForm()) {
+      setStatus({ type: "error", message: "Please fix the highlighted fields and try again." });
+      return;
+    }
+
+    setLoading(true);
 
     const { error } = await supabase.auth.updateUser({
       data: {
         full_name: `${formData.firstName} ${formData.lastName}`,
         phone: formData.phone,
-        nic: formData.nic,
-        district: formData.district,
-        address: formData.address,
         avatar_url: formData.avatarUrl,
       },
     });
 
     if (error) {
-      setStatus({ type: 'error', message: `Commit Failed: ${error.message}` });
+      setStatus({ type: 'error', message: `Failed to update profile: ${error.message}` });
     } else {
-      setStatus({ type: 'success', message: 'Identity synchronized with regional registry.' });
+      setStatus({ type: 'success', message: 'Profile updated successfully.' });
     }
 
     setLoading(false);
@@ -142,12 +190,17 @@ export default function ProfileForm() {
     return (
       <div className="flex flex-col items-center gap-4 py-20">
         <div className="w-12 h-12 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
-        <p className="text-white/85 font-black uppercase tracking-widest text-xs animate-pulse">Update Profile</p>
+        <p className="text-white/85 font-black uppercase tracking-widest text-xs animate-pulse">Loading profile...</p>
       </div>
     );
   }
 
   const inputClass = "w-full px-5 py-4 rounded-2xl border border-white/10 bg-white/5 text-white placeholder:text-white/85 focus:outline-none focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500/60 hover:border-white/25 hover:bg-white/[0.08] transition-all duration-200 font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed cursor-text";
+
+  const updateField = (key, value) => {
+    setFormData((prev) => ({ ...prev, [key]: value }));
+    setFieldErrors((prev) => ({ ...prev, [key]: validateField(key, value) }));
+  };
 
   return (
     <div className="font-sans relative">
@@ -208,26 +261,25 @@ export default function ProfileForm() {
 
           {uploading && (
             <p className="text-[10px] text-emerald-400 mt-6 font-black uppercase tracking-[0.3em] animate-pulse">
-              {t('uploadingMatrix')}
+              Uploading photo...
             </p>
           )}
         </div>
 
         <form onSubmit={handleUpdate} className="space-y-12">
-          {/* Personal Identification Section */}
+          {/* Basic profile section */}
           <div className="space-y-8">
             <div className="flex items-center gap-4">
               <span className="h-px flex-1 bg-white/10"></span>
-              <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-white/85">{t('personalId')}</h3>
+              <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-white/85">Basic information</h3>
               <span className="h-px flex-1 bg-white/10"></span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {[
-              { label: t('givenName'),          key: "firstName", type: "text", placeholder: "SENTINEL" },
-                { label: t('surname'),            key: "lastName",  type: "text", placeholder: "OPERATOR" },
-                { label: t('identification'),     key: "nic",       type: "text", placeholder: "XXXXXXXXXV" },
-                { label: t('tacticalPhone'),      key: "phone",     type: "text", placeholder: "+94 77 XXX XXXX" },
+                { label: "First name", key: "firstName", type: "text", placeholder: "John" },
+                { label: "Surname", key: "lastName", type: "text", placeholder: "Doe" },
+                { label: "Phone number", key: "phone", type: "tel", placeholder: "+94 77 123 4567" },
               ].map((field) => (
                 <div key={field.key} className="group/field space-y-2">
                   <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/85 ml-2 transition-colors duration-200 group-hover/field:text-emerald-400/70">
@@ -237,70 +289,43 @@ export default function ProfileForm() {
                     type={field.type}
                     placeholder={field.placeholder}
                     value={formData[field.key]}
-                    onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value })}
-                    className={inputClass}
+                    onChange={(e) => updateField(field.key, e.target.value)}
+                    onBlur={(e) => setFieldErrors((prev) => ({ ...prev, [field.key]: validateField(field.key, e.target.value) }))}
+                    className={`${inputClass} ${fieldErrors[field.key] ? "border-red-400/70 focus:border-red-400/80 focus:ring-red-500/20" : ""}`}
+                    required
                   />
+                  {fieldErrors[field.key] && (
+                    <p className="text-[11px] text-red-300 font-semibold ml-2">{fieldErrors[field.key]}</p>
+                  )}
                 </div>
               ))}
-            </div>
-          </div>
-
-          {/* Sector Registration Section */}
-          <div className="space-y-8">
-            <div className="flex items-center gap-4">
-              <span className="h-px flex-1 bg-white/10"></span>
-              <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-white/85">{t('sectorReg')}</h3>
-              <span className="h-px flex-1 bg-white/10"></span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="group/field space-y-2">
                 <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/85 ml-2 transition-colors duration-200 group-hover/field:text-emerald-400/70">
-                  {t('emailEndpoint')}
+                  Email address
                 </label>
                 <input
                   type="email"
                   value={formData.email}
                   disabled
-                  className={inputClass}
+                  onBlur={(e) => setFieldErrors((prev) => ({ ...prev, email: validateField("email", e.target.value) }))}
+                  className={`${inputClass} ${fieldErrors.email ? "border-red-400/70" : ""}`}
                 />
-              </div>
-              <div className="group/field space-y-2">
-                <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/85 ml-2 transition-colors duration-200 group-hover/field:text-emerald-400/70">
-                  {t('districtSector')}
-                </label>
-                <input
-                  type="text"
-                  placeholder="COLOMBO"
-                  value={formData.district}
-                  onChange={(e) => setFormData({ ...formData, district: e.target.value })}
-                  className={inputClass}
-                />
-              </div>
-              <div className="group/field md:col-span-2 space-y-2">
-                <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/85 ml-2 transition-colors duration-200 group-hover/field:text-emerald-400/70">
-                  {t('physicalAddress')}
-                </label>
-                <textarea
-                  rows="3"
-                  placeholder="PRIMARY BASE OF OPERATIONS..."
-                  value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  className={inputClass + " resize-none min-h-[100px]"}
-                ></textarea>
+                {fieldErrors.email && (
+                  <p className="text-[11px] text-red-300 font-semibold ml-2">{fieldErrors.email}</p>
+                )}
               </div>
             </div>
           </div>
 
-          <div className="flex justify-center pt-10 flex-col items-center gap-4">
+          <div className="flex justify-center pt-16 sm:pt-20 mt-4 flex-col items-center gap-4">
             <button
               type="submit"
               disabled={loading || uploading}
-              className="group relative w-full md:w-80 h-16 rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.03] hover:shadow-lg hover:shadow-emerald-500/25 active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
+              className="group relative w-full md:w-80 h-14 rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-500/25 active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
             >
               <div className="absolute inset-0 bg-emerald-500/20 group-hover:bg-emerald-500/35 transition-colors duration-300" />
               <div className="absolute inset-x-0 bottom-0 h-[2px] bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)] group-hover:shadow-[0_0_25px_rgba(16,185,129,0.8)] transition-all duration-300" />
-              <div className="relative flex items-center justify-center gap-3 text-emerald-400 text-[11px] font-black uppercase tracking-[0.4em]">
+              <div className="relative flex items-center justify-center gap-2 text-emerald-300 text-sm font-bold tracking-wide">
                 {loading ? (
                   <div className="w-4 h-4 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
                 ) : (
@@ -308,20 +333,20 @@ export default function ProfileForm() {
                     {status?.type === 'success' ? 'verified' : 'shield_with_heart'}
                   </span>
                 )}
-                {loading ? "Synchronizing..." : status?.type === 'success' ? t('synchronized') : "Update Profile"}
+                {loading ? "Saving..." : status?.type === 'success' ? "Saved" : "Save Profile"}
               </div>
             </button>
             
             <button
               type="button"
               onClick={handleLogout}
-              className="group relative w-full md:w-80 h-16 rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.03] hover:shadow-lg hover:shadow-red-500/25 active:scale-95"
+              className="group relative w-full md:w-80 h-14 rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-red-500/25 active:scale-95"
             >
               <div className="absolute inset-0 bg-red-500/10 group-hover:bg-red-500/20 transition-colors duration-300" />
               <div className="absolute inset-x-0 bottom-0 h-[2px] bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.5)] group-hover:shadow-[0_0_25px_rgba(239,68,68,0.8)] transition-all duration-300" />
-              <div className="relative flex items-center justify-center gap-3 text-red-500 text-[11px] font-black uppercase tracking-[0.4em]">
+              <div className="relative flex items-center justify-center gap-2 text-red-400 text-sm font-bold tracking-wide">
                 <span className="material-symbols-outlined text-[20px]">logout</span>
-                Logout
+                Log Out
               </div>
             </button>
           </div>
