@@ -230,6 +230,12 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
           <p className="text-[9px] text-white/25 mt-1">
             S2 = Sentinel-2 optical · S1 = Sentinel-1 SAR
           </p>
+          <div className="mt-3 space-y-1">
+            <p className="text-[9px] text-white/25">NDVI — Normalized Difference Vegetation Index</p>
+            <p className="text-[9px] text-white/25">EVI — Enhanced Vegetation Index</p>
+            <p className="text-[9px] text-white/25">VV — Vertical Transmit / Vertical Receive</p>
+            <p className="text-[9px] text-white/25">VH — Vertical Transmit / Horizontal Receive</p>
+          </div>
         </div>
 
       </div>
