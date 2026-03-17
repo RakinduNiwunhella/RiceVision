@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { getDSDivision } from "../../utils/geoUtils";
 import { useLanguage } from "../../context/LanguageContext";
-import TutorialTooltip from "../../components/TutorialTooltip";
+import TutorialTooltip from "../../Components/TutorialTooltip";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
 
 // ─────────────────────────────────────────────

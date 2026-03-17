@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { apiFetch } from "../../api/apiFetch";
 import { useLanguage } from "../../context/LanguageContext";
 import { useNavigate } from "react-router-dom";
-import TutorialTooltip from "../../components/TutorialTooltip";
+import TutorialTooltip from "../../Components/TutorialTooltip";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
 
 const healthColor = (health) => {

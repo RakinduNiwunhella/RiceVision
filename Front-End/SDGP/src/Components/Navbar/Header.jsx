@@ -7,7 +7,7 @@ import { useLanguage, LANGUAGES } from "../../context/LanguageContext";
 import Notifications from "../Notifications/Notifications";
 import { supabase } from "../../supabaseClient";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
-import TutorialTooltip from "../../components/TutorialTooltip";
+import TutorialTooltip from "../../Components/TutorialTooltip";
 
 const searchIndex = [
   {

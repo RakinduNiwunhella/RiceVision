@@ -4,14 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { FaSun, FaMoon } from "react-icons/fa";
 import { useTheme } from "../../context/ThemeContext";
 import { useLanguage } from "../../context/LanguageContext";
-
-
-//PRODUCTION
-const API_BASE = "https://ricevision-cakt.onrender.com";
-
-//LOCAL
-//const API_BASE = "http://localhost:8000";
-
+import { API_BASE } from "../../config/apiBase";
 
 export default function SignupPage() {
   const { isDark, toggleTheme } = useTheme();

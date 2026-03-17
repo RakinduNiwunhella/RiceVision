@@ -8,7 +8,7 @@ import autoTable from 'jspdf-autotable';
 import logoImg from '../assets/logo.png';
 import { apiFetch } from "../../api/apiFetch";
 import { useLanguage } from "../../context/LanguageContext";
-import TutorialTooltip from "../../components/TutorialTooltip";
+import TutorialTooltip from "../../Components/TutorialTooltip";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
 
 const CustomSelect = ({ value, onChange, options, className = "" }) => {

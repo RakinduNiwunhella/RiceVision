@@ -4,7 +4,7 @@ import FiltersPanel from "../Map/FiltersPanel";
 import MapLayersPanel from "../Map/MapLayersPanel";
 import RiceMap from "../Map/RiceMap";
 import { useSearchParams } from "react-router-dom";
-import TutorialTooltip from "../../components/TutorialTooltip";
+import TutorialTooltip from "../../Components/TutorialTooltip";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
 
 /* Normalize health values so they match checkbox labels exactly */
