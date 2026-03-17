@@ -842,7 +842,7 @@ const Report = () => {
     return { label: "HIGH RISK", color: "text-red-400" };
   };
 
-  const ReportPane = ({ report, config, setConfig, title, districtSelectorRef, yieldHeroRef, metricsExportRef }) => {
+  const ReportPane = ({ report, config, setConfig, title, districtSelectorRef, yieldHeroRef, metricsExportRef, isSingleMode = false }) => {
     if (report?.error) return (
       <div className="flex-1 glass p-6 sm:p-12 rounded-2xl sm:rounded-[3rem] text-center border border-red-500/20">
         <span className="material-symbols-outlined text-5xl text-red-400/40 mb-4 block">signal_disconnected</span>
@@ -881,7 +881,10 @@ const Report = () => {
             <button
               ref={metricsExportRef}
               onClick={() => generatePDF(report, config)}
-              className="flex items-center gap-2 text-[10px] font-black px-4 py-1.5 rounded-xl border border-white/10 transition-all duration-300 hover:bg-white/10 hover:border-white/20 hover:scale-[1.02] cursor-pointer uppercase tracking-widest"            >
+              className={`flex items-center gap-2 text-[10px] font-black px-4 py-1.5 rounded-xl border transition-all duration-300 hover:scale-[1.02] cursor-pointer uppercase tracking-widest ${isSingleMode
+                ? "border-emerald-400/70 bg-emerald-500/10 hover:bg-emerald-500/20 hover:border-emerald-300"
+                : "border-white/10 hover:bg-white/10 hover:border-white/20"
+                }`}            >
               <span className="material-symbols-outlined text-xs">download</span>
               Export PDF
             </button>
@@ -910,18 +913,20 @@ const Report = () => {
         </div>
 
         {/* Yield Hero */}
-        <div ref={yieldHeroRef} className="glass p-3 sm:p-5 rounded-xl sm:rounded-[2rem] border border-emerald-500/20 shadow-xl mb-6 relative overflow-hidden">
+        <div ref={yieldHeroRef} className="glass p-3 sm:p-5 rounded-xl sm:rounded-[2rem] border border-emerald-500/20 shadow-xl mb-6 relative overflow-hidden min-h-[230px] sm:min-h-[260px]">
           {/* subtle glow */}
           <div className="absolute top-0 right-0 w-36 h-36 bg-emerald-500/10 blur-[50px] -mr-8 -mt-8 pointer-events-none rounded-full" />
-          <div className="relative z-10">
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/85 mb-1 flex items-center gap-2">
-              <span className="material-symbols-outlined text-emerald-400 text-sm">monitoring</span>
-              Predicted Average
-            </p>
-            <h2 className="text-2xl sm:text-4xl font-black tracking-tighter text-white">
-              {Math.round(report.summary.yield).toLocaleString()}
-              <span className="text-base font-normal text-white/85 ml-2">kg/ha</span>
-            </h2>
+          <div className="relative z-10 h-full flex flex-col">
+            <div className="pt-1 sm:pt-2 text-center flex flex-col items-center">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/85 mb-1 flex items-center justify-center gap-2">
+                <span className="material-symbols-outlined text-emerald-400 text-sm">monitoring</span>
+                Predicted Average
+              </p>
+              <h2 className="text-3xl sm:text-5xl font-black tracking-tighter text-white leading-none">
+                {Math.round(report.summary.yield).toLocaleString()}
+                <span className="text-base font-normal text-white/85 ml-2">kg/ha</span>
+              </h2>
+            </div>
             <div className="mt-3 pt-3 border-t border-white/5 grid grid-cols-2 gap-3">
               <div>
                 <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/85 mb-0.5">Total Yield</p>
@@ -1012,6 +1017,15 @@ const Report = () => {
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span className="text-[10px] font-black uppercase tracking-widest text-white/85">{t('liveData')}</span>
             </div>
+            {mode === "compare" && dataA && dataB && (
+              <button
+                onClick={() => generateComparisonPDF()}
+                className="flex items-center gap-2 text-[10px] font-black px-4 py-2 rounded-xl border border-emerald-400/70 bg-emerald-500/10 transition-all duration-300 hover:bg-emerald-500/20 hover:border-emerald-300 hover:scale-[1.02] cursor-pointer uppercase tracking-widest"
+              >
+                <span className="material-symbols-outlined text-sm">compare</span>
+                Export Comparison Report
+              </button>
+            )}
           </div>
         </div>
 
@@ -1025,23 +1039,12 @@ const Report = () => {
             districtSelectorRef={currentStep === 2 ? districtSelectorRef : undefined}
             yieldHeroRef={currentStep === 3 ? yieldHeroRef : undefined}
             metricsExportRef={currentStep === 4 ? metricsExportRef : undefined}
+            isSingleMode={mode === "single"}
           />
           {mode === "compare" && <ReportPane report={dataB} config={configB} setConfig={setConfigB} title="COMPARISON" />}
         </div>
 
       </div>
-      {mode === "compare" && dataA && dataB && (
-        <div className="flex justify-center mt-6">
-          <button
-            onClick={() => generateComparisonPDF()}
-            className="flex items-center gap-2 text-[11px] font-black px-6 py-3 rounded-2xl border border-white/10 transition-all duration-300 hover:bg-white/10 hover:border-white/20 hover:scale-[1.02] cursor-pointer uppercase tracking-widest"
-          >
-            <span className="material-symbols-outlined text-sm">compare</span>
-            Export Comparison Report
-          </button>
-        </div>
-      )}
-
       {/* ─── TUTORIAL TOOLTIPS ─── */}
       {showTutorial && currentTutorialStep && (
         <>
