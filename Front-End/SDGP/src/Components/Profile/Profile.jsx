@@ -2,7 +2,7 @@ import { useState, useRef, useMemo } from "react";
 import ProfileForm from "./ProfileForm";
 import MyFieldTab from "./MyFieldTab";
 import { useLanguage } from "../../context/LanguageContext";
-import TutorialTooltip from "../../components/TutorialTooltip";
+import TutorialTooltip from "../../Components/TutorialTooltip";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
 
 export default function Profile() {

@@ -10,12 +10,11 @@ function Info() {
         <Reveal>
         <div className="flex flex-col justify-center h-full">
           <h2 className="text-4xl md:text-5xl font-bold leading-tight text-gray-900 dark:text-white">
-           Stepping Up Agricultural  <br/> Intelligence in Sri Lanka
+           Agricultural Intelligence <br/> Powered by Satellites
           </h2>
 
           <p className="mt-6 text-lg text-gray-700 leading-relaxed text-justify dark:text-white">
-            Alongside farmers, government agencies and researchers, we are transforming how Sri Lanka monitors paddy fields reducing crop losses, 
-            strengthening food security, and supporting smarter decisions through satellite powered insights.
+            RiceVision is a satellite-based agricultural monitoring system that observes rice cultivation, analyzes crop health, and predicts future yield using remote sensing and machine learning. By replacing costly manual field inspections with automated satellite imagery analysis, we deliver accurate, large-scale insights to support sustainable food production across Sri Lanka.
           </p>
         </div>
         </Reveal>
@@ -30,8 +29,7 @@ function Info() {
               Who We Are <span className="text-green-700">&gt;</span>
             </h3>
             <p className="text-gray-700 dark:text-slate-300 mt-3">
-            We are building Sri Lanka's first satellite-based rice monitoring and yield prediction system using
-             Earth Observation, machine learning, and field data.</p>
+            We integrate satellite remote sensing, geospatial analysis, and machine learning to monitor rice cultivation and forecast yields across Sri Lanka.</p>
           </div>
           </Reveal>
 
@@ -42,9 +40,7 @@ function Info() {
               What We Do <span className="text-green-700">&gt;</span>
             </h3>
             <p className="text-gray-700 dark:text-slate-300 mt-3">
-             We use Sentinel-1, Sentinel-2, and AI to track paddy health, growth stages, water stress, and yield
-              in near real time. These insights help reduce losses, guide inputs, and support national food security
-               planning.
+             We collect Sentinel-1 and Sentinel-2 imagery via Google Earth Engine, calculate vegetation indices (NDVI, EVI, NDWI), and use machine learning models to detect growth stages, classify crop health, and predict harvest yields.
             </p>
           </div>
           </Reveal>
@@ -56,8 +52,7 @@ function Info() {
               How To Help <span className="text-green-700">&gt;</span>
             </h3>
             <p className="text-gray-700 dark:text-slate-300 mt-3">
-            Partner with us to advance digital agriculture across Sri Lanka. Share field data, join pilots, or integrate
-             our platform to help farmers make faster decisions and cut rice import dependence.</p>
+            Partner with us to advance data-driven agriculture. Share field data, collaborate on pilot regions, or use our insights to help farmers, researchers, and policymakers make better decisions.</p>
           </div>
           </Reveal>
 
@@ -68,7 +63,7 @@ function Info() {
               Where We Work <span className="text-green-700">&gt;</span>
             </h3>
             <p className="text-gray-700 dark:text-slate-300 mt-3">
-             Our system spans major paddy-growing districts in both Yala and Maha seasons. Cloud-penetrating radar enables reliable, year round monitoring, even during heavy monsoons.
+             Our system covers major paddy-growing districts across both Yala and Maha seasons. Satellite images are preprocessed to remove cloud cover, enabling continuous and reliable year-round monitoring.
             </p>
           </div>
           </Reveal>
