@@ -913,11 +913,11 @@ const Report = () => {
         </div>
 
         {/* Yield Hero */}
-        <div ref={yieldHeroRef} className="glass p-3 sm:p-5 rounded-xl sm:rounded-[2rem] border border-emerald-500/20 shadow-xl mb-6 relative overflow-hidden min-h-[230px] sm:min-h-[260px]">
+        <div ref={yieldHeroRef} className="glass p-3 sm:p-5 rounded-xl sm:rounded-[2rem] border border-emerald-500/20 shadow-xl mb-6 relative overflow-hidden">
           {/* subtle glow */}
           <div className="absolute top-0 right-0 w-36 h-36 bg-emerald-500/10 blur-[50px] -mr-8 -mt-8 pointer-events-none rounded-full" />
-          <div className="relative z-10 h-full flex flex-col">
-            <div className="pt-1 sm:pt-2 text-center flex flex-col items-center">
+          <div className="relative z-10 flex flex-col">
+            <div className="text-center flex flex-col items-center justify-center py-1 sm:py-2">
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/85 mb-1 flex items-center justify-center gap-2">
                 <span className="material-symbols-outlined text-emerald-400 text-sm">monitoring</span>
                 Predicted Average
@@ -927,7 +927,7 @@ const Report = () => {
                 <span className="text-base font-normal text-white/85 ml-2">kg/ha</span>
               </h2>
             </div>
-            <div className="mt-3 pt-3 border-t border-white/5 grid grid-cols-2 gap-3">
+            <div className="mt-2 pt-3 border-t border-white/5 grid grid-cols-2 gap-3">
               <div>
                 <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/85 mb-0.5">Total Yield</p>
                 <p className="text-base font-black text-white">{Math.round(report.summary.total_kg).toLocaleString()} <span className="text-xs font-bold text-white/85">kg</span></p>
