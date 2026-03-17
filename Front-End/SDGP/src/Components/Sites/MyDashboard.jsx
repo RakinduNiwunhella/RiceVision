@@ -501,47 +501,151 @@ const MyDashboard = () => {
           </div>
 
           {/* Regional Health Overview */}
-          <div ref={districtTableRef} className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-2 flex items-center gap-2">
-              <span className="material-symbols-outlined text-cyan-400 text-sm">map</span>
-              District Overview
-            </p>
-            <h3 className="text-xl font-black text-white tracking-tight uppercase mb-8">District Health Status</h3>
+         {/* Regional Pest Overview */}
+<div ref={districtTableRef} className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
+  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-2 flex items-center gap-2">
+    <Bug className="text-rose-400 text-sm" />
+    District Overview
+  </p>
 
-            <div className="flex-1 space-y-2 no-scrollbar overflow-y-auto max-h-[420px] pr-2">
-              {(showAllDistricts ? districtHealth : districtHealth.slice(0, 12)).map((d, i) => {
-                const healthPct = Math.round(d.normal_pct);
-                const color = healthPct >= 75 ? "#10b981" : healthPct >= 50 ? "#f59e0b" : "#ef4444";
-                return (
-                  <div
-                    key={i}
-                    className="flex justify-between items-center p-3 rounded-2xl bg-white/5 hover:bg-white/10 transition-all group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-1.5 h-1.5 rounded-full" style={{ background: color, boxShadow: `0 0 8px ${color}` }} />
-                      <span className="text-xs font-black text-white/70 uppercase tracking-tight group-hover:text-white transition-colors">{d.district}</span>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <div className="w-20 h-1.5 bg-white/5 rounded-full overflow-hidden p-[1px]">
-                        <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${healthPct}%`, background: color }} />
-                      </div>
-                      <span className="text-[10px] font-black tabular-nums w-8 text-right" style={{ color }}>{healthPct}%</span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+  <h3 className="text-xl font-black text-white tracking-tight uppercase mb-8">
+    District Pest Outbreak Status
+  </h3>
 
-            <div className="mt-8 pt-6 border-t border-white/5 text-center">
-              <button
-                ref={districtToggleBtnRef}
-                onClick={() => setShowAllDistricts(!showAllDistricts)}
-                className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 hover:text-white transition-colors"
-              >
-                {showAllDistricts ? "Show Less" : `Show All (${districtHealth.length} Items)`}
-              </button>
-            </div>
+  <div className="flex-1 space-y-2 no-scrollbar overflow-y-auto max-h-[420px] pr-2">
+    {(showAllDistricts ? districtHealth : districtHealth.slice(0, 12)).map((d, i) => {
+
+      // 🔥 Convert health → pest risk
+      const pestPct = Math.round(100 - d.normal_pct);
+
+      // 🎨 Pest color logic
+      const color =
+        pestPct <= 30 ? "#10b981" :   // Low risk
+        pestPct <= 70 ? "#f59e0b" :   // Medium risk
+        "#ef4444";                    // High risk
+
+      // 🟢🟡🔴 indicator
+      const statusIcon =
+        pestPct <= 30 ? "🟢" :
+        pestPct <= 70 ? "🟡" :
+        "🔴";
+
+      return (
+        <div
+          key={i}
+          className="flex justify-between items-center p-3 rounded-2xl bg-white/5 hover:bg-white/10 transition-all group"
+        >
+          {/* LEFT */}
+          <div className="flex items-center gap-3">
+            <Bug size={14} className="text-rose-400" />
+            <span className="text-xs font-black text-white/70 uppercase tracking-tight group-hover:text-white transition-colors">
+              {d.district}
+            </span>
           </div>
+
+          {/* RIGHT */}
+          <div className="flex items-center gap-4">
+
+            {/* Progress Bar */}
+            <div className="w-20 h-1.5 bg-white/5 rounded-full overflow-hidden p-[1px]">
+              <div
+                className="h-full rounded-full transition-all duration-1000"
+                style={{ width: `${pestPct}%`, background: color }}
+              />
+            </div>
+
+            {/* Percentage + Status */}
+            <span className="text-[10px] font-black tabular-nums text-right" style={{ color }}>
+              {pestPct}% {statusIcon}
+            </span>
+          </div>
+        </div>
+      );
+    })}
+  </div>
+
+  <div className="mt-8 pt-6 border-t border-white/5 text-center">
+    <button
+      ref={districtToggleBtnRef}
+      onClick={() => setShowAllDistricts(!showAllDistricts)}
+      className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 hover:text-white transition-colors"
+    >
+      {showAllDistricts ? "Show Less" : `Show All (${districtHealth.length} Items)`}
+    </button>
+  </div>
+</div>{/* Regional Pest Overview */}
+<div ref={districtTableRef} className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
+  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-2 flex items-center gap-2">
+    <Bug className="text-rose-400 text-sm" />
+    District Overview
+  </p>
+
+  <h3 className="text-xl font-black text-white tracking-tight uppercase mb-8">
+    District Pest Outbreak Status
+  </h3>
+
+  <div className="flex-1 space-y-2 no-scrollbar overflow-y-auto max-h-[420px] pr-2">
+    {(showAllDistricts ? districtHealth : districtHealth.slice(0, 12)).map((d, i) => {
+
+      // 🔥 Convert health → pest risk
+      const pestPct = Math.round(100 - d.normal_pct);
+
+      // 🎨 Pest color logic
+      const color =
+        pestPct <= 30 ? "#10b981" :   // Low risk
+        pestPct <= 70 ? "#f59e0b" :   // Medium risk
+        "#ef4444";                    // High risk
+
+      // 🟢🟡🔴 indicator
+      const statusIcon =
+        pestPct <= 30 ? "🟢" :
+        pestPct <= 70 ? "🟡" :
+        "🔴";
+
+      return (
+        <div
+          key={i}
+          className="flex justify-between items-center p-3 rounded-2xl bg-white/5 hover:bg-white/10 transition-all group"
+        >
+          {/* LEFT */}
+          <div className="flex items-center gap-3">
+            <Bug size={14} className="text-rose-400" />
+            <span className="text-xs font-black text-white/70 uppercase tracking-tight group-hover:text-white transition-colors">
+              {d.district}
+            </span>
+          </div>
+
+          {/* RIGHT */}
+          <div className="flex items-center gap-4">
+
+            {/* Progress Bar */}
+            <div className="w-20 h-1.5 bg-white/5 rounded-full overflow-hidden p-[1px]">
+              <div
+                className="h-full rounded-full transition-all duration-1000"
+                style={{ width: `${pestPct}%`, background: color }}
+              />
+            </div>
+
+            {/* Percentage + Status */}
+            <span className="text-[10px] font-black tabular-nums text-right" style={{ color }}>
+              {pestPct}% {statusIcon}
+            </span>
+          </div>
+        </div>
+      );
+    })}
+  </div>
+
+  <div className="mt-8 pt-6 border-t border-white/5 text-center">
+    <button
+      ref={districtToggleBtnRef}
+      onClick={() => setShowAllDistricts(!showAllDistricts)}
+      className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 hover:text-white transition-colors"
+    >
+      {showAllDistricts ? "Show Less" : `Show All (${districtHealth.length} Items)`}
+    </button>
+  </div>
+</div>
 
         </div>
 
