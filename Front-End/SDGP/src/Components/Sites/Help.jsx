@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   QuestionMarkCircleIcon,
   PhoneIcon,
   EnvelopeIcon,
   ExclamationTriangleIcon,
   ChevronDownIcon,
+  PlayCircleIcon,
 } from "@heroicons/react/24/outline";
 import { fetchFaqs, submitComplaint } from "../../api/api";
 import { useLanguage } from "../../context/LanguageContext";
-import TutorialTooltip from "../../components/TutorialTooltip";
-import { usePageTutorial } from "../../hooks/usePageTutorial";
 
 const Help = () => {
   const { t } = useLanguage();
@@ -27,39 +27,12 @@ const Help = () => {
   const [faqs, setFaqs] = useState([]);
   const [faqLoading, setFaqLoading] = useState(true);
   const [openFaq, setOpenFaq] = useState(null);
-  // Tutorial Setup
-  const tutorialSteps = [
-    {
-      title: t("helpSupport") || "Help & Support",
-      action: "Explore the Help center to get support, submit complaints, and find answers",
-      outcome: "You will find guidance on using RiceVision and ways to get technical assistance"
-    },
-    {
-      title: "Submit Complaint",
-      action: "Fill in your information, select complaint type, and describe your issue in detail",
-      outcome: "Your feedback will be submitted to the team for investigation and resolution"
-    },
-    {
-      title: "Knowledge Base",
-      action: "Browse FAQs and click questions to expand answers about common issues",
-      outcome: "You will find quick solutions to frequently asked questions without contacting support"
-    }
-  ];
+  const navigate = useNavigate();
 
-  const {
-    currentStep,
-    showTutorial,
-    currentTutorialStep,
-    hasMoreSteps,
-    nextStep,
-    prevStep,
-    closeTutorial
-  } = usePageTutorial("help", tutorialSteps);
-
-  // Element refs for tutorial
-  const headerRef = React.useRef(null);
-  const complaintFormRef = React.useRef(null);
-  const faqSectionRef = React.useRef(null);
+  const handleReplayTutorial = () => {
+    localStorage.setItem('ricevision_force_tutorial_replay', 'true');
+    navigate('/dashboard');
+  };
   /* ---------------- FETCH FAQS ---------------- */
 
   useEffect(() => {
@@ -120,16 +93,23 @@ const Help = () => {
       <div className="max-w-7xl mx-auto space-y-10 pb-20">
 
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6" ref={headerRef}>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
             <h1 className="flex items-center gap-2 sm:gap-3 text-xl sm:text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
               <QuestionMarkCircleIcon className="w-6 h-6 sm:w-8 sm:h-8 md:w-12 md:h-12 text-emerald-400" />
               {t('helpSupport')}
             </h1>
             <p className="text-white/40 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em] max-w-2xl">
-
+              {/* Optional subtitle text */}
             </p>
           </div>
+          <button 
+            onClick={handleReplayTutorial}
+            className="flex items-center gap-2 glass px-4 py-2 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 rounded-xl uppercase tracking-widest text-[10px] font-black transition-all active:scale-95"
+          >
+            <PlayCircleIcon className="w-5 h-5" />
+            Replay Tutorials
+          </button>
         </div>
 
         {/* Quick Contact Grid */}
@@ -177,7 +157,7 @@ const Help = () => {
 
           {/* Complaint Console */}
           <div className="lg:col-span-3">
-            <div ref={complaintFormRef} className="glass p-4 sm:p-6 md:p-8 lg:p-10 rounded-xl sm:rounded-2xl md:rounded-[2.5rem] border border-white/10 shadow-2xl space-y-6 sm:space-y-8">
+            <div className="glass p-4 sm:p-6 md:p-8 lg:p-10 rounded-xl sm:rounded-2xl md:rounded-[2.5rem] border border-white/10 shadow-2xl space-y-6 sm:space-y-8">
               <div className="flex items-center gap-3 border-b border-white/10 pb-6">
                 <ExclamationTriangleIcon className="w-6 h-6 text-amber-400" />
                 <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/40">{t('feedbackLoop')}</h2>
@@ -248,7 +228,7 @@ const Help = () => {
 
           {/* Dynamic Knowledge Base (FAQs) */}
           <div className="lg:col-span-2 space-y-6">
-            <div ref={faqSectionRef} className="glass p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl md:rounded-[2.5rem] border border-white/10 shadow-xl h-fit">
+            <div className="glass p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl md:rounded-[2.5rem] border border-white/10 shadow-xl h-fit">
                 <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/40 mb-8 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
                 {t('quickHelp')}
@@ -296,56 +276,7 @@ const Help = () => {
           </div>
         </div>
 
-        {/* ─── TUTORIAL TOOLTIPS ─── */}
-        {showTutorial && currentTutorialStep && (
-          <>
-            {currentStep === 0 && (
-              <TutorialTooltip
-                visible={true}
-                position="bottom"
-                title={currentTutorialStep.title}
-                action={currentTutorialStep.action}
-                outcome={currentTutorialStep.outcome}
-                elementRef={headerRef}
-                step={currentStep}
-                totalSteps={tutorialSteps.length}
-                onNext={nextStep}
-                onPrevious={prevStep}
-                onDismiss={closeTutorial}
-              />
-            )}
-            {currentStep === 1 && (
-              <TutorialTooltip
-                visible={true}
-                position="top"
-                title={currentTutorialStep.title}
-                action={currentTutorialStep.action}
-                outcome={currentTutorialStep.outcome}
-                elementRef={complaintFormRef}
-                step={currentStep}
-                totalSteps={tutorialSteps.length}
-                onNext={nextStep}
-                onPrevious={prevStep}
-                onDismiss={closeTutorial}
-              />
-            )}
-            {currentStep === 2 && (
-              <TutorialTooltip
-                visible={true}
-                position="left"
-                title={currentTutorialStep.title}
-                action={currentTutorialStep.action}
-                outcome={currentTutorialStep.outcome}
-                elementRef={faqSectionRef}
-                step={currentStep}
-                totalSteps={tutorialSteps.length}
-                onNext={nextStep}
-                onPrevious={prevStep}
-                onDismiss={closeTutorial}
-              />
-            )}
-          </>
-        )}
+
       </div>
     </div>
   );

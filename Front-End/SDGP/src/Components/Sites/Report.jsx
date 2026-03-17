@@ -114,6 +114,16 @@ const Report = () => {
   const [availableDates, setAvailableDates] = useState([]);
   const [configA, setConfigA] = useState({ district: selectedDistrict || "Anuradhapura", date: "", season: "Maha" });
   const [configB, setConfigB] = useState({ district: "Gampaha", date: "", season: "Maha" });
+
+  useEffect(() => {
+    if (location.state?.district) {
+      setConfigA((prev) => ({
+        ...prev,
+        district: location.state.district,
+      }));
+    }
+  }, [location.state]);
+
   const [dataA, setDataA] = useState(null);
   const [dataB, setDataB] = useState(null);
 
@@ -194,19 +204,18 @@ const Report = () => {
 
       const json = await res.json();
 
-      if (!res.ok) {
-        throw new Error(json.detail || "Data not found");
-      }
-
+      if (!res.ok) throw new Error(json.detail || "Data not found");
       setter(json);
+
+
     } catch (err) {
       setter({ error: true, message: err.message });
     }
   };
 
   useEffect(() => {
-    fetchData(configA, setDataA);
-    if (mode === "compare") fetchData(configB, setDataB);
+    if (configA.date) fetchData(configA, setDataA);
+    if (mode === "compare" && configB.date) fetchData(configB, setDataB);
   }, [configA, configB, mode]);
 
   const generatePDF = async (report, config) => {

@@ -16,8 +16,9 @@ import {
 } from "recharts";
 import { useLanguage } from "../../context/LanguageContext";
 import { AlertTriangle, CloudRain, Bug } from "lucide-react";
-import TutorialTooltip from "../../components/TutorialTooltip";
+import TutorialOverlay from "../TutorialOverlay";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
+import { useNavigate } from "react-router-dom";
 
 import {
   fetchHealthSummary,
@@ -78,6 +79,7 @@ const MyDashboard = () => {
   const [districtHealth, setDistrictHealth] = useState([]);
   const [showAllDistricts, setShowAllDistricts] = useState(false);
   const [stageDistribution, setStageDistribution] = useState([]);
+  const navigate = useNavigate();
 
   // Refs for tutorial tooltips
   const headerRef = useRef(null);
@@ -95,91 +97,58 @@ const MyDashboard = () => {
   // Tutorial setup - cards, icons, and key actions on dashboard
   const tutorialSteps = useMemo(() => {
     const steps = [
-    {
-      title: "Dashboard: Your Field Control Center",
-      action: "Start here to see a complete overview of all your field conditions",
-      outcome: "You'll see 5 key panels showing health, yield, threats, growth stages, and district comparison",
-      ref: headerRef,
-      position: "bottom",
-    },
-    {
-      title: "Live Sync Status",
-      action: "Check this status indicator to confirm latest data sync",
-      outcome: "If the system is synced, your analytics and alerts are up to date",
-      ref: syncBadgeRef,
-      position: "left",
-    },
-    {
-      title: "Panel 1: Crop Health Distribution",
-      action: "This pie chart shows your current crop health across all fields",
-      outcome: "Green (Optimal) = Healthy crops ready for growth. Yellow (Mild Stress) = Some crops need attention. Red (Severe Stress) = Critical issues needing immediate action",
-      ref: healthCardRef,
-      position: "bottom",
-    },
-    {
-      title: "Panel 2: Yield Forecast",
-      action: "See your expected total harvest in metric tons. Check the ranked districts below",
-      outcome: "Top districts shown = Best performers. Use this to identify which areas have ideal conditions and learn from them",
-      ref: yieldCardRef,
-      position: "bottom",
-    },
-    {
-      title: "Supply Stability",
-      action: "Track expected shortfall and national demand saturation",
-      outcome: "Use this card to quickly spot demand pressure and supply risk",
-      ref: supplyCardRef,
-      position: "bottom",
-    },
-    {
-      title: "Panel 3: Active Threats",
-      action: "Review disease outbreaks and pest risks. Shows threat count and details",
-      outcome: "Click any threat to see recommendations and view exact location on Field Map. Red = High priority action needed",
-      ref: threatsCardRef,
-      position: "bottom",
-    },
+      {
+        ref: headerRef,
+        title: "Welcome! This is your field control center overview.",
+      },
+      {
+        ref: syncBadgeRef,
+        title: "Check this icon to ensure your data is freshly synced.",
+      },
+      {
+        ref: healthCardRef,
+        title: "See crop health as a pie chart. Green means optimal.",
+      },
+      {
+        ref: yieldCardRef,
+        title: "View your expected total harvest here in metric tons.",
+      },
+      {
+        ref: supplyCardRef,
+        title: "Track expected shortfalls and national demand saturation risks quickly.",
+      },
+      {
+        ref: threatsCardRef,
+        title: "Review active disease outbreaks and critical pest risks.",
+      },
     ]
 
     if (outbreaks.length > 0) {
       steps.push({
-        title: "Threat Actions",
-        action: "Use this button to open detailed recommendations for a threat",
-        outcome: "You can inspect causes, severity, and what to do next quickly",
         ref: threatDetailsBtnRef,
-        position: "left",
+        title: "Click here to open detailed recommendations for this threat.",
       })
     }
 
     if (outbreaks.length > 5) {
       steps.push({
-        title: "Threat List Controls",
-        action: "Use this button to expand or collapse the threat list",
-        outcome: "You can switch between a quick summary and full threat list",
         ref: outbreaksToggleBtnRef,
-        position: "top",
+        title: "Click this to expand or collapse your threat list.",
       })
     }
 
     steps.push(
       {
-        title: "Panel 4: Crop Stage Distribution",
-        action: "Bar chart showing percentage of crops in each growth stage (Seedling -> Mature)",
-        outcome: "Use this for planning: fertilizer timing, pest control, and harvest scheduling based on stage distribution",
         ref: stageChartRef,
-        position: "bottom",
+        title: "Check what percentage of your crops are in each growth stage.",
       },
       {
-        title: "Panel 5: District Health Overview",
-        action: "Compare health metrics across all your districts in one table",
-        outcome: "Shows health percentage, stress levels, and risk status for each region. Green = Healthy, Yellow = Monitor, Red = Action needed",
         ref: districtTableRef,
-        position: "bottom",
+        title: "Compare health metrics across all your districts in one table.",
       },
       {
-        title: "District List Controls",
-        action: "Use this button to expand or collapse the district list",
-        outcome: "You can quickly switch between summarized and full district-level detail",
         ref: districtToggleBtnRef,
-        position: "top",
+        title: "Use this button to expand the full district list.",
       },
     )
 
@@ -420,6 +389,7 @@ const MyDashboard = () => {
                 </div>
                 <button
                   ref={i === 0 ? threatDetailsBtnRef : undefined}
+                  onClick={() => navigate("/alerts")}
                   className="text-[10px] font-black uppercase tracking-[0.2em] rounded-xl px-6 py-2.5 border border-white/10 text-white/40 hover:text-white hover:border-white/40 hover:bg-white/5 transition-all active:scale-95"
                 >
                   {t('viewDetails')}
@@ -575,22 +545,16 @@ const MyDashboard = () => {
 
         </div>
 
-        {/* Tutorial Tooltips */}
-        {showTutorial && currentTutorialStep && tutorialSteps[currentStep] && (
-          <TutorialTooltip
-            visible={true}
-            position={currentTutorialStep.position || "bottom"}
-            title={currentTutorialStep.title}
-            action={currentTutorialStep.action}
-            outcome={currentTutorialStep.outcome}
-            elementRef={currentTutorialStep.ref}
-            step={currentStep}
-            totalSteps={tutorialSteps.length}
-            onNext={nextStep}
-            onPrevious={prevStep}
-            onDismiss={closeTutorial}
-          />
-        )}
+        {/* Tutorial Overlay */}
+        <TutorialOverlay
+          visible={showTutorial}
+          steps={tutorialSteps}
+          currentStep={currentStep}
+          onNext={nextStep}
+          onBack={prevStep}
+          onSkip={closeTutorial}
+          onFinish={closeTutorial}
+        />
       </div>
     </div>
   );

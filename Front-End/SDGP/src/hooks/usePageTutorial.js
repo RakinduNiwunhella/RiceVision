@@ -1,73 +1,66 @@
 import { useState, useEffect, useCallback } from 'react'
+import { supabase } from '../supabaseClient'
 
-const STORAGE_KEY = 'ricevision_tutorial_pages'
-const HEADER_REQUIRED_STEPS_KEY = 'ricevision_header_required_steps'
-
-const readTutorialPages = () => {
-  const stored = localStorage.getItem(STORAGE_KEY)
-  if (!stored) return {}
-
-  try {
-    return JSON.parse(stored)
-  } catch (e) {
-    console.error('Failed to parse tutorial pages', e)
-    return {}
-  }
-}
-
-const isHeaderCurrentVersionComplete = (pages) => {
-  const requiredHeaderSteps = Number(localStorage.getItem(HEADER_REQUIRED_STEPS_KEY) || 0)
-  if (!requiredHeaderSteps || Number.isNaN(requiredHeaderSteps)) return false
-
-  return !!pages.Header && pages.Header__tutorialStepCount === requiredHeaderSteps
-}
+const REPLAY_KEY = 'ricevision_force_tutorial_replay'
+const LOCAL_OVERRIDE_KEY = 'ricevision_local_onboarding_done'
 
 /**
- * Custom hook to manage per-page tutorial state
- * Tracks which tutorial tooltips user has seen using localStorage
- * Header page tutorials take priority - page tutorials skip if Header not complete
+ * Custom hook to manage first-time onboarding tutorial state.
+ * Relies on Supabase user_metadata for cross-device persistence.
  */
 export const usePageTutorial = (pageName, tutorialSteps = []) => {
   const [currentStep, setCurrentStep] = useState(0)
   const [showTutorial, setShowTutorial] = useState(false)
-  const [visitedPages, setVisitedPages] = useState({})
-  const [isHeaderComplete, setIsHeaderComplete] = useState(false)
-  const pageVersionKey = `${pageName}__tutorialStepCount`
+  
+  const isDashboard = pageName === 'dashboard'
 
-  // Keep all pages in sync when Header tutorial completes in the same tab.
   useEffect(() => {
-    const isHeaderPage = pageName === 'Header'
+    // Only 'dashboard' auto-starts tutorials.
+    if (!isDashboard || tutorialSteps.length === 0) return
 
-    const syncFromStorage = () => {
-      const pages = readTutorialPages()
-      setVisitedPages(pages)
+    const initTutorialState = async () => {
+      // 1. Check for manual replay request
+      if (localStorage.getItem(REPLAY_KEY) === 'true') {
+        localStorage.removeItem(REPLAY_KEY)
+        setShowTutorial(true)
+        return
+      }
 
-      const headerDone = isHeaderCurrentVersionComplete(pages)
-      setIsHeaderComplete(headerDone)
+      // 2. Client-side fast path override 
+      // (prevents flash if supabase call takes a moment)
+      if (localStorage.getItem(LOCAL_OVERRIDE_KEY) === 'true') {
+        setShowTutorial(false)
+        return
+      }
 
-      const hasSeenCurrentVersion =
-        !!pages[pageName] && pages[pageVersionKey] === tutorialSteps.length
-      const shouldShow = tutorialSteps.length > 0 && !hasSeenCurrentVersion
-      setShowTutorial(shouldShow && (isHeaderPage || headerDone))
+      try {
+        const { data: { user } } = await supabase.auth.getUser()
+        
+        // If no user (logged out), don't show.
+        if (!user) return
+
+        // 3. True backend check
+        const isCompleted = user.user_metadata?.onboarding_completed === true
+        
+        if (isCompleted) {
+          localStorage.setItem(LOCAL_OVERRIDE_KEY, 'true')
+          setShowTutorial(false)
+        } else {
+          setShowTutorial(true)
+        }
+      } catch (err) {
+        console.error("Failed to check onboarding state:", err)
+      }
     }
 
-    syncFromStorage()
-
-    window.addEventListener('storage', syncFromStorage)
-    window.addEventListener('ricevision:tutorial-pages-updated', syncFromStorage)
-
-    return () => {
-      window.removeEventListener('storage', syncFromStorage)
-      window.removeEventListener('ricevision:tutorial-pages-updated', syncFromStorage)
-    }
-  }, [pageName, tutorialSteps.length, pageVersionKey])
+    initTutorialState()
+  }, [isDashboard, tutorialSteps.length])
 
   // Move to next tutorial step
   const nextStep = useCallback(() => {
     if (currentStep < tutorialSteps.length - 1) {
-      setCurrentStep(currentStep + 1)
+      setCurrentStep(prev => prev + 1)
     } else {
-      // Finished all steps - mark page as visited
       closeTutorial()
     }
   }, [currentStep, tutorialSteps.length])
@@ -75,41 +68,32 @@ export const usePageTutorial = (pageName, tutorialSteps = []) => {
   // Move to previous step
   const prevStep = useCallback(() => {
     if (currentStep > 0) {
-      setCurrentStep(currentStep - 1)
+      setCurrentStep(prev => prev - 1)
     }
   }, [currentStep])
 
-  // Close tutorial and mark page as visited
+  // Mark onboarding complete in backend
+  const completeOnboarding = async () => {
+    localStorage.setItem(LOCAL_OVERRIDE_KEY, 'true')
+    try {
+      await supabase.auth.updateUser({
+        data: { onboarding_completed: true }
+      })
+    } catch (err) {
+      console.error("Failed to save onboarding completion:", err)
+    }
+  }
+
+  // Close tutorial
   const closeTutorial = useCallback(() => {
     setShowTutorial(false)
-    const updated = {
-      ...readTutorialPages(),
-      [pageName]: true,
-      [pageVersionKey]: tutorialSteps.length,
-    }
-    setVisitedPages(updated)
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
-    window.dispatchEvent(new Event('ricevision:tutorial-pages-updated'))
-  }, [pageName, pageVersionKey, tutorialSteps.length])
+    completeOnboarding()
+  }, [])
 
-  // Skip entire tutorial
+  // Skip tutorial entirely
   const skipTutorial = useCallback(() => {
-    closeTutorial()
-  }, [closeTutorial])
-
-  // Reset tutorial for testing
-  const resetTutorial = useCallback(() => {
-    localStorage.removeItem(STORAGE_KEY)
-    setVisitedPages({})
-    setIsHeaderComplete(false)
-    setCurrentStep(0)
-    setShowTutorial(pageName === 'Header')
-    window.dispatchEvent(new Event('ricevision:tutorial-pages-updated'))
-  }, [pageName])
-
-  const forceShowTutorial = useCallback(() => {
-    setCurrentStep(0)
-    setShowTutorial(tutorialSteps.length > 0)
+    setShowTutorial(false)
+    completeOnboarding()
   }, [])
 
   return {
@@ -121,9 +105,5 @@ export const usePageTutorial = (pageName, tutorialSteps = []) => {
     prevStep,
     closeTutorial,
     skipTutorial,
-    resetTutorial,
-    forceShowTutorial,
-    isHeaderComplete,
-    visitedPages,
   }
 }

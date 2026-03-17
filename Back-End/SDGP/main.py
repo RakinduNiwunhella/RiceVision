@@ -45,3 +45,7 @@ app.include_router(chat_router, dependencies=[Depends(get_current_user)])
 app.include_router(signin_router)
 app.include_router(signup_router)
 
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
+
