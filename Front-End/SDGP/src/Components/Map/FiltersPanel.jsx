@@ -172,28 +172,6 @@ export default function FiltersPanel({ filters, setFilters }) {
             </label>
           ))}
         </div>
-
-        <div className="mt-4 pt-4 border-t border-white/10">
-          <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/40 mb-3">
-            Legend
-          </p>
-          <div className="space-y-2">
-            {[
-              { color: "#22c55e", label: "Normal" },
-              { color: "#eab308", label: "Mild Stress" },
-              { color: "#ef4444", label: "Severe Stress" },
-              { color: "#9ca3af", label: "Not Applicable" },
-            ].map(({ color, label }) => (
-              <div key={label} className="flex items-center gap-2">
-                <span
-                  className="w-3 h-3 rounded-full flex-shrink-0"
-                  style={{ backgroundColor: color }}
-                />
-                <span className="text-[11px] text-white/50">{label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
     </div>
   );
