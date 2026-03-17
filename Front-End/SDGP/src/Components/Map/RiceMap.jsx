@@ -456,7 +456,7 @@ export default function RiceMap({ filters, layers, flyTo }) {
       maxBounds={!selectedDistrict ? SRI_LANKA_BOUNDS : undefined}
       maxBoundsViscosity={1.0}
       preferCanvas={true}
-      className="h-full w-full rounded-3xl"
+      className="h-[100dvh] w-screen md:h-full md:w-full rounded-none md:rounded-3xl"
     >
       <FlyToController flyTo={flyTo} />
       <AlertMarker flyTo={flyTo} />
