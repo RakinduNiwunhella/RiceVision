@@ -38,7 +38,7 @@ const StatWidget = ({ title, value, subtitle, icon }) => (
     <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none">
       <span className="material-symbols-outlined text-4xl sm:text-6xl">{icon}</span>
     </div>
-    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-2 sm:mb-3">{title}</p>
+    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/85 mb-2 sm:mb-3">{title}</p>
     <p className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tighter drop-shadow-2xl">{value}</p>
     {subtitle && <p className="text-[10px] font-bold text-emerald-400/60 mt-2 sm:mt-3 uppercase tracking-widest">{subtitle}</p>}
   </div>
@@ -53,9 +53,9 @@ const ProgressWidget = ({ label, value, color }) => {
 
   return (
     <div className="mb-5 last:mb-0">
-      <div className="flex justify-between text-[10px] font-black text-white/40 uppercase tracking-widest mb-2">
+      <div className="flex justify-between text-[10px] font-black text-white/85 uppercase tracking-widest mb-2">
         <span>{label}</span>
-        <span className="text-white/80">{value}%</span>
+        <span className="text-white/90">{value}%</span>
       </div>
       <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden border border-white/5">
         <div
@@ -223,14 +223,14 @@ const MyDashboard = () => {
           <div>
             <h1 className="text-xl sm:text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
             </h1>
-            <p className="text-white/40 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em]">
+            <p className="text-white/85 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em]">
               {t('welcomeSubtitle')}
             </p>
           </div>
 
           <div ref={syncBadgeRef} className="glass px-6 py-3 rounded-2xl border-white/10 flex items-center gap-3">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-white/60">{t('systemSynced')}</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-white/90">{t('systemSynced')}</span>
           </div>
         </div>
 
@@ -239,7 +239,7 @@ const MyDashboard = () => {
 
           {/* Field Health Distribution */}
           <div ref={healthCardRef} className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col items-center">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-8 self-start flex items-center gap-2">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/85 mb-8 self-start flex items-center gap-2">
               <span className="material-symbols-outlined text-emerald-400 text-sm">radiology</span>
               {t('cropHealthDist')}
             </p>
@@ -271,21 +271,21 @@ const MyDashboard = () => {
                   </PieChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="absolute inset-0 flex items-center justify-center text-white/20 animate-pulse text-xs font-black uppercase tracking-widest">
+                <div className="absolute inset-0 flex items-center justify-center text-white/85 animate-pulse text-xs font-black uppercase tracking-widest">
                   {t('analysing')}
                 </div>
               )}
               {/* Center stats */}
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                 <span className="text-3xl font-black text-white">{healthSummary?.normal_pct.toFixed(0)}%</span>
-                <span className="text-[8px] font-black text-white/30 uppercase tracking-[0.2em]">{t('optimal')}</span>
+                <span className="text-[8px] font-black text-white/85 uppercase tracking-[0.2em]">{t('optimal')}</span>
               </div>
             </div>
             <div className="grid grid-cols-3 gap-4 w-full mt-8 pt-6 border-t border-white/5">
               {healthPieData.map((d, i) => (
                 <div key={i} className="flex flex-col items-center text-center">
                   <div className="w-1.5 h-1.5 rounded-full mb-2" style={{ background: pieColors[i] }} />
-                  <span className="text-[10px] font-black text-white/60 uppercase tracking-tighter mb-1 line-clamp-1">{d.name}</span>
+                  <span className="text-[10px] font-black text-white/85 uppercase tracking-tighter mb-1 line-clamp-1">{d.name}</span>
                   <span className="text-xs font-bold text-white">{d.value.toFixed(1)}%</span>
                 </div>
               ))}
@@ -294,7 +294,7 @@ const MyDashboard = () => {
 
           {/* Yield Forecast */}
           <div ref={yieldCardRef} className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-6 flex items-center gap-2">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/85 mb-6 flex items-center gap-2">
               <span className="material-symbols-outlined text-cyan-400 text-sm">trending_up</span>
               {t('outputProjection')}
             </p>
@@ -309,15 +309,15 @@ const MyDashboard = () => {
             </div>
 
             <div className="mt-8 pt-8 border-t border-white/10">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/20 mb-4 ml-1">{t('highPerformance')}</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/85 mb-4 ml-1">{t('highPerformance')}</p>
               <div className="space-y-4">
                 {bestYieldDistricts.map((d, i) => (
                   <div key={i} className="flex justify-between items-center group/item hover:translate-x-1 transition-transform">
                     <div className="flex items-center gap-3">
-                      <span className="text-[10px] font-black text-white/20 w-4">{i + 1}</span>
+                      <span className="text-[10px] font-black text-white/85 w-4">{i + 1}</span>
                       <span className="text-xs font-black text-white uppercase tracking-tight group-hover/item:text-cyan-400 transition-colors">{d.District}</span>
                     </div>
-                    <span className="text-xs font-black text-white/80 tabular-nums">{formatMT(d.total_yield_kg_ha)} <span className="text-[10px] text-white/20">t</span></span>
+                    <span className="text-xs font-black text-white/90 tabular-nums">{formatMT(d.total_yield_kg_ha)} <span className="text-[10px] text-white/85">t</span></span>
                   </div>
                 ))}
               </div>
@@ -327,7 +327,7 @@ const MyDashboard = () => {
           {/* Expected Shortfall */}
           <div ref={supplyCardRef} className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col justify-between md:col-span-2 lg:col-span-1">
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-6 flex items-center gap-2">
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/85 mb-6 flex items-center gap-2">
                 <span className="material-symbols-outlined text-amber-500 text-sm">error</span>
                 Supply Stability
               </p>
@@ -338,7 +338,7 @@ const MyDashboard = () => {
             </div>
 
             <div className="space-y-4 mt-8">
-              <div className="flex justify-between items-end text-[10px] font-black uppercase tracking-widest text-white/30">
+              <div className="flex justify-between items-end text-[10px] font-black uppercase tracking-widest text-white/85">
                 <span>{t('nationalDemand')}</span>
                 <span className="text-white">92.7%</span>
               </div>
@@ -348,7 +348,7 @@ const MyDashboard = () => {
                   style={{ width: "92.7%", transition: "width 2s cubic-bezier(0.34, 1.56, 0.64, 1)" }}
                 />
               </div>
-              <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.2em] italic text-center">{t('referenceThreshold')}</p>
+              <p className="text-[10px] font-bold text-white/85 uppercase tracking-[0.2em] italic text-center">{t('referenceThreshold')}</p>
             </div>
           </div>
         </div>
@@ -356,13 +356,13 @@ const MyDashboard = () => {
         {/* ── Active Threats Section (Wider) ── */}
         <div ref={threatsCardRef} className="glass p-1 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl overflow-hidden">
           <div className="p-4 sm:p-8 border-b border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-            <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/40 flex items-center gap-3">
+            <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/85 flex items-center gap-3">
               <span className="material-symbols-outlined text-rose-500">sensors</span>
               {t('diseaseOutbreak')}
             </h2>
             <div className="flex items-center gap-4">
-              <span className="text-[10px] font-black text-white/20 uppercase tracking-widest animate-pulse">{t('checkingFields')}</span>
-              <div className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase text-white/60">
+              <span className="text-[10px] font-black text-white/85 uppercase tracking-widest animate-pulse">{t('checkingFields')}</span>
+              <div className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase text-white/85">
                 {outbreaks.length} {t('alertsDetected')}
               </div>
             </div>
@@ -380,7 +380,7 @@ const MyDashboard = () => {
                   </div>
                   <div>
                     <p className="font-black text-white text-sm uppercase tracking-tight">{o.title} — {o.district}</p>
-                    <div className="flex items-center gap-3 mt-1 text-[10px] font-black text-white/30 uppercase tracking-widest">
+                    <div className="flex items-center gap-3 mt-1 text-[10px] font-black text-white/85 uppercase tracking-widest">
                       <span>{o.event_date}</span>
                       <div className="w-1 h-1 rounded-full bg-white/10" />
                       <span className="text-emerald-400 group-hover:animate-pulse">{t('active')}</span>
@@ -390,7 +390,7 @@ const MyDashboard = () => {
                 <button
                   ref={i === 0 ? threatDetailsBtnRef : undefined}
                   onClick={() => navigate("/alerts")}
-                  className="text-[10px] font-black uppercase tracking-[0.2em] rounded-xl px-6 py-2.5 border border-white/10 text-white/40 hover:text-white hover:border-white/40 hover:bg-white/5 transition-all active:scale-95"
+                  className="text-[10px] font-black uppercase tracking-[0.2em] rounded-xl px-6 py-2.5 border border-white/10 text-white/85 hover:text-white hover:border-white/40 hover:bg-white/5 transition-all active:scale-95"
                 >
                   {t('viewDetails')}
                 </button>
@@ -403,7 +403,7 @@ const MyDashboard = () => {
               <button
                 ref={outbreaksToggleBtnRef}
                 onClick={() => setShowAllOutbreaks(!showAllOutbreaks)}
-                className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 hover:text-white transition-colors flex items-center gap-2"
+                className="text-[10px] font-black uppercase tracking-[0.4em] text-white/85 hover:text-white transition-colors flex items-center gap-2"
               >
                 {showAllOutbreaks ? t('showLess') : `${t('showAll')} (${outbreaks.length})`}
                 <span className="material-symbols-outlined text-sm">{showAllOutbreaks ? 'keyboard_double_arrow_up' : 'keyboard_double_arrow_down'}</span>
@@ -417,7 +417,7 @@ const MyDashboard = () => {
 
           {/* Stage Distribution */}
           <div ref={stageChartRef} className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-2 flex items-center gap-2">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/85 mb-2 flex items-center gap-2">
               <span className="material-symbols-outlined text-purple-400 text-sm">bar_chart</span>
               {t('growthAnalysis')}
             </p>
@@ -429,7 +429,7 @@ const MyDashboard = () => {
                 <>
                   {/* Total pill */}
                   <div className="flex items-center justify-between mb-5 p-4 rounded-2xl bg-white/5 border border-white/5">
-                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/30">{t('totalFieldsTracked')}</p>
+                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/85">{t('totalFieldsTracked')}</p>
                     <p className="text-2xl font-black text-white tracking-tighter">{total.toLocaleString()}</p>
                   </div>
 
@@ -482,7 +482,7 @@ const MyDashboard = () => {
                       return (
                         <div key={i} className="flex items-center gap-3 group">
                           <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: color, boxShadow: `0 0 6px ${color}` }} />
-                          <span className="text-[10px] font-black text-white/50 uppercase tracking-tight flex-1 group-hover:text-white/80 transition-colors truncate">{d.stage_name}</span>
+                          <span className="text-[10px] font-black text-white/85 uppercase tracking-tight flex-1 group-hover:text-white/90 transition-colors truncate">{d.stage_name}</span>
                           <div className="w-24 h-1.5 bg-white/5 rounded-full overflow-hidden">
                             <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${pct}%`, background: color }} />
                           </div>
@@ -494,7 +494,7 @@ const MyDashboard = () => {
                 </>
               );
             })() : (
-              <div className="flex-1 min-h-75 flex items-center justify-center text-white/20 animate-pulse text-xs font-black uppercase tracking-widest">
+              <div className="flex-1 min-h-75 flex items-center justify-center text-white/85 animate-pulse text-xs font-black uppercase tracking-widest">
                 Loading Stage Data...
               </div>
             )}
@@ -503,7 +503,7 @@ const MyDashboard = () => {
           {/* Regional Health Overview */}
          {/* Regional Pest Overview */}
 <div ref={districtTableRef} className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
-  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-2 flex items-center gap-2">
+  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/85 mb-2 flex items-center gap-2">
     <Bug className="text-rose-400 text-sm" />
     District Overview
   </p>
@@ -538,7 +538,7 @@ const MyDashboard = () => {
           {/* LEFT */}
           <div className="flex items-center gap-3">
             <Bug size={14} className="text-rose-400" />
-            <span className="text-xs font-black text-white/70 uppercase tracking-tight group-hover:text-white transition-colors">
+            <span className="text-xs font-black text-white/85 uppercase tracking-tight group-hover:text-white transition-colors">
               {d.district}
             </span>
           </div>
@@ -568,7 +568,7 @@ const MyDashboard = () => {
     <button
       ref={districtToggleBtnRef}
       onClick={() => setShowAllDistricts(!showAllDistricts)}
-      className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 hover:text-white transition-colors"
+      className="text-[10px] font-black uppercase tracking-[0.4em] text-white/85 hover:text-white transition-colors"
     >
       {showAllDistricts ? "Show Less" : `Show All (${districtHealth.length} Items)`}
     </button>
