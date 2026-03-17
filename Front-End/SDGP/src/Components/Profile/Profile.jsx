@@ -86,7 +86,7 @@ export default function Profile() {
             {activeTab === "identity" ? t('identityProfile') : t('myPaddyField')}
           </h1>
 
-          <p className="text-white/60 text-sm font-medium max-w-xl leading-relaxed">
+          <p className="text-white/85 text-sm font-medium max-w-xl leading-relaxed">
             {activeTab === "identity"
               ? t('profileDesc')
               : t('paddyFieldDesc')}
@@ -102,7 +102,7 @@ export default function Profile() {
               className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl text-[10px] sm:text-xs font-black uppercase tracking-[0.15em] sm:tracking-[0.25em] transition-all whitespace-nowrap ${
                 activeTab === tab.id
                   ? "bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 shadow-lg shadow-emerald-500/10"
-                  : "bg-white/5 border border-white/10 text-white/40 hover:bg-white/10 hover:text-white/70"
+                  : "bg-white/5 border border-white/10 text-white/85 hover:bg-white/10 hover:text-white/90"
               }`}
             >
               <span className="material-symbols-outlined text-sm">{tab.icon}</span>

@@ -51,7 +51,7 @@ export default function FiltersPanel({ filters, setFilters }) {
   return (
     <div className="w-full md:w-80 lg:w-80 glass p-4 sm:p-6 overflow-y-auto max-h-[50vh] sm:max-h-[60vh] lg:max-h-[calc(100vh-6rem)] shadow-xl">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-sm font-bold uppercase tracking-widest text-white/50">
+        <h2 className="text-sm font-bold uppercase tracking-widest text-white/85">
           Filters
         </h2>
 
@@ -72,7 +72,7 @@ export default function FiltersPanel({ filters, setFilters }) {
 
       {/* District (Single Selection) */}
       <div className="mb-8">
-        <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/40 mb-3">
+        <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/85 mb-3">
           District Selection
         </p>
         <div className="space-y-1 text-sm max-h-60 overflow-y-auto pr-2 custom-scrollbar">
@@ -114,7 +114,7 @@ export default function FiltersPanel({ filters, setFilters }) {
       {/* Health Status */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/40">
+          <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/85">
             Crop Condition
           </p>
           {/* clear all by selecting 'All' or using button */}
@@ -174,7 +174,7 @@ export default function FiltersPanel({ filters, setFilters }) {
         </div>
 
         <div className="mt-4 pt-4 border-t border-white/10">
-          <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/40 mb-3">
+          <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/85 mb-3">
             Legend
           </p>
           <div className="space-y-2">
@@ -189,7 +189,7 @@ export default function FiltersPanel({ filters, setFilters }) {
                   className="w-3 h-3 rounded-full flex-shrink-0"
                   style={{ backgroundColor: color }}
                 />
-                <span className="text-[11px] text-white/50">{label}</span>
+                <span className="text-[11px] text-white/85">{label}</span>
               </div>
             ))}
           </div>

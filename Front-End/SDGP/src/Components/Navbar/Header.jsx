@@ -364,7 +364,7 @@ const Header = () => {
                       to={item.path}
                       className={`flex items-center gap-1 lg:gap-1.5 px-2 lg:px-3 py-1.5 rounded-lg text-[10px] lg:text-[11px] font-semibold tracking-wide whitespace-nowrap transition-all duration-300 ${isActive
                           ? "bg-white/15 text-white shadow-xl shadow-black/5 border border-white/20"
-                          : "text-white/50 hover:text-white hover:bg-white/10"
+                          : "text-white/85 hover:text-white hover:bg-white/10"
                         }`}
                     >
                       <span className="material-symbols-outlined text-[15px] lg:text-[16px]">
@@ -382,7 +382,7 @@ const Header = () => {
               {/* Search Bar - hidden on small screens */}
               <div className="relative hidden lg:block" ref={searchRef}>
                 <span
-                  className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-white/40 transition text-[18px] pointer-events-none"
+                  className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-white/85 transition text-[18px] pointer-events-none"
                   style={{
                     color:
                       showResults && filteredResults.length
@@ -412,7 +412,7 @@ const Header = () => {
                   }}
                   onKeyDown={handleKeyDown}
                   placeholder={t("searchPlaceholder")}
-                  className="w-24 xl:w-36 bg-white/5 border border-white/10 rounded-xl py-1 pl-9 pr-3 text-xs text-white text-center placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:bg-white/10 focus:border-white/20 transition-all shadow-inner"
+                  className="w-24 xl:w-36 bg-white/5 border border-white/10 rounded-xl py-1 pl-9 pr-3 text-xs text-white text-center placeholder:text-white/85 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:bg-white/10 focus:border-white/20 transition-all shadow-inner"
                   autoComplete="off"
                 />
                 {showResults &&
@@ -443,7 +443,7 @@ const Header = () => {
                               <p className="text-xs font-semibold text-white">
                                 {item.label}
                               </p>
-                              <p className="text-[10px] text-white/40">
+                              <p className="text-[10px] text-white/85">
                                 {item.description}
                               </p>
                             </div>
@@ -451,7 +451,7 @@ const Header = () => {
                         ))
                       ) : (
                         <div className="px-4 py-3">
-                          <p className="text-xs text-white/40">
+                          <p className="text-xs text-white/85">
                             No results for &ldquo;{searchQuery}&rdquo;
                           </p>
                         </div>
@@ -467,7 +467,7 @@ const Header = () => {
                 <div className="relative" ref={langBtnRef}>
                   <button
                     ref={languageBtnRef}
-                    className="h-8 px-2 rounded-lg flex items-center gap-1 text-white/50 hover:text-white hover:bg-white/10 transition"
+                    className="h-8 px-2 rounded-lg flex items-center gap-1 text-white/85 hover:text-white hover:bg-white/10 transition"
                     title="Language"
                     onClick={() => {
                       if (langBtnRef.current) {
@@ -508,7 +508,7 @@ const Header = () => {
                             }}
                             className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition hover:bg-white/10 ${language === lang.code
                                 ? "bg-emerald-500/20 text-white"
-                                : "text-white/60"
+                                : "text-white/85"
                               }`}
                           >
                             <span className="text-xs font-semibold">
@@ -523,7 +523,7 @@ const Header = () => {
                 </div>
                 <button
                   ref={themeBtnRef}
-                  className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition"
+                  className="w-8 h-8 rounded-lg flex items-center justify-center text-white/85 hover:text-white hover:bg-white/10 transition"
                   title="Toggle Dark Mode"
                   onClick={toggleTheme}
                 >
@@ -540,7 +540,7 @@ const Header = () => {
               <Link
                 ref={profileBtnRef}
                 to="/profile"
-                className="hidden sm:flex w-8 h-8 rounded-lg items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition"
+                className="hidden sm:flex w-8 h-8 rounded-lg items-center justify-center text-white/85 hover:text-white hover:bg-white/10 transition"
                 title="View Profile"
               >
                 <span className="material-symbols-outlined text-[20px]">
@@ -550,7 +550,7 @@ const Header = () => {
 
               {/* Mobile hamburger button */}
               <button
-                className="md:hidden w-9 h-9 rounded-lg flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition"
+                className="md:hidden w-9 h-9 rounded-lg flex items-center justify-center text-white/85 hover:text-white hover:bg-white/10 transition"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
                 <span className="material-symbols-outlined text-[22px]">
@@ -572,7 +572,7 @@ const Header = () => {
           <div className="absolute top-20 left-3 right-3 glass rounded-2xl border border-white/10 shadow-2xl p-4 space-y-2 max-h-[calc(100vh-6rem)] overflow-y-auto">
             {/* Search bar for mobile */}
             <div className="relative mb-3">
-              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-white/40 text-[18px] pointer-events-none">
+              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-white/85 text-[18px] pointer-events-none">
                 search
               </span>
               <input
@@ -583,7 +583,7 @@ const Header = () => {
                   setShowResults(true);
                 }}
                 placeholder={t("searchPlaceholder")}
-                className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+                className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-white/85 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
                 autoComplete="off"
               />
             </div>
@@ -622,7 +622,7 @@ const Header = () => {
                   onClick={() => setMobileMenuOpen(false)}
                   className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${isActive
                       ? "bg-white/15 text-white border border-white/20"
-                      : "text-white/60 hover:text-white hover:bg-white/10"
+                      : "text-white/85 hover:text-white hover:bg-white/10"
                     }`}
                 >
                   <span className="material-symbols-outlined text-[18px]">
@@ -642,7 +642,7 @@ const Header = () => {
                     onClick={() => setLanguage(lang.code)}
                     className={`h-9 px-3 rounded-lg flex items-center gap-1.5 transition text-sm font-semibold ${language === lang.code
                         ? "bg-emerald-500/20 text-white border border-white/20"
-                        : "text-white/50 hover:text-white hover:bg-white/10"
+                        : "text-white/85 hover:text-white hover:bg-white/10"
                       }`}
                   >
                     <span className="material-symbols-outlined text-[18px]">
@@ -655,7 +655,7 @@ const Header = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <button
-                    className="w-9 h-9 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition"
+                    className="w-9 h-9 rounded-lg flex items-center justify-center text-white/85 hover:text-white hover:bg-white/10 transition"
                     onClick={toggleTheme}
                   >
                     <span className="material-symbols-outlined text-[18px]">
@@ -667,7 +667,7 @@ const Header = () => {
                 <Link
                   to="/profile"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition text-sm font-semibold"
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-white/85 hover:text-white hover:bg-white/10 transition text-sm font-semibold"
                 >
                   <span className="material-symbols-outlined text-[18px]">
                     person
@@ -776,7 +776,7 @@ function NotificationPanelButton() {
     <div ref={wrapperRef} className="relative overflow-visible">
       <button
         ref={buttonRef}
-        className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition relative"
+        className="w-8 h-8 rounded-lg flex items-center justify-center text-white/85 hover:text-white hover:bg-white/10 transition relative"
         title="Notifications"
         onClick={() => setShow((s) => !s)}
       >

@@ -86,7 +86,7 @@ const Help = () => {
   };
 
   const inputClass =
-    "w-full rounded-xl border border-white/10 bg-white/5 text-white px-4 py-2.5 focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all duration-300 placeholder:text-white/20 font-medium";
+    "w-full rounded-xl border border-white/10 bg-white/5 text-white px-4 py-2.5 focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all duration-300 placeholder:text-white/85 font-medium";
 
   return (
     <div className="min-h-full p-4 sm:p-6 lg:p-10 text-white font-sans">
@@ -99,7 +99,7 @@ const Help = () => {
               <QuestionMarkCircleIcon className="w-6 h-6 sm:w-8 sm:h-8 md:w-12 md:h-12 text-emerald-400" />
               {t('helpSupport')}
             </h1>
-            <p className="text-white/40 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em] max-w-2xl">
+            <p className="text-white/85 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em] max-w-2xl">
               {/* Optional subtitle text */}
             </p>
           </div>
@@ -142,7 +142,7 @@ const Help = () => {
                   {card.title}
                 </h3>
               </div>
-              <p className="text-white/40 text-sm leading-relaxed mb-6 font-medium">
+              <p className="text-white/85 text-sm leading-relaxed mb-6 font-medium">
                 {card.desc}
               </p>
               <button className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 glass rounded-lg border-white/10 hover:bg-white/5 transition-colors ${idx === 0 ? 'text-emerald-400' : 'text-cyan-400'}`}>
@@ -160,17 +160,17 @@ const Help = () => {
             <div className="glass p-4 sm:p-6 md:p-8 lg:p-10 rounded-xl sm:rounded-2xl md:rounded-[2.5rem] border border-white/10 shadow-2xl space-y-6 sm:space-y-8">
               <div className="flex items-center gap-3 border-b border-white/10 pb-6">
                 <ExclamationTriangleIcon className="w-6 h-6 text-amber-400" />
-                <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/40">{t('feedbackLoop')}</h2>
+                <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/85">{t('feedbackLoop')}</h2>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2 ml-1">{t('fullOperatorName')}</label>
+                    <label className="block text-[10px] font-black uppercase tracking-widest text-white/85 mb-2 ml-1">{t('fullOperatorName')}</label>
                     <input name="full_name" value={form.full_name} onChange={handleChange} className={inputClass} placeholder="John Doe" />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2 ml-1">{t('assignedPosition')}</label>
+                    <label className="block text-[10px] font-black uppercase tracking-widest text-white/85 mb-2 ml-1">{t('assignedPosition')}</label>
                     <input name="position" value={form.position} onChange={handleChange} className={inputClass} placeholder="Field Supervisor" />
                   </div>
                 </div>
@@ -178,16 +178,16 @@ const Help = () => {
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2 ml-1">{t('province')}</label>
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-white/85 mb-2 ml-1">{t('province')}</label>
                       <input name="province" value={form.province} onChange={handleChange} className={inputClass} />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2 ml-1">{t('district')}</label>
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-white/85 mb-2 ml-1">{t('district')}</label>
                       <input name="district" value={form.district} onChange={handleChange} className={inputClass} />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2 ml-1">{t('anomalyType')}</label>
+                    <label className="block text-[10px] font-black uppercase tracking-widest text-white/85 mb-2 ml-1">{t('anomalyType')}</label>
                     <select
                       name="complaint_type"
                       value={form.complaint_type}
@@ -205,7 +205,7 @@ const Help = () => {
               </div>
 
               <div className="space-y-4">
-                <label className="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2 ml-1">{t('detailedMessage')}</label>
+                <label className="block text-[10px] font-black uppercase tracking-widest text-white/85 mb-2 ml-1">{t('detailedMessage')}</label>
                 <textarea
                   name="message"
                   value={form.message}
@@ -229,7 +229,7 @@ const Help = () => {
           {/* Dynamic Knowledge Base (FAQs) */}
           <div className="lg:col-span-2 space-y-6">
             <div className="glass p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl md:rounded-[2.5rem] border border-white/10 shadow-xl h-fit">
-                <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/40 mb-8 flex items-center gap-2">
+                <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/85 mb-8 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
                 {t('quickHelp')}
               </h2>
@@ -237,7 +237,7 @@ const Help = () => {
               {faqLoading && (
                 <div className="flex items-center gap-3 py-10 justify-center">
                   <div className="w-4 h-4 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin" />
-                  <span className="text-xs font-black uppercase text-white/20">{t('decryptingFaqs')}</span>
+                  <span className="text-xs font-black uppercase text-white/85">{t('decryptingFaqs')}</span>
                 </div>
               )}
 
@@ -250,17 +250,17 @@ const Help = () => {
                   >
                     <button
                       onClick={() => setOpenFaq(openFaq === faq.id ? null : faq.id)}
-                      className="w-full flex justify-between items-center px-5 py-4 text-left font-bold text-xs md:text-sm text-white/80 group"
+                      className="w-full flex justify-between items-center px-5 py-4 text-left font-bold text-xs md:text-sm text-white/90 group"
                     >
                       <span className="group-hover:text-white transition-colors">{faq.question}</span>
                       <ChevronDownIcon
-                        className={`w-4 h-4 text-white/30 transition-transform duration-500 ${openFaq === faq.id ? "rotate-180 text-emerald-400" : ""
+                        className={`w-4 h-4 text-white/85 transition-transform duration-500 ${openFaq === faq.id ? "rotate-180 text-emerald-400" : ""
                           }`}
                       />
                     </button>
 
                     {openFaq === faq.id && (
-                      <div className="px-5 pb-5 text-xs text-white/40 leading-relaxed font-medium animate-in fade-in slide-in-from-top-2 duration-300">
+                      <div className="px-5 pb-5 text-xs text-white/85 leading-relaxed font-medium animate-in fade-in slide-in-from-top-2 duration-300">
                         {faq.answer}
                       </div>
                     )}
@@ -271,7 +271,7 @@ const Help = () => {
 
             {/* Support Tag */}
             <div className="glass p-6 rounded-3xl border border-white/10 text-center">
-              <p className="text-[10px] font-black uppercase text-white/20 tracking-tighter">System Version Alpha-1.0.4 • RiceVision Core</p>
+              <p className="text-[10px] font-black uppercase text-white/85 tracking-tighter">System Version Alpha-1.0.4 • RiceVision Core</p>
             </div>
           </div>
         </div>

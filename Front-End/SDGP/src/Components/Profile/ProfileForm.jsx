@@ -142,12 +142,12 @@ export default function ProfileForm() {
     return (
       <div className="flex flex-col items-center gap-4 py-20">
         <div className="w-12 h-12 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
-        <p className="text-white/40 font-black uppercase tracking-widest text-xs animate-pulse">Update Profile</p>
+        <p className="text-white/85 font-black uppercase tracking-widest text-xs animate-pulse">Update Profile</p>
       </div>
     );
   }
 
-  const inputClass = "w-full px-5 py-4 rounded-2xl border border-white/10 bg-white/5 text-white placeholder:text-white/30 focus:outline-none focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500/60 hover:border-white/25 hover:bg-white/[0.08] transition-all duration-200 font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed cursor-text";
+  const inputClass = "w-full px-5 py-4 rounded-2xl border border-white/10 bg-white/5 text-white placeholder:text-white/85 focus:outline-none focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500/60 hover:border-white/25 hover:bg-white/[0.08] transition-all duration-200 font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed cursor-text";
 
   return (
     <div className="font-sans relative">
@@ -218,7 +218,7 @@ export default function ProfileForm() {
           <div className="space-y-8">
             <div className="flex items-center gap-4">
               <span className="h-px flex-1 bg-white/10"></span>
-              <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-white/60">{t('personalId')}</h3>
+              <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-white/85">{t('personalId')}</h3>
               <span className="h-px flex-1 bg-white/10"></span>
             </div>
 
@@ -230,7 +230,7 @@ export default function ProfileForm() {
                 { label: t('tacticalPhone'),      key: "phone",     type: "text", placeholder: "+94 77 XXX XXXX" },
               ].map((field) => (
                 <div key={field.key} className="group/field space-y-2">
-                  <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/50 ml-2 transition-colors duration-200 group-hover/field:text-emerald-400/70">
+                  <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/85 ml-2 transition-colors duration-200 group-hover/field:text-emerald-400/70">
                     {field.label}
                   </label>
                   <input
@@ -249,13 +249,13 @@ export default function ProfileForm() {
           <div className="space-y-8">
             <div className="flex items-center gap-4">
               <span className="h-px flex-1 bg-white/10"></span>
-              <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-white/60">{t('sectorReg')}</h3>
+              <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-white/85">{t('sectorReg')}</h3>
               <span className="h-px flex-1 bg-white/10"></span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="group/field space-y-2">
-                <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/50 ml-2 transition-colors duration-200 group-hover/field:text-emerald-400/70">
+                <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/85 ml-2 transition-colors duration-200 group-hover/field:text-emerald-400/70">
                   {t('emailEndpoint')}
                 </label>
                 <input
@@ -266,7 +266,7 @@ export default function ProfileForm() {
                 />
               </div>
               <div className="group/field space-y-2">
-                <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/50 ml-2 transition-colors duration-200 group-hover/field:text-emerald-400/70">
+                <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/85 ml-2 transition-colors duration-200 group-hover/field:text-emerald-400/70">
                   {t('districtSector')}
                 </label>
                 <input
@@ -278,7 +278,7 @@ export default function ProfileForm() {
                 />
               </div>
               <div className="group/field md:col-span-2 space-y-2">
-                <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/50 ml-2 transition-colors duration-200 group-hover/field:text-emerald-400/70">
+                <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/85 ml-2 transition-colors duration-200 group-hover/field:text-emerald-400/70">
                   {t('physicalAddress')}
                 </label>
                 <textarea
