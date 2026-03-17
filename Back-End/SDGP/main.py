@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from .auth import get_current_user
@@ -16,14 +18,23 @@ from .routes.signup import router as signup_router
 
 app = FastAPI()
 
+
+def _get_cors_origins() -> list[str]:
+    configured = os.getenv("CORS_ORIGINS", "")
+    if configured.strip():
+        return [origin.strip().rstrip("/") for origin in configured.split(",") if origin.strip()]
+
+    return [
+        "http://localhost:5173",
+        "https://app.ricevisionlanka.com",
+        "https://ricevision-cakt.onrender.com",
+    ]
+
 # Allow frontend to call backend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",           # local React dev
-        "https://ricevision-cakt.onrender.com",  # deployed frontend (change to your real frontend URL)
-                                     # temporary: allow all during testing
-    ],
+    allow_origins=_get_cors_origins(),
+    allow_origin_regex=r"^https://([a-z0-9-]+\.)?ricevisionlanka\.com$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
