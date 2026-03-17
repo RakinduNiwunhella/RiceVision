@@ -8,7 +8,7 @@
 
 /* ── Glass Surface (Base) ── */
 .glass {
-    background: rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(40px) saturate(200%);
     -webkit-backdrop-filter: blur(40px) saturate(200%);
     border: 1px solid rgba(255, 255, 255, 0.35);
@@ -25,13 +25,23 @@
 }
 
 .dark .glass {
-    background: rgba(10, 18, 35, 0.45);
+    background: rgba(10, 18, 35, 0.52);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-top: 1px solid rgba(255, 255, 255, 0.2);
     box-shadow:
         0 8px 32px rgba(0, 0, 0, 0.6),
         inset 0 1px 0 rgba(255, 255, 255, 0.07),
         inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+}
+
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+    .glass {
+        background: rgba(18, 28, 20, 0.72);
+    }
+
+    .dark .glass {
+        background: rgba(10, 18, 35, 0.75);
+    }
 }
 
 /* ── Iridescent shimmer overlay (subtle) ── */
@@ -87,7 +97,7 @@
 
 /* ── Backward compat aliases (explicit CSS, no @apply for custom classes) ── */
 .glass-card-inner {
-    background: rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(40px) saturate(200%);
     -webkit-backdrop-filter: blur(40px) saturate(200%);
     border: 1px solid rgba(255, 255, 255, 0.35);
