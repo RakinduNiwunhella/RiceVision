@@ -52,7 +52,7 @@ const Notifications = ({ onRead, style }) => {
       </div>
 
       {notifications.length === 0 ? (
-        <p className="text-white/60 text-sm">No notifications</p>
+        <p className="text-white/85 text-sm">No notifications</p>
       ) : (
         notifications.map((note) => (
           <div
@@ -73,7 +73,7 @@ const Notifications = ({ onRead, style }) => {
                 {note.message}
               </p>
 
-              <span className="text-xs text-white/70">
+              <span className="text-xs text-white/85">
                 {new Date(note.created_at).toLocaleString()}
               </span>
             </div>

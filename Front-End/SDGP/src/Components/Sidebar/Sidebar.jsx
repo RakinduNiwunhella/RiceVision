@@ -1,7 +1,7 @@
 import React, { useRef, useMemo } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useLanguage } from '../../context/LanguageContext'
-import TutorialTooltip from '../../components/TutorialTooltip'
+import TutorialTooltip from '../../Components/TutorialTooltip'
 import { usePageTutorial } from '../../hooks/usePageTutorial'
 
 const Sidebar = () => {

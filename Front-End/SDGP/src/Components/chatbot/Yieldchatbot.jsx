@@ -377,7 +377,7 @@ const styles = {
         lineHeight: 1.3,
     },
     headerSub: {
-        color: "rgba(255,255,255,0.35)",
+        color: "rgba(255,255,255,0.85)",
         fontSize: 10.5,
         fontWeight: 600,
         textTransform: "uppercase",
@@ -387,7 +387,7 @@ const styles = {
     closeBtn: {
         background: "rgba(255,255,255,0.07)",
         border: "1px solid rgba(255,255,255,0.1)",
-        color: "rgba(255,255,255,0.6)",
+        color: "rgba(255,255,255,0.85)",
         width: 28,
         height: 28,
         borderRadius: 8,
@@ -435,7 +435,7 @@ const styles = {
         background: role === "user"
             ? "linear-gradient(135deg, #065f46, #10b981)"
             : "rgba(255,255,255,0.07)",
-        color: "rgba(255,255,255,0.88)",
+        color: "white",
         border: role === "user"
             ? "1px solid rgba(16,185,129,0.4)"
             : "1px solid rgba(255,255,255,0.08)",
@@ -468,7 +468,7 @@ const styles = {
     chip: {
         background: "rgba(255,255,255,0.05)",
         border: "1px solid rgba(255,255,255,0.12)",
-        color: "rgba(255,255,255,0.65)",
+        color: "rgba(255,255,255,0.95)",
         borderRadius: 20,
         padding: "5px 11px",
         fontSize: 11,
@@ -495,7 +495,7 @@ const styles = {
         outline: "none",
         background: "rgba(255,255,255,0.06)",
         fontFamily: "ui-sans-serif, system-ui, sans-serif",
-        color: "rgba(255,255,255,0.88)",
+        color: "white",
         transition: "border-color 0.2s",
     },
     sendBtn: {

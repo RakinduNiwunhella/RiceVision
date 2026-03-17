@@ -5,7 +5,7 @@ import { useTheme } from "../../context/ThemeContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { supabase } from "../../supabaseClient";
 import FieldDrawMap from "./FieldDrawMap";
-import TutorialTooltip from "../../components/TutorialTooltip";
+import TutorialTooltip from "../../Components/TutorialTooltip";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
 import { PRICE_PER_ACRE_LKR } from "./fieldConstants";
 
@@ -171,7 +171,7 @@ export default function FieldSetupPage() {
                         ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/40"
                         : step > n
                         ? "bg-emerald-500/30 text-emerald-400"
-                        : "bg-white/10 text-white/30"
+                        : "bg-white/10 text-white/85"
                     }`}
                   >
                     {step > n
@@ -181,7 +181,7 @@ export default function FieldSetupPage() {
                   </div>
                   <span
                     className={`text-xs font-semibold hidden md:block transition-colors ${
-                      step === n ? "text-emerald-400" : "text-white/30"
+                      step === n ? "text-emerald-400" : "text-white/85"
                     }`}
                   >
                     {label}
@@ -226,7 +226,7 @@ export default function FieldSetupPage() {
               <h1 className="text-5xl font-black tracking-tight mb-5 leading-tight">
                 {t('registerPaddyTitle')}
               </h1>
-              <p className="text-white/55 text-lg leading-relaxed">
+              <p className="text-white/85 text-lg leading-relaxed">
                 {t('registerPaddySubtitle')}
               </p>
             </div>
@@ -260,7 +260,7 @@ export default function FieldSetupPage() {
                   <span className={`material-symbols-outlined text-2xl mt-0.5 ${accent}`}>{icon}</span>
                   <div>
                     <h3 className="font-bold text-sm mb-1.5">{t(titleKey)}</h3>
-                    <p className="text-white/45 text-xs leading-relaxed">{t(descKey)}</p>
+                    <p className="text-white/85 text-xs leading-relaxed">{t(descKey)}</p>
                   </div>
                 </div>
               ))}
@@ -273,7 +273,7 @@ export default function FieldSetupPage() {
               </button>
               <button
                 onClick={() => navigate("/dashboard")}
-                className="text-white/35 hover:text-white/60 text-sm transition-colors"
+                className="text-white/85 hover:text-white/90 text-sm transition-colors"
               >
                 {t('skipForNow')}
               </button>
@@ -286,7 +286,7 @@ export default function FieldSetupPage() {
           <div className="flex flex-col gap-5">
             <div>
               <h2 className="text-3xl font-black mb-2">{t('drawYourPaddyField')}</h2>
-              <p className="text-white/50 text-sm leading-relaxed max-w-2xl">
+              <p className="text-white/85 text-sm leading-relaxed max-w-2xl">
                 {t('drawYourPaddyDesc')}
               </p>
             </div>
@@ -319,14 +319,14 @@ export default function FieldSetupPage() {
           <div className="flex flex-col gap-6">
             <div>
               <h2 className="text-3xl font-black mb-2">{t('reviewPaymentTitle')}</h2>
-              <p className="text-white/50 text-sm">{t('reviewPaymentDesc')}</p>
+              <p className="text-white/85 text-sm">{t('reviewPaymentDesc')}</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
               {/* ── Field summary card ── */}
               <div className="p-6 rounded-2xl bg-white/5 border border-white/10 space-y-5">
-                <h3 className="text-[11px] font-black uppercase tracking-[0.35em] text-white/50">
+                <h3 className="text-[11px] font-black uppercase tracking-[0.35em] text-white/85">
                   {t('fieldSummaryTitle')}
                 </h3>
 
@@ -374,7 +374,7 @@ export default function FieldSetupPage() {
               {/* ── Payment gateway mock ── */}
               <div className="p-6 rounded-2xl bg-white/5 border border-white/10 space-y-5">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-[11px] font-black uppercase tracking-[0.35em] text-white/50">
+                  <h3 className="text-[11px] font-black uppercase tracking-[0.35em] text-white/85">
                     {t('securePaymentTitle')}
                   </h3>
                   <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30 uppercase tracking-widest">
@@ -386,7 +386,7 @@ export default function FieldSetupPage() {
                 <div className="flex items-center justify-between px-4 py-3 rounded-xl bg-white/5 border border-white/10">
                   <div>
                     <p className="text-xs font-bold text-white/80">RiceVision Field Monitoring</p>
-                    <p className="text-[10px] text-white/40">{district || "Sri Lanka"} · {acres.toFixed(3)} acres</p>
+                    <p className="text-[10px] text-white/85">{district || "Sri Lanka"} · {acres.toFixed(3)} acres</p>
                   </div>
                   <span className="font-black text-emerald-400">Rs. {price.toLocaleString()}</span>
                 </div>
@@ -394,7 +394,7 @@ export default function FieldSetupPage() {
                 {/* Mock card fields */}
                 <div className="space-y-3 opacity-50 pointer-events-none select-none">
                   <div>
-                    <label className="block text-[10px] text-white/50 uppercase tracking-wider mb-1.5">
+                    <label className="block text-[10px] text-white/85 uppercase tracking-wider mb-1.5">
                       {t('cardNumberLabel')}
                     </label>
                     <input
@@ -405,11 +405,11 @@ export default function FieldSetupPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-[10px] text-white/50 uppercase tracking-wider mb-1.5">{t('expiryLabel')}</label>
+                      <label className="block text-[10px] text-white/85 uppercase tracking-wider mb-1.5">{t('expiryLabel')}</label>
                       <input disabled value="MM / YY" className="w-full px-4 py-3 text-sm rounded-xl bg-white/5 border border-white/10 text-white cursor-not-allowed" />
                     </div>
                     <div>
-                      <label className="block text-[10px] text-white/50 uppercase tracking-wider mb-1.5">{t('cvvLabel')}</label>
+                      <label className="block text-[10px] text-white/85 uppercase tracking-wider mb-1.5">{t('cvvLabel')}</label>
                       <input disabled value="•••" className="w-full px-4 py-3 text-sm rounded-xl bg-white/5 border border-white/10 text-white font-mono cursor-not-allowed" />
                     </div>
                   </div>
@@ -431,7 +431,7 @@ export default function FieldSetupPage() {
                 )}
 
                 {/* Security note */}
-                <div className="flex items-center gap-2 text-white/25 text-[10px]">
+                <div className="flex items-center gap-2 text-white/85 text-[10px]">
                   <span className="material-symbols-outlined text-base">lock</span>
                   <span>{t('securedSSL')}</span>
                 </div>
@@ -490,7 +490,7 @@ export default function FieldSetupPage() {
 function SummaryRow({ label, value }) {
   return (
     <div className="flex justify-between items-center text-sm">
-      <span className="text-white/45">{label}</span>
+      <span className="text-white/85">{label}</span>
       <span className="font-semibold text-white">{value}</span>
     </div>
   );

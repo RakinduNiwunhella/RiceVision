@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { updateAlertStatus } from "../../api/api";
 import { apiFetch } from "../../api/apiFetch";
 import { useLanguage } from "../../context/LanguageContext";
-import TutorialTooltip from "../../components/TutorialTooltip";
+import TutorialTooltip from "../../Components/TutorialTooltip";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
 
 
@@ -23,7 +23,7 @@ const renderTitle = (title, isPest, isPast) => {
   return (
     <span>
       {match[1]}
-      <span className={`risk-count ${isPast ? "!text-white/40" : ""}`}>
+      <span className={`risk-count ${isPast ? "!text-white/85" : ""}`}>
         {match[2]}
         {match[3]}
       </span>
@@ -62,7 +62,7 @@ const ResolveModal = ({ onConfirm, onCancel }) => {
         <h3 className="text-lg font-black text-white">Resolve Alert</h3>
 
         <div className="flex flex-col gap-2">
-          <label className="text-xs font-bold uppercase text-white/40">
+          <label className="text-xs font-bold uppercase text-white/85">
             Resolution Note (optional)
           </label>
           <textarea
@@ -71,7 +71,7 @@ const ResolveModal = ({ onConfirm, onCancel }) => {
             onChange={(e) => setNote(e.target.value)}
             placeholder="Describe how this was resolved…"
             rows={4}
-            className="bg-white/5 border border-white/10 rounded-2xl py-3 px-4 text-sm text-white placeholder:text-white/20 resize-none focus:outline-none focus:border-white/30"
+            className="bg-white/5 border border-white/10 rounded-2xl py-3 px-4 text-sm text-white placeholder:text-white/85 resize-none focus:outline-none focus:border-white/30"
           />
         </div>
 
@@ -409,14 +409,14 @@ const Alerts = () => {
             <h1 className="text-3xl md:text-5xl font-black text-white">
               {t("fieldRiskAlerts")}
             </h1>
-            <p className="text-white/40 text-xs mt-1 font-bold uppercase tracking-[0.2em]">
+            <p className="text-white/85 text-xs mt-1 font-bold uppercase tracking-[0.2em]">
               Real-time Field Health intelligence
             </p>
           </div>
 
           <div className="flex gap-3">
             <div className="glass px-4 py-2 rounded-xl border-white/10">
-              <span className="text-[10px] font-black uppercase text-white/30 block">
+              <span className="text-[10px] font-black uppercase text-white/85 block">
                 {t("active")}
               </span>
               <span className="text-lg font-black text-red-400">
@@ -425,7 +425,7 @@ const Alerts = () => {
             </div>
 
             <div className="glass px-4 py-2 rounded-xl border-white/10">
-              <span className="text-[10px] font-black uppercase text-white/30 block">
+              <span className="text-[10px] font-black uppercase text-white/85 block">
                 {t("resolved")}
               </span>
               <span className="text-lg font-black text-emerald-400">
@@ -448,7 +448,7 @@ const Alerts = () => {
                   }}
                   className={`px-5 py-2 rounded-xl text-xs font-bold transition-all ${activeTab === key
                     ? "bg-white/15 text-white"
-                    : "text-white/40 hover:text-white/70"
+                    : "text-white/85 hover:text-white/90"
                     }`}
                 >
                   {tabLabels[idx]}
@@ -462,7 +462,7 @@ const Alerts = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               ref={searchRef}
-              className="bg-white/5 border border-white/10 rounded-2xl py-3 px-6 text-sm text-white placeholder:text-white/20"
+              className="bg-white/5 border border-white/10 rounded-2xl py-3 px-6 text-sm text-white placeholder:text-white/85"
             />
           </div>
         </div>
@@ -472,7 +472,7 @@ const Alerts = () => {
         <div className="space-y-6">
           {filteredAlerts.length === 0 && (
             <div className="glass p-8 sm:p-12 md:p-20 rounded-2xl sm:rounded-[2rem] text-center">
-              <p className="text-white/30 font-bold uppercase">
+              <p className="text-white/85 font-bold uppercase">
                 No Past threats detected
               </p>
             </div>
@@ -486,7 +486,7 @@ const Alerts = () => {
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                   <h2
-                    className={`text-xl font-black ${activeTab === "Past Alerts" ? "text-white/40" : "text-emerald-400"}`}
+                    className={`text-xl font-black ${activeTab === "Past Alerts" ? "text-white/85" : "text-emerald-400"}`}
                   >
                     {renderTitle(
                       alert.title,
@@ -495,16 +495,16 @@ const Alerts = () => {
                     )}
                   </h2>
 
-                  <p className="text-white/60 text-sm mt-1">
+                  <p className="text-white/85 text-sm mt-1">
                     {alert.description}
                   </p>
 
-                  <span className="text-xs text-white/40">
+                  <span className="text-xs text-white/85">
                     {formatTimestamp(alert.timestamp)}
                   </span>
 
                   {activeTab === "Past Alerts" && alert.note && (
-                    <p className="text-white/40 text-xs mt-1">
+                    <p className="text-white/85 text-xs mt-1">
                       Note: {alert.note}
                     </p>
                   )}

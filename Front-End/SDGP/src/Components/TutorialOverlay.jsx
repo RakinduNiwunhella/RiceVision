@@ -184,7 +184,7 @@ const TutorialOverlay = ({
           className="absolute -top-2.5 -right-2.5 w-6 h-6 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full flex items-center justify-center transition-all"
           title="Skip tutorial"
         >
-          <X size={11} className="text-white/70" />
+          <X size={11} className="text-white/85" />
         </button>
 
         {/* Step counter */}
@@ -229,8 +229,8 @@ const TutorialOverlay = ({
             disabled={isFirst}
             className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               isFirst
-                ? 'text-white/20 cursor-not-allowed'
-                : 'text-white/60 hover:text-white hover:bg-white/10'
+                ? 'text-white/85 cursor-not-allowed'
+                : 'text-white/85 hover:text-white hover:bg-white/10'
             }`}
           >
             <ChevronLeft size={14} />
@@ -241,7 +241,7 @@ const TutorialOverlay = ({
             {/* Skip */}
             <button
               onClick={onSkip}
-              className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white/40 hover:text-white/70 hover:bg-white/5 transition-all"
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white/85 hover:text-white/90 hover:bg-white/5 transition-all"
             >
               Skip
             </button>

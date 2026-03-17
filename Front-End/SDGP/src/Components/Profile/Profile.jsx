@@ -2,7 +2,7 @@ import { useState, useRef, useMemo } from "react";
 import ProfileForm from "./ProfileForm";
 import MyFieldTab from "./MyFieldTab";
 import { useLanguage } from "../../context/LanguageContext";
-import TutorialTooltip from "../../components/TutorialTooltip";
+import TutorialTooltip from "../../Components/TutorialTooltip";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
 
 export default function Profile() {
@@ -35,8 +35,8 @@ export default function Profile() {
   const contentRef = useRef(null)
 
   const TABS = [
-    { id: "identity", labelKey: "identityProfile", icon: "verified_user" },
-    { id: "field",    labelKey: "myPaddyField",    icon: "landscape"     },
+    { id: "identity", label: "Profile Details", icon: "verified_user" },
+    { id: "field", label: "My Paddy Field", icon: "landscape" },
   ];
   const [activeTab, setActiveTab] = useState("identity");
   const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
@@ -79,34 +79,34 @@ export default function Profile() {
         <div ref={headerRef} className="mb-8 relative">
           <p className="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-400 mb-3 flex items-center gap-2">
             <span className="material-symbols-outlined text-sm">verified_user</span>
-            {t('operatorAuth')}
+            Profile settings
           </p>
 
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tighter uppercase mb-3 sm:mb-4">
-            {activeTab === "identity" ? t('identityProfile') : t('myPaddyField')}
+            {activeTab === "identity" ? "Profile Details" : "My Paddy Field"}
           </h1>
 
-          <p className="text-white/60 text-sm font-medium max-w-xl leading-relaxed">
+          <p className="text-white/85 text-sm font-medium max-w-xl leading-relaxed">
             {activeTab === "identity"
-              ? t('profileDesc')
-              : t('paddyFieldDesc')}
+              ? "Update your name, phone number, email address, and profile photo."
+              : "View and manage your registered paddy field information."}
           </p>
         </div>
 
         {/* Tab switcher */}
-        <div ref={tabSwitcherRef} className="flex gap-2 mb-6 sm:mb-8 relative overflow-x-auto no-scrollbar">
+        <div ref={tabSwitcherRef} className="flex gap-3 mt-10 sm:mt-12 mb-6 sm:mb-8 relative overflow-x-auto no-scrollbar">
           {TABS.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl text-[10px] sm:text-xs font-black uppercase tracking-[0.15em] sm:tracking-[0.25em] transition-all whitespace-nowrap ${
+              className={`flex items-center gap-2 sm:gap-2.5 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap ${
                 activeTab === tab.id
-                  ? "bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 shadow-lg shadow-emerald-500/10"
-                  : "bg-white/5 border border-white/10 text-white/40 hover:bg-white/10 hover:text-white/70"
+                  ? "bg-emerald-500/25 border border-emerald-500/60 text-emerald-200 shadow-lg shadow-emerald-500/10"
+                  : "bg-white/5 border border-white/10 text-white/90 hover:bg-white/10 hover:text-white"
               }`}
             >
               <span className="material-symbols-outlined text-sm">{tab.icon}</span>
-              {t(tab.labelKey)}
+              {tab.label}
             </button>
           ))}
           {/* Active tab bottom line indicator */}
