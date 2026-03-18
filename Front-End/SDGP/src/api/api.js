@@ -3,7 +3,18 @@ import { apiFetch } from "./apiFetch";
 // Authenticated helper for all backend GET requests
 async function get(path) {
   const res = await apiFetch(path);
-  if (!res.ok) throw new Error("API error");
+  if (!res.ok) {
+    let detail = "";
+    try {
+      const payload = await res.json();
+      detail = payload?.detail || payload?.message || "";
+    } catch {
+      // Ignore JSON parse errors and fall back to status text.
+    }
+
+    const suffix = detail || res.statusText || "Request failed";
+    throw new Error(`API error (${res.status}): ${suffix}`);
+  }
   return res.json();
 }
 
