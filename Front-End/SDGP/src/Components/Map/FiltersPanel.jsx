@@ -85,7 +85,7 @@ export default function FiltersPanel({ filters, setFilters }) {
 
       {/* District (Searchable Dropdown) */}
       <div className="mb-8 relative">
-        <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/40 mb-3">
+        <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/85 mb-3">
           District
         </p>
 
@@ -100,7 +100,7 @@ export default function FiltersPanel({ filters, setFilters }) {
             }))
           }
           onFocus={() => setDropdownOpen(true)}
-          className="w-full px-4 pr-10 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder-white/40 focus:outline-none focus:border-emerald-400 focus:bg-white/10 transition"
+          className="w-full px-4 pr-10 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder-white/85 focus:outline-none focus:border-emerald-400 focus:bg-white/10 transition"
         />
 
         {/* Dropdown list */}
@@ -126,7 +126,7 @@ export default function FiltersPanel({ filters, setFilters }) {
                   className={`px-4 py-3 text-sm cursor-pointer transition-all duration-200 hover:bg-white/20 active:scale-[0.98] ${
                     filters.districts[0] === d
                       ? "bg-emerald-500/25 text-emerald-300 shadow-inner"
-                      : "text-white/80"
+                      : "text-white/85"
                   }`}
                 >
                   {d}

@@ -282,7 +282,7 @@ export default function ProfileForm() {
                 { label: "Phone number", key: "phone", type: "tel", placeholder: "+94 77 123 4567" },
               ].map((field) => (
                 <div key={field.key} className="group/field space-y-2">
-                  <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/85 ml-2 transition-colors duration-200 group-hover/field:text-emerald-400/70">
+                  <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/85 ml-2 transition-colors duration-200 group-hover/field:text-emerald-300">
                     {field.label}
                   </label>
                   <input
@@ -300,7 +300,7 @@ export default function ProfileForm() {
                 </div>
               ))}
               <div className="group/field space-y-2">
-                <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/85 ml-2 transition-colors duration-200 group-hover/field:text-emerald-400/70">
+                <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/85 ml-2 transition-colors duration-200 group-hover/field:text-emerald-300">
                   Email address
                 </label>
                 <input

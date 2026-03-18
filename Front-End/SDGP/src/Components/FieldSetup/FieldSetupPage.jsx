@@ -385,7 +385,7 @@ export default function FieldSetupPage() {
                 {/* Order line */}
                 <div className="flex items-center justify-between px-4 py-3 rounded-xl bg-white/5 border border-white/10">
                   <div>
-                    <p className="text-xs font-bold text-white/80">RiceVision Field Monitoring</p>
+                    <p className="text-xs font-bold text-white/85">RiceVision Field Monitoring</p>
                     <p className="text-[10px] text-white/85">{district || "Sri Lanka"} · {acres.toFixed(3)} acres</p>
                   </div>
                   <span className="font-black text-emerald-400">Rs. {price.toLocaleString()}</span>

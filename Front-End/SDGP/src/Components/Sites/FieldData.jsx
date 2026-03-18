@@ -203,7 +203,7 @@ const FieldData = () => {
                     </td>
                     <td className="hidden sm:table-cell px-3 sm:px-6 py-3 sm:py-5 text-center">
                       <div className="flex flex-col">
-                        <span className="text-white/80">{d.avg_yield_kg_ha}</span>
+                        <span className="text-white/85">{d.avg_yield_kg_ha}</span>
                         <span className="text-[10px] text-white/85 uppercase font-black tracking-tighter">kg/Ha</span>
                       </div>
                     </td>

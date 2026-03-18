@@ -329,7 +329,7 @@ export default function FieldDrawMap({
                     value={districtSearch}
                     onChange={(e) => setDistrictSearch(e.target.value)}
                     placeholder="Filter districts..."
-                    className="w-full px-3 py-1.5 text-xs rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                    className="w-full px-3 py-1.5 text-xs rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/85 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                     onClick={(e) => e.stopPropagation()}
                   />
                 </div>
@@ -345,7 +345,7 @@ export default function FieldDrawMap({
                       className={`px-4 py-2 text-sm cursor-pointer transition-colors ${
                         selectedDistrict?.file === d.file
                           ? "bg-emerald-500/20 text-emerald-400 font-semibold"
-                          : "text-white/80 hover:bg-white/5"
+                          : "text-white/85 hover:bg-white/5"
                       }`}
                     >
                       {d.name}
@@ -365,7 +365,7 @@ export default function FieldDrawMap({
                 value={locSearch}
                 onChange={(e) => searchLocation(e.target.value)}
                 placeholder="Search location in Sri Lanka…"
-                className="flex-1 bg-transparent text-sm text-white placeholder-white/30 focus:outline-none"
+                className="flex-1 bg-transparent text-sm text-white placeholder-white/85 focus:outline-none"
               />
               {locSearch && (
                 <button
@@ -382,7 +382,7 @@ export default function FieldDrawMap({
                   <li
                     key={r.place_id}
                     onClick={() => flyToResult(r)}
-                    className="px-4 py-2.5 text-xs text-white/80 hover:bg-white/5 cursor-pointer truncate"
+                    className="px-4 py-2.5 text-xs text-white/85 hover:bg-white/5 cursor-pointer truncate"
                   >
                     {r.display_name}
                   </li>
@@ -419,7 +419,7 @@ export default function FieldDrawMap({
             value={fieldName}
             onChange={(e) => onFieldNameChange?.(e.target.value)}
             placeholder="Name your field (e.g. North Paddy, Home Field…)"
-            className="flex-1 px-3 py-2 rounded-xl border border-white/15 bg-white/5 text-white text-sm placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500/50 transition-all"
+            className="flex-1 px-3 py-2 rounded-xl border border-white/15 bg-white/5 text-white text-sm placeholder-white/85 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500/50 transition-all"
           />
         </div>
       )}
@@ -512,9 +512,9 @@ export default function FieldDrawMap({
       {/* Hint text */}
       {!readOnly && (
         <p className="text-xs text-white/85 text-center">
-          <span className="text-amber-400/70">■</span> Yellow = known paddy areas &nbsp;·&nbsp;
+          <span className="text-amber-300">■</span> Yellow = known paddy areas &nbsp;·&nbsp;
           Use the <strong className="text-white/90">polygon / rectangle tool</strong> (top-right of map) to outline your field &nbsp;·&nbsp;
-          {initialFeature && <span><span className="text-blue-400/70">⬝</span> Dashed blue = your current field</span>}
+          {initialFeature && <span><span className="text-blue-300">⬝</span> Dashed blue = your current field</span>}
         </p>
       )}
     </div>

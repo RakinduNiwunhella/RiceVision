@@ -381,7 +381,7 @@ export default function RiceVisionWeather() {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setDropdownOpen((o) => !o)}
-                className="glass px-5 py-2.5 rounded-2xl border border-white/10 text-[10px] font-black uppercase tracking-widest text-white/80 hover:border-emerald-500/30 hover:text-emerald-400 transition-all flex items-center gap-3 min-w-44 justify-between"
+                className="glass px-5 py-2.5 rounded-2xl border border-white/10 text-[10px] font-black uppercase tracking-widest text-white/85 hover:border-emerald-500/30 hover:text-emerald-400 transition-all flex items-center gap-3 min-w-44 justify-between"
               >
                 <span className="material-symbols-outlined text-sm">location_on</span>
                 {district?.name}
@@ -417,7 +417,7 @@ export default function RiceVisionWeather() {
               <div className="flex items-end gap-4">
                 <h2 className="text-4xl sm:text-6xl md:text-8xl lg:text-[10rem] font-black text-white leading-none">{Math.round(c.temperature_2m)}°</h2>
                 <div className="mb-4">
-                  <span className="text-base sm:text-2xl font-black text-white/80">{cond.icon} {cond.label}</span>
+                  <span className="text-base sm:text-2xl font-black text-white/85">{cond.icon} {cond.label}</span>
                   <p className="text-white/85 text-sm mt-1">Feels like {Math.round(c.apparent_temperature)}°C</p>
                 </div>
               </div>
@@ -598,7 +598,7 @@ export default function RiceVisionWeather() {
                           className={`border-b border-white/5 hover:bg-white/[0.05] transition-colors ${i === 0 ? "bg-emerald-500/10" : ""
                             }`}
                         >
-                          <td className="px-3 py-3 text-white/80 whitespace-nowrap">
+                          <td className="px-3 py-3 text-white/85 whitespace-nowrap">
                             {new Date(h.time[idx]).toLocaleTimeString("en-US", {
                               hour: "2-digit",
                               minute: "2-digit",
@@ -848,7 +848,7 @@ export default function RiceVisionWeather() {
                       return (
                         <tr key={idx} className="border-b border-white/5 hover:bg-white/[0.05] transition-colors">
 
-                          <td className="px-3 py-3 text-white/80 whitespace-nowrap">
+                          <td className="px-3 py-3 text-white/85 whitespace-nowrap">
                             {fmtDay(d.time[idx], true)}
                           </td>
 
@@ -927,7 +927,7 @@ export default function RiceVisionWeather() {
 
                     <div className="text-3xl mb-3">{info.icon}</div>
 
-                    <p className="text-xl font-bold text-white/80">
+                    <p className="text-xl font-bold text-white/85">
                       {Math.round(d.temperature_2m_max[idx])}°
                     </p>
 
@@ -989,7 +989,7 @@ export default function RiceVisionWeather() {
                       return (
                         <tr key={idx} className="border-b border-white/5 hover:bg-white/[0.05] transition-colors">
 
-                          <td className="px-3 py-3 text-white/80 whitespace-nowrap">
+                          <td className="px-3 py-3 text-white/85 whitespace-nowrap">
                             {fmtDay(date)}
                           </td>
 

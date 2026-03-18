@@ -271,7 +271,7 @@ export default function MyFieldTab() {
                 </div>
               </div>
               <div className="flex flex-col items-center justify-center gap-1 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30">
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400/70">{t('annualCostLabel')}</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-300">{t('annualCostLabel')}</span>
                 <span className="text-3xl font-black text-emerald-400">Rs. {price.toLocaleString()}</span>
                 <span className="text-[10px] text-white/85">Rs. {PRICE_PER_ACRE_LKR.toLocaleString()} / acre</span>
               </div>
