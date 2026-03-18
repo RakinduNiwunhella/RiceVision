@@ -91,24 +91,31 @@ function DrawControl({ onDraw, onClear }) {
           allowIntersection: false,
           showArea: true,
           shapeOptions: {
-            color:       "#10b981",
+            color:       "#059669",
             fillColor:   "#10b981",
-            fillOpacity: 0.3,
-            weight:      2,
+            fillOpacity: 0.35,
+            weight:      3,
           },
-          guidelineDistance: 20,
+          guidelineDistance: 25,
           metric: true,
         },
         rectangle: {
           shapeOptions: {
-            color:       "#10b981",
+            color:       "#059669",
             fillColor:   "#10b981",
-            fillOpacity: 0.3,
-            weight:      2,
+            fillOpacity: 0.35,
+            weight:      3,
+          },
+        },
+        circle: {
+          shapeOptions: {
+            color:       "#059669",
+            fillColor:   "#10b981",
+            fillOpacity: 0.35,
+            weight:      3,
           },
         },
         polyline:     false,
-        circle:       false,
         marker:       false,
         circlemarker: false,
       },
@@ -528,7 +535,7 @@ export default function FieldDrawMap({
       {!readOnly && (
         <p className="text-xs text-white/85 text-center">
           <span className="text-amber-400/70">■</span> Yellow = known paddy areas &nbsp;·&nbsp;
-          Use the <strong className="text-white/90">polygon / rectangle tool</strong> (top-right of map) to outline your field &nbsp;·&nbsp;
+          Use the <strong className="text-white/90">polygon, rectangle, or circle tools</strong> (top-right of map) to outline your field &nbsp;·&nbsp;
           {initialFeature && <span><span className="text-blue-400/70">⬝</span> Dashed blue = your current field</span>}
         </p>
       )}
