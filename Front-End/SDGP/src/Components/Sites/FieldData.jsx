@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { apiFetch } from "../../api/apiFetch";
 import { useLanguage } from "../../context/LanguageContext";
 import { useNavigate } from "react-router-dom";
-import TutorialTooltip from "../../components/TutorialTooltip";
+import TutorialTooltip from "../../Components/TutorialTooltip";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
 
 const healthColor = (health) => {
@@ -14,7 +14,7 @@ const healthColor = (health) => {
     case "Critical":
       return "text-red-400 bg-red-500/10 border-red-500/20";
     default:
-      return "text-white/40 bg-white/5 border-white/10";
+      return "text-white/85 bg-white/5 border-white/10";
   }
 };
 
@@ -98,7 +98,7 @@ const FieldData = () => {
       <div className="min-h-full flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
-          <p className="text-white/40 font-black uppercase tracking-widest text-xs animate-pulse">{t('decryptingIntel')}</p>
+          <p className="text-white/85 font-black uppercase tracking-widest text-xs animate-pulse">{t('decryptingIntel')}</p>
         </div>
       </div>
     );
@@ -114,7 +114,7 @@ const FieldData = () => {
             <h1 className="text-xl sm:text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
               Field Data
             </h1>
-            <p className="text-white/40 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em]">
+            <p className="text-white/85 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em]">
               {t('liveStream')}
             </p>
           </div>
@@ -128,11 +128,11 @@ const FieldData = () => {
               className="glass glass-hover p-4 sm:p-6 rounded-[1.5rem] sm:rounded-[2.5rem] border border-white/10 shadow-xl group transition-all duration-500"
             >
               <div className="flex justify-between items-start mb-4">
-                <span className={`material-symbols-outlined ${item.color || 'text-white/40'} text-3xl group-hover:scale-110 transition-transform duration-500`}>
+                <span className={`material-symbols-outlined ${item.color || 'text-white/85'} text-3xl group-hover:scale-110 transition-transform duration-500`}>
                   {item.icon}
                 </span>
               </div>
-              <p className="text-xs font-bold text-white/40 uppercase tracking-widest mb-1">
+              <p className="text-xs font-bold text-white/85 uppercase tracking-widest mb-1">
                 {item.label}
               </p>
               <p className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tighter">
@@ -145,7 +145,7 @@ const FieldData = () => {
         {/* Table Section */}
         <div ref={currentStep === 2 ? tableRef : undefined} className="glass p-1 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl overflow-hidden group">
           <div className="p-4 sm:p-8 border-b border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-            <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/40 flex items-center gap-3">
+            <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/85 flex items-center gap-3">
               <span className="material-symbols-outlined text-emerald-400">dataset</span>
               {t('districtPerformance')}
             </h2>
@@ -159,7 +159,7 @@ const FieldData = () => {
           <div className="overflow-x-auto no-scrollbar">
             <table className="w-full text-xs border-collapse">
               <thead>
-                <tr className="text-white/30 uppercase text-[10px] font-black tracking-widest border-b border-white/5 whitespace-nowrap">
+                <tr className="text-white/85 uppercase text-[10px] font-black tracking-widest border-b border-white/5 whitespace-nowrap">
                   <th className="px-3 sm:px-6 md:px-8 py-3 sm:py-5 text-left font-black whitespace-nowrap">District</th>
                   <th className="px-3 sm:px-6 py-3 sm:py-5 text-left font-black whitespace-nowrap">Total Fields</th>
                   <th className="px-3 sm:px-6 py-3 sm:py-5 text-left font-black whitespace-nowrap">Healthy</th>
@@ -185,7 +185,7 @@ const FieldData = () => {
                         </span>
                       </div>
                     </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-5 text-center text-white/60 font-bold">{d.total_fields}</td>
+                    <td className="px-3 sm:px-6 py-3 sm:py-5 text-center text-white/85 font-bold">{d.total_fields}</td>
                     <td className="px-3 sm:px-6 py-3 sm:py-5 text-center">
                       <span className="px-3 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[11px] font-black uppercase">
                         {d.healthy_fields}
@@ -204,12 +204,12 @@ const FieldData = () => {
                     <td className="hidden sm:table-cell px-3 sm:px-6 py-3 sm:py-5 text-center">
                       <div className="flex flex-col">
                         <span className="text-white/80">{d.avg_yield_kg_ha}</span>
-                        <span className="text-[10px] text-white/20 uppercase font-black tracking-tighter">kg/Ha</span>
+                        <span className="text-[10px] text-white/85 uppercase font-black tracking-tighter">kg/Ha</span>
                       </div>
                     </td>
                     <td className="hidden sm:table-cell px-3 sm:px-6 md:px-8 py-3 sm:py-5 text-center">
                       <span className="font-black text-center text-white">{Number(d.total_yield_kg).toLocaleString()}</span>
-                      <span className="ml-1 text-[10px] text-white/40 uppercase font-black">kg</span>
+                      <span className="ml-1 text-[10px] text-white/85 uppercase font-black">kg</span>
                     </td>
                     <td className="px-3 sm:px-6 py-3 sm:py-5 text-center">
                       <div ref={mapButtonRef} className="flex items-center justify-center gap-2">

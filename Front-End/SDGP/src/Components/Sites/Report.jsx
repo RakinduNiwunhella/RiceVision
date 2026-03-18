@@ -8,7 +8,7 @@ import autoTable from 'jspdf-autotable';
 import logoImg from '../assets/logo.png';
 import { apiFetch } from "../../api/apiFetch";
 import { useLanguage } from "../../context/LanguageContext";
-import TutorialTooltip from "../../components/TutorialTooltip";
+import TutorialTooltip from "../../Components/TutorialTooltip";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
 
 const CustomSelect = ({ value, onChange, options, className = "" }) => {
@@ -55,7 +55,7 @@ const CustomSelect = ({ value, onChange, options, className = "" }) => {
         <span>{value}</span>
 
         <span
-          className="material-symbols-outlined text-sm text-white/40 transition-transform duration-200"
+          className="material-symbols-outlined text-sm text-white/85 transition-transform duration-200"
           style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)" }}
         >
           expand_more
@@ -842,12 +842,12 @@ const Report = () => {
     return { label: "HIGH RISK", color: "text-red-400" };
   };
 
-  const ReportPane = ({ report, config, setConfig, title, districtSelectorRef, yieldHeroRef, metricsExportRef }) => {
+  const ReportPane = ({ report, config, setConfig, title, districtSelectorRef, yieldHeroRef, metricsExportRef, isSingleMode = false }) => {
     if (report?.error) return (
       <div className="flex-1 glass p-6 sm:p-12 rounded-2xl sm:rounded-[3rem] text-center border border-red-500/20">
         <span className="material-symbols-outlined text-5xl text-red-400/40 mb-4 block">signal_disconnected</span>
         <h3 className="text-red-400 font-black uppercase tracking-widest mb-3 text-sm">Data Unavailable</h3>
-        <p className="text-xs text-white/30 mb-6">{report.message}</p>
+        <p className="text-xs text-white/85 mb-6">{report.message}</p>
         {availableDates.length > 0 && (
           <CustomSelect
             value={config.date}
@@ -860,7 +860,7 @@ const Report = () => {
 
     if (!report) return (
       <div className="flex-1 glass rounded-2xl sm:rounded-[3rem] p-8 sm:p-20 text-center animate-pulse">
-        <p className="text-white/20 font-black uppercase tracking-widest text-xs">Fetching Satellite Data...</p>
+        <p className="text-white/85 font-black uppercase tracking-widest text-xs">Fetching Satellite Data...</p>
       </div>
     );
 
@@ -881,7 +881,10 @@ const Report = () => {
             <button
               ref={metricsExportRef}
               onClick={() => generatePDF(report, config)}
-              className="flex items-center gap-2 text-[10px] font-black px-4 py-1.5 rounded-xl border border-white/10 transition-all duration-300 hover:bg-white/10 hover:border-white/20 hover:scale-[1.02] cursor-pointer uppercase tracking-widest"            >
+              className={`flex items-center gap-2 text-[10px] font-black px-4 py-1.5 rounded-xl border transition-all duration-300 hover:scale-[1.02] cursor-pointer uppercase tracking-widest ${isSingleMode
+                ? "border-emerald-400/70 bg-emerald-500/10 hover:bg-emerald-500/20 hover:border-emerald-300"
+                : "border-white/10 hover:bg-white/10 hover:border-white/20"
+                }`}            >
               <span className="material-symbols-outlined text-xs">download</span>
               Export PDF
             </button>
@@ -913,23 +916,25 @@ const Report = () => {
         <div ref={yieldHeroRef} className="glass p-3 sm:p-5 rounded-xl sm:rounded-[2rem] border border-emerald-500/20 shadow-xl mb-6 relative overflow-hidden">
           {/* subtle glow */}
           <div className="absolute top-0 right-0 w-36 h-36 bg-emerald-500/10 blur-[50px] -mr-8 -mt-8 pointer-events-none rounded-full" />
-          <div className="relative z-10">
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-1 flex items-center gap-2">
-              <span className="material-symbols-outlined text-emerald-400 text-sm">monitoring</span>
-              Predicted Average
-            </p>
-            <h2 className="text-2xl sm:text-4xl font-black tracking-tighter text-white">
-              {Math.round(report.summary.yield).toLocaleString()}
-              <span className="text-base font-normal text-white/50 ml-2">kg/ha</span>
-            </h2>
-            <div className="mt-3 pt-3 border-t border-white/5 grid grid-cols-2 gap-3">
+          <div className="relative z-10 flex flex-col">
+            <div className="text-center flex flex-col items-center justify-center py-1 sm:py-2">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/85 mb-1 flex items-center justify-center gap-2">
+                <span className="material-symbols-outlined text-emerald-400 text-sm">monitoring</span>
+                Predicted Average
+              </p>
+              <h2 className="text-3xl sm:text-5xl font-black tracking-tighter text-white leading-none">
+                {Math.round(report.summary.yield).toLocaleString()}
+                <span className="text-base font-normal text-white/85 ml-2">kg/ha</span>
+              </h2>
+            </div>
+            <div className="mt-2 pt-3 border-t border-white/5 grid grid-cols-2 gap-3">
               <div>
-                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/30 mb-0.5">Total Yield</p>
-                <p className="text-base font-black text-white">{Math.round(report.summary.total_kg).toLocaleString()} <span className="text-xs font-bold text-white/40">kg</span></p>
+                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/85 mb-0.5">Total Yield</p>
+                <p className="text-base font-black text-white">{Math.round(report.summary.total_kg).toLocaleString()} <span className="text-xs font-bold text-white/85">kg</span></p>
               </div>
               <div>
-                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/30 mb-0.5">Historical Baseline</p>
-                <p className="text-base font-black text-white">{Math.round(report.summary.historical).toLocaleString()} <span className="text-xs font-bold text-white/40">kg/ha</span></p>
+                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/85 mb-0.5">Historical Baseline</p>
+                <p className="text-base font-black text-white">{Math.round(report.summary.historical).toLocaleString()} <span className="text-xs font-bold text-white/85">kg/ha</span></p>
               </div>
             </div>
           </div>
@@ -955,7 +960,7 @@ const Report = () => {
         {/* Metric Cards */}
         <div className="grid grid-cols-2 gap-4">
           <div className="glass glass-hover p-5 rounded-3xl border border-white/10 group transition-all duration-300">
-            <p className="text-[9px] font-black text-white/30 uppercase tracking-widest mb-2">Pest Count</p>
+            <p className="text-[9px] font-black text-white/85 uppercase tracking-widest mb-2">Pest Count</p>
             <div className="flex items-baseline gap-2">
               <span className="text-2xl font-black text-white">{report.metrics.pest_count}</span>
               <span className={`text-[9px] font-black ${getPestStatus(report.metrics.pest_count).color}`}>
@@ -964,7 +969,7 @@ const Report = () => {
             </div>
           </div>
           <div className="glass glass-hover p-5 rounded-3xl border border-white/10 group transition-all duration-300">
-            <p className="text-[9px] font-black text-white/30 uppercase tracking-widest mb-2">Risk Factor</p>
+            <p className="text-[9px] font-black text-white/85 uppercase tracking-widest mb-2">Risk Factor</p>
             <div className="flex items-baseline gap-2">
               <span className="text-2xl font-black text-white">{report.metrics.risk_score.toFixed(1)}</span>
               <span className={`text-[9px] font-black ${getRiskStatus(report.metrics.risk_score).color}`}>
@@ -987,7 +992,7 @@ const Report = () => {
             <h1 className="text-xl sm:text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
               {t('yieldReports')}
             </h1>
-            <p className="text-white/40 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em]">
+            <p className="text-white/85 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em]">
               {t('satelliteDerivedAnalytics')}
             </p>
           </div>
@@ -997,21 +1002,30 @@ const Report = () => {
             <div className="flex p-1 rounded-2xl bg-white/5 border border-white/10 w-fit">
               <button
                 onClick={() => setMode("single")}
-                className={`px-4 sm:px-6 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${mode === "single" ? "glass bg-white/15 text-white shadow-lg border-white/20" : "text-white/40 hover:text-white/70"}`}
+                className={`px-4 sm:px-6 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${mode === "single" ? "glass bg-white/15 text-white shadow-lg border-white/20" : "text-white/85 hover:text-white/90"}`}
               >
                 {t('single')}
               </button>
               <button
                 onClick={() => setMode("compare")}
-                className={`px-4 sm:px-6 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${mode === "compare" ? "glass bg-white/15 text-white shadow-lg border-white/20" : "text-white/40 hover:text-white/70"}`}
+                className={`px-4 sm:px-6 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${mode === "compare" ? "glass bg-white/15 text-white shadow-lg border-white/20" : "text-white/85 hover:text-white/90"}`}
               >
                 {t('compare')}
               </button>
             </div>
             <div className="glass px-4 py-2 rounded-xl border-white/10 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-white/60">{t('liveData')}</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-white/85">{t('liveData')}</span>
             </div>
+            {mode === "compare" && dataA && dataB && (
+              <button
+                onClick={() => generateComparisonPDF()}
+                className="flex items-center gap-2 text-[10px] font-black px-4 py-2 rounded-xl border border-emerald-400/70 bg-emerald-500/10 transition-all duration-300 hover:bg-emerald-500/20 hover:border-emerald-300 hover:scale-[1.02] cursor-pointer uppercase tracking-widest"
+              >
+                <span className="material-symbols-outlined text-sm">compare</span>
+                Export Comparison Report
+              </button>
+            )}
           </div>
         </div>
 
@@ -1025,23 +1039,12 @@ const Report = () => {
             districtSelectorRef={currentStep === 2 ? districtSelectorRef : undefined}
             yieldHeroRef={currentStep === 3 ? yieldHeroRef : undefined}
             metricsExportRef={currentStep === 4 ? metricsExportRef : undefined}
+            isSingleMode={mode === "single"}
           />
           {mode === "compare" && <ReportPane report={dataB} config={configB} setConfig={setConfigB} title="COMPARISON" />}
         </div>
 
       </div>
-      {mode === "compare" && dataA && dataB && (
-        <div className="flex justify-center mt-6">
-          <button
-            onClick={() => generateComparisonPDF()}
-            className="flex items-center gap-2 text-[11px] font-black px-6 py-3 rounded-2xl border border-white/10 transition-all duration-300 hover:bg-white/10 hover:border-white/20 hover:scale-[1.02] cursor-pointer uppercase tracking-widest"
-          >
-            <span className="material-symbols-outlined text-sm">compare</span>
-            Export Comparison Report
-          </button>
-        </div>
-      )}
-
       {/* ─── TUTORIAL TOOLTIPS ─── */}
       {showTutorial && currentTutorialStep && (
         <>
