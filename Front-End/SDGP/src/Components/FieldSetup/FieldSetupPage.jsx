@@ -298,7 +298,7 @@ export default function FieldSetupPage() {
               onClear={handleClear}
               fieldName={fieldName}
               onFieldNameChange={setFieldName}
-              height="calc(100vh - 380px)"
+              height="calc(100vh - 320px)"
             />
 
             <div className="flex justify-between gap-3 pt-1">
@@ -350,7 +350,7 @@ export default function FieldSetupPage() {
                 </div>
 
                 <div className="border-t border-white/10 pt-4 space-y-2">
-                  <SummaryRow label={t('rateLabel')}       value={`Rs. ${PRICE_PER_ACRE_LKR.toLocaleString()} / acre / year`} />
+                  <SummaryRow label={t('rateLabel')}       value={`Rs. ${PRICE_PER_ACRE_LKR.toLocaleString()} / acre / month`} />
                   <div className="flex justify-between items-center">
                     <span className="text-[11px] font-black uppercase tracking-widest text-emerald-400">
                       {t('annualCostLabel')}
@@ -422,7 +422,7 @@ export default function FieldSetupPage() {
                   onClick={() => setPayClicked(true)}
                   className="w-full py-3.5 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-400 font-black text-sm hover:bg-amber-500/25 transition-all tracking-wide"
                 >
-                  Pay Rs. {price.toLocaleString()} / year
+                  Pay Rs. {price.toLocaleString()} / month
                 </button>
 
                 {payClicked && (

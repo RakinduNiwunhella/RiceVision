@@ -91,24 +91,31 @@ function DrawControl({ onDraw, onClear }) {
           allowIntersection: false,
           showArea: true,
           shapeOptions: {
-            color:       "#10b981",
+            color:       "#059669",
             fillColor:   "#10b981",
-            fillOpacity: 0.3,
-            weight:      2,
+            fillOpacity: 0.35,
+            weight:      3,
           },
-          guidelineDistance: 20,
+          guidelineDistance: 25,
           metric: true,
         },
         rectangle: {
           shapeOptions: {
-            color:       "#10b981",
+            color:       "#059669",
             fillColor:   "#10b981",
-            fillOpacity: 0.3,
-            weight:      2,
+            fillOpacity: 0.35,
+            weight:      3,
+          },
+        },
+        circle: {
+          shapeOptions: {
+            color:       "#059669",
+            fillColor:   "#10b981",
+            fillOpacity: 0.35,
+            weight:      3,
           },
         },
         polyline:     false,
-        circle:       false,
         marker:       false,
         circlemarker: false,
       },
@@ -307,7 +314,7 @@ export default function FieldDrawMap({
 
   /* ── Render ── */
   return (
-    <div className="flex flex-col gap-3" style={{ minHeight: height }}>
+    <div className="flex flex-col gap-3 w-full" style={{ height }}>
       {/* ── Controls row ── */}
       {!readOnly && (
         <div className="flex flex-wrap gap-2 items-start">
@@ -442,7 +449,7 @@ export default function FieldDrawMap({
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-emerald-400 text-base">paid</span>
             <span className="text-white/85">Price:</span>
-            <span className="font-black text-emerald-400">Rs. {price.toLocaleString()} / year</span>
+            <span className="font-black text-emerald-400">Rs. {price.toLocaleString()} / month</span>
             <span className="text-white/85 text-xs">(Rs. {PRICE_PER_ACRE_LKR.toLocaleString()} per acre)</span>
           </div>
         </div>
@@ -450,8 +457,7 @@ export default function FieldDrawMap({
 
       {/* ── Map container ── */}
       <div
-        className="relative rounded-xl overflow-hidden border border-white/10 flex-1"
-        style={{ height }}
+        className="relative rounded-xl overflow-hidden border border-white/10 flex-1 w-full"
         onClick={() => setShowDistrictMenu(false)}
       >
         {loadingGeoJSON && (
@@ -463,7 +469,11 @@ export default function FieldDrawMap({
         <MapContainer
           center={SL_CENTER}
           zoom={7}
+          minZoom={5}
+          maxZoom={18}
           style={{ width: "100%", height: "100%" }}
+          preferCanvas={true}
+          className="h-full w-full rounded-lg"
           zoomControl
         >
           <TileLayer
@@ -525,7 +535,7 @@ export default function FieldDrawMap({
       {!readOnly && (
         <p className="text-xs text-white/85 text-center">
           <span className="text-amber-400/70">■</span> Yellow = known paddy areas &nbsp;·&nbsp;
-          Use the <strong className="text-white/90">polygon / rectangle tool</strong> (top-right of map) to outline your field &nbsp;·&nbsp;
+          Use the <strong className="text-white/90">polygon, rectangle, or circle tools</strong> (top-right of map) to outline your field &nbsp;·&nbsp;
           {initialFeature && <span><span className="text-blue-400/70">⬝</span> Dashed blue = your current field</span>}
         </p>
       )}
