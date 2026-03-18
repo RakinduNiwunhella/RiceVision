@@ -215,16 +215,17 @@ const MyDashboard = () => {
   /* ------------------ RENDER ------------------ */
 
   return (
-    <div className="min-h-full p-4 sm:p-6 lg:p-10 text-white font-sans transition-all duration-500">
-      <div className="max-w-7xl mx-auto space-y-12 pb-20">
+    <div className="min-h-full px-3 py-4 sm:px-6 sm:py-6 lg:p-10 text-white font-sans transition-all duration-500">
+      <div className="max-w-7xl mx-auto space-y-6 sm:space-y-10 lg:space-y-12 pb-16 sm:pb-20">
 
         {/* ── Page Header ── */}
         <div ref={currentStep === 0 ? headerRef : undefined} className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
             <h1 className="text-xl sm:text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
+            Welcome to RiceVision
             </h1>
-            <p className="text-white/85 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em]">
-              {t('welcomeSubtitle')}
+            <p className="text-white/40 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em]">
+              {t('Satellite-driven insights for national food security')}
             </p>
           </div>
 
@@ -235,11 +236,11 @@ const MyDashboard = () => {
         </div>
 
         {/* ── Row 1: Stat Widgets ── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-6 sm:mt-10">
 
           {/* Field Health Distribution */}
-          <div ref={healthCardRef} className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col items-center">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/85 mb-8 self-start flex items-center gap-2">
+          <div ref={healthCardRef} className="glass glass-hover p-4 sm:p-6 md:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col items-center">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-8 self-start flex items-center gap-2">
               <span className="material-symbols-outlined text-emerald-400 text-sm">radiology</span>
               {t('cropHealthDist')}
             </p>
@@ -293,8 +294,8 @@ const MyDashboard = () => {
           </div>
 
           {/* Yield Forecast */}
-          <div ref={yieldCardRef} className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/85 mb-6 flex items-center gap-2">
+          <div ref={yieldCardRef} className="glass glass-hover p-4 sm:p-6 md:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-6 flex items-center gap-2">
               <span className="material-symbols-outlined text-cyan-400 text-sm">trending_up</span>
               {t('outputProjection')}
             </p>
@@ -325,7 +326,7 @@ const MyDashboard = () => {
           </div>
 
           {/* Expected Shortfall */}
-          <div ref={supplyCardRef} className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col justify-between md:col-span-2 lg:col-span-1">
+          <div ref={supplyCardRef} className="glass glass-hover p-4 sm:p-6 md:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col justify-between md:col-span-2 lg:col-span-1">
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/85 mb-6 flex items-center gap-2">
                 <span className="material-symbols-outlined text-amber-500 text-sm">error</span>
@@ -354,7 +355,7 @@ const MyDashboard = () => {
         </div>
 
         {/* ── Active Threats Section (Wider) ── */}
-        <div ref={threatsCardRef} className="glass p-1 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl overflow-hidden">
+        <div ref={threatsCardRef} className="glass p-2 sm:p-1 rounded-[1.5rem] sm:rounded-[3rem] border border-white/10 shadow-2xl overflow-hidden">
           <div className="p-4 sm:p-8 border-b border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/85 flex items-center gap-3">
               <span className="material-symbols-outlined text-rose-500">sensors</span>
@@ -372,7 +373,7 @@ const MyDashboard = () => {
             {(showAllOutbreaks ? outbreaks : outbreaks.slice(0, 5)).map((o, i) => (
               <div
                 key={o.id}
-                className="group flex flex-col sm:flex-row justify-between items-start sm:items-center px-4 sm:px-6 py-4 rounded-2xl bg-white/5 hover:bg-white/10 transition-all border border-white/5 hover:border-white/20 gap-3"
+                className="group flex flex-col sm:flex-row justify-between items-start sm:items-center px-4 sm:px-6 py-3 sm:py-4 rounded-2xl bg-white/5 hover:bg-white/10 transition-all border border-white/5 hover:border-white/20 gap-3"
               >
                 <div className="flex items-center gap-5">
                   <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -413,11 +414,11 @@ const MyDashboard = () => {
         </div>
 
         {/* ── Analytical Depth Row ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8 pb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 pb-10 sm:pb-12">
 
           {/* Stage Distribution */}
-          <div ref={stageChartRef} className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/85 mb-2 flex items-center gap-2">
+          <div ref={stageChartRef} className="glass glass-hover p-4 sm:p-6 md:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-2 flex items-center gap-2">
               <span className="material-symbols-outlined text-purple-400 text-sm">bar_chart</span>
               {t('growthAnalysis')}
             </p>
@@ -500,8 +501,7 @@ const MyDashboard = () => {
             )}
           </div>
 
-          {/* Regional Health Overview */}
-         {/* Regional Pest Overview */}
+          {/* Regional Health / Pest Overview */}
 <div ref={districtTableRef} className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
   <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/85 mb-2 flex items-center gap-2">
     <Bug className="text-rose-400 text-sm" />
@@ -509,33 +509,23 @@ const MyDashboard = () => {
   </p>
 
   <h3 className="text-xl font-black text-white tracking-tight uppercase mb-8">
-    District Pest Outbreak Status
+    District Pest & Health Status
   </h3>
 
   <div className="flex-1 space-y-2 no-scrollbar overflow-y-auto max-h-[420px] pr-2">
     {(showAllDistricts ? districtHealth : districtHealth.slice(0, 12)).map((d, i) => {
-
-      // 🔥 Convert health → pest risk
+      const healthPct = Math.round(d.normal_pct);
       const pestPct = Math.round(100 - d.normal_pct);
 
-      // 🎨 Pest color logic
-      const color =
-        pestPct <= 30 ? "#10b981" :   // Low risk
-        pestPct <= 70 ? "#f59e0b" :   // Medium risk
-        "#ef4444";                    // High risk
-
-      // 🟢🟡🔴 indicator
-      const statusIcon =
-        pestPct <= 30 ? "🟢" :
-        pestPct <= 70 ? "🟡" :
-        "🔴";
+      const healthColor = healthPct >= 75 ? "#10b981" : healthPct >= 50 ? "#f59e0b" : "#ef4444";
+      const pestColor = pestPct <= 30 ? "#10b981" : pestPct <= 70 ? "#f59e0b" : "#ef4444";
+      const statusIcon = pestPct <= 30 ? "🟢" : pestPct <= 70 ? "🟡" : "🔴";
 
       return (
         <div
           key={i}
           className="flex justify-between items-center p-3 rounded-2xl bg-white/5 hover:bg-white/10 transition-all group"
         >
-          {/* LEFT */}
           <div className="flex items-center gap-3">
             <Bug size={14} className="text-rose-400" />
             <span className="text-xs font-black text-white/85 uppercase tracking-tight group-hover:text-white transition-colors">
@@ -543,20 +533,27 @@ const MyDashboard = () => {
             </span>
           </div>
 
-          {/* RIGHT */}
           <div className="flex items-center gap-4">
-
-            {/* Progress Bar */}
             <div className="w-20 h-1.5 bg-white/5 rounded-full overflow-hidden p-[1px]">
               <div
                 className="h-full rounded-full transition-all duration-1000"
-                style={{ width: `${pestPct}%`, background: color }}
+                style={{ width: `${pestPct}%`, background: pestColor }}
               />
             </div>
 
-            {/* Percentage + Status */}
-            <span className="text-[10px] font-black tabular-nums text-right" style={{ color }}>
+            <span className="text-[10px] font-black tabular-nums text-right" style={{ color: pestColor }}>
               {pestPct}% {statusIcon}
+            </span>
+
+            <div className="w-20 h-1.5 bg-white/5 rounded-full overflow-hidden p-[1px]">
+              <div
+                className="h-full rounded-full transition-all duration-1000"
+                style={{ width: `${healthPct}%`, background: healthColor }}
+              />
+            </div>
+
+            <span className="text-[10px] font-black tabular-nums text-right" style={{ color: healthColor }}>
+              {healthPct}%
             </span>
           </div>
         </div>

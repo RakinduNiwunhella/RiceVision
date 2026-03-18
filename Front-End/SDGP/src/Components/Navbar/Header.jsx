@@ -502,7 +502,7 @@ const Header = () => {
               </div>
 
               {/* Actions */}
-              <div className="hidden sm:flex items-center gap-1.5 border-l border-white/10 pl-3">
+              <div className="hidden md:flex items-center gap-1.5 border-l border-white/10 pl-3">
                 {/* Language Selector */}
                 <div className="relative" ref={langBtnRef}>
                   <button
@@ -580,7 +580,7 @@ const Header = () => {
               <Link
                 ref={profileBtnRef}
                 to="/profile"
-                className="hidden sm:flex w-8 h-8 rounded-lg items-center justify-center text-white/85 hover:text-white hover:bg-white/10 transition"
+                className="hidden md:flex w-8 h-8 rounded-lg items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition"
                 title="View Profile"
               >
                 {profileAvatarUrl ? (
@@ -595,6 +595,48 @@ const Header = () => {
                   </span>
                 )}
               </Link>
+
+              {/* Mobile actions */}
+              <div className="flex md:hidden items-center gap-1">
+                <button
+                  ref={languageBtnRef}
+                  onClick={() => {
+                    const order = ["en", "si", "ta"];
+                    const currentIndex = order.indexOf(language);
+                    const nextLang = order[(currentIndex + 1) % order.length];
+                    setLanguage(nextLang);
+                  }}
+                  className="w-9 h-9 rounded-lg flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition"
+                  title="Change Language"
+                >
+                  <span className="material-symbols-outlined text-[20px]">language</span>
+                </button>
+
+                <button
+                  ref={themeBtnRef}
+                  className="w-9 h-9 rounded-lg flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition"
+                  onClick={toggleTheme}
+                  title="Toggle Theme"
+                >
+                  <span className="material-symbols-outlined text-[20px]">
+                    {isDark ? "light_mode" : "dark_mode"}
+                  </span>
+                </button>
+
+                <div ref={notificationBtnRef}>
+                  <NotificationPanelButton />
+                </div>
+                <Link
+                  ref={profileBtnRef}
+                  to="/profile"
+                  className="w-9 h-9 rounded-lg flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition"
+                  title="View Profile"
+                >
+                  <span className="material-symbols-outlined text-[20px]">
+                    person
+                  </span>
+                </Link>
+              </div>
 
               {/* Mobile hamburger button */}
               <button
@@ -680,58 +722,6 @@ const Header = () => {
                 </Link>
               );
             })}
-            {/* Mobile-only actions */}
-            <div className="border-t border-white/10 pt-3 mt-2 flex flex-col gap-3">
-              {/* Language options */}
-              <div className="flex items-center gap-2">
-                {LANGUAGES.map((lang) => (
-                  <button
-                    key={lang.code}
-                    onClick={() => setLanguage(lang.code)}
-                    className={`h-9 px-3 rounded-lg flex items-center gap-1.5 transition text-sm font-semibold ${language === lang.code
-                        ? "bg-emerald-500/20 text-white border border-white/20"
-                        : "text-white/85 hover:text-white hover:bg-white/10"
-                      }`}
-                  >
-                    <span className="material-symbols-outlined text-[18px]">
-                      language
-                    </span>
-                    {lang.short}
-                  </button>
-                ))}
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <button
-                    className="w-9 h-9 rounded-lg flex items-center justify-center text-white/85 hover:text-white hover:bg-white/10 transition"
-                    onClick={toggleTheme}
-                  >
-                    <span className="material-symbols-outlined text-[18px]">
-                      {isDark ? "light_mode" : "dark_mode"}
-                    </span>
-                  </button>
-                  <NotificationPanelButton />
-                </div>
-                <Link
-                  to="/profile"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-white/85 hover:text-white hover:bg-white/10 transition text-sm font-semibold"
-                >
-                  {profileAvatarUrl ? (
-                    <img
-                      src={profileAvatarUrl}
-                      alt="Profile"
-                      className="w-6 h-6 rounded-md object-cover border border-white/20"
-                    />
-                  ) : (
-                    <span className="w-6 h-6 rounded-md bg-white/10 border border-white/20 text-white text-[10px] font-black flex items-center justify-center">
-                      {profileInitials}
-                    </span>
-                  )}
-                  Profile
-                </Link>
-              </div>
-            </div>
           </div>
         </div>
       )}
