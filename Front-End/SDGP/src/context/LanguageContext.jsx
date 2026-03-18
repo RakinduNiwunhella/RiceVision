@@ -99,7 +99,7 @@ export const translations = {
 
     // ── Dashboard ──
     welcomeTitle: "Welcome to RiceVision",
-    welcomeSubtitle: "Insights of smarter farming",
+    welcomeSubtitle: "Insights for smarter farming",
     systemSynced: "System Synchronized",
     cropHealthDist: "Crop Health Distribution",
     analysing: "Analysing...",
@@ -122,11 +122,14 @@ export const translations = {
     growthAnalysis: "Growth Analysis",
     cropStageDistribution: "Crop Stage Distribution",
     totalFieldsTracked: "Total Fields Tracked",
+    loadingStageData: "Loading stage data...",
+    districtOverview: "District Overview",
+    districtPestHealthStatus: "District Pest & Health Status",
     districtHealthMap: "District Health Map",
 
     // ── Alerts ──
     fieldRiskAlerts: "Field Risk Alerts",
-    automatedMonitoring: "Automated Sentinel Monitoring",
+    automatedMonitoring: "Automated Monitoring",
     active: "Active",
     resolved: "Resolved",
     disasters: "Disasters",
@@ -141,30 +144,29 @@ export const translations = {
     // ── Help ──
     helpSupport: "Help & Support",
     quickAssistance: "Quick Assistance",
-    quickAssistanceDesc:
-      "Immediate tactical assistance for critical infrastructure failures.",
+    quickAssistanceDesc: "Get quick help for urgent issues.",
     dialConcierge: "Dial Concierge",
     askTeam: "Ask Our Team",
-    askTeamDesc: "Submit non-urgent data requests or detailed system feedback.",
+    askTeamDesc: "Send non-urgent questions or feedback.",
     transmitEmail: "Transmit Email",
-    feedbackLoop: "Intelligence Feedback Loop",
+    feedbackLoop: "Feedback Form",
     fullOperatorName: "Full Operator Name",
     assignedPosition: "Assigned Position",
     province: "Province",
     district: "District",
     anomalyType: "Anomaly Type",
     selectSeverity: "Select Severity",
-    detailedMessage: "Detailed Diagnostic Message",
-    describeIssue: "Describe the issue in detail so we can help you....",
+    detailedMessage: "Detailed Message",
+    describeIssue: "Describe the issue in detail so we can help you...",
     transmitting: "Transmitting...",
     submitReport: "Submit Your Report",
     quickHelp: "Quick Help",
-    decryptingFaqs: "Decrypting FAQs...",
+    decryptingFaqs: "Loading FAQs...",
 
     // ── Field Data ──
     fieldIntelligence: "Field Intelligence",
-    liveStream: "Live Sentinel Stream",
-    decryptingIntel: "Decrypting Field Intelligence...",
+    liveStream: "Live Data Stream",
+    decryptingIntel: "Analyzing field data...",
     districtPerformance: "District-wise Performance Summary",
     colDistrict: "District",
     colTotalFields: "Total Fields",
@@ -205,18 +207,18 @@ export const translations = {
     operatorAuth: "Operator Authorization",
     identityProfile: "Identity Profile",
     profileDesc:
-      "Synthesize and finalize your operator credentials within the RiceVision network. All modifications are recorded permanently in the regional registry.",
+      "Keep your profile details up to date for a better experience in RiceVision.",
     personalId: "Personal Identification",
     sectorReg: "Sector Registration",
     givenName: "Given Name",
     surname: "Surname",
     identification: "Identification (NIC)",
-    tacticalPhone: "Tactical Phone",
-    emailEndpoint: "Encryption Endpoint (Email)",
-    address: "Operational Zone (Address)",
-    uploadingMatrix: "Uploading Matrix...",
-    updating: "Applying Changes...",
-    updateProfile: "Synchronize Identity",
+    tacticalPhone: "Phone Number",
+    emailEndpoint: "Email Address",
+    address: "Address",
+    uploadingMatrix: "Uploading photo...",
+    updating: "Updating...",
+    updateProfile: "Update Profile",
 
     // ── Notifications ──
     notifications: "Notifications",
@@ -382,13 +384,347 @@ export const translations = {
     single: "Single",
     compare: "Compare",
     liveData: "Live Data",
+
+    // ── Cross-Page Missing Keys ──
+    districtStat: "District",
+    hourlyForecast: "Hourly Forecast",
+    soilAgronomic: "Soil & Agronomic Data",
+    historyData: "Historical Data",
+    confirmEmailLoginBeforeSave:
+      "Please confirm your email and log in before saving your field.",
+    saveFieldFailedPrefix: "Could not save field",
+    fieldMonitoringTitle: "RiceVision Field Monitoring",
+    sriLanka: "Sri Lanka",
+    payNow: "Pay",
+    perYear: "year",
+    saveFailedPrefix: "Save failed",
+    fieldBoundarySaved: "Field boundary saved to registry.",
+    confirmRemoveFieldRegistration:
+      "Are you sure you want to remove your field registration? This cannot be undone.",
+    deleteFailedPrefix: "Delete failed",
+    fieldRegistrationRemoved: "Field registration removed.",
+    quickPhoneSupportTitle: "Quick phone support",
+    quickPhoneSupportDesc:
+      "Call our support team for urgent help with your dashboard, field setup, or report issues.",
+    emailSupportTitle: "Email support",
+    emailSupportDesc:
+      "Send your issue details by email and our team will respond with a solution.",
+    call: "Call",
+    email: "Email",
+    submitComplaintTitle: "Submit a complaint",
+    fullNameExample: "John Doe",
+    assignedPositionExample: "Field Supervisor",
+    selectIssueType: "Select issue type",
+    issueTechnical: "Technical issue",
+    issueDataMismatch: "Data mismatch",
+    issueAccountAccess: "Account or access issue",
+    issueOther: "Other",
+    complaintValidationRequired: "Full name and complaint message are required.",
+    complaintSubmittedSuccess: "Complaint submitted successfully.",
+    complaintSubmitFailed: "Failed to submit complaint.",
+    resolveAlertTitle: "Resolve Alert",
+    resolutionNoteOptional: "Resolution Note (optional)",
+    resolutionNotePlaceholder: "Describe how this was resolved...",
+    confirmBtn: "Confirm",
+    alertsRealtimeSubtitle: "Real-time field health intelligence",
+    noPastThreats: "No past threats detected",
+    noteLabel: "Note",
+    alertsTutorialTabsTitle: "Alert Tabs",
+    alertsTutorialTabsAction:
+      "Click on different tabs to view different types of alerts.",
+    alertsTutorialTabsOutcome:
+      "You will see disasters, pest risks, or past resolved alerts.",
+    alertsTutorialSearchTitle: "Search Alerts",
+    alertsTutorialSearchAction:
+      "Type in the search box to find specific alerts.",
+    alertsTutorialSearchOutcome:
+      "The alert list filters to show only matching results.",
+    alertsTutorialResolveTitle: "Resolve Alert",
+    alertsTutorialResolveAction:
+      "Click the Resolve button on any active alert.",
+    alertsTutorialResolveOutcome:
+      "A dialog opens where you can add a resolution note.",
+    alertsTutorialIgnoreTitle: "Ignore Alert",
+    alertsTutorialIgnoreAction:
+      "Click Ignore to dismiss an alert without resolving.",
+    alertsTutorialIgnoreOutcome:
+      "The alert moves to the Past Alerts tab.",
+    alertsTutorialMapTitle: "View on Map",
+    alertsTutorialMapAction:
+      "Click View in Map to see the alert location.",
+    alertsTutorialMapOutcome:
+      "You are taken to the map showing the affected area.",
+    fieldDataOverviewTitle: "Field Data Overview",
+    fieldDataOverviewAction:
+      "This page shows a summary of all your field statistics.",
+    fieldDataOverviewOutcome:
+      "You will see total fields, healthy count, stressed crops, and critical alerts.",
+    fieldDataSummaryTitle: "Summary Statistics",
+    fieldDataSummaryAction:
+      "Check the stat cards for quick field health metrics.",
+    fieldDataSummaryOutcome:
+      "Green means healthy fields, yellow means stressed fields, and red means critical alerts.",
+    fieldDataDistrictTableTitle: "District Comparison Table",
+    fieldDataDistrictTableAction:
+      "Scroll through the table to see field data for each district.",
+    fieldDataDistrictTableOutcome:
+      "Compare health, total yield, and stress across districts.",
+    fieldDataViewMapTitle: "View on Map",
+    fieldDataViewMapAction:
+      "Use View in Map next to any district to open the map.",
+    fieldDataViewMapOutcome:
+      "The map opens focused on the selected district.",
+    actionLabel: "Action",
+    viewReportBtn: "View Report",
+    weatherTutorialOverviewAction:
+      "Explore current weather conditions including temperature, rain, and wind.",
+    weatherTutorialOverviewOutcome:
+      "You will see real-time weather measurements for your location.",
+    weatherTutorialHourlyAction:
+      "Open the hourly tab to view 24-hour weather progression.",
+    weatherTutorialHourlyOutcome:
+      "You will see temperature, rain, and wind changes for the next 24 hours.",
+    weatherTutorialSoilAction:
+      "Open the soil tab to view soil and agronomic conditions.",
+    weatherTutorialSoilOutcome:
+      "You will see soil temperature, moisture, VPD, and evapotranspiration data.",
+    weatherTutorialForecastAction:
+      "Open the forecast tab to view the extended 14-day outlook.",
+    weatherTutorialForecastOutcome:
+      "You will see daily predictions to plan field operations.",
+    weatherTutorialHistoryAction:
+      "Open the history tab to review past weather records.",
+    weatherTutorialHistoryOutcome:
+      "You will see recent patterns to compare seasonal behavior.",
+    dsDivision: "DS Division",
+    colombo: "Colombo",
+    autoDetected: "Auto-detected",
+    daytime: "Daytime",
+    night: "Night",
+    hourlyDetailTable: "Hourly Detail Table",
+    soilTemperatureProfiles: "Soil Temperature Profiles",
+    soilMoistureContent: "Soil Moisture Content",
+    agronomicIndicators: "Agronomic Indicators",
+    sprayFieldAdvisory: "Spray & Field Work Advisory",
+    outlook14Day: "14-Day Outlook",
+    weeklyAgroForecastDetail: "Weekly Agro Forecast Detail",
+    past7DaysFieldHistory: "Past 7 Days - Field History",
+    historicalDetailTable: "Historical Detail Table",
+    reportTutorialOverviewAction:
+      "Explore satellite-derived yield predictions and analysis.",
+    reportTutorialOverviewOutcome:
+      "You will see detailed forecasts with comparative metrics and export options.",
+    reportTutorialModeTitle: "Single vs Compare",
+    reportTutorialModeAction:
+      "Switch between Single and Compare modes for side-by-side analysis.",
+    reportTutorialModeOutcome:
+      "You can analyze one district or compare two districts.",
+    reportTutorialDistrictTitle: "District Selection",
+    reportTutorialDistrictAction:
+      "Select a district to view its yield analytics.",
+    reportTutorialDistrictOutcome:
+      "The report loads data and predictions for that district.",
+    reportTutorialYieldTitle: "Yield Prediction",
+    reportTutorialYieldAction:
+      "Review predicted yield and historical comparison.",
+    reportTutorialYieldOutcome:
+      "You will see expected harvest and baseline values.",
+    reportTutorialMetricsTitle: "Metrics and Export",
+    reportTutorialMetricsAction:
+      "Review pest and risk metrics, then export the report.",
+    reportTutorialMetricsOutcome:
+      "A complete analysis PDF can be downloaded.",
+    dataUnavailable: "Data Unavailable",
+    fetchingSatelliteData: "Fetching satellite data...",
+    viewLabel: "View",
+    primaryLabel: "Primary",
+    comparisonLabel: "Comparison",
+    predictedAverage: "Predicted Average",
+    totalYieldLabel: "Total Yield",
+    historicalBaseline: "Historical Baseline",
+    pestCount: "Pest Count",
+    riskFactor: "Risk Factor",
+    exportComparisonReport: "Export Comparison Report",
+    loginFailed: "Login failed",
+    pleaseEnterEmail: "Please enter your email.",
+    failedToSendResetEmail: "Failed to send reset email.",
+    networkErrorTryAgain: "Network error. Please try again.",
+    validEmailAddressError: "Please enter a valid email address.",
+    signupFailed: "Signup failed",
+    createAccountSubtitle: "Create your RiceVision account to get started.",
+    sidebarTutorialNavTitle: "Sidebar Navigation",
+    sidebarTutorialNavAction:
+      "Use the left sidebar to navigate between main pages.",
+    sidebarTutorialNavOutcome:
+      "You can access Dashboard, Field Map, Alerts, Weather, Reports, and more from here.",
+    sidebarTutorialTopTitle: "Top Navigation Links",
+    sidebarTutorialTopAction:
+      "Click Dashboard, Field Map, or other items to navigate.",
+    sidebarTutorialTopOutcome:
+      "The highlighted item shows your current page.",
+    sidebarTutorialBottomTitle: "Bottom Options",
+    sidebarTutorialBottomAction:
+      "Open profile settings, support, or logout from the bottom section.",
+    sidebarTutorialBottomOutcome:
+      "You can manage your account quickly from any page.",
+    systemVersionTag: "System Version Alpha-1.0.4 - RiceVision Core",
+    dashboardTutorialWelcome:
+      "Welcome. This is your field control center overview.",
+    dashboardTutorialSync:
+      "Check this icon to ensure your data is freshly synced.",
+    dashboardTutorialHealth:
+      "See crop health as a pie chart. Green means optimal.",
+    dashboardTutorialYield:
+      "View your expected total harvest here in metric tons.",
+    dashboardTutorialSupply:
+      "Track expected shortfalls and national demand risks quickly.",
+    dashboardTutorialThreats:
+      "Review active disease outbreaks and critical pest risks.",
+    dashboardTutorialThreatDetails:
+      "Open detailed recommendations for this threat.",
+    dashboardTutorialThreatToggle:
+      "Expand or collapse your threat list.",
+    dashboardTutorialStageChart:
+      "Check what percentage of your crops are in each growth stage.",
+    dashboardTutorialDistrictTable:
+      "Compare health metrics across all your districts in one table.",
+    dashboardTutorialDistrictToggle:
+      "Use this button to expand the full district list.",
+    fieldsLabel: "fields",
+    countLabel: "Count",
+    statusSafe: "SAFE",
+    statusModerate: "MODERATE",
+    statusCritical: "CRITICAL",
+    statusStable: "STABLE",
+    statusWarning: "WARNING",
+    statusHighRisk: "HIGH RISK",
+    wmoClearSky: "Clear Sky",
+    wmoPartlyCloudy: "Partly Cloudy",
+    wmoOvercast: "Overcast",
+    wmoFoggyHaze: "Foggy / Haze",
+    wmoDrizzle: "Drizzle",
+    wmoRain: "Rain",
+    wmoSnowIce: "Snow / Ice",
+    wmoRainShowers: "Rain Showers",
+    wmoHeavySnowShowers: "Heavy Snow Showers",
+    wmoThunderstorm: "Thunderstorm",
+    wmoUnknown: "Unknown",
+    weatherAdvisoryFeels: "Feels {temp}°C",
+    weatherAdvisoryFungalRisk: "Fungal risk",
+    weatherAdvisoryNormal: "Normal",
+    weatherAdvisoryMoistureThreshold: "Moisture saturation threshold",
+    weatherAdvisoryPoorSunlight: "Poor sunlight",
+    weatherAdvisoryGoodForCrops: "Good for crops",
+    weatherAdvisoryMeanSeaLevel: "Mean sea level",
+    weatherAdvisoryAvoidSpraying: "Avoid spraying",
+    weatherAdvisorySafeForSpraying: "Safe for spraying",
+    weatherAdvisoryHighGusts: "High gusts",
+    weatherAdvisorySafe: "Safe",
+    weatherAdvisoryCurrentHour: "Current hour",
+    weatherAdvisoryUVVeryHigh: "Very high",
+    weatherAdvisoryUVModerate: "Moderate",
+    weatherAdvisoryUVLow: "Low",
+    weatherAdvisoryPoorVisibility: "Poor visibility",
+    weatherAdvisoryGood: "Good",
+    weatherAdvisoryHoursWithRain: "Hours with rain",
+    weatherAdvisoryTodayTotal: "Today total",
+    weatherAdvisoryIrrigationGuide: "Irrigation guide",
+    weatherAdvisoryCropStress: "Crop stress",
+    weatherAdvisoryTotalRainToday: "Total rain today",
+    weatherAdvisoryMaxChanceToday: "Max chance today",
+    weatherTableColTime: "Time",
+    weatherTableColCondition: "Condition",
+    weatherTableColTemp: "Temp",
+    weatherTableColFeels: "Feels",
+    weatherTableColHumidity: "Humidity",
+    weatherTableColRainPercent: "Rain%",
+    weatherTableColRainMm: "Rain mm",
+    weatherTableColWind: "Wind",
+    weatherTableColUV: "UV",
+    weatherTableColET0: "ET0",
+    weatherTableColVisibility: "Visibility",
+    weatherTableColDate: "Date",
+    weatherTableColMaxTemp: "Max C",
+    weatherTableColMinTemp: "Min C",
+    weatherTableColWindMax: "Wind Max",
+    weatherTableColUvMax: "UV Max",
+    weatherTableColRadiation: "Radiation",
+    weatherTableColSunrise: "Sunrise",
+    weatherTableColSunset: "Sunset",
+    weatherTableColConditions: "Conditions",
+    weatherTableColRainSum: "Rain Sum",
+    weatherTableColRainHours: "Rain Hrs",
+    soilTempSurfaceLabel: "Surface (0 cm)",
+    soilTempSurfaceDesc: "Top layer - seed germination zone",
+    soilTempShallowLabel: "Shallow (6 cm)",
+    soilTempShallowDesc: "Root zone for seedlings",
+    soilTempMediumLabel: "Medium (18 cm)",
+    soilTempMediumDesc: "Active root zone - paddy growth",
+    soilAdvisoryTooCold: "Too cold for germination",
+    soilAdvisoryHeatStress: "Heat stress risk",
+    soilAdvisoryOptimal: "Optimal for paddy",
+    soilMoistureDepth0to1: "0-1 cm",
+    soilMoistureDepth0to1Desc: "Topsoil - surface evaporation layer",
+    soilMoistureDepth1to3: "1-3 cm",
+    soilMoistureDepth1to3Desc: "Seedling root zone",
+    soilMoistureDepth3to9: "3-9 cm",
+    soilMoistureDepth3to9Desc: "Primary root absorption zone",
+    soilMoistureLabel: "Soil Moisture",
+    soilMoistureLow: "Low - consider irrigation",
+    soilMoistureSaturated: "Saturated",
+    soilMoistureGood: "Good moisture level",
+    et0EvapotranspirationToday: "ET0 Evapotranspiration Today",
+    et0Description:
+      "Reference evapotranspiration (FAO-56) is the amount of water crops would use under optimal conditions.",
+    et0HighDemand: "High demand - increase irrigation",
+    et0ModerateDemand: "Moderate - normal irrigation",
+    et0LowDemand: "Low demand - reduce irrigation",
+    vapourPressureDeficit: "Vapour Pressure Deficit",
+    vpdDescription: "High VPD can increase crop water stress.",
+    vpdSevereStress: "Severe stress",
+    vpdModerateStress: "Moderate stress",
+    vpdGoodConditions: "Good conditions",
+    solarRadiationToday: "Solar Radiation Today",
+    solarRadiationDescription:
+      "Higher radiation drives evapotranspiration and photosynthesis.",
+    solarRadiationHigh: "High radiation day",
+    solarRadiationNormal: "Normal radiation",
+    advisorySprayingTitle: "Pesticide / Herbicide Spraying",
+    advisoryIrrigationTitle: "Irrigation Recommended",
+    advisoryFungalRiskTitle: "Fungal Disease Risk",
+    advisoryFieldMachineryTitle: "Field Machinery Work",
+    advisoryHarvestTitle: "Harvest Conditions",
+    advisoryUvRiskTitle: "UV Exposure Risk",
+    advisoryWindDriftRisk: "Wind {speed} km/h - drift risk",
+    advisoryRainWashOffRisk: "Active rain - wash-off risk",
+    advisoryHeavyCloudPoorDrying: "Heavy cloud - poor drying",
+    advisoryAllConditionsMet: "All conditions met",
+    advisoryEt0Low: "ET0 low ({et0} mm)",
+    advisorySoilMoistureSufficient: "Soil moisture sufficient",
+    advisoryEt0MoistureLow: "ET0 = {et0} mm, moisture low",
+    advisoryHumidityMonitorBlast: "Humidity {humidity}% - monitor for blast",
+    advisoryHumidityLowRisk: "Humidity {humidity}% - low risk",
+    advisoryRainSoilWaterlogged: "Rain present - soil waterlogged",
+    advisorySoilTooWetMachinery: "Soil too wet for machinery",
+    advisoryConditionsSuitable: "Conditions suitable",
+    advisoryRainAvoidHarvest: "Rain - avoid harvest",
+    advisoryHighHumidityGrainMoistureRisk:
+      "High humidity - grain moisture risk",
+    advisoryGoodHarvestWindow: "Good harvest window",
+    advisoryUvVeryHigh: "UV {uv} - very high, use protection",
+    advisoryUvWearProtection: "UV {uv} - wear protective gear",
+    advisoryUvSafe: "UV {uv} - safe",
+    advisoryStatusMonitor: "Monitor",
+    advisoryStatusGo: "Go",
+    advisoryStatusHold: "Hold",
+    weatherRainShort: "Rain",
   },
 
   si: {
     // ── Nav ──
     dashboard: "උපකරණ පුවරුව",
     fieldData: "කෙත් දත්ත",
-    map: "සản-ල",
+    map: "සිතියම",
     weather: "කාලගුණය",
     alerts: "අනතුරු ඇඟවීම්",
     report: "වාර්තාව",
@@ -397,7 +733,7 @@ export const translations = {
     noResults: "ප්‍රතිඵල නොමැත",
 
     // ── Navigation Button Tutorials (FLAT KEYS) ──
-    dashboardTutTitle: "සියලු ඔබේ ක්ෂේත්‍ර බලන්න",
+    dashboardTutTitle: "ඔබගේ සියලු ක්ෂේත්‍ර බලන්න",
     dashboardTutAction: "බෝග සෞඛ්‍ය, අස්වැන්න, තර්ජන පරීක්ෂා කරන්න",
     dashboardTutOutcome: "එකම ස්ථානයේ සියලු ක්ෂේත්‍ර තොරතුරු",
     
@@ -406,18 +742,18 @@ export const translations = {
     fieldDataTutOutcome: "සියලු ක්ෂේත්‍ර විස්තර සහ ඉතිහාසය බලන්න",
     
     mapTutTitle: "චන්ද්‍රිකා ක්ෂේත්‍ර දර්ශනය",
-    mapTutAction: "ක්ෂේත්‍ර පිතු සහ ස්ථරයන් බලන්න",
+    mapTutAction: "ක්ෂේත්‍ර පින්තූර සහ ස්ථර බලන්න",
     mapTutOutcome: "සිතියමේ සෞඛ්‍ය බලන්න",
     
     weatherTutTitle: "කාලගුණ අනාවැකිය පරීක්ෂා කරන්න",
     weatherTutAction: "උෂ්ණත්වය, වර්ෂා සහ පස බලන්න",
-    weatherTutOutcome: "කාලගුණ ඉතිරි කිරීමක් මත පදනම් වී සැලසුම්",
+    weatherTutOutcome: "කාලගුණය මත පදනම්ව ගොවිතැන සැලසුම් කරන්න",
     
-    alertsTutTitle: "පත්කයේ සහ රෝගවල අනතුරු ප්‍රවේශ කරන්න",
-    alertsTutAction: "බෝගවලට ක්රියාශීල තර්ජන බලන්න",
+    alertsTutTitle: "පළිබෝධ හා රෝග අනතුරු ඇඟවීම් ලබා ගන්න",
+    alertsTutAction: "බෝගවලට ඇති සක්‍රිය තර්ජන බලන්න",
     alertsTutOutcome: "ඔබේ බෝගවලට තර්ජන ගැන දැන ගන්න",
     
-    reportTutTitle: "අස්වැන්න කර්ම විශ්ලේෂණ කරන්න",
+    reportTutTitle: "අස්වැන්න කාර්ය සාධනය විශ්ලේෂණය කරන්න",
     reportTutAction: "දිස්ත්‍රික් සහ අස්වැන්න සංසන්දනය කරන්න",
     reportTutOutcome: "අස්වැන්න ප්‍රතිඵල තේරුම් ගන්න",
     
@@ -425,9 +761,9 @@ export const translations = {
     helpTutAction: "පිළිතුරු සහ FAQ සොයන්න",
     helpTutOutcome: "ඔබට අවශ්‍ය විට සහාය ලබා ගන්න",
     
-    chatbotTutTitle: "তাৎক্ষণিক AI পরামর්শ পান",
-    chatbotTutAction: "চ্যাট সহায়ক খুলতে ক্লিক করুন",
-    chatbotTutOutcome: "প্রশ্ন জিজ্ঞাসা করুন এবং তাৎক্ষণিক উত্তর পান",
+    chatbotTutTitle: "ක්ෂණික AI උපදෙස් ලබා ගන්න",
+    chatbotTutAction: "චැට් සහායකය විවෘත කිරීමට ක්ලික් කරන්න",
+    chatbotTutOutcome: "ප්‍රශ්න අසන්න සහ ක්ෂණික පිළිතුරු ලබා ගන්න",
     
     // ── Header Action Button Tutorials (FLAT KEYS) ──
     searchHeaderTitle: "පිටු ඉක්මනින් සොයන්න",
@@ -436,15 +772,15 @@ export const translations = {
     
     languageTitle: "භාෂාව මාරු කරන්න",
     languageAction: "ඉංග්‍රීසි, සිංහල හෝ දෙමළ තෝරා ගැනීමට ක්ලික් කරන්න",
-    languageOutcome: "යෙදුම ඔබේ භාෂාවින් පෙන්නුම් දෙයි",
+    languageOutcome: "යෙදුම ඔබේ භාෂාවෙන් පෙන්වයි",
     
-    themeTitle: "දීප්තිමතභාවය මට්ටම වෙනස් කරන්න",
+    themeTitle: "දර්ශන මාදිලිය වෙනස් කරන්න",
     themeAction: "සඳ/සූර්ය අයිකනය ක්ලික් කරන්න",
-    themeOutcome: "අඳුරු හෝ ආලෝකමත් ප්‍රකාශනය ටොගල් කරන්න",
+    themeOutcome: "අඳුරු හෝ ආලෝක මාදිලිය අතර මාරු කරන්න",
     
     notificationsTitle: "පණිවිඩ පරීක්ෂා කරන්න",
-    notificationsAction: "අනතුරු ඇඟවීම් සහ යාවත්කාලීනයි බලන්න",
-    notificationsOutcome: "දැනුම්දෙන්න අවුරුද්ධ",
+    notificationsAction: "අනතුරු ඇඟවීම් සහ යාවත්කාලීන බලන්න",
+    notificationsOutcome: "වැදගත් දැනුම්දීම් පිළිබඳ යාවත්කාලීනව සිටින්න",
     
     profileTitle: "ඔබේ ගිණුම් සැකසීම්",
     profileAction: "ඔබේ තොරතුරු සංස්කරණය කරන්න",
@@ -468,27 +804,27 @@ export const translations = {
         outcome: "ඔබේ කෙත ලියාපදිංචි වී ඔබ එය නිරීක්ෂණ කිරීමට පටන් ගත හැකිය",
       },
       download: {
-        title: "වාර්තාව នាందු නිෂ්පාදිතය",
+        title: "වාර්තාව නිර්යාත කරන්න",
         action: "'PDF බාගන්න' ක්ලික් කර කෙත් විශ්ලේෂණ වාර්තාව ලබා ගන්න",
-        outcome: "කෙත් දත්ත සහ විශ්ලේෂණ සහිත විස්තරිත PDF ឯකសារ তৈরි කරනු ලැබේ",
+        outcome: "කෙත් දත්ත සහ විශ්ලේෂණ සමඟ විස්තරාත්මක PDF ලේඛනයක් සාදනු ලැබේ",
       },
     },
 
     // ── Dashboard ──
     welcomeTitle: "RiceVision වෙත සාදරයෙන් පිළිගනිමු",
-    welcomeSubtitle: "දක්ෂ ගොවිතැනෙහි අවබෝධය",
+    welcomeSubtitle: "බුද්ධිමත් ගොවිතැන සඳහා අවබෝධය",
     systemSynced: "පද්ධතිය සමමුහුර්ත කර ඇත",
     cropHealthDist: "බෝග සෞඛ්‍ය බෙදාහැරීම",
     analysing: "විශ්ලේෂණය කරමින්...",
     optimal: "ශ්‍රේෂ්ඨ",
-    mildStress: "මෘදු ඒකාග්‍රතාව",
-    severeStress: "දැඩි ඒකාග්‍රතාව",
+    mildStress: "මධ්‍යම ආතතිය",
+    severeStress: "දැඩි ආතතිය",
     outputProjection: "නිෂ්පාදන අනාවැකිය",
     metricTons: "මෙට්‍රික් ටොන් (ඇ.)",
     highPerformance: "ඉහළ කාර්ය සාධන ප්‍රදේශ",
     supplyStability: "සැපයුම් ස්ථාවරත්වය",
     expectedShortfall: "අපේක්ෂිත හිඟය (MT)",
-    nationalDemand: "ජාතික ඉල්ලුම් සන්තෘප්තිය",
+    nationalDemand: "ජාතික ඉල්ලුම සපුරාලීම",
     referenceThreshold: "ආශ්‍රිතය: MT 3.0M සීමාව",
     diseaseOutbreak: "රෝග හා ව්‍යසන ආගමනය",
     checkingFields: "කෙත් පරීක්ෂා කරමින්...",
@@ -498,8 +834,11 @@ export const translations = {
     showAll: "සියල්ල බලන්න",
     growthAnalysis: "වර්ධන විශ්ලේෂණය",
     cropStageDistribution: "බෝග අදියර බෙදාහැරීම",
-    totalFieldsTracked: "ලුහුඬු කළ කෙත් ගණන",
-    districtHealthMap: "දිස්ත්‍රික් සෞඛ්‍ය සản-ල",
+    totalFieldsTracked: "අධීක්ෂණය වන මුළු කෙත් ගණන",
+    loadingStageData: "බෝග අදියර දත්ත පූරණය කරමින්...",
+    districtOverview: "දිස්ත්‍රික් සාරාංශය",
+    districtPestHealthStatus: "දිස්ත්‍රික් පළිබෝධ හා සෞඛ්‍ය තත්ත්වය",
+    districtHealthMap: "දිස්ත්‍රික් සෞඛ්‍ය සිතියම",
 
     // ── Alerts ──
     fieldRiskAlerts: "කෙත් අවදානම් ඇඟවීම්",
@@ -513,33 +852,33 @@ export const translations = {
     noThreats: "ක්‍රියාකාරී තර්ජන හඳුනාගෙන නැත",
     resolveBtn: "විසඳන්න",
     ignoreBtn: "නොසලකන්න",
-    viewInMap: "සản-ලෙ බලන්න",
+    viewInMap: "සිතියමේ බලන්න",
 
     // ── Help ──
     helpSupport: "උදව් සහ සහාය",
     quickAssistance: "ඉක්මන් සහාය",
-    quickAssistanceDesc: "තීරණාත්මක යටිතල අකාමාවන් සඳහා ඉක්මන් සහාය.",
+    quickAssistanceDesc: "අත්‍යවශ්‍ය ගැටලු සඳහා ඉක්මන් සහාය ලබා ගන්න.",
     dialConcierge: "ඇමතුම ගන්න",
     askTeam: "කණ්ඩායමෙන් අසන්න",
-    askTeamDesc: "හදිසි නොවන දත්ත ඉල්ලීම් හෝ ප්‍රතිපෝෂණ ඉදිරිපත් කරන්න.",
+    askTeamDesc: "හදිසි නොවන ප්‍රශ්න හෝ ප්‍රතිචාර අපට යවන්න.",
     transmitEmail: "ඊමේල් යවන්න",
-    feedbackLoop: "ප්‍රතිපෝෂණ පරිපාලනය",
+    feedbackLoop: "ප්‍රතිචාර පෝරමය",
     fullOperatorName: "සම්පූර්ණ නාමය",
     assignedPosition: "නිශ්චිත තනතුර",
     province: "පළාත",
     district: "දිස්ත්‍රික්කය",
     anomalyType: "ගැටලු වර්ගය",
     selectSeverity: "බරපතල බව තෝරන්න",
-    detailedMessage: "සවිස්තරාත්මක පණිවිඩය",
+    detailedMessage: "විස්තරාත්මක පණිවිඩය",
     describeIssue: "ගැටලුව සවිස්තරාත්මකව විස්තර කරන්න...",
     transmitting: "යවමින්...",
     submitReport: "වාර්තාව ඉදිරිපත් කරන්න",
     quickHelp: "ඉක්මන් උදව්",
-    decryptingFaqs: "FAQs පූරණය කරමින්...",
+    decryptingFaqs: "නිතර අසන ප්‍රශ්න පූරණය කරමින්...",
 
     // ── Field Data ──
     fieldIntelligence: "කෙත් බුද්ධිය",
-    liveStream: "සජීව ධාරාව",
+    liveStream: "සජීව දත්ත ප්‍රවාහය",
     decryptingIntel: "කෙත් දත්ත විශ්ලේෂණය කරමින්...",
     districtPerformance: "දිස්ත්‍රික් කාර්ය සාධන සාරාංශය",
     colDistrict: "දිස්ත්‍රික්කය",
@@ -562,9 +901,9 @@ export const translations = {
     cloudCover: "වලා ආවරණය",
     atmospheric: "වායුගෝලීය තත්ත්ව",
     tabOverview: "දළ විශ්ලේෂණය",
-    tabHourly: "පැය-by-පැය",
+    tabHourly: "පැයෙන් පැය",
     tab14Day: "දින 14",
-    tabSoil: "පසෙ",
+    tabSoil: "පස",
     tabAgriculture: "කෘෂිකර්ම",
 
     // ── Report ──
@@ -581,7 +920,7 @@ export const translations = {
     operatorAuth: "ක්‍රියාකරු අනුමැතිය",
     identityProfile: "අනන්‍යතා විස්තරය",
     profileDesc:
-      "RiceVision ජාලයේ ඔබේ ක්‍රියාකරු අක්‍රිය සාකාරය සාකච්ඡා කරන්න.",
+      "RiceVision තුළ හොඳ අත්දැකීමක් සඳහා ඔබේ පැතිකඩ තොරතුරු යාවත්කාලීනව තබා ගන්න.",
     personalId: "පෞද්ගලික හඳුනාගැනීම",
     sectorReg: "ක්ෂේත්‍ර ලියාපදිංචිය",
     givenName: "ලබා දුන් නාමය",
@@ -592,7 +931,7 @@ export const translations = {
     address: "ලිපිනය",
     uploadingMatrix: "ඡායාරූපය යවමින්...",
     updating: "යාවත්කාලීන කරමින්...",
-    updateProfile: "අනන්‍යතාව සමමුහුර්ත කරන්න",
+    updateProfile: "පැතිකඩ යාවත්කාලීන කරන්න",
 
     // ── Notifications ──
     notifications: "දැනුම්දීම්",
@@ -604,7 +943,7 @@ export const translations = {
     emailAddress: "ඊමේල් ලිපිනය",
     password: "මුරපදය",
     forgotPassword: "මුරපදය අමතකද?",
-    keepLoggedIn: "ලොගිනව තබා ගන්න",
+    keepLoggedIn: "ලොගින් වී සිටින්න",
     signingIn: "ඇතුල් වෙමින්...",
     signInBtn: "ගිණුමට ඇතුල් වන්න",
     orDivider: "හෝ",
@@ -623,7 +962,7 @@ export const translations = {
 
     // ── Sidebar ──
     myDashboard: "මගේ උපකරණ පුවරුව",
-    fieldMap: "කෙත් සản-ල",
+    fieldMap: "කෙත් සිතියම",
     myProfile: "මගේ ගිණුම",
     helpFAQ: "උදව් සහ FAQ",
     logout: "ලොග් අවුට්",
@@ -661,13 +1000,13 @@ export const translations = {
     drawFieldStep: "කෙත ඇඳීම",
     paymentStep: "ගෙවීම",
     confirmEmailBanner:
-      "තහවුරු ඊමේල් එකක් යවා ඇත. ගෙවීම සම්පූර්ණ කිරීමට ඔබේ ඊමේල් තහවුරු කරන්න — ඔබට දැන් සản-ල දැකිය හැකිය.",
+      "තහවුරු කිරීමේ ඊමේල් එකක් යවා ඇත. ගෙවීම සම්පූර්ණ කිරීමට පෙර ඊමේල් තහවුරු කරන්න — ඔබට දැන් සිතියම පෙරදසුන් කළ හැකිය.",
     registerPaddyTitle: "ඔබේ ගොළු කෙත ලියාපදිංචි කරන්න",
     registerPaddySubtitle:
       "ගොළු කෙත් සීමාව ඇඳීමෙන් චන්ද්‍රිකා-ශක්තිය සෞඛ්‍ය නිරීක්ෂණය, රෝග ඇඟවීම්, අස්වැන්න අනාවැකි සහ ව්‍යසන වාර්තා ලබා ගන්න.",
     drawFreely: "නිදහසේ ඇඳීම",
     drawFreelyDesc:
-      "ජීව චන්ද්‍රිකා සản-ලෙ ඔබේ ගොළු ප්‍රදේශයේ සීමාව polygon හෝ ​රෙකටැංගල් මෙවලමින් ගෙනයන්න.",
+      "සජීව චන්ද්‍රිකා සිතියම මත ඔබේ ගොළු කෙත් සීමාව බහුකෝණය හෝ ආයාතය මෙවලමෙන් ඇඳන්න.",
     satelliteInsightsTitle: "චන්ද්‍රිකා තොරතුරු",
     satelliteInsightsDesc:
       "Sentinel රූපවලින් යාවත්කාලීන NDVI, EVI, VV/VH SAR අධ-ස්ථරීකරණ සහ සෞඛ්‍ය වර්ගීකරණ ලැබේ.",
@@ -675,10 +1014,10 @@ export const translations = {
     pricingCardDesc:
       "සරල ස්ථාවර මිල ගනන් — ඔබ ලියාපදිංචි කළ ප්‍රදේශය පමණක් ගෙවන්න. වාර්ෂිකව.",
     getStartedBtn: "ආරම්භ කරන්න — කෙත ඇඳීම",
-    skipForNow: "දැනට අත්හරින්න — පසුව Profile හි සකසන්න →",
+    skipForNow: "දැනට අත්හරින්න — පසුව පැතිකඩෙන් සකසන්න →",
     drawYourPaddyField: "ඔබේ ගොළු කෙත ඇඳීම",
     drawYourPaddyDesc:
-      "ගොළු කලාප සීමා ලෝඩ් කිරීමට ඔබේ දිස්ත්‍රික්කය තෝරන්න, ඉන්පසු ඔබේ කෙත ඇඳීමට draw tools භාවිත කරන්න.",
+      "ගොළු කලාප සීමා පූරණය කිරීමට දිස්ත්‍රික්කය තෝරන්න, ඉන්පසු ඔබේ කෙත ඇඳීමට ඇඳීමේ මෙවලම් භාවිත කරන්න.",
     back: "← ආපසු",
     reviewSelection: "තේරීම සමාලෝකනය →",
     reviewPaymentTitle: "සමාලෝකනය සහ ගෙවීම",
@@ -695,17 +1034,17 @@ export const translations = {
     expiryLabel: "කල් ඉකුත් දිනය",
     cvvLabel: "CVV",
     paymentComingSoon:
-      "ගෙවීම් ද්වාරය ඉක්මනින් ලැබේ. ඔබේ slot රක්ෂා කිරීම සඳහා දැන් කෙත සුරකින්න.",
+      "ගෙවීම් ද්වාරය ඉක්මනින් ලැබේ. ඔබේ ස්ථානය රක්ෂා කිරීමට දැන් කෙත සුරකින්න.",
     securedSSL:
       "SSL සහිත ආරක්ෂිතව · PayHere විසින් ධාවනය · ඔබේ කාඩ් දත්ත ගබඩා නොවේ",
-    backToMapBtn: "← සản-ලට ආපසු",
+    backToMapBtn: "← සිතියමට ආපසු",
     savingField: "සුරකිමින්...",
     completeRegistrationBtn: "ලියාපදිංචිය සම්පූර්ණ කරන්න",
 
     // ── My Field Tab ──
     fieldRegistry: "කෙත් ලේඛනාගාරය",
     fieldRegistryExisting:
-      "ඔබේ ලියාපදිංචි ගොළු කෙත. සීමාව යාවත්කාලීන කිරීමට Edit හෝ ප්‍රතිස්ථාපනය කිරීමට නව polygon ඇඳීම කරන්න.",
+      "ඔබේ ලියාපදිංචි ගොළු කෙත. සීමාව යාවත්කාලීන කිරීමට සංස්කරණය කරන්න හෝ ප්‍රතිස්ථාපනය සඳහා නව බහුකෝණයක් ඇඳන්න.",
     fieldRegistryNew:
       "ඔබ තවම ගොළු කෙතක් ලියාපදිංචි කර නැත. පහත ඔබේ කෙත් සීමාව ඇඳීම කරන්න.",
     editBtn: "සංස්කරණය",
@@ -715,7 +1054,7 @@ export const translations = {
     areaStat: "ප්‍රදේශය",
     annualFeeStat: "වාර්ෂික ගාස්තු",
     editModeInfo:
-      "නව polygon ඇඳීමෙන් ඔබේ පවතින සීමාව ප්‍රතිස්ථාපනය කරන්න. ඉරි ගසා ඇති නිල් සීමාව ඔබේ වත්මන් කෙත් පෙන්වයි.",
+      "නව බහුකෝණයක් ඇඳීමෙන් ඔබේ පවතින සීමාව ප්‍රතිස්ථාපනය කරන්න. ඉරි ගසා ඇති නිල් සීමාව ඔබේ වත්මන් කෙත පෙන්වයි.",
     selectionSummary: "තේරීම් සාරාංශ",
     cancelBtn: "අවලංගු කරන්න",
     saveFieldBtn: "කෙත සුරකින්න",
@@ -743,7 +1082,7 @@ export const translations = {
     visibility: "දෘශ්‍යතාව",
     maxTemp: "උපරිම උෂ්ණත්වය",
     minTemp: "අවම උෂ්ණත්වය",
-    uvIndexMax: "UV දර්ශකය Max",
+    uvIndexMax: "උපරිම UV දර්ශකය",
     daylightRain: "දවල් වැස්ස",
     solarRadiation: "සූර්ය විකිරණ",
     evapotranspiration: "ජලය ආශෝෂණය",
@@ -758,6 +1097,318 @@ export const translations = {
     single: "තනි",
     compare: "සංසන්දනය",
     liveData: "සජීව දත්ත",
+
+    // ── Cross-Page Missing Keys ──
+    districtStat: "දිස්ත්‍රික්කය",
+    hourlyForecast: "පැයෙන් පැය අනාවැකිය",
+    soilAgronomic: "පස සහ කෘෂි දත්ත",
+    historyData: "ඉතිහාස දත්ත",
+    confirmEmailLoginBeforeSave:
+      "ඔබේ කෙත සුරැකීමට පෙර ඔබේ ඊමේල් තහවුරු කර ලොගින් වන්න.",
+    saveFieldFailedPrefix: "කෙත සුරැකීම අසාර්ථකයි",
+    fieldMonitoringTitle: "RiceVision කෙත් නිරීක්ෂණය",
+    sriLanka: "ශ්‍රී ලංකාව",
+    payNow: "ගෙවන්න",
+    perYear: "වසරකට",
+    saveFailedPrefix: "සුරැකීම අසාර්ථකයි",
+    fieldBoundarySaved: "කෙත් සීමාව සාර්ථකව සුරැකීය.",
+    confirmRemoveFieldRegistration:
+      "ඔබේ කෙත් ලියාපදිංචිය ඉවත් කිරීමට තහවුරුද? මෙය ආපසු හැරවිය නොහැක.",
+    deleteFailedPrefix: "මැකීම අසාර්ථකයි",
+    fieldRegistrationRemoved: "කෙත් ලියාපදිංචිය ඉවත් කර ඇත.",
+    quickPhoneSupportTitle: "ඉක්මන් දුරකථන සහාය",
+    quickPhoneSupportDesc:
+      "උපකරණ පුවරුව, කෙත් සැකසුම හෝ වාර්තා ගැටලු සඳහා අප අමතන්න.",
+    emailSupportTitle: "ඊමේල් සහාය",
+    emailSupportDesc:
+      "ගැටලුව විස්තර සමඟ ඊමේල් යවන්න. අපගේ කණ්ඩායම විසඳුමක් සමඟ ප්‍රතිචාර දක්වයි.",
+    call: "අමතන්න",
+    email: "ඊමේල්",
+    submitComplaintTitle: "පැමිණිල්ලක් ඉදිරිපත් කරන්න",
+    fullNameExample: "නිදසුන: කසුන් පෙරේරා",
+    assignedPositionExample: "නිදසුන: ක්ෂේත්‍ර පරීක්ෂක",
+    selectIssueType: "ගැටලු වර්ගය තෝරන්න",
+    issueTechnical: "තාක්ෂණික ගැටලුව",
+    issueDataMismatch: "දත්ත නොගැළපීම",
+    issueAccountAccess: "ගිණුම් හෝ ප්‍රවේශ ගැටලුව",
+    issueOther: "වෙනත්",
+    complaintValidationRequired: "සම්පූර්ණ නම සහ පැමිණිලි පණිවිඩය අනිවාර්යයි.",
+    complaintSubmittedSuccess: "පැමිණිල්ල සාර්ථකව යවන ලදී.",
+    complaintSubmitFailed: "පැමිණිල්ල යැවීම අසාර්ථකයි.",
+    resolveAlertTitle: "අනතුරු ඇඟවීම විසඳන්න",
+    resolutionNoteOptional: "විසඳුම් සටහන (විකල්ප)",
+    resolutionNotePlaceholder: "මෙය කොහොම විසඳා දැයි ලියන්න...",
+    confirmBtn: "තහවුරු කරන්න",
+    alertsRealtimeSubtitle: "සජීව කෙත් සෞඛ්‍ය තොරතුරු",
+    noPastThreats: "පසුගිය තර්ජන හඳුනාගැනීම් නොමැත",
+    noteLabel: "සටහන",
+    alertsTutorialTabsTitle: "අනතුරු ටැබ්",
+    alertsTutorialTabsAction: "විවිධ අනතුරු වර්ග බැලීමට ටැබ් මාරු කරන්න.",
+    alertsTutorialTabsOutcome: "ව්‍යසන, පළිබෝධ හෝ පසුගිය ඇඟවීම් ඔබට පෙන්වයි.",
+    alertsTutorialSearchTitle: "අනතුරු සොයන්න",
+    alertsTutorialSearchAction: "නිශ්චිත ඇඟවීම් සොයා සෙවුම් කොටුව භාවිත කරන්න.",
+    alertsTutorialSearchOutcome: "ගැළපෙන ඇඟවීම් පමණක් ලැයිස්තුගත වේ.",
+    alertsTutorialResolveTitle: "අනතුරු විසඳන්න",
+    alertsTutorialResolveAction: "සක්‍රිය අනතුරක් මත විසඳන්න බොත්තම ඔබන්න.",
+    alertsTutorialResolveOutcome: "විසඳුම් සටහන එක් කිරීමට කවුළුවක් විවෘත වේ.",
+    alertsTutorialIgnoreTitle: "අනතුර නොසලකන්න",
+    alertsTutorialIgnoreAction: "විසඳීමකින් තොරව ඉවත් කිරීමට නොසලකන්න ඔබන්න.",
+    alertsTutorialIgnoreOutcome: "එය පසුගිය ඇඟවීම් ටැබ් එකට ගමන් කරයි.",
+    alertsTutorialMapTitle: "සිතියමේ බලන්න",
+    alertsTutorialMapAction: "ස්ථානය බැලීමට සිතියමේ බලන්න ඔබන්න.",
+    alertsTutorialMapOutcome: "අදාළ ප්‍රදේශය පෙන්වමින් සිතියම විවෘත වේ.",
+    fieldDataOverviewTitle: "කෙත් දත්ත සාරාංශය",
+    fieldDataOverviewAction: "මෙම පිටුව ඔබේ සියලු කෙත් සංඛ්‍යාලේඛන සාරාංශයක් පෙන්වයි.",
+    fieldDataOverviewOutcome: "මුළු කෙත්, සෞඛ්‍ය සම්පන්න, ආතති සහ අනතුරු අගයන් පෙන්වයි.",
+    fieldDataSummaryTitle: "සාරාංශ සංඛ්‍යාලේඛන",
+    fieldDataSummaryAction: "ක්ෂණික සෞඛ්‍ය දත්ත සඳහා කාඩ්පත් බලන්න.",
+    fieldDataSummaryOutcome: "කොළ=සෞඛ්‍ය, කහ=ආතති, රතු=ගැටලු.",
+    fieldDataDistrictTableTitle: "දිස්ත්‍රික් සංසන්දන වගුව",
+    fieldDataDistrictTableAction: "දිස්ත්‍රික් අනුව දත්ත බැලීමට වගුව සෙට් කරන්න.",
+    fieldDataDistrictTableOutcome: "සෞඛ්‍යය, අස්වැන්න සහ ආතතිය දිස්ත්‍රික් අනුව සංසන්දනය කරන්න.",
+    fieldDataViewMapTitle: "සිතියමේ බලන්න",
+    fieldDataViewMapAction: "දිස්ත්‍රික්කයක් සඳහා සිතියම විවෘත කිරීමට බොත්තම භාවිත කරන්න.",
+    fieldDataViewMapOutcome: "තෝරාගත් දිස්ත්‍රික්කය සමඟ සිතියම විවෘත වේ.",
+    actionLabel: "ක්‍රියාව",
+    viewReportBtn: "වාර්තාව බලන්න",
+    weatherTutorialOverviewAction:
+      "උෂ්ණත්වය, වැසි සහ සුළං ඇතුළු වත්මන් කාලගුණ තත්ත්ව බලන්න.",
+    weatherTutorialOverviewOutcome:
+      "ඔබේ ස්ථානයට අදාල සජීව කාලගුණ මිනුම් පෙන්වයි.",
+    weatherTutorialHourlyAction:
+      "පැය 24 ක ප්‍රගතිය බැලීමට පැය අනාවැකි ටැබ් විවෘත කරන්න.",
+    weatherTutorialHourlyOutcome:
+      "ඊළඟ පැය 24 සඳහා කාලගුණ වෙනස්කම් පෙන්වයි.",
+    weatherTutorialSoilAction:
+      "පස සහ කෘෂි තත්ත්ව බැලීමට පස ටැබ් විවෘත කරන්න.",
+    weatherTutorialSoilOutcome:
+      "පස් උෂ්ණත්වය, ආර්ද්‍රතාව, VPD සහ ET දත්ත පෙන්වයි.",
+    weatherTutorialForecastAction:
+      "දිගු දින 14 පෙරදසුන බැලීමට අනාවැකි ටැබ් විවෘත කරන්න.",
+    weatherTutorialForecastOutcome:
+      "කෙත් ක්‍රියා සැලසුම් කිරීමට දෛනික අනාවැකි ලැබේ.",
+    weatherTutorialHistoryAction:
+      "පසුගිය කාලගුණ වාර්තා බැලීමට ඉතිහාස ටැබ් විවෘත කරන්න.",
+    weatherTutorialHistoryOutcome:
+      "සෘතුමය රටා සංසන්දනයට අතීත දත්ත පෙන්වයි.",
+    dsDivision: "ප්‍රාදේශීය ලේකම් කොට්ඨාසය",
+    colombo: "කොළඹ",
+    autoDetected: "ස්වයංක්‍රීයව හඳුනාගත්",
+    daytime: "දවාල",
+    night: "රාත්‍රිය",
+    hourlyDetailTable: "පැය විස්තර වගුව",
+    soilTemperatureProfiles: "පස් උෂ්ණත්ව පැතිකඩ",
+    soilMoistureContent: "පස් ආර්ද්‍රතා අන්තර්ගතය",
+    agronomicIndicators: "කෘෂි දර්ශක",
+    sprayFieldAdvisory: "ඉසිවීම සහ කෙත් වැඩ උපදෙස්",
+    outlook14Day: "දින 14 පෙරදසුන",
+    weeklyAgroForecastDetail: "සතිපතා කෘෂි අනාවැකි විස්තර",
+    past7DaysFieldHistory: "පසුගිය දින 7 කෙත් ඉතිහාසය",
+    historicalDetailTable: "ඉතිහාස විස්තර වගුව",
+    reportTutorialOverviewAction:
+      "චන්ද්‍රිකා පදනම් අස්වැන්න අනාවැකි සහ විශ්ලේෂණ බලන්න.",
+    reportTutorialOverviewOutcome:
+      "සංසන්දන දර්ශක සහ නිර්යාත විකල්ප සමඟ විස්තරාත්මක වාර්තා පෙන්වයි.",
+    reportTutorialModeTitle: "තනි හෝ සංසන්දනය",
+    reportTutorialModeAction:
+      "තනි සහ සංසන්දන මාදිලි අතර මාරු කරන්න.",
+    reportTutorialModeOutcome:
+      "තනි දිස්ත්‍රික්කයක් හෝ දෙකක් සංසන්දනය කළ හැක.",
+    reportTutorialDistrictTitle: "දිස්ත්‍රික් තේරීම",
+    reportTutorialDistrictAction: "අස්වැන්න දත්ත බැලීමට දිස්ත්‍රික්කය තෝරන්න.",
+    reportTutorialDistrictOutcome:
+      "තෝරාගත් දිස්ත්‍රික්කයට අදාල අනාවැකි දත්ත පූරණය වේ.",
+    reportTutorialYieldTitle: "අස්වැන්න අනාවැකිය",
+    reportTutorialYieldAction: "අනාවැකි අස්වැන්න සහ ඉතිහාස අගය සංසන්දනය බලන්න.",
+    reportTutorialYieldOutcome: "අපේක්ෂිත අස්වැන්න සහ මූලික අගය පෙන්වයි.",
+    reportTutorialMetricsTitle: "දර්ශක සහ නිර්යාත",
+    reportTutorialMetricsAction:
+      "පළිබෝධ සහ අවදානම් දර්ශක බලලා PDF ලෙස නිර්යාත කරන්න.",
+    reportTutorialMetricsOutcome: "සම්පූර්ණ විශ්ලේෂණ වාර්තාව බාගත කළ හැක.",
+    dataUnavailable: "දත්ත නොමැත",
+    fetchingSatelliteData: "චන්ද්‍රිකා දත්ත ලබාගනිමින්...",
+    viewLabel: "දර්ශනය",
+    primaryLabel: "ප්‍රධාන",
+    comparisonLabel: "සංසන්දන",
+    predictedAverage: "අනාවැකි සාමාන්‍යය",
+    totalYieldLabel: "මුළු අස්වැන්න",
+    historicalBaseline: "ඉතිහාස මූලික අගය",
+    pestCount: "පළිබෝධ ගණන",
+    riskFactor: "අවදානම් සාධකය",
+    exportComparisonReport: "සංසන්දන වාර්තාව නිර්යාත කරන්න",
+    loginFailed: "ලොගින් අසාර්ථකයි",
+    pleaseEnterEmail: "කරුණාකර ඊමේල් ලිපිනය ඇතුළත් කරන්න.",
+    failedToSendResetEmail: "නැවත සැකසුම් ඊමේල් යැවීමට අසමත් විය.",
+    networkErrorTryAgain: "ජාල දෝෂයක්. කරුණාකර නැවත උත්සාහ කරන්න.",
+    validEmailAddressError: "වලංගු ඊමේල් ලිපිනයක් ඇතුළත් කරන්න.",
+    signupFailed: "ලියාපදිංචිය අසාර්ථකයි",
+    createAccountSubtitle: "ආරම්භ කිරීමට ඔබේ RiceVision ගිණුම සාදන්න.",
+    sidebarTutorialNavTitle: "පැති තීරු නාවිගේෂන්",
+    sidebarTutorialNavAction:
+      "ප්‍රධාන පිටු අතර ගමන් කිරීමට වම් පැති තීරුව භාවිත කරන්න.",
+    sidebarTutorialNavOutcome:
+      "උපකරණ පුවරුව, සිතියම, ඇඟවීම්, කාලගුණය සහ වාර්තා මෙතැනින් ලැබේ.",
+    sidebarTutorialTopTitle: "ඉහළ නාවිගේෂන් සබැඳි",
+    sidebarTutorialTopAction:
+      "ගමන් කිරීමට ඩෑෂ්බෝඩ්, සිතියම හෝ වෙනත් මෙනු අයිතමයක් තෝරන්න.",
+    sidebarTutorialTopOutcome:
+      "හයිලයිට් වී ඇති අයිතමය වත්මන් පිටුව පෙන්වයි.",
+    sidebarTutorialBottomTitle: "පහළ විකල්ප",
+    sidebarTutorialBottomAction:
+      "පහළ කොටසින් පැතිකඩ, උදව් හෝ ලොග්අවුට් විකල්ප භාවිත කරන්න.",
+    sidebarTutorialBottomOutcome:
+      "ඕනෑම පිටුවකින් ගිණුම් කළමනාකරණයට ඉක්මන් ප්‍රවේශය ලැබේ.",
+    systemVersionTag: "පද්ධති අනුවාදය Alpha-1.0.4 - RiceVision Core",
+    dashboardTutorialWelcome:
+      "සාදරයෙන් පිළිගනිමු. මෙය ඔබගේ කෙත් පාලන මධ්‍යස්ථානයයි.",
+    dashboardTutorialSync:
+      "දත්ත අලුත් බව තහවුරු කිරීමට මෙම ලකුණ පරීක්ෂා කරන්න.",
+    dashboardTutorialHealth:
+      "බෝග සෞඛ්‍ය පයි චාට් එකෙන් බලන්න. කොළ වර්ණය හොඳ තත්ත්වයයි.",
+    dashboardTutorialYield:
+      "අපේක්ෂිත මුළු අස්වැන්න මෙට්‍රික් ටොන්වලින් මෙහි බලන්න.",
+    dashboardTutorialSupply:
+      "අපේක්ෂිත හිඟය සහ ජාතික ඉල්ලුම් අවදානම් ඉක්මනින් නිරීක්ෂණය කරන්න.",
+    dashboardTutorialThreats:
+      "සක්‍රිය රෝග පැතිරීම් සහ පළිබෝධ අවදානම් බලන්න.",
+    dashboardTutorialThreatDetails:
+      "මෙම තර්ජනය සඳහා විස්තරාත්මක නිර්දේශ විවෘත කරන්න.",
+    dashboardTutorialThreatToggle:
+      "තර්ජන ලැයිස්තුව විහිදුවීමට හෝ සඟවීමට මෙය භාවිත කරන්න.",
+    dashboardTutorialStageChart:
+      "බෝග වර්ධන අදියරවල ප්‍රතිශත මෙතැනින් බලන්න.",
+    dashboardTutorialDistrictTable:
+      "සියලු දිස්ත්‍රික් සෞඛ්‍ය දත්ත එකම වගුවක සංසන්දනය කරන්න.",
+    dashboardTutorialDistrictToggle:
+      "සම්පූර්ණ දිස්ත්‍රික් ලැයිස්තුව විහිදුවීමට මෙම බොත්තම භාවිත කරන්න.",
+    fieldsLabel: "කෙත්",
+    countLabel: "ගණන",
+    statusSafe: "ආරක්ෂිත",
+    statusModerate: "මධ්‍යම",
+    statusCritical: "ගැඹුරු අවදානම්",
+    statusStable: "ස්ථාවර",
+    statusWarning: "අවවාදය",
+    statusHighRisk: "ඉහළ අවදානම",
+    wmoClearSky: "පැහැදිලි අහස",
+    wmoPartlyCloudy: "අඩක් වලාකුළු",
+    wmoOvercast: "සම්පූර්ණ වලාකුළු",
+    wmoFoggyHaze: "මීදුම / මළුව",
+    wmoDrizzle: "සුළු වැසි",
+    wmoRain: "වැසි",
+    wmoSnowIce: "හිම / අයිස්",
+    wmoRainShowers: "වැසි වැටීම්",
+    wmoHeavySnowShowers: "දැඩි හිම වැටීම්",
+    wmoThunderstorm: "ගිගුරුම් වැසි",
+    wmoUnknown: "නොදන්නා",
+    weatherAdvisoryFeels: "දැනෙන උෂ්ණත්වය {temp}°C",
+    weatherAdvisoryFungalRisk: "දිලීර අවදානම",
+    weatherAdvisoryNormal: "සාමාන්‍ය",
+    weatherAdvisoryMoistureThreshold: "ආර්ද්‍රතා සංතෘප්ති සීමාව",
+    weatherAdvisoryPoorSunlight: "අඩු හිරු එළිය",
+    weatherAdvisoryGoodForCrops: "බෝගයට හොඳයි",
+    weatherAdvisoryMeanSeaLevel: "මධ්‍යම මුහුදු මට්ටම",
+    weatherAdvisoryAvoidSpraying: "ඉසීමෙන් වළකින්න",
+    weatherAdvisorySafeForSpraying: "ඉසීමට සුදුසුයි",
+    weatherAdvisoryHighGusts: "දැඩි සුළං ගැස්ම",
+    weatherAdvisorySafe: "ආරක්ෂිත",
+    weatherAdvisoryCurrentHour: "දැනට පැය",
+    weatherAdvisoryUVVeryHigh: "UV ඉතා ඉහළ",
+    weatherAdvisoryUVModerate: "මධ්‍යම",
+    weatherAdvisoryUVLow: "අඩු",
+    weatherAdvisoryPoorVisibility: "අඩු දෘශ්‍යතාව",
+    weatherAdvisoryGood: "හොඳ",
+    weatherAdvisoryHoursWithRain: "වැසි ඇති පැය",
+    weatherAdvisoryTodayTotal: "අද එකතුව",
+    weatherAdvisoryIrrigationGuide: "ජලසෙචන මාර්ගෝපදේශය",
+    weatherAdvisoryCropStress: "බෝග ආතතිය",
+    weatherAdvisoryTotalRainToday: "අද මුළු වැසි",
+    weatherAdvisoryMaxChanceToday: "අද උපරිම සම්භාවිතාව",
+    weatherTableColTime: "වේලාව",
+    weatherTableColCondition: "තත්ත්වය",
+    weatherTableColTemp: "උෂ්ණත්වය",
+    weatherTableColFeels: "දැනෙන",
+    weatherTableColHumidity: "ආර්ද්‍රතාව",
+    weatherTableColRainPercent: "වැසි%",
+    weatherTableColRainMm: "වැසි mm",
+    weatherTableColWind: "සුළං",
+    weatherTableColUV: "UV",
+    weatherTableColET0: "ET0",
+    weatherTableColVisibility: "දෘශ්‍යතාව",
+    weatherTableColDate: "දිනය",
+    weatherTableColMaxTemp: "උපරිම C",
+    weatherTableColMinTemp: "අවම C",
+    weatherTableColWindMax: "සුළං උපරිම",
+    weatherTableColUvMax: "UV උපරිම",
+    weatherTableColRadiation: "විකිරණ",
+    weatherTableColSunrise: "ඉර උදාව",
+    weatherTableColSunset: "ඉර බැසීම",
+    weatherTableColConditions: "තත්ත්වයන්",
+    weatherTableColRainSum: "වැසි එකතුව",
+    weatherTableColRainHours: "වැසි පැය",
+    soilTempSurfaceLabel: "පෘෂ්ඨය (0 cm)",
+    soilTempSurfaceDesc: "ඉහළ ස්ථරය - බීජ මතුකිරීමේ කලාපය",
+    soilTempShallowLabel: "අඩු ගැඹුර (6 cm)",
+    soilTempShallowDesc: "බීජලද පැළ සඳහා මුල් කලාපය",
+    soilTempMediumLabel: "මධ්‍යම (18 cm)",
+    soilTempMediumDesc: "ක්‍රියාකාරී මුල් කලාපය - ගොයම් වර්ධනය",
+    soilAdvisoryTooCold: "මතුකිරීමට ඉතා සීතලයි",
+    soilAdvisoryHeatStress: "උෂ්ණ ආතති අවදානම",
+    soilAdvisoryOptimal: "ගොයම් සඳහා සුදුසු",
+    soilMoistureDepth0to1: "0-1 cm",
+    soilMoistureDepth0to1Desc: "ඉහළ පස - වාෂ්පීභවනය කලාපය",
+    soilMoistureDepth1to3: "1-3 cm",
+    soilMoistureDepth1to3Desc: "පැළ මුල් කලාපය",
+    soilMoistureDepth3to9: "3-9 cm",
+    soilMoistureDepth3to9Desc: "ප්‍රධාන මුල් අවශෝෂණ කලාපය",
+    soilMoistureLabel: "පස ආර්ද්‍රතාව",
+    soilMoistureLow: "අඩුයි - ජලසෙචනය සලකා බලන්න",
+    soilMoistureSaturated: "සංතෘප්ත",
+    soilMoistureGood: "හොඳ ආර්ද්‍රතා මට්ටම",
+    et0EvapotranspirationToday: "අද ET0 වාෂ්පීකරණ-උද්ගිරණය",
+    et0Description:
+      "FAO-56 අනුව හොඳ තත්ත්වයේ බෝග භාවිතා කරන ජල ප්‍රමාණය සඳහා සඳහනකි.",
+    et0HighDemand: "ඉහළ අවශ්‍යතාව - ජලසෙචනය වැඩි කරන්න",
+    et0ModerateDemand: "මධ්‍යම - සාමාන්‍ය ජලසෙචනය",
+    et0LowDemand: "අඩු අවශ්‍යතාව - ජලසෙචනය අඩු කරන්න",
+    vapourPressureDeficit: "වාෂ්ප පීඩන ඌනතාව",
+    vpdDescription: "ඉහළ VPD නිසා බෝග ජල ආතතිය වැඩිවිය හැක.",
+    vpdSevereStress: "දැඩි ආතතිය",
+    vpdModerateStress: "මධ්‍යම ආතතිය",
+    vpdGoodConditions: "හොඳ තත්ත්වය",
+    solarRadiationToday: "අද සූර්ය විකිරණය",
+    solarRadiationDescription:
+      "ඉහළ විකිරණය වාෂ්පීභවනය සහ ප්‍රභාසංස්ලේෂණය වැඩි කරයි.",
+    solarRadiationHigh: "ඉහළ විකිරණ දිනය",
+    solarRadiationNormal: "සාමාන්‍ය විකිරණය",
+    advisorySprayingTitle: "පළිබෝධ නාශක / වල් නාශක ඉසීම",
+    advisoryIrrigationTitle: "ජලසෙචනය නිර්දේශිතයි",
+    advisoryFungalRiskTitle: "දිලීර රෝග අවදානම",
+    advisoryFieldMachineryTitle: "කෙත් යන්ත්‍ර වැඩ",
+    advisoryHarvestTitle: "අස්වනු තත්ත්වය",
+    advisoryUvRiskTitle: "UV නිරාවරණ අවදානම",
+    advisoryWindDriftRisk: "සුළං {speed} km/h - වැළඳී යාමේ අවදානම",
+    advisoryRainWashOffRisk: "වැසි පවතී - සෝදා යාමේ අවදානම",
+    advisoryHeavyCloudPoorDrying: "දැඩි වලාකුළු - වියළීම අඩු",
+    advisoryAllConditionsMet: "සියලු තත්ත්ව සපුරා ඇත",
+    advisoryEt0Low: "ET0 අඩුයි ({et0} mm)",
+    advisorySoilMoistureSufficient: "පස ආර්ද්‍රතාව ප්‍රමාණවත්",
+    advisoryEt0MoistureLow: "ET0 = {et0} mm, ආර්ද්‍රතාව අඩුයි",
+    advisoryHumidityMonitorBlast: "ආර්ද්‍රතාව {humidity}% - බ්ලාස්ට් නිරීක්ෂණය කරන්න",
+    advisoryHumidityLowRisk: "ආර්ද්‍රතාව {humidity}% - අඩු අවදානම",
+    advisoryRainSoilWaterlogged: "වැසි ඇත - පස ජලයෙන් පිරී ඇත",
+    advisorySoilTooWetMachinery: "පස යන්ත්‍ර සඳහා ඉතා තෙත්",
+    advisoryConditionsSuitable: "තත්ත්ව සුදුසුයි",
+    advisoryRainAvoidHarvest: "වැසි - අස්වනු මඟහරින්න",
+    advisoryHighHumidityGrainMoistureRisk:
+      "ඉහළ ආර්ද්‍රතාව - ධාන්‍ය ආර්ද්‍රතා අවදානම",
+    advisoryGoodHarvestWindow: "අස්වනු සඳහා හොඳ කාල කවුළුව",
+    advisoryUvVeryHigh: "UV {uv} - ඉතා ඉහළ, ආරක්ෂාව භාවිත කරන්න",
+    advisoryUvWearProtection: "UV {uv} - ආරක්ෂිත උපකරණ පැළඳින්න",
+    advisoryUvSafe: "UV {uv} - ආරක්ෂිතයි",
+    advisoryStatusMonitor: "නිරීක්ෂණය",
+    advisoryStatusGo: "යන්න",
+    advisoryStatusHold: "නවත්වන්න",
+    weatherRainShort: "වැසි",
   },
 
   ta: {
@@ -782,14 +1433,14 @@ export const translations = {
     fieldDataTutOutcome: "சகல வயல் விவரங்களையும் பார்க்கவும்",
     
     mapTutTitle: "செயற்கைக்கோள் வயல் காட்சிப்படுத்தல்",
-    mapTutAction: "வயல் பிம்பங்கள் மற்றும் சுரங்குகளை பார்க்கவும்",
+    mapTutAction: "வயல் படங்கள் மற்றும் அடுக்குகளை பார்க்கவும்",
     mapTutOutcome: "வரைபடத்தில் ஆரோக்கியம் பார்க்கவும்",
     
-    weatherTutTitle: "வானிலை முன்னிறுத்தல் சரிபார்க்கவும்",
+    weatherTutTitle: "வானிலை முன்னறிவிப்பை சரிபார்க்கவும்",
     weatherTutAction: "வெப்பநிலை, மழை, மண் பார்க்கவும்",
     weatherTutOutcome: "வானிலையின் அடிப்படையில் விவசாய திட்டமிடுங்கள்",
     
-    alertsTutTitle: "பூச்சிக்கு மற்றும் நோய் அச்சரிக்கைகளைப் பெறுங்கள்",
+    alertsTutTitle: "பூச்சி மற்றும் நோய் எச்சரிக்கைகளைப் பெறுங்கள்",
     alertsTutAction: "பயிர்களுக்கான செயலில் அச்சுறுத்தல்கள் பார்க்கவும்",
     alertsTutOutcome: "உங்கள் பயிர்களுக்கான ஆபத்து பற்றி அறிந்து கொள்ளுங்கள்",
     
@@ -798,12 +1449,12 @@ export const translations = {
     reportTutOutcome: "மகசூல் முடிவுகளை புரிந்து கொள்ளுங்கள்",
     
     helpTutTitle: "உதவி மற்றும் ஆதரவு பெறுங்கள்",
-    helpTutAction: "பதில் மற்றும் FAQ கண்டுபிடிக்கவும்",
+    helpTutAction: "பதில்கள் மற்றும் FAQ-ஐ கண்டுபிடிக்கவும்",
     helpTutOutcome: "உங்களுக்கு தேவை எனில் உதவி பெறுங்கள்",
     
-    chatbotTutTitle: "তাৎক্ষণিક AI পরামর্শ পান",
-    chatbotTutAction: "চ্যাট সহায়ক খুলতে ক্লিক করুন",
-    chatbotTutOutcome: "প্রশ্ন জিজ্ঞাসা করুন এবং তাৎক্ষণিক উত্তর পান",
+    chatbotTutTitle: "உடனடி AI ஆலோசனை பெறுங்கள்",
+    chatbotTutAction: "அரட்டை உதவியாளரை திறக்க கிளிக் செய்யவும்",
+    chatbotTutOutcome: "கேள்விகள் கேட்டு உடனடி பதில்கள் பெறுங்கள்",
     
     // ── Header Action Button Tutorials (FLAT KEYS) ──
     searchHeaderTitle: "பக்கங்களை விரைவாக கண்டுபிடிக்கவும்",
@@ -811,16 +1462,16 @@ export const translations = {
     searchHeaderOutcome: "எந்த பக்கத்திற்கும் உடனடியாக குதிக்கவும்",
     
     languageTitle: "மொழி மாற்றவும்",
-    languageAction: "ஆங்கிலம், சிங்களம் அல்லது தமிழ்ப் பயன்பாட்டைத் தேர்க்கவும்",
+    languageAction: "ஆங்கிலம், சிங்களம் அல்லது தமிழை தேர்வு செய்யவும்",
     languageOutcome: "பயன்பாடு உங்கள் மொழியில் தோன்றும்",
     
-    themeTitle: "பிரகாசம் நிலை மாற்றவும்",
+    themeTitle: "காட்சி முறையை மாற்றவும்",
     themeAction: "சந்திரன்/சூரியன் ஐகனைக் கிளிக் செய்யவும்",
-    themeOutcome: "அன்பான அல்லது ஒளி பயன்முறை ஏற்ற இறக்கம் செய்யவும்",
+    themeOutcome: "இருள் அல்லது வெளிச்ச முறையை மாற்றவும்",
     
     notificationsTitle: "செய்திகளை சரிபார்க்கவும்",
     notificationsAction: "எச்சரிக்கைகள் மற்றும் புதுப்பிப்புகளைப் பார்க்கவும்",
-    notificationsOutcome: "தெரிந்து கொள்ளப்படுவது முக்கியமான நிகழ்வுகளைப் பற்றி",
+    notificationsOutcome: "முக்கிய அறிவிப்புகளை உடனுக்குடன் தெரிந்து கொள்ளுங்கள்",
     
     profileTitle: "உங்கள் கணக்கு அமைப்புகள்",
     profileAction: "உங்கள் தகவலைத் திருத்தவும்",
@@ -852,7 +1503,7 @@ export const translations = {
 
     // ── Dashboard ──
     welcomeTitle: "RiceVision-க்கு வரவேற்கிறோம்",
-    welcomeSubtitle: "சிறந்த விவசாயத்தின் நுண்ணறிவு",
+    welcomeSubtitle: "சிறந்த விவசாயத்திற்கான நுண்ணறிவு",
     systemSynced: "கணினி இணைக்கப்பட்டது",
     cropHealthDist: "பயிர் ஆரோக்கிய விநியோகம்",
     analysing: "பகுப்பாய்வு செய்கிறது...",
@@ -875,6 +1526,9 @@ export const translations = {
     growthAnalysis: "வளர்ச்சி பகுப்பாய்வு",
     cropStageDistribution: "பயிர் கட்ட விநியோகம்",
     totalFieldsTracked: "கண்காணிக்கப்படும் மொத்த வயல்கள்",
+    loadingStageData: "பயிர் கட்ட தரவு ஏற்றப்படுகிறது...",
+    districtOverview: "மாவட்ட மேலோட்டம்",
+    districtPestHealthStatus: "மாவட்ட பூச்சி மற்றும் ஆரோக்கிய நிலை",
     districtHealthMap: "மாவட்ட ஆரோக்கிய வரைபடம்",
 
     // ── Alerts ──
@@ -894,12 +1548,12 @@ export const translations = {
     // ── Help ──
     helpSupport: "உதவி & ஆதரவு",
     quickAssistance: "விரைவு உதவி",
-    quickAssistanceDesc: "முக்கியமான தகராறுகளுக்கு உடனடி உதவி.",
+    quickAssistanceDesc: "அவசரமான பிரச்சினைகளுக்கு விரைவான உதவி பெறுங்கள்.",
     dialConcierge: "அழைக்கவும்",
     askTeam: "எங்கள் குழுவிடம் கேளுங்கள்",
     askTeamDesc: "அவசர அல்லாத கோரிக்கைகள் அல்லது கருத்துக்களை சமர்ப்பிக்கவும்.",
     transmitEmail: "மின்னஞ்சல் அனுப்பவும்",
-    feedbackLoop: "கருத்து வழிமுறை",
+    feedbackLoop: "கருத்து படிவம்",
     fullOperatorName: "முழு இயக்குநர் பெயர்",
     assignedPosition: "நியமிக்கப்பட்ட பதவி",
     province: "மாகாணம்",
@@ -911,11 +1565,11 @@ export const translations = {
     transmitting: "அனுப்புகிறது...",
     submitReport: "அறிக்கையை சமர்ப்பிக்கவும்",
     quickHelp: "விரைவு உதவி",
-    decryptingFaqs: "FAQs ஏற்றுகிறது...",
+    decryptingFaqs: "அடிக்கடி கேட்கப்படும் கேள்விகள் ஏற்றப்படுகிறது...",
 
     // ── Field Data ──
     fieldIntelligence: "வயல் நுண்ணறிவு",
-    liveStream: "நேரடி ஒளிபரப்பு",
+    liveStream: "நேரடி தரவு ஓடை",
     decryptingIntel: "வயல் தரவு பகுப்பாய்வு செய்கிறது...",
     districtPerformance: "மாவட்ட செயல்திறன் சுருக்கம்",
     colDistrict: "மாவட்டம்",
@@ -957,7 +1611,7 @@ export const translations = {
     operatorAuth: "இயக்குநர் அங்கீகாரம்",
     identityProfile: "அடையாள சுயவிவரம்",
     profileDesc:
-      "RiceVision நெட்வொர்க்கில் உங்கள் இயக்குநர் சான்றுகளை முடிக்கவும்.",
+      "RiceVision-இல் சிறந்த அனுபவத்திற்காக உங்கள் சுயவிவர தகவலை புதுப்பித்த நிலையில் வைத்திருங்கள்.",
     personalId: "தனிப்பட்ட அடையாளம்",
     sectorReg: "துறை பதிவு",
     givenName: "முதல் பெயர்",
@@ -968,7 +1622,7 @@ export const translations = {
     address: "முகவரி",
     uploadingMatrix: "புகைப்படம் பதிவேற்றுகிறது...",
     updating: "புதுப்பிக்கிறது...",
-    updateProfile: "அடையாளத்தை ஒத்திசைக்கவும்",
+    updateProfile: "சுயவிவரத்தை புதுப்பிக்கவும்",
 
     // ── Notifications ──
     notifications: "அறிவிப்புகள்",
@@ -1056,8 +1710,8 @@ export const translations = {
     skipForNow: "இப்போது தவிர்க்கவும் — பின்னர் சுயவிவரத்தில் அமைக்கவும் →",
     drawYourPaddyField: "உங்கள் நெல் வயலை வரையுங்கள்",
     drawYourPaddyDesc:
-      "நெல் மண்டல எல்லைகளை ஏற்ற மாவட்டத்தை தேர்ந்தெடுக்கவும், பின்னர் உங்கள் வயலை வரைய வரைகலை கருவிகளைப் பயன்படுத்துங்கள்.",
-    back: "← பின்பு",
+      "நெல் மண்டல எல்லைகளை ஏற்ற மாவட்டத்தை தேர்வு செய்து, பின்னர் உங்கள் வயலை வரைய கருவிகளை பயன்படுத்துங்கள்.",
+    back: "← பின்",
     reviewSelection: "தேர்வை மதிப்பாய்வு செய்யுங்கள் →",
     reviewPaymentTitle: "மதிப்பாய்வு & கட்டணம்",
     reviewPaymentDesc:
@@ -1094,7 +1748,7 @@ export const translations = {
     areaStat: "பரப்பு",
     annualFeeStat: "வருடாந்திர கட்டணம்",
     editModeInfo:
-      "புதிய பலகோணத்தை வரைந்து உங்கள் தற்போதைய எல்லையை மாற்றவும். சரிய நீல கோடு உங்கள் தற்போதைய வயலை காட்டுகிறது.",
+      "புதிய பலகோணத்தை வரைந்து உங்கள் தற்போதைய எல்லையை மாற்றவும். புள்ளியிட்ட நீல கோடு உங்கள் தற்போதைய வயலை காட்டுகிறது.",
     selectionSummary: "தேர்வு சுருக்கம்",
     cancelBtn: "ரத்துசெய்",
     saveFieldBtn: "வயலை சேமி",
@@ -1138,6 +1792,341 @@ export const translations = {
     single: "ஒற்றை",
     compare: "ஒப்பிடு",
     liveData: "நேரடி தரவு",
+
+    // ── Cross-Page Missing Keys ──
+    districtStat: "மாவட்டம்",
+    hourlyForecast: "மணிநேர முன்னறிவிப்பு",
+    soilAgronomic: "மண் மற்றும் விவசாய தரவு",
+    historyData: "வரலாற்றுத் தரவு",
+    confirmEmailLoginBeforeSave:
+      "வயலை சேமிப்பதற்கு முன் உங்கள் மின்னஞ்சலை உறுதிப்படுத்தி உள்நுழையவும்.",
+    saveFieldFailedPrefix: "வயல் சேமிப்பு தோல்வி",
+    fieldMonitoringTitle: "RiceVision வயல் கண்காணிப்பு",
+    sriLanka: "இலங்கை",
+    payNow: "செலுத்தவும்",
+    perYear: "வருடம்",
+    saveFailedPrefix: "சேமித்தல் தோல்வி",
+    fieldBoundarySaved: "வயல் எல்லை வெற்றிகரமாக சேமிக்கப்பட்டது.",
+    confirmRemoveFieldRegistration:
+      "உங்கள் வயல் பதிவை நீக்க விரும்புகிறீர்களா? இதை மீண்டும் மாற்ற முடியாது.",
+    deleteFailedPrefix: "நீக்கம் தோல்வி",
+    fieldRegistrationRemoved: "வயல் பதிவு நீக்கப்பட்டது.",
+    quickPhoneSupportTitle: "விரைவு தொலைபேசி ஆதரவு",
+    quickPhoneSupportDesc:
+      "டாஷ்போர்டு, வயல் அமைப்பு அல்லது அறிக்கை பிரச்சினைகளுக்கு எங்களை அழைக்கவும்.",
+    emailSupportTitle: "மின்னஞ்சல் ஆதரவு",
+    emailSupportDesc:
+      "உங்கள் பிரச்சினை விவரங்களை மின்னஞ்சலில் அனுப்புங்கள். குழு தீர்வுடன் பதிலளிக்கும்.",
+    call: "அழை",
+    email: "மின்னஞ்சல்",
+    submitComplaintTitle: "புகார் சமர்ப்பிக்கவும்",
+    fullNameExample: "எ.கா.: கமல் பெரேரா",
+    assignedPositionExample: "எ.கா.: வயல் மேற்பார்வையாளர்",
+    selectIssueType: "பிரச்சினை வகையைத் தேர்வு செய்யவும்",
+    issueTechnical: "தொழில்நுட்ப பிரச்சினை",
+    issueDataMismatch: "தரவு பொருந்தாமை",
+    issueAccountAccess: "கணக்கு அல்லது அணுகல் பிரச்சினை",
+    issueOther: "மற்றவை",
+    complaintValidationRequired: "முழு பெயரும் புகார் செய்தியும் அவசியம்.",
+    complaintSubmittedSuccess: "புகார் வெற்றிகரமாக சமர்ப்பிக்கப்பட்டது.",
+    complaintSubmitFailed: "புகார் சமர்ப்பிப்பு தோல்வியுற்றது.",
+    resolveAlertTitle: "எச்சரிக்கையை தீர்க்கவும்",
+    resolutionNoteOptional: "தீர்வு குறிப்பு (விருப்பம்)",
+    resolutionNotePlaceholder: "இது எப்படி தீர்க்கப்பட்டது என்பதை எழுதவும்...",
+    confirmBtn: "உறுதிப்படுத்து",
+    alertsRealtimeSubtitle: "நேரடி வயல் ஆரோக்கிய நுண்ணறிவு",
+    noPastThreats: "முன்னைய அச்சுறுத்தல்கள் இல்லை",
+    noteLabel: "குறிப்பு",
+    alertsTutorialTabsTitle: "எச்சரிக்கை தாவல்கள்",
+    alertsTutorialTabsAction:
+      "வேறு எச்சரிக்கை வகைகளைப் பார்க்க தாவல்களை மாற்றவும்.",
+    alertsTutorialTabsOutcome:
+      "பேரழிவு, பூச்சி அபாயம் அல்லது கடந்த எச்சரிக்கைகள் காட்டப்படும்.",
+    alertsTutorialSearchTitle: "எச்சரிக்கைகளைத் தேடு",
+    alertsTutorialSearchAction:
+      "குறிப்பிட்ட எச்சரிக்கைகளை கண்டுபிடிக்க தேடல் பெட்டியைப் பயன்படுத்தவும்.",
+    alertsTutorialSearchOutcome:
+      "பொருந்தும் எச்சரிக்கைகள் மட்டும் காட்டப்படும்.",
+    alertsTutorialResolveTitle: "எச்சரிக்கையை தீர்க்கவும்",
+    alertsTutorialResolveAction:
+      "செயலில் உள்ள எச்சரிக்கையில் தீர்க்கவும் பொத்தானை அழுத்தவும்.",
+    alertsTutorialResolveOutcome:
+      "தீர்வு குறிப்பைச் சேர்க்க ஒரு பெட்டி திறக்கும்.",
+    alertsTutorialIgnoreTitle: "எச்சரிக்கையை புறக்கணிக்கவும்",
+    alertsTutorialIgnoreAction:
+      "தீர்க்காமல் நீக்க புறக்கணிக்கவும் பொத்தானை அழுத்தவும்.",
+    alertsTutorialIgnoreOutcome:
+      "அது கடந்த எச்சரிக்கைகள் தாவலுக்கு நகரும்.",
+    alertsTutorialMapTitle: "வரைபடத்தில் காண்க",
+    alertsTutorialMapAction:
+      "இடத்தைப் பார்க்க வரைபடத்தில் காண்க பொத்தானை அழுத்தவும்.",
+    alertsTutorialMapOutcome:
+      "பாதிக்கப்பட்ட பகுதியுடன் வரைபடம் திறக்கும்.",
+    fieldDataOverviewTitle: "வயல் தரவு மேலோட்டம்",
+    fieldDataOverviewAction:
+      "இந்த பக்கம் உங்கள் வயல் புள்ளிவிவரங்களின் சுருக்கத்தை காட்டுகிறது.",
+    fieldDataOverviewOutcome:
+      "மொத்த வயல்கள், ஆரோக்கியம், அழுத்தம் மற்றும் எச்சரிக்கைகள் காட்டப்படும்.",
+    fieldDataSummaryTitle: "சுருக்க புள்ளிவிவரங்கள்",
+    fieldDataSummaryAction:
+      "விரைவான ஆரோக்கிய அளவுகோல்களுக்கு அட்டைகளைப் பாருங்கள்.",
+    fieldDataSummaryOutcome:
+      "பச்சை=ஆரோக்கியம், மஞ்சள்=அழுத்தம், சிவப்பு=முக்கிய எச்சரிக்கை.",
+    fieldDataDistrictTableTitle: "மாவட்ட ஒப்பீட்டு அட்டவணை",
+    fieldDataDistrictTableAction:
+      "ஒவ்வொரு மாவட்டத்தின் தரவையும் அட்டவணையில் ஸ்க்ரோல் செய்து பாருங்கள்.",
+    fieldDataDistrictTableOutcome:
+      "மாவட்டங்களுக்கிடையிலான ஆரோக்கியம் மற்றும் மகசூலை ஒப்பிடலாம்.",
+    fieldDataViewMapTitle: "வரைபடத்தில் காண்க",
+    fieldDataViewMapAction:
+      "ஏதேனும் மாவட்டத்திற்கு வரைபடம் திறக்க பொத்தானைப் பயன்படுத்தவும்.",
+    fieldDataViewMapOutcome:
+      "தேர்ந்தெடுத்த மாவட்டத்துடன் வரைபடம் திறக்கும்.",
+    actionLabel: "செயல்",
+    viewReportBtn: "அறிக்கையை காண்க",
+    weatherTutorialOverviewAction:
+      "வெப்பநிலை, மழை மற்றும் காற்று உள்ளிட்ட தற்போதைய வானிலை பார்க்கவும்.",
+    weatherTutorialOverviewOutcome:
+      "உங்கள் இடத்திற்கான நேரடி வானிலை அளவீடுகள் காட்டப்படும்.",
+    weatherTutorialHourlyAction:
+      "அடுத்த 24 மணி முன்னேற்றம் பார்க்க மணிநேர தாவலைத் திறக்கவும்.",
+    weatherTutorialHourlyOutcome:
+      "வெப்பநிலை, மழை, காற்று மாற்றங்கள் காட்டப்படும்.",
+    weatherTutorialSoilAction:
+      "மண் மற்றும் விவசாய நிலை பார்க்க மண் தாவலைத் திறக்கவும்.",
+    weatherTutorialSoilOutcome:
+      "மண் வெப்பநிலை, ஈரப்பதம், VPD, ET தரவு காட்டப்படும்.",
+    weatherTutorialForecastAction:
+      "14 நாள் நீண்ட முன்னறிவிப்பைப் பார்க்க முன்னறிவிப்பு தாவலைத் திறக்கவும்.",
+    weatherTutorialForecastOutcome:
+      "தினசரி கணிப்புகள் மூலம் வேலைத் திட்டமிடலாம்.",
+    weatherTutorialHistoryAction:
+      "கடந்த பதிவுகளைப் பார்க்க வரலாறு தாவலைத் திறக்கவும்.",
+    weatherTutorialHistoryOutcome:
+      "சமீபத்திய வானிலை முறைபாடுகளை ஒப்பிடலாம்.",
+    dsDivision: "பிரதேச செயலகப் பிரிவு",
+    colombo: "கொழும்பு",
+    autoDetected: "தானாக கண்டறியப்பட்டது",
+    daytime: "பகல்",
+    night: "இரவு",
+    hourlyDetailTable: "மணிநேர விரிவான அட்டவணை",
+    soilTemperatureProfiles: "மண் வெப்பநிலை சுயவிவரங்கள்",
+    soilMoistureContent: "மண் ஈரப்பத அளவு",
+    agronomicIndicators: "விவசாய குறியீடுகள்",
+    sprayFieldAdvisory: "தெளிப்பு மற்றும் வயல் வேலை ஆலோசனை",
+    outlook14Day: "14 நாள் முன்னோக்கு",
+    weeklyAgroForecastDetail: "வாராந்திர விவசாய முன்னறிவிப்பு விவரம்",
+    past7DaysFieldHistory: "கடந்த 7 நாட்கள் வயல் வரலாறு",
+    historicalDetailTable: "வரலாற்று விரிவான அட்டவணை",
+    reportTutorialOverviewAction:
+      "செயற்கைக்கோள் அடிப்படையிலான மகசூல் கணிப்புகளை ஆய்வு செய்யுங்கள்.",
+    reportTutorialOverviewOutcome:
+      "ஒப்பீட்டு அளவுகோல்களுடன் விரிவான அறிக்கைகள் காணலாம்.",
+    reportTutorialModeTitle: "ஒற்றை அல்லது ஒப்பீடு",
+    reportTutorialModeAction:
+      "ஒற்றை மற்றும் ஒப்பீட்டு முறைகளுக்கு இடையில் மாற்றவும்.",
+    reportTutorialModeOutcome:
+      "ஒரு மாவட்டம் அல்லது இரண்டு மாவட்டங்களை ஒப்பிடலாம்.",
+    reportTutorialDistrictTitle: "மாவட்டத் தேர்வு",
+    reportTutorialDistrictAction:
+      "மகசூல் பகுப்பாய்வு பார்க்க மாவட்டத்தைத் தேர்வு செய்யவும்.",
+    reportTutorialDistrictOutcome:
+      "தேர்ந்தெடுத்த மாவட்டத்திற்கான தரவு ஏற்றப்படும்.",
+    reportTutorialYieldTitle: "மகசூல் கணிப்பு",
+    reportTutorialYieldAction:
+      "கணிக்கப்பட்ட மகசூல் மற்றும் வரலாற்று ஒப்பீட்டை பார்க்கவும்.",
+    reportTutorialYieldOutcome:
+      "எதிர்பார்க்கப்படும் மகசூல் மற்றும் அடிப்படை மதிப்பு காட்டப்படும்.",
+    reportTutorialMetricsTitle: "அளவுகோல்கள் மற்றும் ஏற்றுமதி",
+    reportTutorialMetricsAction:
+      "பூச்சி/அபாய அளவுகோல்கள் பார்த்து அறிக்கையை ஏற்றுமதி செய்யவும்.",
+    reportTutorialMetricsOutcome:
+      "முழுமையான பகுப்பாய்வு PDF பதிவிறக்கம் செய்யலாம்.",
+    dataUnavailable: "தரவு கிடைக்கவில்லை",
+    fetchingSatelliteData: "செயற்கைக்கோள் தரவைப் பெறுகிறது...",
+    viewLabel: "காட்சி",
+    primaryLabel: "முதன்மை",
+    comparisonLabel: "ஒப்பீடு",
+    predictedAverage: "கணிக்கப்பட்ட சராசரி",
+    totalYieldLabel: "மொத்த மகசூல்",
+    historicalBaseline: "வரலாற்று அடிப்படை",
+    pestCount: "பூச்சி எண்ணிக்கை",
+    riskFactor: "அபாய காரணி",
+    exportComparisonReport: "ஒப்பீட்டு அறிக்கையை ஏற்றுமதி செய்",
+    loginFailed: "உள்நுழைவு தோல்வி",
+    pleaseEnterEmail: "தயவுசெய்து உங்கள் மின்னஞ்சலை உள்ளிடவும்.",
+    failedToSendResetEmail: "கடவுச்சொல் மீட்டமைவு மின்னஞ்சல் அனுப்ப முடியவில்லை.",
+    networkErrorTryAgain: "பிணைய பிழை. தயவுசெய்து மீண்டும் முயற்சிக்கவும்.",
+    validEmailAddressError: "செல்லுபடியாகும் மின்னஞ்சல் முகவரியை உள்ளிடவும்.",
+    signupFailed: "பதிவு தோல்வி",
+    createAccountSubtitle:
+      "தொடங்க உங்கள் RiceVision கணக்கை உருவாக்குங்கள்.",
+    sidebarTutorialNavTitle: "பக்கப்பட்டி வழிசெலுத்தல்",
+    sidebarTutorialNavAction:
+      "முக்கிய பக்கங்களுக்கு செல்ல இடது பக்கப்பட்டியை பயன்படுத்துங்கள்.",
+    sidebarTutorialNavOutcome:
+      "டாஷ்போர்டு, வரைபடம், எச்சரிக்கைகள், வானிலை, அறிக்கைகள் அனைத்தையும் இங்கிருந்து திறக்கலாம்.",
+    sidebarTutorialTopTitle: "மேல் வழிசெலுத்தல் இணைப்புகள்",
+    sidebarTutorialTopAction:
+      "செல்ல வேண்டிய பக்கத்தை மேல் இணைப்புகளில் கிளிக் செய்யவும்.",
+    sidebarTutorialTopOutcome:
+      "ஒளிரும் இணைப்பு நீங்கள் இருக்கும் தற்போதைய பக்கத்தை காட்டும்.",
+    sidebarTutorialBottomTitle: "கீழ் விருப்பங்கள்",
+    sidebarTutorialBottomAction:
+      "கீழ்பகுதியில் சுயவிவரம், உதவி மற்றும் வெளியேறல் விருப்பங்கள் உள்ளன.",
+    sidebarTutorialBottomOutcome:
+      "எந்த பக்கத்திலிருந்தும் கணக்கு மேலாண்மைக்கு விரைவான அணுகல் கிடைக்கும்.",
+    systemVersionTag: "அமைப்பு பதிப்பு Alpha-1.0.4 - RiceVision Core",
+    dashboardTutorialWelcome:
+      "வரவேற்பு. இது உங்கள் வயல் கட்டுப்பாட்டு மையத்தின் மேலோட்டம்.",
+    dashboardTutorialSync:
+      "உங்கள் தரவு புதுப்பிக்கப்பட்டதா என்பதை இந்த குறியீட்டில் சரிபார்க்கவும்.",
+    dashboardTutorialHealth:
+      "பயிர் ஆரோக்கியத்தை பை சார்டில் பாருங்கள். பச்சை சிறந்த நிலை.",
+    dashboardTutorialYield:
+      "எதிர்பார்க்கப்படும் மொத்த மகசூலை மெட்ரிக் டன்னில் இங்கே பாருங்கள்.",
+    dashboardTutorialSupply:
+      "எதிர்பார்க்கப்படும் பற்றாக்குறை மற்றும் தேசிய தேவை அபாயங்களை வேகமாக கண்காணிக்கவும்.",
+    dashboardTutorialThreats:
+      "செயலில் உள்ள நோய் பரவல்கள் மற்றும் பூச்சி அபாயங்களை பாருங்கள்.",
+    dashboardTutorialThreatDetails:
+      "இந்த அச்சுறுத்தலுக்கான விரிவான பரிந்துரைகளை திறக்கவும்.",
+    dashboardTutorialThreatToggle:
+      "அச்சுறுத்தல் பட்டியலை விரிவாக்க / சுருக்க இதைப் பயன்படுத்தவும்.",
+    dashboardTutorialStageChart:
+      "உங்கள் பயிர்கள் எந்த வளர்ச்சி கட்டத்தில் உள்ளன என்பதை சதவீதமாக பாருங்கள்.",
+    dashboardTutorialDistrictTable:
+      "அனைத்து மாவட்டங்களின் ஆரோக்கிய அளவுகோல்களை ஒரே அட்டவணையில் ஒப்பிடுங்கள்.",
+    dashboardTutorialDistrictToggle:
+      "முழு மாவட்ட பட்டியலை விரிவாக்க இந்த பொத்தானை பயன்படுத்துங்கள்.",
+    fieldsLabel: "வயல்கள்",
+    countLabel: "எண்ணிக்கை",
+    statusSafe: "பாதுகாப்பான",
+    statusModerate: "மிதமான",
+    statusCritical: "முக்கிய",
+    statusStable: "நிலையான",
+    statusWarning: "எச்சரிக்கை",
+    statusHighRisk: "உயர் அபாயம்",
+    wmoClearSky: "தெளிந்த வானம்",
+    wmoPartlyCloudy: "பகுதி மேகமூட்டம்",
+    wmoOvercast: "முழு மேகமூட்டம்",
+    wmoFoggyHaze: "மூடுபனி / பனித்தூள்",
+    wmoDrizzle: "சிறு தூறல்",
+    wmoRain: "மழை",
+    wmoSnowIce: "பனி / ஐஸ்",
+    wmoRainShowers: "மழை சாரல்கள்",
+    wmoHeavySnowShowers: "கனமழை பனிச்சாரல்",
+    wmoThunderstorm: "இடி மின்னல் மழை",
+    wmoUnknown: "அறியப்படாதது",
+    weatherAdvisoryFeels: "உணரப்படும் வெப்பம் {temp}°C",
+    weatherAdvisoryFungalRisk: "பூஞ்சை அபாயம்",
+    weatherAdvisoryNormal: "சாதாரணம்",
+    weatherAdvisoryMoistureThreshold: "ஈரப்பத நிறைவு வரம்பு",
+    weatherAdvisoryPoorSunlight: "குறைந்த சூரிய ஒளி",
+    weatherAdvisoryGoodForCrops: "பயிர்களுக்கு நல்லது",
+    weatherAdvisoryMeanSeaLevel: "சராசரி கடல் மட்டம்",
+    weatherAdvisoryAvoidSpraying: "தெளிப்பதை தவிர்க்கவும்",
+    weatherAdvisorySafeForSpraying: "தெளிப்பதற்கு பாதுகாப்பானது",
+    weatherAdvisoryHighGusts: "கன காற்றடிகள்",
+    weatherAdvisorySafe: "பாதுகாப்பானது",
+    weatherAdvisoryCurrentHour: "தற்போதைய மணி",
+    weatherAdvisoryUVVeryHigh: "UV மிகவும் உயரம்",
+    weatherAdvisoryUVModerate: "மிதமான",
+    weatherAdvisoryUVLow: "குறைவு",
+    weatherAdvisoryPoorVisibility: "குறைந்த தெளிவு",
+    weatherAdvisoryGood: "நல்லது",
+    weatherAdvisoryHoursWithRain: "மழை பெய்த மணிநேரங்கள்",
+    weatherAdvisoryTodayTotal: "இன்றைய மொத்தம்",
+    weatherAdvisoryIrrigationGuide: "பாசன வழிகாட்டி",
+    weatherAdvisoryCropStress: "பயிர் அழுத்தம்",
+    weatherAdvisoryTotalRainToday: "இன்றைய மொத்த மழை",
+    weatherAdvisoryMaxChanceToday: "இன்றைய அதிகபட்ச வாய்ப்பு",
+    weatherTableColTime: "நேரம்",
+    weatherTableColCondition: "நிலை",
+    weatherTableColTemp: "வெப்பம்",
+    weatherTableColFeels: "உணர்வு",
+    weatherTableColHumidity: "ஈரப்பதம்",
+    weatherTableColRainPercent: "மழை%",
+    weatherTableColRainMm: "மழை mm",
+    weatherTableColWind: "காற்று",
+    weatherTableColUV: "UV",
+    weatherTableColET0: "ET0",
+    weatherTableColVisibility: "தெளிவு",
+    weatherTableColDate: "தேதி",
+    weatherTableColMaxTemp: "அதிகபட்ச C",
+    weatherTableColMinTemp: "குறைந்தபட்ச C",
+    weatherTableColWindMax: "காற்று அதிகபட்சம்",
+    weatherTableColUvMax: "UV அதிகபட்சம்",
+    weatherTableColRadiation: "கதிர்வீச்சு",
+    weatherTableColSunrise: "சூரிய உதயம்",
+    weatherTableColSunset: "சூரிய அஸ்தமனம்",
+    weatherTableColConditions: "நிலைகள்",
+    weatherTableColRainSum: "மழை மொத்தம்",
+    weatherTableColRainHours: "மழை மணிநேரம்",
+    soilTempSurfaceLabel: "மேற்பரப்பு (0 cm)",
+    soilTempSurfaceDesc: "மேல் அடுக்கு - விதை முளைப்பு பகுதி",
+    soilTempShallowLabel: "ஆழமற்ற (6 cm)",
+    soilTempShallowDesc: "நாற்று வேர் பகுதி",
+    soilTempMediumLabel: "மத்திய (18 cm)",
+    soilTempMediumDesc: "செயலில் உள்ள வேர் பகுதி - நெல் வளர்ச்சி",
+    soilAdvisoryTooCold: "முளைப்பதற்கு மிகவும் குளிர்",
+    soilAdvisoryHeatStress: "வெப்ப அழுத்த அபாயம்",
+    soilAdvisoryOptimal: "நெலுக்கு சிறந்தது",
+    soilMoistureDepth0to1: "0-1 cm",
+    soilMoistureDepth0to1Desc: "மேல் மண் - மேற்பரப்பு ஆவியாகும் அடுக்கு",
+    soilMoistureDepth1to3: "1-3 cm",
+    soilMoistureDepth1to3Desc: "நாற்று வேர் பகுதி",
+    soilMoistureDepth3to9: "3-9 cm",
+    soilMoistureDepth3to9Desc: "முக்கிய வேர் உறிஞ்சும் பகுதி",
+    soilMoistureLabel: "மண் ஈரப்பதம்",
+    soilMoistureLow: "குறைவு - பாசனம் பரிசீலிக்கவும்",
+    soilMoistureSaturated: "நிறைவு",
+    soilMoistureGood: "நல்ல ஈரப்பத நிலை",
+    et0EvapotranspirationToday: "இன்றைய ET0 ஆவியீடு-உமிழ்வு",
+    et0Description:
+      "FAO-56 குறியீட்டின் படி, சிறந்த சூழலில் பயிர் பயன்படுத்தும் நீர் அளவு.",
+    et0HighDemand: "அதிக தேவை - பாசனம் அதிகரிக்கவும்",
+    et0ModerateDemand: "மிதமானது - சாதாரண பாசனம்",
+    et0LowDemand: "குறைந்த தேவை - பாசனம் குறைக்கவும்",
+    vapourPressureDeficit: "ஆவியழுத்த குறைவு",
+    vpdDescription: "உயர் VPD பயிரில் நீர் அழுத்தத்தை அதிகரிக்கலாம்.",
+    vpdSevereStress: "கடுமையான அழுத்தம்",
+    vpdModerateStress: "மிதமான அழுத்தம்",
+    vpdGoodConditions: "நல்ல நிலை",
+    solarRadiationToday: "இன்றைய சூரிய கதிர்வீச்சு",
+    solarRadiationDescription:
+      "அதிக கதிர்வீச்சு ஆவியீடு மற்றும் ஒளிச்சேர்க்கையை உயர்த்தும்.",
+    solarRadiationHigh: "அதிக கதிர்வீச்சு நாள்",
+    solarRadiationNormal: "சாதாரண கதிர்வீச்சு",
+    advisorySprayingTitle: "பூச்சிக்கொல்லி / களைக்கொல்லி தெளித்தல்",
+    advisoryIrrigationTitle: "பாசனம் பரிந்துரை",
+    advisoryFungalRiskTitle: "பூஞ்சை நோய் அபாயம்",
+    advisoryFieldMachineryTitle: "வயல் இயந்திரப் பணி",
+    advisoryHarvestTitle: "அறுவடை நிலை",
+    advisoryUvRiskTitle: "UV வெளிப்பாடு அபாயம்",
+    advisoryWindDriftRisk: "காற்று {speed} km/h - சிதறல் அபாயம்",
+    advisoryRainWashOffRisk: "மழை உள்ளது - கழுவிச் செல்லும் அபாயம்",
+    advisoryHeavyCloudPoorDrying: "கன மேகம் - உலர்வு குறைவு",
+    advisoryAllConditionsMet: "அனைத்து நிபந்தனைகளும் பூர்த்தி",
+    advisoryEt0Low: "ET0 குறைவு ({et0} mm)",
+    advisorySoilMoistureSufficient: "மண் ஈரப்பதம் போதுமானது",
+    advisoryEt0MoistureLow: "ET0 = {et0} mm, ஈரப்பதம் குறைவு",
+    advisoryHumidityMonitorBlast: "ஈரப்பதம் {humidity}% - பிளாஸ்ட் கண்காணிக்கவும்",
+    advisoryHumidityLowRisk: "ஈரப்பதம் {humidity}% - குறைந்த அபாயம்",
+    advisoryRainSoilWaterlogged: "மழை உள்ளது - மண் நீர்நிலையாகியுள்ளது",
+    advisorySoilTooWetMachinery: "இயந்திரப் பணிக்கு மண் மிக ஈரமாக உள்ளது",
+    advisoryConditionsSuitable: "நிலைகள் பொருத்தமானவை",
+    advisoryRainAvoidHarvest: "மழை - அறுவடை தவிர்க்கவும்",
+    advisoryHighHumidityGrainMoistureRisk:
+      "அதிக ஈரப்பதம் - தானிய ஈரத்தன்மை அபாயம்",
+    advisoryGoodHarvestWindow: "அறுவடைக்கு நல்ல நேர சாளரம்",
+    advisoryUvVeryHigh: "UV {uv} - மிகவும் உயரம், பாதுகாப்பு பயன்படுத்தவும்",
+    advisoryUvWearProtection: "UV {uv} - பாதுகாப்பு உபகரணம் அணியவும்",
+    advisoryUvSafe: "UV {uv} - பாதுகாப்பானது",
+    advisoryStatusMonitor: "கண்காணி",
+    advisoryStatusGo: "செல்",
+    advisoryStatusHold: "நிறுத்து",
+    weatherRainShort: "மழை",
   },
 };
 
@@ -1157,8 +2146,15 @@ export function LanguageProvider({ children }) {
     localStorage.setItem("language", code);
   };
 
+  const getByPath = (obj, key) => {
+    if (!obj || !key) return undefined;
+    return key.split(".").reduce((acc, part) => (acc == null ? undefined : acc[part]), obj);
+  };
+
   const t = (key) =>
-    translations[language]?.[key] ?? translations["en"][key] ?? key;
+    getByPath(translations[language], key) ??
+    getByPath(translations["en"], key) ??
+    key;
 
   return (
     <LanguageContext.Provider

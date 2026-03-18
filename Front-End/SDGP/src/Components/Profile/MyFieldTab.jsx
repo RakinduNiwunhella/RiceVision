@@ -89,19 +89,19 @@ export default function MyFieldTab() {
     setSaving(false);
 
     if (error) {
-      setStatus({ type: "error", message: `Save failed: ${error.message}` });
+      setStatus({ type: "error", message: `${t('saveFailedPrefix')}: ${error.message}` });
       return;
     }
 
     setExisting(data);
     setEditMode(false);
     setDrawnFeature(null);
-    setStatus({ type: "success", message: "Field boundary saved to registry." });
+    setStatus({ type: "success", message: t('fieldBoundarySaved') });
   };
 
   const deleteField = async () => {
     if (!existing || !user) return;
-    if (!window.confirm("Are you sure you want to remove your field registration? This cannot be undone.")) return;
+    if (!window.confirm(t('confirmRemoveFieldRegistration'))) return;
 
     const { error } = await supabase
       .from("user_fields")
@@ -109,14 +109,14 @@ export default function MyFieldTab() {
       .eq("user_id", user.id);
 
     if (error) {
-      setStatus({ type: "error", message: `Delete failed: ${error.message}` });
+      setStatus({ type: "error", message: `${t('deleteFailedPrefix')}: ${error.message}` });
       return;
     }
     setExisting(null);
     setEditMode(false);
     setDrawnFeature(null);
     setFieldName("");
-    setStatus({ type: "success", message: "Field registration removed." });
+    setStatus({ type: "success", message: t('fieldRegistrationRemoved') });
   };
 
   if (loading) {
@@ -194,7 +194,7 @@ export default function MyFieldTab() {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
             {[
               { icon: "badge",        label: t('fieldNameStat'),  value: existing.field_name || "—"                                },
-              { icon: "location_on",  label: t('districtStat') || t('district'),   value: existing.district || "—"                                 },
+              { icon: "location_on",  label: t('districtStat'),   value: existing.district || "—"                                 },
               { icon: "straighten",   label: t('areaStat'),       value: `${parseFloat(existing.area_acres).toFixed(3)} ac`        },
               { icon: "crop_square",  label: t('areaSqmLabel'),   value: `${(existing.area_acres * 4046.86).toFixed(0)} m²`        },
               { icon: "paid",         label: t('annualFeeStat'),  value: `Rs. ${existing.price_lkr.toLocaleString()}`              },

@@ -99,61 +99,61 @@ const MyDashboard = () => {
     const steps = [
       {
         ref: headerRef,
-        title: "Welcome! This is your field control center overview.",
+        title: t("dashboardTutorialWelcome"),
       },
       {
         ref: syncBadgeRef,
-        title: "Check this icon to ensure your data is freshly synced.",
+        title: t("dashboardTutorialSync"),
       },
       {
         ref: healthCardRef,
-        title: "See crop health as a pie chart. Green means optimal.",
+        title: t("dashboardTutorialHealth"),
       },
       {
         ref: yieldCardRef,
-        title: "View your expected total harvest here in metric tons.",
+        title: t("dashboardTutorialYield"),
       },
       {
         ref: supplyCardRef,
-        title: "Track expected shortfalls and national demand saturation risks quickly.",
+        title: t("dashboardTutorialSupply"),
       },
       {
         ref: threatsCardRef,
-        title: "Review active disease outbreaks and critical pest risks.",
+        title: t("dashboardTutorialThreats"),
       },
     ]
 
     if (outbreaks.length > 0) {
       steps.push({
         ref: threatDetailsBtnRef,
-        title: "Click here to open detailed recommendations for this threat.",
+        title: t("dashboardTutorialThreatDetails"),
       })
     }
 
     if (outbreaks.length > 5) {
       steps.push({
         ref: outbreaksToggleBtnRef,
-        title: "Click this to expand or collapse your threat list.",
+        title: t("dashboardTutorialThreatToggle"),
       })
     }
 
     steps.push(
       {
         ref: stageChartRef,
-        title: "Check what percentage of your crops are in each growth stage.",
+        title: t("dashboardTutorialStageChart"),
       },
       {
         ref: districtTableRef,
-        title: "Compare health metrics across all your districts in one table.",
+        title: t("dashboardTutorialDistrictTable"),
       },
       {
         ref: districtToggleBtnRef,
-        title: "Use this button to expand the full district list.",
+        title: t("dashboardTutorialDistrictToggle"),
       },
     )
 
     return steps
-  }, [outbreaks.length])
+  }, [outbreaks.length, t])
 
   const { currentStep, showTutorial, currentTutorialStep, hasMoreSteps, nextStep, prevStep, closeTutorial } =
     usePageTutorial("dashboard", tutorialSteps);
@@ -222,10 +222,10 @@ const MyDashboard = () => {
         <div ref={currentStep === 0 ? headerRef : undefined} className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
             <h1 className="text-xl sm:text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
-            Welcome to RiceVision
+            {t('welcomeTitle')}
             </h1>
             <p className="text-white/85 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em]">
-              {t('Satellite-driven insights for national food security')}
+              {t('welcomeSubtitle')}
             </p>
           </div>
 
@@ -330,7 +330,7 @@ const MyDashboard = () => {
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/85 mb-6 flex items-center gap-2">
                 <span className="material-symbols-outlined text-amber-500 text-sm">error</span>
-                Supply Stability
+                {t('supplyStability')}
               </p>
               <div className="py-2">
                 <p className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tighter mb-1" style={{ textShadow: "0 10px 40px rgba(0,0,0,0.5)" }}>220K</p>
@@ -460,7 +460,7 @@ const MyDashboard = () => {
                           labelStyle={{ color: "#fff", fontSize: "10px", fontWeight: "900", textTransform: "uppercase", letterSpacing: "0.15em" }}
                           itemStyle={{ color: "#a78bfa", fontSize: "11px", fontWeight: "bold" }}
                           cursor={{ fill: "rgba(255,255,255,0.02)" }}
-                          formatter={(value) => [`${value.toLocaleString()} fields`, "Count"]}
+                          formatter={(value) => [`${value.toLocaleString()} ${t('fieldsLabel')}`, t('countLabel')]}
                         />
                         <Bar dataKey="stage_count" radius={[8, 8, 0, 0]} maxBarSize={56}>
                           {stageDistribution.map((_, i) => (
@@ -496,7 +496,7 @@ const MyDashboard = () => {
               );
             })() : (
               <div className="flex-1 min-h-75 flex items-center justify-center text-white/85 animate-pulse text-xs font-black uppercase tracking-widest">
-                Loading Stage Data...
+                {t('loadingStageData')}
               </div>
             )}
           </div>
@@ -505,11 +505,11 @@ const MyDashboard = () => {
 <div ref={districtTableRef} className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
   <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/85 mb-2 flex items-center gap-2">
     <Bug className="text-rose-400 text-sm" />
-    District Overview
+    {t('districtOverview')}
   </p>
 
   <h3 className="text-xl font-black text-white tracking-tight uppercase mb-8">
-    District Pest & Health Status
+    {t('districtPestHealthStatus')}
   </h3>
 
   <div className="flex-1 space-y-2 no-scrollbar overflow-y-auto max-h-[420px] pr-2">
@@ -567,7 +567,7 @@ const MyDashboard = () => {
       onClick={() => setShowAllDistricts(!showAllDistricts)}
       className="text-[10px] font-black uppercase tracking-[0.4em] text-white/85 hover:text-white transition-colors"
     >
-      {showAllDistricts ? "Show Less" : `Show All (${districtHealth.length} Items)`}
+      {showAllDistricts ? t('showLess') : `${t('showAll')} (${districtHealth.length})`}
     </button>
   </div>
 </div>

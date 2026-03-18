@@ -95,7 +95,7 @@ export default function FieldSetupPage() {
     if (!drawnFeature) return;
 
     if (!user) {
-      alert("Please confirm your email and log in before saving your field.");
+      alert(t("confirmEmailLoginBeforeSave"));
       navigate("/signin");
       return;
     }
@@ -117,7 +117,7 @@ export default function FieldSetupPage() {
     setSaving(false);
 
     if (error) {
-      alert(`Could not save field: ${error.message}`);
+      alert(`${t("saveFieldFailedPrefix")}: ${error.message}`);
       return;
     }
     navigate("/dashboard");
@@ -385,8 +385,8 @@ export default function FieldSetupPage() {
                 {/* Order line */}
                 <div className="flex items-center justify-between px-4 py-3 rounded-xl bg-white/5 border border-white/10">
                   <div>
-                    <p className="text-xs font-bold text-white/85">RiceVision Field Monitoring</p>
-                    <p className="text-[10px] text-white/85">{district || "Sri Lanka"} · {acres.toFixed(3)} acres</p>
+                    <p className="text-xs font-bold text-white/85">{t("fieldMonitoringTitle")}</p>
+                    <p className="text-[10px] text-white/85">{district || t("sriLanka")} · {acres.toFixed(3)} acres</p>
                   </div>
                   <span className="font-black text-emerald-400">Rs. {price.toLocaleString()}</span>
                 </div>
@@ -420,7 +420,7 @@ export default function FieldSetupPage() {
                   onClick={() => setPayClicked(true)}
                   className="w-full py-3.5 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-400 font-black text-sm hover:bg-amber-500/25 transition-all tracking-wide"
                 >
-                  Pay Rs. {price.toLocaleString()} / year
+                  {t("payNow")} Rs. {price.toLocaleString()} / {t("perYear")}
                 </button>
 
                 {payClicked && (

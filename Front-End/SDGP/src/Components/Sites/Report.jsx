@@ -131,28 +131,28 @@ const Report = () => {
   const tutorialSteps = [
     {
       title: t("yieldReports") || "Yield Analytics Reports",
-      action: "Explore satellite-derived yield predictions and analysis",
-      outcome: "You will see detailed yield forecasts with comparative metrics and export options"
+      action: t("reportTutorialOverviewAction"),
+      outcome: t("reportTutorialOverviewOutcome")
     },
     {
-      title: "Single vs Compare",
-      action: "Toggle between 'Single' report view and 'Compare' mode for side-by-side analysis",
-      outcome: "You can analyze one district or compare two districts' yield predictions"
+      title: t("reportTutorialModeTitle"),
+      action: t("reportTutorialModeAction"),
+      outcome: t("reportTutorialModeOutcome")
     },
     {
-      title: "District Selection",
-      action: "Click to select a district and view its yield analytics",
-      outcome: "The report will load satellite data and yield predictions for the selected district"
+      title: t("reportTutorialDistrictTitle"),
+      action: t("reportTutorialDistrictAction"),
+      outcome: t("reportTutorialDistrictOutcome")
     },
     {
-      title: "Yield Prediction",
-      action: "View the predicted yield and comparison with historical baseline",
-      outcome: "You will see the expected harvest (kg/ha) and how it compares to past years"
+      title: t("reportTutorialYieldTitle"),
+      action: t("reportTutorialYieldAction"),
+      outcome: t("reportTutorialYieldOutcome")
     },
     {
-      title: "Metrics & Export",
-      action: "Review pest count, risk factors, and other metrics. Use Export PDF to download the report",
-      outcome: "You get a comprehensive analysis document ready for sharing or storage"
+      title: t("reportTutorialMetricsTitle"),
+      action: t("reportTutorialMetricsAction"),
+      outcome: t("reportTutorialMetricsOutcome")
     }
   ];
 
@@ -831,22 +831,22 @@ const Report = () => {
 
   };
   const getPestStatus = (count) => {
-    if (count === 0) return { label: "SAFE", color: "text-emerald-400" };
-    if (count < 20) return { label: "MODERATE", color: "text-amber-400" };
-    return { label: "CRITICAL", color: "text-red-400" };
+    if (count === 0) return { label: t("statusSafe"), color: "text-emerald-400" };
+    if (count < 20) return { label: t("statusModerate"), color: "text-amber-400" };
+    return { label: t("statusCritical"), color: "text-red-400" };
   };
 
   const getRiskStatus = (score) => {
-    if (score < 1) return { label: "STABLE", color: "text-emerald-400" };
-    if (score < 4) return { label: "WARNING", color: "text-amber-400" };
-    return { label: "HIGH RISK", color: "text-red-400" };
+    if (score < 1) return { label: t("statusStable"), color: "text-emerald-400" };
+    if (score < 4) return { label: t("statusWarning"), color: "text-amber-400" };
+    return { label: t("statusHighRisk"), color: "text-red-400" };
   };
 
   const ReportPane = ({ report, config, setConfig, title, districtSelectorRef, yieldHeroRef, metricsExportRef, isSingleMode = false }) => {
     if (report?.error) return (
       <div className="flex-1 glass p-6 sm:p-12 rounded-2xl sm:rounded-[3rem] text-center border border-red-500/20">
         <span className="material-symbols-outlined text-5xl text-red-300 mb-4 block">signal_disconnected</span>
-        <h3 className="text-red-400 font-black uppercase tracking-widest mb-3 text-sm">Data Unavailable</h3>
+        <h3 className="text-red-400 font-black uppercase tracking-widest mb-3 text-sm">{t('dataUnavailable')}</h3>
         <p className="text-xs text-white/85 mb-6">{report.message}</p>
         {availableDates.length > 0 && (
           <CustomSelect
@@ -860,7 +860,7 @@ const Report = () => {
 
     if (!report) return (
       <div className="flex-1 glass rounded-2xl sm:rounded-[3rem] p-8 sm:p-20 text-center animate-pulse">
-        <p className="text-white/85 font-black uppercase tracking-widest text-xs">Fetching Satellite Data...</p>
+        <p className="text-white/85 font-black uppercase tracking-widest text-xs">{t('fetchingSatelliteData')}</p>
       </div>
     );
 
@@ -876,7 +876,7 @@ const Report = () => {
           <div className="col-span-2 flex justify-between items-center mb-2">
             <span className="text-[10px] font-black text-emerald-400 tracking-[0.2em] uppercase flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              {title} VIEW
+              {title} {t('viewLabel')}
             </span>
             <button
               ref={metricsExportRef}
@@ -886,7 +886,7 @@ const Report = () => {
                 : "border-white/10 hover:bg-white/10 hover:border-white/20"
                 }`}            >
               <span className="material-symbols-outlined text-xs">download</span>
-              Export PDF
+              {t('downloadPdf')}
             </button>
           </div>
           <div ref={districtSelectorRef}>
@@ -920,7 +920,7 @@ const Report = () => {
             <div className="text-center flex flex-col items-center justify-center py-1 sm:py-2">
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/85 mb-1 flex items-center justify-center gap-2">
                 <span className="material-symbols-outlined text-emerald-400 text-sm">monitoring</span>
-                Predicted Average
+                {t('predictedAverage')}
               </p>
               <h2 className="text-3xl sm:text-5xl font-black tracking-tighter text-white leading-none">
                 {Math.round(report.summary.yield).toLocaleString()}
@@ -929,11 +929,11 @@ const Report = () => {
             </div>
             <div className="mt-2 pt-3 border-t border-white/5 grid grid-cols-2 gap-3">
               <div>
-                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/85 mb-0.5">Total Yield</p>
+                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/85 mb-0.5">{t('totalYieldLabel')}</p>
                 <p className="text-base font-black text-white">{Math.round(report.summary.total_kg).toLocaleString()} <span className="text-xs font-bold text-white/85">kg</span></p>
               </div>
               <div>
-                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/85 mb-0.5">Historical Baseline</p>
+                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/85 mb-0.5">{t('historicalBaseline')}</p>
                 <p className="text-base font-black text-white">{Math.round(report.summary.historical).toLocaleString()} <span className="text-xs font-bold text-white/85">kg/ha</span></p>
               </div>
             </div>
@@ -960,7 +960,7 @@ const Report = () => {
         {/* Metric Cards */}
         <div className="grid grid-cols-2 gap-4">
           <div className="glass glass-hover p-5 rounded-3xl border border-white/10 group transition-all duration-300">
-            <p className="text-[9px] font-black text-white/85 uppercase tracking-widest mb-2">Pest Count</p>
+            <p className="text-[9px] font-black text-white/85 uppercase tracking-widest mb-2">{t('pestCount')}</p>
             <div className="flex items-baseline gap-2">
               <span className="text-2xl font-black text-white">{report.metrics.pest_count}</span>
               <span className={`text-[9px] font-black ${getPestStatus(report.metrics.pest_count).color}`}>
@@ -969,7 +969,7 @@ const Report = () => {
             </div>
           </div>
           <div className="glass glass-hover p-5 rounded-3xl border border-white/10 group transition-all duration-300">
-            <p className="text-[9px] font-black text-white/85 uppercase tracking-widest mb-2">Risk Factor</p>
+            <p className="text-[9px] font-black text-white/85 uppercase tracking-widest mb-2">{t('riskFactor')}</p>
             <div className="flex items-baseline gap-2">
               <span className="text-2xl font-black text-white">{report.metrics.risk_score.toFixed(1)}</span>
               <span className={`text-[9px] font-black ${getRiskStatus(report.metrics.risk_score).color}`}>
@@ -1023,7 +1023,7 @@ const Report = () => {
                 className="flex items-center gap-2 text-[10px] font-black px-4 py-2 rounded-xl border border-emerald-400/70 bg-emerald-500/10 transition-all duration-300 hover:bg-emerald-500/20 hover:border-emerald-300 hover:scale-[1.02] cursor-pointer uppercase tracking-widest"
               >
                 <span className="material-symbols-outlined text-sm">compare</span>
-                Export Comparison Report
+                {t('exportComparisonReport')}
               </button>
             )}
           </div>
@@ -1035,13 +1035,13 @@ const Report = () => {
             report={dataA}
             config={configA}
             setConfig={setConfigA}
-            title="PRIMARY"
+            title={t('primaryLabel')}
             districtSelectorRef={currentStep === 2 ? districtSelectorRef : undefined}
             yieldHeroRef={currentStep === 3 ? yieldHeroRef : undefined}
             metricsExportRef={currentStep === 4 ? metricsExportRef : undefined}
             isSingleMode={mode === "single"}
           />
-          {mode === "compare" && <ReportPane report={dataB} config={configB} setConfig={setConfigB} title="COMPARISON" />}
+          {mode === "compare" && <ReportPane report={dataB} config={configB} setConfig={setConfigB} title={t('comparisonLabel')} />}
         </div>
 
       </div>
