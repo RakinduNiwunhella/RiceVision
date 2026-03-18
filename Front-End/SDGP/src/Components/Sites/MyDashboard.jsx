@@ -162,6 +162,13 @@ const MyDashboard = () => {
 
   const pieColors = ["#10b981", "#f59e0b", "#ef4444"]; // Emerald-500, Amber-500, Red-500
 
+  const currentSeason = (yieldForecast?.season || "").toLowerCase() === "yala" ? "Yala" : "Maha";
+  const seasonalTargetMT = currentSeason === "Maha" ? 2_600_000 : 1_300_000;
+  const seasonalTargetKgs = seasonalTargetMT * 1000;
+  const actualYieldKgs = Number(yieldForecast?.total_yield_kgs || 0);
+  const expectedShortfallMT = Math.max(0, Math.round((seasonalTargetKgs - actualYieldKgs) / 1000));
+  const demandSaturationPct = Math.max(0, Math.min(100, (actualYieldKgs / seasonalTargetKgs) * 100));
+
   const healthPieData = healthSummary
     ? [
       { name: t('optimal'), value: healthSummary.normal_pct },
@@ -330,10 +337,12 @@ const MyDashboard = () => {
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/85 mb-6 flex items-center gap-2">
                 <span className="material-symbols-outlined text-amber-500 text-sm">error</span>
-                Supply Stability
+                {t('supplyStability')}
               </p>
               <div className="py-2">
-                <p className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tighter mb-1" style={{ textShadow: "0 10px 40px rgba(0,0,0,0.5)" }}>220K</p>
+                <p className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tighter mb-1" style={{ textShadow: "0 10px 40px rgba(0,0,0,0.5)" }}>
+                  {yieldForecast ? formatMT(expectedShortfallMT) : "---"}
+                </p>
                 <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest">{t('expectedShortfall')}</p>
               </div>
             </div>
@@ -341,15 +350,17 @@ const MyDashboard = () => {
             <div className="space-y-4 mt-8">
               <div className="flex justify-between items-end text-[10px] font-black uppercase tracking-widest text-white/85">
                 <span>{t('nationalDemand')}</span>
-                <span className="text-white">92.7%</span>
+                <span className="text-white">{demandSaturationPct.toFixed(1)}%</span>
               </div>
               <div className="w-full h-3 bg-white/5 rounded-full overflow-hidden border border-white/5 p-[1px]">
                 <div
                   className="h-full bg-gradient-to-r from-amber-500 to-emerald-500 rounded-full shadow-[0_0_15px_rgba(245,158,11,0.2)]"
-                  style={{ width: "92.7%", transition: "width 2s cubic-bezier(0.34, 1.56, 0.64, 1)" }}
+                  style={{ width: `${demandSaturationPct}%`, transition: "width 2s cubic-bezier(0.34, 1.56, 0.64, 1)" }}
                 />
               </div>
-              <p className="text-[10px] font-bold text-white/85 uppercase tracking-[0.2em] italic text-center">{t('referenceThreshold')}</p>
+              <p className="text-[10px] font-bold text-white/85 uppercase tracking-[0.2em] italic text-center">
+                {`${t('referenceThreshold')} ${currentSeason} ${formatMT(seasonalTargetMT)} MT`}
+              </p>
             </div>
           </div>
         </div>
