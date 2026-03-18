@@ -40,19 +40,16 @@ export function translateStageCategory(value, t) {
   const normalized = String(value).toLowerCase().trim();
   
   const stageKeyMap = {
-    'germination': 'stageGermination',
-    'seedling': 'stageSeedling',
+    
     'vegetative': 'stageVegetative',
-    'tillering': 'stageTillering',
-    'panicle initiation': 'stagePanicleInitiation',
-    'booting': 'stageBooting',
-    'heading': 'stageHeading',
-    'flowering': 'stageFlowering',
-    'milk': 'stageMilk',
-    'dough': 'stageDough',
+    'transplant': 'stageTransplant',
+   
+    'reproductive': 'stageReproductive',
+   
+    
     'ripening': 'stageRipening',
-    'maturity': 'stageMaturity',
-    'harvest': 'stageMaturity'
+    
+    'harvest': 'stageHarvest'
   };
   
   const key = stageKeyMap[normalized];

@@ -179,8 +179,7 @@ const MyDashboard = () => {
       { name: t('mildStress'), value: healthSummary.mild_stress_pct },
       { name: t('severeStress'), value: healthSummary.severe_stress_pct },
     ]
-    : [];
-
+    : []
   useEffect(() => {
     const loadData = async () => {
       try {

@@ -735,18 +735,13 @@ export const translations = {
     healthNotApplicable: "Not Applicable",
 
     // ── Growth Stages ──
-    stageGermination: "Germination",
-    stageSeedling: "Seedling",
+  
     stageVegetative: "Vegetative",
-    stageTillering: "Tillering",
-    stagePanicleInitiation: "Panicle Initiation",
-    stageBooting: "Booting",
-    stageHeading: "Heading",
-    stageFlowering: "Flowering",
-    stageMilk: "Milk",
-    stageDough: "Dough",
+    stageTransplant: "Transplant",
+    stageReproductive: "Reproductive",
+   
     stageRipening: "Ripening",
-    stageMaturity: "Maturity",
+    stageHarvest: "Harvest",
 
     // ── Pest Risk Levels ──
     pestRiskNone: "None",
@@ -920,7 +915,7 @@ export const translations = {
 
     // ── Dashboard ──
     welcomeTitle: "RiceVision වෙත සාදරයෙන් පිළිගනිමු",
-    welcomeSubtitle: "නවීන කෘෂිකර්මය සඳහා බුද්ධිමත් මඟපෙන්වීම්",
+    welcomeSubtitle: "නවීන කෘෂිකර්මාන්තය සඳහා බුද්ධිමත් මඟපෙන්වීම්",
     systemSynced: "පද්ධතිය සමමුහුර්ත කර ඇත",
     cropHealthDist: "බෝග සෞඛ්‍ය බෙදාහැරීම",
     analysing: "විශ්ලේෂණය කරමින්...",
@@ -992,7 +987,7 @@ export const translations = {
     colDistrict: "දිස්ත්‍රික්කය",
     colTotalFields: "මුළු කෙත්",
     colHealthy: "සෞඛ්‍ය සම්පන්න",
-    colStressed: "ඒකාග්‍ර",
+    colStressed: "මධ්‍යම ආතතිය",
     colCritical: "අනතුරු",
     colAvgYield: "සාමාන්‍ය අස්වැන්න (kg/ha)",
     colTotalYield: "මුළු අස්වැන්න (kg)",
@@ -1534,18 +1529,15 @@ export const translations = {
     healthNotApplicable: "প්‍රযోজනීય නොවේ",
 
     // ── Growth Stages ──
-    stageGermination: "බීජ මතුකිරීම",
-    stageSeedling: "පැළ අවස්ථාව",
-    stageVegetative: "විටබෝධක අවස්ථාව",
-    stageTillering: "කිරි අවස්ථාව",
-    stagePanicleInitiation: "දූපිండු ඇරඹුම",
-    stageBooting: "ශිරස් අවස්ථාව",
-    stageHeading: "ශිරස් බිම්බ ඉවතයින්",
-    stageFlowering: "මල් බැස්ම",
-    stageMilk: "කිරි අවස්ථාව",
-    stageDough: "පිටි අවස්ථාව",
-    stageRipening: "ප්‍රswimmers ඔවුන්",
-    stageMaturity: "",
+   
+    stageTransplant: "පැළ අවධිය",
+    stageVegetative: "වර්ධන අවධිය",
+    
+    stageReproductive: "වගාවේ බීජ බිහිවන අවස්ථාව",
+    
+    
+    stageRipening: "නෙලීමට සූදානම් වන අවධිය",
+    stageHarvest: "අස්වනු නෙලීමේ අවධිය",
 
     // ── Pest Risk Levels ──
     pestRiskNone: "නැත",
