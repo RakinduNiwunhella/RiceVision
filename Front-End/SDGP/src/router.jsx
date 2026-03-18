@@ -106,6 +106,10 @@ const router = createBrowserRouter([
     path: "*",
     element: <Navigate to="/signin" replace />,
   },
-]);
+], {
+  future: {
+    v7_startTransition: true,
+  },
+});
 
 export default router;

@@ -12,5 +12,9 @@ export async function apiFetch(url, options = {}) {
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
 
-  return fetch(`${API_BASE}${url}`, { ...options, headers });
+  return fetch(`${API_BASE}${url}`, {
+    ...options,
+    headers,
+    credentials: 'include', // Allow cookies and auth headers for CORS requests
+  });
 }
