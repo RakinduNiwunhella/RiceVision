@@ -64,11 +64,11 @@ def get_yield():
 
 @router.get("/best-districts")
 def get_best_yield_districts():
-    # Primary source: precomputed top-yield view.
+    # Primary source: precomputed yield view for all districts.
     response = supabase.table("best_yield_districts_view") \
         .select("District, total_yield_kg_ha") \
         .order("total_yield_kg_ha", desc=True) \
-        .limit(5) \
+        .limit(25) \
         .execute()
 
     ranked = [
@@ -76,8 +76,8 @@ def get_best_yield_districts():
         if (row.get("District") or "").strip() and row.get("total_yield_kg_ha") is not None
     ]
 
-    # Fallback: when the view returns fewer than 5 valid rows, compute from raw dataset.
-    if len(ranked) < 5:
+    # Fallback: when the view returns fewer than 25 valid rows, compute from raw dataset.
+    if len(ranked) < 25:
         raw = supabase.table("Final_Dataset_Yield") \
             .select("districtname, predictedyield_kg_ha") \
             .limit(5000) \
@@ -126,10 +126,10 @@ def get_best_yield_districts():
             ranked.append(row)
             seen.add(district_key)
 
-            if len(ranked) >= 5:
+            if len(ranked) >= 25:
                 break
 
-    return ranked[:5]
+    return ranked[:25]
 
 
 @router.get("/health-summary")

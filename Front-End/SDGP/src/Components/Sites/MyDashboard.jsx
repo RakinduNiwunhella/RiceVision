@@ -1,8 +1,6 @@
 // MyDashboard.jsx
 import { useState, useEffect, useRef, useMemo } from "react";
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   Tooltip,
@@ -172,13 +170,11 @@ const MyDashboard = () => {
   }, [topYieldDistricts]);
 
   const yieldChartData = useMemo(() => {
-    return topYieldDistricts.map((district, index) => ({
-      rank: `#${index + 1}`,
+    return topYieldDistricts.map((district) => ({
       district: district.District,
       yield: Number(district?.total_yield_kg_ha ?? 0),
-      average: yieldPanelOverview.avgTopYield,
     }));
-  }, [topYieldDistricts, yieldPanelOverview.avgTopYield]);
+  }, [topYieldDistricts]);
 
   const healthPieData = healthSummary
     ? [
@@ -355,14 +351,14 @@ const MyDashboard = () => {
 
             <div className="mt-8 pt-8 border-t border-white/10">
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/85 mb-4 ml-1">{t('highPerformance')}</p>
-              <div className="space-y-4">
+              <div className="space-y-4 max-h-[320px] overflow-y-auto pr-1">
                 {topYieldDistricts.map((d, i) => (
                   <div key={i} className="flex justify-between items-center group/item hover:translate-x-1 transition-transform">
                     <div className="flex items-center gap-3">
                       <span className="text-[10px] font-black text-white/85 w-4">{i + 1}</span>
                       <span className="text-xs font-black text-white uppercase tracking-tight group-hover/item:text-cyan-400 transition-colors">{d.District}</span>
                     </div>
-                    <span className="text-xs font-black text-white/90 tabular-nums">{formatMT(d.total_yield_kg_ha)} <span className="text-[10px] text-white/85">t</span></span>
+                    <span className="text-xs font-black text-white/90 tabular-nums">{formatMT(Math.round(Number(d.total_yield_kg_ha || 0)))} <span className="text-[10px] text-white/85">kg/ha</span></span>
                   </div>
                 ))}
               </div>
@@ -407,14 +403,14 @@ const MyDashboard = () => {
           <div className="p-4 sm:p-8 border-b border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/85 flex items-center gap-3">
               <span className="material-symbols-outlined text-cyan-400">monitoring</span>
-              National Yield Intelligence
+              National Yield
             </h2>
             <div className="flex items-center gap-2 flex-wrap">
               <div className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase text-white/85">
                 {currentSeason} Season
               </div>
               <div className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase text-white/85">
-                {topYieldDistricts.length} Top District Signals
+                {topYieldDistricts.length} District Yields
               </div>
             </div>
           </div>
@@ -422,65 +418,49 @@ const MyDashboard = () => {
           <div className="p-4 sm:p-6 grid grid-cols-1 xl:grid-cols-5 gap-4 sm:gap-6">
             <div className="xl:col-span-3 rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/85">Top District Yield Curve</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/85">All District Yield Overview</p>
                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-400">
-                  Top Avg: {formatMT(Math.round(yieldPanelOverview.avgTopYield))} kg/ha
+                  National Avg: {formatMT(Math.round(yieldPanelOverview.avgTopYield))} kg/ha
                 </p>
               </div>
 
               {yieldChartData.length > 0 ? (
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={yieldChartData} margin={{ top: 10, right: 10, left: -10, bottom: 50 }}>
-                    <XAxis
-                      dataKey="district"
-                      tick={{ fill: "rgba(255,255,255,0.5)", fontSize: 9, fontWeight: 900 }}
-                      axisLine={{ stroke: "rgba(255,255,255,0.08)" }}
-                      tickLine={false}
-                      angle={-30}
-                      textAnchor="end"
-                      interval={0}
-                      height={55}
-                    />
-                    <YAxis
-                      tick={{ fill: "rgba(255,255,255,0.35)", fontSize: 9, fontWeight: 900 }}
-                      axisLine={false}
-                      tickLine={false}
-                      width={45}
-                      tickFormatter={(value) => formatMT(value)}
-                    />
-                    <Tooltip
-                      contentStyle={{ background: "rgba(5,5,20,0.95)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "16px", backdropFilter: "blur(20px)" }}
-                      labelStyle={{ color: "#fff", fontSize: "10px", fontWeight: "900", textTransform: "uppercase", letterSpacing: "0.12em" }}
-                      itemStyle={{ color: "#fff", fontSize: "11px", fontWeight: "bold" }}
-                      formatter={(value, name) => [
-                        `${Number(value).toLocaleString()} kg/ha`,
-                        name === "yield" ? "District yield" : "Top-5 average",
-                      ]}
-                    />
-                    <Legend wrapperStyle={{ paddingTop: 10 }} iconType="circle" />
-                    <Line
-                      type="monotone"
-                      dataKey="yield"
-                      stroke="#06b6d4"
-                      name="District yield"
-                      strokeWidth={3}
-                      dot={{ r: 4, strokeWidth: 2, fill: "#06b6d4" }}
-                      activeDot={{ r: 6 }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="average"
-                      stroke="#f59e0b"
-                      name="Top-5 average"
-                      strokeWidth={2}
-                      strokeDasharray="6 6"
-                      dot={false}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
+                <div className="max-h-[340px] sm:max-h-[420px] overflow-y-auto pr-2">
+                  <ResponsiveContainer width="100%" height={Math.max(320, yieldChartData.length * 24)}>
+                    <BarChart data={yieldChartData} layout="vertical" margin={{ top: 10, right: 20, left: 10, bottom: 10 }}>
+                      <XAxis
+                        type="number"
+                        tick={{ fill: "rgba(255,255,255,0.35)", fontSize: 9, fontWeight: 900 }}
+                        axisLine={false}
+                        tickLine={false}
+                        tickFormatter={(value) => formatMT(value)}
+                      />
+                      <YAxis
+                        type="category"
+                        dataKey="district"
+                        tick={{ fill: "rgba(255,255,255,0.6)", fontSize: 10, fontWeight: 800 }}
+                        axisLine={false}
+                        tickLine={false}
+                        width={95}
+                      />
+                      <Tooltip
+                        contentStyle={{ background: "rgba(5,5,20,0.95)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "16px", backdropFilter: "blur(20px)" }}
+                        labelStyle={{ color: "#fff", fontSize: "10px", fontWeight: "900", textTransform: "uppercase", letterSpacing: "0.12em" }}
+                        itemStyle={{ color: "#fff", fontSize: "11px", fontWeight: "bold" }}
+                        formatter={(value) => [`${Number(value).toLocaleString()} kg/ha`, "District yield"]}
+                      />
+                      <Bar
+                        dataKey="yield"
+                        name="District yield"
+                        radius={[0, 10, 10, 0]}
+                        fill="#06b6d4"
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
               ) : (
                 <div className="min-h-[280px] flex items-center justify-center text-white/85 animate-pulse text-xs font-black uppercase tracking-widest">
-                  Loading Yield Trend...
+                  Loading District Yields...
                 </div>
               )}
             </div>
@@ -492,7 +472,7 @@ const MyDashboard = () => {
                   <p className="text-xs font-black tabular-nums text-cyan-400 mt-1">{formatMT(Math.round(yieldPanelOverview.topYield))}</p>
                 </div>
                 <div className="rounded-xl border border-white/10 bg-white/5 px-2 py-2 text-center">
-                  <p className="text-[9px] font-black uppercase tracking-[0.12em] text-white/50">Avg Top 5</p>
+                  <p className="text-[9px] font-black uppercase tracking-[0.12em] text-white/50">National Avg</p>
                   <p className="text-xs font-black tabular-nums text-amber-400 mt-1">{formatMT(Math.round(yieldPanelOverview.avgTopYield))}</p>
                 </div>
                 <div className="rounded-xl border border-white/10 bg-white/5 px-2 py-2 text-center">
@@ -501,7 +481,7 @@ const MyDashboard = () => {
                 </div>
               </div>
 
-              <div className="mt-4 flex-1 space-y-2">
+              <div className="mt-4 flex-1 space-y-2 max-h-[420px] overflow-y-auto pr-1">
                 {topYieldDistricts.map((district, i) => {
                   const districtYield = Number(district?.total_yield_kg_ha ?? 0);
                   const leaderYield = Number(topYieldDistricts[0]?.total_yield_kg_ha ?? 0);
