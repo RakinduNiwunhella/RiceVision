@@ -27,9 +27,18 @@ def get_user_field(current_user: dict = Depends(get_current_user)):
             .execute()
         )
 
-        return {"status": "success", "data": response.data}
+        # response.data is None if no field exists for this user — that's the expected behavior
+        # when a user hasn't registered a field yet
+        data = response.data if response else None
+        return {"status": "success", "data": data}
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"Failed to fetch user field: {str(exc)}")
+        # Log the exception for debugging but don't expose internals
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Failed to fetch user field. Please try again later."
+        )
 
 
 @router.put("")
@@ -44,10 +53,18 @@ def upsert_user_field(payload: UserFieldUpsert, current_user: dict = Depends(get
             "district": payload.district,
         }
 
-        response = (
+        # Supabase Python sync client in this project does not support
+        # chaining select() directly after upsert(). Do write then read.
+        (
             supabase.table("user_fields")
             .upsert(row, on_conflict="user_id")
+            .execute()
+        )
+
+        response = (
+            supabase.table("user_fields")
             .select("*")
+            .eq("user_id", current_user["user_id"])
             .maybe_single()
             .execute()
         )

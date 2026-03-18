@@ -298,7 +298,7 @@ export default function FieldSetupPage() {
               onClear={handleClear}
               fieldName={fieldName}
               onFieldNameChange={setFieldName}
-              height="calc(100vh - 380px)"
+              height="calc(100vh - 320px)"
             />
 
             <div className="flex justify-between gap-3 pt-1">

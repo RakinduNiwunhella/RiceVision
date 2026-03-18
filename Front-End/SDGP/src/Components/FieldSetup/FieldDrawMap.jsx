@@ -78,6 +78,15 @@ function DrawControl({ onDraw, onClear }) {
   useEffect(() => {
     if (!L.Control || !L.Control.Draw) return;
 
+    // Clear, task-specific labels make the toolbar easier to understand.
+    L.drawLocal.draw.toolbar.buttons.polygon = "Draw field boundary";
+    L.drawLocal.draw.toolbar.buttons.rectangle = "Draw quick rectangle";
+    L.drawLocal.edit.toolbar.buttons.edit = "Edit boundary points";
+    L.drawLocal.edit.toolbar.buttons.remove = "Delete boundary";
+    L.drawLocal.draw.handlers.polygon.tooltip.start = "Click to start your boundary";
+    L.drawLocal.draw.handlers.polygon.tooltip.cont = "Click more points to match your field shape";
+    L.drawLocal.draw.handlers.polygon.tooltip.end = "Click first point or double-click to finish";
+
     // create the FeatureGroup once and keep it in a ref
     const drawnItems = new L.FeatureGroup();
     drawnRef.current = drawnItems;
@@ -91,20 +100,20 @@ function DrawControl({ onDraw, onClear }) {
           allowIntersection: false,
           showArea: true,
           shapeOptions: {
-            color:       "#10b981",
+            color:       "#059669",
             fillColor:   "#10b981",
-            fillOpacity: 0.3,
-            weight:      2,
+            fillOpacity: 0.35,
+            weight:      3,
           },
-          guidelineDistance: 20,
+          guidelineDistance: 25,
           metric: true,
         },
         rectangle: {
           shapeOptions: {
-            color:       "#10b981",
+            color:       "#059669",
             fillColor:   "#10b981",
-            fillOpacity: 0.3,
-            weight:      2,
+            fillOpacity: 0.35,
+            weight:      3,
           },
         },
         polyline:     false,
@@ -429,6 +438,30 @@ export default function FieldDrawMap({
         </div>
       )}
 
+      {/* ── Drawing guide ── */}
+      {!readOnly && (
+        <div className="rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-4 py-3 text-xs text-white/90">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="material-symbols-outlined text-emerald-400 text-base">gesture</span>
+            <span className="font-black uppercase tracking-[0.2em] text-emerald-300">How To Draw Your Field</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+            <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2">
+              <strong className="text-white">1. Pick Polygon Tool</strong>
+              <p className="text-white/75 mt-1">Use the top-right polygon icon for custom shapes.</p>
+            </div>
+            <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2">
+              <strong className="text-white">2. Click Field Corners</strong>
+              <p className="text-white/75 mt-1">Click multiple points around your land, then double-click to finish.</p>
+            </div>
+            <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2">
+              <strong className="text-white">3. Edit If Needed</strong>
+              <p className="text-white/75 mt-1">Use the edit tool to drag points and adjust the boundary.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── Area / Price strip ── */}
       {!readOnly && hasPolygon && (
         <div className="flex flex-wrap items-center gap-4 px-4 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-sm">
@@ -453,6 +486,12 @@ export default function FieldDrawMap({
         className="relative rounded-xl overflow-hidden border border-white/10 flex-1 w-full"
         onClick={() => setShowDistrictMenu(false)}
       >
+        {!readOnly && (
+          <div className="absolute left-3 top-3 z-999 px-2.5 py-1.5 rounded-lg border border-white/15 bg-slate-900/80 backdrop-blur-sm text-[11px] text-white/90 pointer-events-none">
+            Draw tools are on the top-right of the map
+          </div>
+        )}
+
         {loadingGeoJSON && (
           <div className="absolute inset-0 z-999 flex items-center justify-center bg-black/50 backdrop-blur-sm pointer-events-none">
             <div className="w-8 h-8 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
@@ -528,7 +567,7 @@ export default function FieldDrawMap({
       {!readOnly && (
         <p className="text-xs text-white/85 text-center">
           <span className="text-amber-400/70">■</span> Yellow = known paddy areas &nbsp;·&nbsp;
-          Use the <strong className="text-white/90">polygon / rectangle tool</strong> (top-right of map) to outline your field &nbsp;·&nbsp;
+          <strong className="text-white/90">Polygon = custom shape</strong>, Rectangle = quick draw &nbsp;·&nbsp;
           {initialFeature && <span><span className="text-blue-400/70">⬝</span> Dashed blue = your current field</span>}
         </p>
       )}

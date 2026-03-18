@@ -40,8 +40,11 @@ export default function MyFieldTab() {
           setExisting(data);
           if (data.field_name) setFieldName(data.field_name);
         }
+        // If data is null, it means user has no saved field yet — that's okay
       } catch (error) {
-        setStatus({ type: "error", message: `Load failed: ${error.message}` });
+        console.error("Error fetching field:", error);
+        // Only show error if it's not a "no field" case
+        setStatus({ type: "error", message: `Unable to load field data. Please refresh the page.` });
       }
       setLoading(false);
     })();
@@ -114,9 +117,10 @@ export default function MyFieldTab() {
     );
   }
 
-  const price = existing
-    ? existing.price_lkr
-    : Math.ceil(acres * PRICE_PER_ACRE_LKR);
+  // When drawing a new polygon, calculate price dynamically. Otherwise use existing price.
+  const price = drawnFeature
+    ? Math.ceil(acres * PRICE_PER_ACRE_LKR)
+    : (existing?.price_lkr || 0);
 
   return (
     <div className="space-y-6 relative">
@@ -201,7 +205,7 @@ export default function MyFieldTab() {
             <FieldDrawMap
               initialFeature={existing.geojson}
               readOnly
-              height="400px"
+              height="600px"
             />
           </div>
         </div>
@@ -223,7 +227,7 @@ export default function MyFieldTab() {
             fieldName={fieldName}
             onFieldNameChange={setFieldName}
             initialFeature={editMode ? existing?.geojson : null}
-            height="440px"
+            height="600px"
           />
 
           {/* Summary + price */}
