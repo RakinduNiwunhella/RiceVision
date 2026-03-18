@@ -253,6 +253,7 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
         </div>
 
       </div>
+      
 
       {/* CENTER LOCK MESSAGE */}
 

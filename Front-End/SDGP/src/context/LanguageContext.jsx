@@ -720,13 +720,23 @@ export const translations = {
     weatherRainShort: "Rain",
 
     // ── Map & Filter Labels ──
-    mapFiltersTitle: "Filters",
+    mapLayersTitle: "Map Layers",
     mapClearBtn: "Clear",
     mapDistrictLabel: "District",
     mapSearchDistrictPlaceholder: "Search district...",
     mapCropConditionLabel: "Crop Condition",
     mapAllStatuses: "All",
     mapLegendLabel: "Legend",
+    mapLayerPaddyExtent: "Paddy Extent",
+    mapLayerShowCircles: "Show field circles",
+    mapLayerSatelliteView: "Satellite View",
+    mapLayersHintIntro: "Select layers to overlay specialized agricultural satellite telemetry.",
+    mapLayersHintSensors: "S2 = Sentinel-2 optical · S1 = Sentinel-1 SAR",
+    mapLayersHintNDVI: "NDVI — Normalized Difference Vegetation Index",
+    mapLayersHintEVI: "EVI — Enhanced Vegetation Index",
+    mapLayersHintVV: "VV — Vertical Transmit / Vertical Receive",
+    mapLayersHintVH: "VH — Vertical Transmit / Horizontal Receive",
+
 
     // ── Crop Health Categories ──
     healthNormal: "Normal",
@@ -734,8 +744,7 @@ export const translations = {
     healthSevereStress: "Severe Stress",
     healthNotApplicable: "Not Applicable",
 
-    // ── Growth Stages ──
-  
+    // ── Growth Stages ──  
     stageVegetative: "Vegetative",
     stageTransplant: "Transplant",
     stageReproductive: "Reproductive",
@@ -1514,19 +1523,25 @@ export const translations = {
     weatherRainShort: "වැසි",
 
     // ── Map & Filter Labels ──
-    mapFiltersTitle: "ෙෛත්‍ර",
+    mapLayersTitle: "සිතියමේ ස්තර",
     mapClearBtn: "ඉවත් කරන්න",
     mapDistrictLabel: "දිස්ත්‍රික්කය",
     mapSearchDistrictPlaceholder: "දිස්ත්‍රික්කය සොයන්න...",
     mapCropConditionLabel: "බෝග තත්ත්වය",
     mapAllStatuses: "සියල්ල",
     mapLegendLabel: "පැතිකඩ",
+    mapLayerPaddyExtent: "වී වගා ප්‍රදේශය",
+    mapLayerShowCircles: "කෙත්වතු වට සලකුණු පෙන්වන්න",
+    mapLayerSatelliteView: "චන්ද්‍රිකා දර්ශනය",
+    mapLayersHintIntro: "චන්ද්‍රිකා දත්ත එකතු කිරීමට ස්තර තෝරන්න",
+    mapLayersHintSensors: "S2 = Sentinel-2 දෘශ්‍ය දත්ත · S1 = Sentinel-1 රේඩාර් දත්ත",
+   
 
     // ── Crop Health Categories ──
-    healthNormal: "ශ්‍රේෂ්ඨ",
+    healthNormal: "නීරෝගී",
     healthMildStress: "මධ්‍යම ආතතිය",
-    healthSevereStress: "දැඩි ආnicolae",
-    healthNotApplicable: "প්‍රযోজනීય නොවේ",
+    healthSevereStress: "දැඩි ආතතිය",
+    healthNotApplicable: "අදාළ නොවේ",
 
     // ── Growth Stages ──
    
@@ -2337,14 +2352,18 @@ export const translations = {
     weatherRainShort: "மழை",
 
     // ── Map & Filter Labels ──
-    mapFiltersTitle: "வடிப்பர்கள்",
-    mapClearBtn: "அப்புறப்படுத்தவும்",
+    mapLayersTitle: "வரைபட அடுக்குகள்",
+    mapClearBtn: "அழிக்கவும்",
     mapDistrictLabel: "மாவட்டம்",
-    mapSearchDistrictPlaceholder: "மாவட்டம் தேடவும்...",
+    mapSearchDistrictPlaceholder: "மாவட்டத்தை தேடுங்கள்...",
     mapCropConditionLabel: "பயிர் நிலை",
-    mapAllStatuses: "அனைத்து",
+    mapAllStatuses: "அனைத்தும்",
     mapLegendLabel: "விளக்கம்",
-
+    mapLayerPaddyExtent: "நெல் பயிர் பரப்பு",
+    mapLayerShowCircles: "வயல் வட்டங்களை காட்டவும்",
+    mapLayerSatelliteView: "செயற்கைக்கோள் காட்சி",
+    mapLayersHintIntro: "செயற்கைக்கோள் தரவு அடுக்குகளை சேர்க்க அடுக்குகளை தேர்ந்தெடுக்கவும்",
+    mapLayersHintSensors: "S2 = Sentinel-2 ஒளிப்படத் தரவு · S1 = Sentinel-1 ரேடார் தரவு",
     // ── Crop Health Categories ──
     healthNormal: "சாதாரணம்",
     healthMildStress: "மிதமான அழுத்தம்",
