@@ -64,11 +64,72 @@ def get_yield():
 
 @router.get("/best-districts")
 def get_best_yield_districts():
+    # Primary source: precomputed top-yield view.
     response = supabase.table("best_yield_districts_view") \
         .select("District, total_yield_kg_ha") \
+        .order("total_yield_kg_ha", desc=True) \
         .limit(5) \
         .execute()
-    return response.data
+
+    ranked = [
+        row for row in (response.data or [])
+        if (row.get("District") or "").strip() and row.get("total_yield_kg_ha") is not None
+    ]
+
+    # Fallback: when the view returns fewer than 5 valid rows, compute from raw dataset.
+    if len(ranked) < 5:
+        raw = supabase.table("Final_Dataset_Yield") \
+            .select("districtname, predictedyield_kg_ha") \
+            .limit(5000) \
+            .execute()
+
+        district_stats = {}
+        for row in (raw.data or []):
+            district = (row.get("districtname") or "").strip()
+            value = row.get("predictedyield_kg_ha")
+
+            if not district or value is None:
+                continue
+
+            try:
+                numeric_value = float(value)
+            except (TypeError, ValueError):
+                continue
+
+            stats = district_stats.setdefault(district, {"sum": 0.0, "count": 0})
+            stats["sum"] += numeric_value
+            stats["count"] += 1
+
+        fallback_ranked = sorted(
+            [
+                {
+                    "District": district,
+                    "total_yield_kg_ha": stats["sum"] / stats["count"],
+                }
+                for district, stats in district_stats.items()
+                if stats["count"] > 0
+            ],
+            key=lambda item: float(item["total_yield_kg_ha"]),
+            reverse=True,
+        )
+
+        seen = {
+            (row.get("District") or "").strip().lower()
+            for row in ranked
+        }
+
+        for row in fallback_ranked:
+            district_key = (row.get("District") or "").strip().lower()
+            if not district_key or district_key in seen:
+                continue
+
+            ranked.append(row)
+            seen.add(district_key)
+
+            if len(ranked) >= 5:
+                break
+
+    return ranked[:5]
 
 
 @router.get("/health-summary")

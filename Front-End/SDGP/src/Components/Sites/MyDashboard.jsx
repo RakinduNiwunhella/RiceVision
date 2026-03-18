@@ -15,16 +15,14 @@ import {
   Bar,
 } from "recharts";
 import { useLanguage } from "../../context/LanguageContext";
-import { AlertTriangle, CloudRain, Bug } from "lucide-react";
+import { Bug } from "lucide-react";
 import TutorialOverlay from "../TutorialOverlay";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
-import { useNavigate } from "react-router-dom";
 
 import {
   fetchHealthSummary,
   fetchYield,
   fetchBestDistricts,
-  fetchOutbreaks,
   fetchDistrictHealth,
   fetchStageDistribution,
 } from "../../api/api";
@@ -74,12 +72,9 @@ const MyDashboard = () => {
   const [healthSummary, setHealthSummary] = useState(null);
   const [yieldForecast, setYieldForecast] = useState(null);
   const [bestYieldDistricts, setBestYieldDistricts] = useState([]);
-  const [outbreaks, setOutbreaks] = useState([]);
-  const [showAllOutbreaks, setShowAllOutbreaks] = useState(false);
   const [districtHealth, setDistrictHealth] = useState([]);
   const [showAllDistricts, setShowAllDistricts] = useState(false);
   const [stageDistribution, setStageDistribution] = useState([]);
-  const navigate = useNavigate();
 
   // Refs for tutorial tooltips
   const headerRef = useRef(null);
@@ -87,9 +82,7 @@ const MyDashboard = () => {
   const healthCardRef = useRef(null);
   const yieldCardRef = useRef(null);
   const supplyCardRef = useRef(null);
-  const threatsCardRef = useRef(null);
-  const threatDetailsBtnRef = useRef(null);
-  const outbreaksToggleBtnRef = useRef(null);
+  const yieldInsightsRef = useRef(null);
   const stageChartRef = useRef(null);
   const districtTableRef = useRef(null);
   const districtToggleBtnRef = useRef(null);
@@ -118,24 +111,10 @@ const MyDashboard = () => {
         title: "Track expected shortfalls and national demand saturation risks quickly.",
       },
       {
-        ref: threatsCardRef,
-        title: "Review active disease outbreaks and critical pest risks.",
+        ref: yieldInsightsRef,
+        title: "Review district-level yield rankings and season momentum.",
       },
     ]
-
-    if (outbreaks.length > 0) {
-      steps.push({
-        ref: threatDetailsBtnRef,
-        title: "Click here to open detailed recommendations for this threat.",
-      })
-    }
-
-    if (outbreaks.length > 5) {
-      steps.push({
-        ref: outbreaksToggleBtnRef,
-        title: "Click this to expand or collapse your threat list.",
-      })
-    }
 
     steps.push(
       {
@@ -153,9 +132,9 @@ const MyDashboard = () => {
     )
 
     return steps
-  }, [outbreaks.length])
+  }, [bestYieldDistricts.length])
 
-  const { currentStep, showTutorial, currentTutorialStep, hasMoreSteps, nextStep, prevStep, closeTutorial } =
+  const { currentStep, showTutorial, nextStep, prevStep, closeTutorial } =
     usePageTutorial("dashboard", tutorialSteps);
 
   const stageColors = ["#10b981", "#06b6d4", "#8b5cf6", "#f59e0b", "#ef4444", "#f97316"];
@@ -169,6 +148,38 @@ const MyDashboard = () => {
   const expectedShortfallMT = Math.max(0, Math.round((seasonalTargetKgs - actualYieldKgs) / 1000));
   const demandSaturationPct = Math.max(0, Math.min(100, (actualYieldKgs / seasonalTargetKgs) * 100));
 
+  const topYieldDistricts = useMemo(() => {
+    return [...bestYieldDistricts].sort(
+      (a, b) => Number(b?.total_yield_kg_ha ?? 0) - Number(a?.total_yield_kg_ha ?? 0),
+    );
+  }, [bestYieldDistricts]);
+
+  const yieldPanelOverview = useMemo(() => {
+    if (topYieldDistricts.length === 0) {
+      return { topYield: 0, avgTopYield: 0, spread: 0 };
+    }
+
+    const values = topYieldDistricts.map((district) => Number(district?.total_yield_kg_ha ?? 0));
+    const topYield = Math.max(...values);
+    const lowestYield = Math.min(...values);
+    const avgTopYield = values.reduce((sum, value) => sum + value, 0) / values.length;
+
+    return {
+      topYield,
+      avgTopYield,
+      spread: Math.max(0, topYield - lowestYield),
+    };
+  }, [topYieldDistricts]);
+
+  const yieldChartData = useMemo(() => {
+    return topYieldDistricts.map((district, index) => ({
+      rank: `#${index + 1}`,
+      district: district.District,
+      yield: Number(district?.total_yield_kg_ha ?? 0),
+      average: yieldPanelOverview.avgTopYield,
+    }));
+  }, [topYieldDistricts, yieldPanelOverview.avgTopYield]);
+
   const healthPieData = healthSummary
     ? [
       { name: t('optimal'), value: healthSummary.normal_pct },
@@ -180,18 +191,16 @@ const MyDashboard = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [health, yld, best, out, dist, stages] = await Promise.all([
+        const [health, yld, best, dist, stages] = await Promise.all([
           fetchHealthSummary(),
           fetchYield(),
           fetchBestDistricts(),
-          fetchOutbreaks(),
           fetchDistrictHealth(),
           fetchStageDistribution()
         ]);
         setHealthSummary(health);
         setYieldForecast(yld);
         setBestYieldDistricts(best);
-        setOutbreaks(out);
         setDistrictHealth(dist);
         setStageDistribution(stages);
       } catch (err) {
@@ -208,15 +217,6 @@ const MyDashboard = () => {
     if (value >= 1_000_000) return (value / 1_000_000).toFixed(2) + "M";
     if (value >= 1_000) return (value / 1_000).toFixed(1) + "K";
     return value.toLocaleString();
-  };
-
-  const getOutbreakIcon = (title) => {
-    const t = title.toLowerCase();
-    if (t.includes("flood") || t.includes("rain") || t.includes("storm"))
-      return <CloudRain size={18} className="text-blue-400" />;
-    if (t.includes("pest") || t.includes("insect"))
-      return <Bug size={18} className="text-rose-400" />;
-    return <AlertTriangle size={18} className="text-amber-400" />;
   };
 
   const sortedDistrictHealth = useMemo(() => {
@@ -356,7 +356,7 @@ const MyDashboard = () => {
             <div className="mt-8 pt-8 border-t border-white/10">
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/85 mb-4 ml-1">{t('highPerformance')}</p>
               <div className="space-y-4">
-                {bestYieldDistricts.map((d, i) => (
+                {topYieldDistricts.map((d, i) => (
                   <div key={i} className="flex justify-between items-center group/item hover:translate-x-1 transition-transform">
                     <div className="flex items-center gap-3">
                       <span className="text-[10px] font-black text-white/85 w-4">{i + 1}</span>
@@ -402,63 +402,138 @@ const MyDashboard = () => {
           </div>
         </div>
 
-        {/* ── Active Threats Section (Wider) ── */}
-        <div ref={threatsCardRef} className="glass p-2 sm:p-1 rounded-[1.5rem] sm:rounded-[3rem] border border-white/10 shadow-2xl overflow-hidden">
+        {/* ── Yield Intelligence Section (Wider) ── */}
+        <div ref={yieldInsightsRef} className="glass p-2 sm:p-1 rounded-[1.5rem] sm:rounded-[3rem] border border-white/10 shadow-2xl overflow-hidden">
           <div className="p-4 sm:p-8 border-b border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/85 flex items-center gap-3">
-              <span className="material-symbols-outlined text-rose-500">sensors</span>
-              {t('diseaseOutbreak')}
+              <span className="material-symbols-outlined text-cyan-400">monitoring</span>
+              National Yield Intelligence
             </h2>
-            <div className="flex items-center gap-4">
-              <span className="text-[10px] font-black text-white/85 uppercase tracking-widest animate-pulse">{t('checkingFields')}</span>
+            <div className="flex items-center gap-2 flex-wrap">
               <div className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase text-white/85">
-                {outbreaks.length} {t('alertsDetected')}
+                {currentSeason} Season
+              </div>
+              <div className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase text-white/85">
+                {topYieldDistricts.length} Top District Signals
               </div>
             </div>
           </div>
 
-          <div className="p-4 space-y-3">
-            {(showAllOutbreaks ? outbreaks : outbreaks.slice(0, 5)).map((o, i) => (
-              <div
-                key={o.id}
-                className="group flex flex-col sm:flex-row justify-between items-start sm:items-center px-4 sm:px-6 py-3 sm:py-4 rounded-2xl bg-white/5 hover:bg-white/10 transition-all border border-white/5 hover:border-white/20 gap-3"
-              >
-                <div className="flex items-center gap-5">
-                  <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    {getOutbreakIcon(o.title)}
-                  </div>
-                  <div>
-                    <p className="font-black text-white text-sm uppercase tracking-tight">{o.title} — {o.district}</p>
-                    <div className="flex items-center gap-3 mt-1 text-[10px] font-black text-white/85 uppercase tracking-widest">
-                      <span>{o.event_date}</span>
-                      <div className="w-1 h-1 rounded-full bg-white/10" />
-                      <span className="text-emerald-400 group-hover:animate-pulse">{t('active')}</span>
-                    </div>
-                  </div>
+          <div className="p-4 sm:p-6 grid grid-cols-1 xl:grid-cols-5 gap-4 sm:gap-6">
+            <div className="xl:col-span-3 rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/85">Top District Yield Curve</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-400">
+                  Top Avg: {formatMT(Math.round(yieldPanelOverview.avgTopYield))} kg/ha
+                </p>
+              </div>
+
+              {yieldChartData.length > 0 ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={yieldChartData} margin={{ top: 10, right: 10, left: -10, bottom: 50 }}>
+                    <XAxis
+                      dataKey="district"
+                      tick={{ fill: "rgba(255,255,255,0.5)", fontSize: 9, fontWeight: 900 }}
+                      axisLine={{ stroke: "rgba(255,255,255,0.08)" }}
+                      tickLine={false}
+                      angle={-30}
+                      textAnchor="end"
+                      interval={0}
+                      height={55}
+                    />
+                    <YAxis
+                      tick={{ fill: "rgba(255,255,255,0.35)", fontSize: 9, fontWeight: 900 }}
+                      axisLine={false}
+                      tickLine={false}
+                      width={45}
+                      tickFormatter={(value) => formatMT(value)}
+                    />
+                    <Tooltip
+                      contentStyle={{ background: "rgba(5,5,20,0.95)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "16px", backdropFilter: "blur(20px)" }}
+                      labelStyle={{ color: "#fff", fontSize: "10px", fontWeight: "900", textTransform: "uppercase", letterSpacing: "0.12em" }}
+                      itemStyle={{ color: "#fff", fontSize: "11px", fontWeight: "bold" }}
+                      formatter={(value, name) => [
+                        `${Number(value).toLocaleString()} kg/ha`,
+                        name === "yield" ? "District yield" : "Top-5 average",
+                      ]}
+                    />
+                    <Legend wrapperStyle={{ paddingTop: 10 }} iconType="circle" />
+                    <Line
+                      type="monotone"
+                      dataKey="yield"
+                      stroke="#06b6d4"
+                      name="District yield"
+                      strokeWidth={3}
+                      dot={{ r: 4, strokeWidth: 2, fill: "#06b6d4" }}
+                      activeDot={{ r: 6 }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="average"
+                      stroke="#f59e0b"
+                      name="Top-5 average"
+                      strokeWidth={2}
+                      strokeDasharray="6 6"
+                      dot={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="min-h-[280px] flex items-center justify-center text-white/85 animate-pulse text-xs font-black uppercase tracking-widest">
+                  Loading Yield Trend...
                 </div>
-                <button
-                  ref={i === 0 ? threatDetailsBtnRef : undefined}
-                  onClick={() => navigate("/alerts")}
-                  className="text-[10px] font-black uppercase tracking-[0.2em] rounded-xl px-6 py-2.5 border border-white/10 text-white/85 hover:text-white hover:border-white/40 hover:bg-white/5 transition-all active:scale-95"
-                >
-                  {t('viewDetails')}
-                </button>
-              </div>
-            ))}
-          </div>
-
-          {outbreaks.length > 5 && (
-            <div className="px-8 py-6 bg-white/2 flex justify-center border-t border-white/5">
-              <button
-                ref={outbreaksToggleBtnRef}
-                onClick={() => setShowAllOutbreaks(!showAllOutbreaks)}
-                className="text-[10px] font-black uppercase tracking-[0.4em] text-white/85 hover:text-white transition-colors flex items-center gap-2"
-              >
-                {showAllOutbreaks ? t('showLess') : `${t('showAll')} (${outbreaks.length})`}
-                <span className="material-symbols-outlined text-sm">{showAllOutbreaks ? 'keyboard_double_arrow_up' : 'keyboard_double_arrow_down'}</span>
-              </button>
+              )}
             </div>
-          )}
+
+            <div className="xl:col-span-2 rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-6 flex flex-col">
+              <div className="grid grid-cols-3 gap-2">
+                <div className="rounded-xl border border-white/10 bg-white/5 px-2 py-2 text-center">
+                  <p className="text-[9px] font-black uppercase tracking-[0.12em] text-white/50">Top</p>
+                  <p className="text-xs font-black tabular-nums text-cyan-400 mt-1">{formatMT(Math.round(yieldPanelOverview.topYield))}</p>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-white/5 px-2 py-2 text-center">
+                  <p className="text-[9px] font-black uppercase tracking-[0.12em] text-white/50">Avg Top 5</p>
+                  <p className="text-xs font-black tabular-nums text-amber-400 mt-1">{formatMT(Math.round(yieldPanelOverview.avgTopYield))}</p>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-white/5 px-2 py-2 text-center">
+                  <p className="text-[9px] font-black uppercase tracking-[0.12em] text-white/50">Spread</p>
+                  <p className="text-xs font-black tabular-nums text-rose-400 mt-1">{formatMT(Math.round(yieldPanelOverview.spread))}</p>
+                </div>
+              </div>
+
+              <div className="mt-4 flex-1 space-y-2">
+                {topYieldDistricts.map((district, i) => {
+                  const districtYield = Number(district?.total_yield_kg_ha ?? 0);
+                  const leaderYield = Number(topYieldDistricts[0]?.total_yield_kg_ha ?? 0);
+                  const relativePct = leaderYield > 0 ? Math.round((districtYield / leaderYield) * 100) : 0;
+
+                  return (
+                    <div key={`${district.District}-${i}`} className="rounded-xl border border-white/10 bg-white/5 p-3">
+                      <div className="flex items-center justify-between gap-3 mb-2">
+                        <p className="text-[10px] font-black uppercase tracking-[0.12em] text-white/85 truncate">
+                          {`#${i + 1} ${district.District}`}
+                        </p>
+                        <p className="text-[10px] font-black tabular-nums text-white">{formatMT(Math.round(districtYield))} kg/ha</p>
+                      </div>
+                      <div className="w-full h-1.5 rounded-full bg-white/5 border border-white/10 overflow-hidden">
+                        <div
+                          className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-emerald-500 transition-all duration-1000"
+                          style={{ width: `${relativePct}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="mt-4 pt-4 border-t border-white/10 flex items-center justify-between">
+                <span className="text-[10px] font-black uppercase tracking-[0.12em] text-white/55">Projected National Yield</span>
+                <span className="text-[10px] font-black tabular-nums text-emerald-400">
+                  {yieldForecast ? `${formatMT(Math.round(yieldForecast.total_yield_kgs))} kg` : "---"}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* ── Analytical Depth Row ── */}
