@@ -1,5 +1,5 @@
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer
+from fastapi.security import HTTPBearer, HTTPAuthCredentials
 import os
 import jwt
 from datetime import datetime
@@ -10,7 +10,7 @@ security = HTTPBearer()
 JWT_SECRET = os.getenv("JWT_SECRET", "your-secret-key-change-in-production")
 JWT_ALGORITHM = "HS256"
 
-def get_current_user(credentials = Depends(security)) -> dict:
+def get_current_user(credentials: HTTPAuthCredentials = Depends(security)) -> dict:
     """
     Validate JWT token and return user info.
     This dependency protects routes that require authentication.
