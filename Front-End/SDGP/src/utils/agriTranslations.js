@@ -43,12 +43,8 @@ export function translateStageCategory(value, t) {
     
     'vegetative': 'stageVegetative',
     'transplant': 'stageTransplant',
-   
     'reproductive': 'stageReproductive',
-   
-    
     'ripening': 'stageRipening',
-    
     'harvest': 'stageHarvest'
   };
   
