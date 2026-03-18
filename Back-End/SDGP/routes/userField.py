@@ -53,10 +53,18 @@ def upsert_user_field(payload: UserFieldUpsert, current_user: dict = Depends(get
             "district": payload.district,
         }
 
-        response = (
+        # Supabase Python sync client in this project does not support
+        # chaining select() directly after upsert(). Do write then read.
+        (
             supabase.table("user_fields")
             .upsert(row, on_conflict="user_id")
+            .execute()
+        )
+
+        response = (
+            supabase.table("user_fields")
             .select("*")
+            .eq("user_id", current_user["user_id"])
             .maybe_single()
             .execute()
         )
