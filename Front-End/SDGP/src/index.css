@@ -3,119 +3,87 @@
 @import "leaflet/dist/leaflet.css";
 
 /* ============================================================
-   APPLE LIQUID GLASS — Design System (Readability Edition)
+   APPLE LIQUID GLASS — Muted Light Mode Version
    ============================================================ */
+
+:root {
+    /* DEFAULT: LIGHT MODE (Reduced Brightness) */
+    --glass-bg: rgba(230, 235, 230, 0.22); /* Muted off-white */
+    --glass-border: rgba(255, 255, 255, 0.25); 
+    --glass-border-top: rgba(255, 255, 255, 0.4);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.1);
+    --glass-shimmer: linear-gradient(145deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.02) 50%, rgba(180, 200, 255, 0.05) 75%, rgba(255, 255, 255, 0.08) 100%);
+    --glass-inset-top: rgba(255, 255, 255, 0.3);
+    --glass-inset-bottom: rgba(0, 0, 0, 0.05);
+}
+
+/* DARK MODE VALUES */
+.dark {
+    --glass-bg: rgba(10, 18, 35, 0.52);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-border-top: rgba(255, 255, 255, 0.2);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    --glass-shimmer: linear-gradient(145deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.01) 50%, rgba(80, 140, 255, 0.04) 75%, rgba(255, 255, 255, 0.04) 100%);
+    --glass-inset-top: rgba(255, 255, 255, 0.07);
+    --glass-inset-bottom: rgba(0, 0, 0, 0.3);
+}
 
 /* ── Glass Surface (Base) ── */
 .glass {
-    background: rgba(255, 255, 255, 0.14);
-    backdrop-filter: blur(40px) saturate(200%);
-    -webkit-backdrop-filter: blur(40px) saturate(200%);
-    border: 1px solid rgba(255, 255, 255, 0.35);
-    border-top: 1px solid rgba(255, 255, 255, 0.55);
+    background: var(--glass-bg);
+    backdrop-filter: blur(40px) saturate(160%); /* Reduced saturation to dim colors */
+    -webkit-backdrop-filter: blur(40px) saturate(160%);
+    border: 1px solid var(--glass-border);
+    border-top: 1px solid var(--glass-border-top);
     border-radius: 20px;
     box-shadow:
-        0 8px 32px rgba(0, 0, 0, 0.35),
-        0 2px 8px rgba(0, 0, 0, 0.2),
-        inset 0 1.5px 0 rgba(255, 255, 255, 0.4),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+        var(--glass-shadow),
+        inset 0 1.5px 0 var(--glass-inset-top),
+        inset 0 -1px 0 var(--glass-inset-bottom);
     transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     position: relative;
     overflow: hidden;
 }
 
-.dark .glass {
-    background: rgba(10, 18, 35, 0.45);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow:
-        0 8px 32px rgba(0, 0, 0, 0.6),
-        inset 0 1px 0 rgba(255, 255, 255, 0.07),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+/* Fallback for low-spec browsers */
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+    .glass { background: rgba(230, 230, 230, 0.9); }
+    .dark .glass { background: rgba(10, 18, 35, 0.85); }
 }
 
-/* ── Iridescent shimmer overlay (subtle) ── */
+/* ── Iridescent shimmer overlay ── */
 .glass::before {
     content: "";
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    background: linear-gradient(145deg,
-            rgba(255, 255, 255, 0.18) 0%,
-            rgba(255, 255, 255, 0.04) 50%,
-            rgba(180, 220, 255, 0.06) 75%,
-            rgba(255, 255, 255, 0.12) 100%);
+    background: var(--glass-shimmer);
     pointer-events: none;
     z-index: 0;
 }
 
-.dark .glass::before {
-    background: linear-gradient(145deg,
-            rgba(255, 255, 255, 0.06) 0%,
-            rgba(255, 255, 255, 0.01) 50%,
-            rgba(80, 140, 255, 0.04) 75%,
-            rgba(255, 255, 255, 0.04) 100%);
-}
-
-/* Content above shimmer */
-.glass>* {
+.glass > * {
     position: relative;
     z-index: 1;
 }
 
-/* ── Hover elevation ── */
+/* ── Hover Effects ── */
 .glass-hover {
     transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease, border-color 0.35s ease;
 }
 
 .glass-hover:hover {
     transform: translateY(-4px) scale(1.008);
-    border-color: rgba(255, 255, 255, 0.55);
-    box-shadow:
-        0 24px 60px rgba(0, 0, 0, 0.4),
-        0 4px 12px rgba(0, 0, 0, 0.25),
-        inset 0 2px 0 rgba(255, 255, 255, 0.6),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.12);
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
 }
 
 .dark .glass-hover:hover {
     border-color: rgba(255, 255, 255, 0.18);
-    box-shadow:
-        0 24px 60px rgba(0, 0, 0, 0.7),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
 }
 
-/* ── Backward compat aliases (explicit CSS, no @apply for custom classes) ── */
-.glass-card-inner {
-    background: rgba(255, 255, 255, 0.14);
-    backdrop-filter: blur(40px) saturate(200%);
-    -webkit-backdrop-filter: blur(40px) saturate(200%);
-    border: 1px solid rgba(255, 255, 255, 0.35);
-    border-top: 1px solid rgba(255, 255, 255, 0.55);
-    border-radius: 20px;
-    box-shadow:
-        0 8px 32px rgba(0, 0, 0, 0.35),
-        0 2px 8px rgba(0, 0, 0, 0.2),
-        inset 0 1.5px 0 rgba(255, 255, 255, 0.4),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    position: relative;
-    overflow: hidden;
-}
-
-.premium-hover {
-    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease, border-color 0.35s ease;
-}
-
-.premium-hover:hover {
-    transform: translateY(-4px) scale(1.008);
-    border-color: rgba(255, 255, 255, 0.55);
-    box-shadow:
-        0 24px 60px rgba(0, 0, 0, 0.4),
-        inset 0 2px 0 rgba(255, 255, 255, 0.6);
-}
-
-/* ── Global background frame ── */
+/* ── Utilities ── */
 .premium-dashboard-bg {
     background-size: cover;
     background-position: center;
@@ -123,114 +91,32 @@
     background-attachment: fixed;
 }
 
-/* ── High-contrast text on glass ── */
 .glass-label {
     color: #ffffff;
-    text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 1px 14px rgba(0, 0, 0, 0.6), 0 0 35px rgba(0, 0, 0, 0.4);
     font-weight: 700;
-    letter-spacing: -0.01em;
 }
 
-/* ── Pill button ── */
 .glass-btn {
-    background: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.35);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
     color: white;
     font-size: 0.75rem;
     font-weight: 600;
     border-radius: 9999px;
     padding: 6px 16px;
-    transition: background 0.25s ease, box-shadow 0.25s ease;
     backdrop-filter: blur(12px);
 }
 
-.glass-btn:hover {
-    background: rgba(255, 255, 255, 0.32);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-}
-
 /* ── Custom Scrollbar ── */
-.custom-scrollbar {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
-}
-
-.custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-    border-radius: 10px;
-}
-
+.custom-scrollbar::-webkit-scrollbar { width: 6px; }
 .custom-scrollbar::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.15);
     border-radius: 10px;
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
-}
-
-@keyframes fade {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
-}
-
-.animate-fade {
-    animation: fade 0.9s ease-in-out;
-}
-
-/* ── Tutorial overlay card & hover tip animations ── */
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: scale(0.96) translateY(4px);
-    }
-
-    to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-    }
+    from { opacity: 0; transform: scale(0.96) translateY(4px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
 }
-
-.animate-fadeIn {
-    animation: fadeIn 0.18s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-}
-
-.tutorial-overlay-card {
-    animation: fadeIn 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-}
-
-/* ── Alert slide-out animation ── */
-.alert-exit {
-    transform: translateX(60px);
-    opacity: 0;
-    transition: transform 0.25s ease, opacity 0.25s ease;
-    pointer-events: none;
-}
-
-/* ── Ignore button — secondary visual weight ── */
-.btn-ignore {
-    opacity: 0.55;
-    filter: saturate(0.6);
-    transition: opacity 0.2s ease, filter 0.2s ease;
-}
-
-.btn-ignore:hover {
-    opacity: 1;
-    filter: saturate(1);
-}
-
-/* ── Pest risk count highlight ── */
-.risk-count {
-    color: #b00707;
-    font-weight: 700;
-}
+.animate-fadeIn { animation: fadeIn 0.18s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }

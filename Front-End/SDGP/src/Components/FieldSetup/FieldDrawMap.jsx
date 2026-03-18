@@ -314,10 +314,10 @@ export default function FieldDrawMap({
             <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-white/15 bg-white/5 text-white text-sm w-48 cursor-pointer hover:border-emerald-500/50 transition-all"
               onClick={() => setShowDistrictMenu((v) => !v)}>
               <span className="material-symbols-outlined text-emerald-400 text-base">location_on</span>
-              <span className={selectedDistrict ? "text-white font-semibold" : "text-white/40"}>
+              <span className={selectedDistrict ? "text-white font-semibold" : "text-white/85"}>
                 {selectedDistrict ? selectedDistrict.name : "Select district"}
               </span>
-              <span className="material-symbols-outlined text-white/30 text-base ml-auto">expand_more</span>
+              <span className="material-symbols-outlined text-white/85 text-base ml-auto">expand_more</span>
             </div>
 
             {showDistrictMenu && (
@@ -359,7 +359,7 @@ export default function FieldDrawMap({
           {/* Location search */}
           <div className="relative flex-1 min-w-45">
             <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-white/15 bg-white/5">
-              <span className="material-symbols-outlined text-white/40 text-base">search</span>
+              <span className="material-symbols-outlined text-white/85 text-base">search</span>
               <input
                 type="text"
                 value={locSearch}
@@ -370,7 +370,7 @@ export default function FieldDrawMap({
               {locSearch && (
                 <button
                   onClick={() => { setLocSearch(""); setLocResults([]); }}
-                  className="text-white/30 hover:text-white/60 transition-colors"
+                  className="text-white/85 hover:text-white/90 transition-colors"
                 >
                   <span className="material-symbols-outlined text-base">close</span>
                 </button>
@@ -400,7 +400,7 @@ export default function FieldDrawMap({
                 className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
                   basemap === key
                     ? "bg-emerald-500 border-emerald-400 text-white shadow-lg shadow-emerald-500/20"
-                    : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10 hover:text-white"
+                    : "bg-white/5 border-white/10 text-white/85 hover:bg-white/10 hover:text-white"
                 }`}
               >
                 {bm.label}
@@ -413,7 +413,7 @@ export default function FieldDrawMap({
       {/* ── Field name input ── */}
       {!readOnly && (
         <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-white/40 text-base shrink-0">badge</span>
+          <span className="material-symbols-outlined text-white/85 text-base shrink-0">badge</span>
           <input
             type="text"
             value={fieldName}
@@ -429,16 +429,16 @@ export default function FieldDrawMap({
         <div className="flex flex-wrap items-center gap-4 px-4 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-sm">
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-emerald-400 text-base">straighten</span>
-            <span className="text-white/70">Area:</span>
+            <span className="text-white/85">Area:</span>
             <span className="font-black text-emerald-400">{acres.toFixed(3)} acres</span>
-            <span className="text-white/30">({(acres * 4046.86).toFixed(0)} m²)</span>
+            <span className="text-white/85">({(acres * 4046.86).toFixed(0)} m²)</span>
           </div>
           <span className="h-4 w-px bg-white/20" />
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-emerald-400 text-base">paid</span>
-            <span className="text-white/70">Price:</span>
+            <span className="text-white/85">Price:</span>
             <span className="font-black text-emerald-400">Rs. {price.toLocaleString()} / year</span>
-            <span className="text-white/30 text-xs">(Rs. {PRICE_PER_ACRE_LKR.toLocaleString()} per acre)</span>
+            <span className="text-white/85 text-xs">(Rs. {PRICE_PER_ACRE_LKR.toLocaleString()} per acre)</span>
           </div>
         </div>
       )}
@@ -511,9 +511,9 @@ export default function FieldDrawMap({
 
       {/* Hint text */}
       {!readOnly && (
-        <p className="text-xs text-white/30 text-center">
+        <p className="text-xs text-white/85 text-center">
           <span className="text-amber-400/70">■</span> Yellow = known paddy areas &nbsp;·&nbsp;
-          Use the <strong className="text-white/50">polygon / rectangle tool</strong> (top-right of map) to outline your field &nbsp;·&nbsp;
+          Use the <strong className="text-white/90">polygon / rectangle tool</strong> (top-right of map) to outline your field &nbsp;·&nbsp;
           {initialFeature && <span><span className="text-blue-400/70">⬝</span> Dashed blue = your current field</span>}
         </p>
       )}

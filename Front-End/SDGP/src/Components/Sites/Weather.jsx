@@ -127,21 +127,21 @@ function StatCard({ label, value, unit, sub, accent = "emerald", icon }) {
   return (
     <div className={`glass glass-hover p-5 rounded-3xl border flex flex-col gap-2 transition-all duration-300 hover:-translate-y-0.5 ${colors[accent]}`}>
       <div className="flex items-center justify-between">
-        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40">{label}</span>
+        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/85">{label}</span>
         {icon && <span className="text-base opacity-60">{icon}</span>}
       </div>
       <div className="flex items-end gap-1">
         <span className={`text-3xl font-black leading-none ${colors[accent].split(" ")[0]}`}>{value}</span>
-        {unit && <span className="text-[10px] text-white/40 font-bold mb-1">{unit}</span>}
+        {unit && <span className="text-[10px] text-white/85 font-bold mb-1">{unit}</span>}
       </div>
-      {sub && <span className="text-[9px] text-white/40 font-medium">{sub}</span>}
+      {sub && <span className="text-[9px] text-white/85 font-medium">{sub}</span>}
     </div>
   );
 }
 
 function SectionHeading({ children }) {
   return (
-    <h3 className="text-[10px] font-black text-white/50 uppercase tracking-[0.4em] mb-6 flex items-center gap-3">
+    <h3 className="text-[10px] font-black text-white/85 uppercase tracking-[0.4em] mb-6 flex items-center gap-3">
       <div className="h-px flex-1 bg-white/10" />
       {children}
       <div className="h-px flex-1 bg-white/10" />
@@ -276,7 +276,7 @@ export default function RiceVisionWeather() {
     return (
       <div className="flex flex-col h-[80vh] items-center justify-center gap-5">
         <div className="w-14 h-14 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
-        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 animate-pulse">
+        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/85 animate-pulse">
           {geoStatus === "locating" ? t('detectingLocation') : t('loadingWeatherData')}
         </p>
       </div>
@@ -350,12 +350,12 @@ export default function RiceVisionWeather() {
             </h1>
 
             {/* Admin hierarchy */}
-            <p className="text-sm md:text-base text-white/70 font-semibold mt-1">
+            <p className="text-sm md:text-base text-white/85 font-semibold mt-1">
               {district?.name} DS Division · {district?.district || "Colombo"} District
             </p>
 
             {/* Meta info */}
-            <p className="text-[10px] text-white/30 mt-2 font-bold uppercase tracking-widest">
+            <p className="text-[10px] text-white/85 mt-2 font-bold uppercase tracking-widest">
               {district?.lat.toFixed(4)}°N · {district?.lon.toFixed(4)}°E · Auto-detected
             </p>
 
@@ -372,7 +372,7 @@ export default function RiceVisionWeather() {
                   { timeout: 8000 }
                 );
               }}
-              className="glass px-4 py-2.5 rounded-2xl border border-white/10 text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-emerald-400 hover:border-emerald-500/30 transition-all flex items-center gap-2"
+              className="glass px-4 py-2.5 rounded-2xl border border-white/10 text-[10px] font-black uppercase tracking-widest text-white/85 hover:text-emerald-400 hover:border-emerald-500/30 transition-all flex items-center gap-2"
             >
               <span className="material-symbols-outlined text-sm">my_location</span>
               {geoStatus === "locating" ? t('locating') : t('locateMe')}
@@ -395,7 +395,7 @@ export default function RiceVisionWeather() {
                       <button
                         key={dst.name}
                         onClick={() => { setDistrict(dst); setDropdownOpen(false); }}
-                        className={`w-full text-left px-5 py-3 text-[10px] font-black uppercase tracking-widest transition-all hover:bg-emerald-500/10 hover:text-emerald-400 ${district?.name === dst.name ? "bg-emerald-500/15 text-emerald-400" : "text-white/60"}`}
+                        className={`w-full text-left px-5 py-3 text-[10px] font-black uppercase tracking-widest transition-all hover:bg-emerald-500/10 hover:text-emerald-400 ${district?.name === dst.name ? "bg-emerald-500/15 text-emerald-400" : "text-white/85"}`}
                       >
                         {dst.name}
                       </button>
@@ -411,14 +411,14 @@ export default function RiceVisionWeather() {
         <div className="glass bg-linear-to-br from-emerald-500/30 to-teal-700/30 p-3 sm:p-6 md:p-10 rounded-xl sm:rounded-[1.5rem] md:rounded-[2.5rem] relative overflow-hidden shadow-2xl">
           <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-8">
             <div>
-              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/50 block mb-3">
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/85 block mb-3">
                 {c.is_day ? "☀️ Daytime" : "🌙 Night"} · {new Date(c.time).toLocaleString("en-US", { weekday: "long", hour: "2-digit", minute: "2-digit" })}
               </span>
               <div className="flex items-end gap-4">
                 <h2 className="text-4xl sm:text-6xl md:text-8xl lg:text-[10rem] font-black text-white leading-none">{Math.round(c.temperature_2m)}°</h2>
                 <div className="mb-4">
                   <span className="text-base sm:text-2xl font-black text-white/80">{cond.icon} {cond.label}</span>
-                  <p className="text-white/40 text-sm mt-1">Feels like {Math.round(c.apparent_temperature)}°C</p>
+                  <p className="text-white/85 text-sm mt-1">Feels like {Math.round(c.apparent_temperature)}°C</p>
                 </div>
               </div>
               <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-4 sm:mt-6">
@@ -431,15 +431,15 @@ export default function RiceVisionWeather() {
             </div>
             <div className="flex flex-col gap-2 sm:gap-3 min-w-0 sm:min-w-40">
               <div className="glass bg-black/20 p-4 rounded-2xl text-center">
-                <p className="text-[9px] text-white/40 font-black uppercase tracking-widest mb-1">Sunrise</p>
+                <p className="text-[9px] text-white/85 font-black uppercase tracking-widest mb-1">Sunrise</p>
                 <p className="text-lg font-black text-amber-400">{fmtTime(d.sunrise[todayI])}</p>
               </div>
               <div className="glass bg-black/20 p-4 rounded-2xl text-center">
-                <p className="text-[9px] text-white/40 font-black uppercase tracking-widest mb-1">Sunset</p>
+                <p className="text-[9px] text-white/85 font-black uppercase tracking-widest mb-1">Sunset</p>
                 <p className="text-lg font-black text-orange-400">{fmtTime(d.sunset[todayI])}</p>
               </div>
               <div className="glass bg-black/20 p-4 rounded-2xl text-center">
-                <p className="text-[9px] text-white/40 font-black uppercase tracking-widest mb-1">Today Rain</p>
+                <p className="text-[9px] text-white/85 font-black uppercase tracking-widest mb-1">Today Rain</p>
                 <p className="text-lg font-black text-blue-400">{d.precipitation_sum[todayI]?.toFixed(1)} mm</p>
               </div>
             </div>
@@ -462,7 +462,7 @@ export default function RiceVisionWeather() {
               onClick={() => setActiveTab(tab.id)}
               className={`px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all duration-200 whitespace-nowrap ${activeTab === tab.id
                 ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                : "text-white/40 hover:text-white/70"
+                : "text-white/85 hover:text-white/95"
                 }`}
             >
               {t(tab.labelKey)}
@@ -522,7 +522,7 @@ export default function RiceVisionWeather() {
                         : "border-white/10"
                         }`}
                     >
-                      <p className="text-[9px] font-black text-white/50 uppercase">
+                      <p className="text-[9px] font-black text-white/85 uppercase">
                         {new Date(h.time[idx]).toLocaleTimeString("en-US", {
                           hour: "2-digit",
                           hour12: true,
@@ -564,7 +564,7 @@ export default function RiceVisionWeather() {
                 <table className="w-full text-[10px] font-bold">
 
                   <thead>
-                    <tr className="text-white/40 uppercase tracking-widest border-b border-white/10">
+                    <tr className="text-white/85 uppercase tracking-widest border-b border-white/10">
                       {[
                         "Time",
                         "Cond",
@@ -614,7 +614,7 @@ export default function RiceVisionWeather() {
                             {Math.round(h.temperature_2m[idx])}°C
                           </td>
 
-                          <td className="px-3 py-3 text-white/60">
+                          <td className="px-3 py-3 text-white/85">
                             {Math.round(h.apparent_temperature[idx])}°C
                           </td>
 
@@ -671,13 +671,13 @@ export default function RiceVisionWeather() {
                 { label: "Medium (18 cm)", value: soilTemp18, depth: "Active root zone — paddy growth" },
               ].map((s) => (
                 <div key={s.label} className="glass glass-hover p-6 rounded-3xl border border-white/10 hover:-translate-y-0.5 transition-all">
-                  <p className="text-[9px] font-black text-white/40 uppercase tracking-[0.3em] mb-4">{s.label}</p>
+                  <p className="text-[9px] font-black text-white/85 uppercase tracking-[0.3em] mb-4">{s.label}</p>
                   <p className="text-5xl font-black text-emerald-400 mb-2">{s.value?.toFixed(1)}°C</p>
-                  <p className="text-[9px] text-white/30 font-medium">{s.depth}</p>
+                  <p className="text-[9px] text-white/85 font-medium">{s.depth}</p>
                   <div className="mt-4 h-1.5 bg-white/5 rounded-full overflow-hidden">
                     <div className="h-full bg-linear-to-r from-emerald-500 to-teal-400 rounded-full" style={{ width: `${Math.min(100, Math.max(0, ((s.value - 15) / 25) * 100))}%` }} />
                   </div>
-                  <div className="flex justify-between text-[8px] text-white/20 mt-1"><span>15°C</span><span>40°C</span></div>
+                  <div className="flex justify-between text-[8px] text-white/85 mt-1"><span>15°C</span><span>40°C</span></div>
                   <p className={`mt-3 text-[9px] font-black uppercase ${s.value < 18 ? "text-blue-400" : s.value > 35 ? "text-red-400" : "text-emerald-400"}`}>
                     {s.value < 18 ? "⚠️ Too cold for germination" : s.value > 35 ? "⚠️ Heat stress risk" : "✓ Optimal for paddy"}
                   </p>
@@ -693,9 +693,9 @@ export default function RiceVisionWeather() {
                 { label: "3–9 cm", value: soilM3, note: "Primary root absorption zone" },
               ].map((s) => (
                 <div key={s.label} className="glass glass-hover p-6 rounded-3xl border border-blue-500/20 hover:-translate-y-0.5 transition-all">
-                  <p className="text-[9px] font-black text-white/40 uppercase tracking-[0.3em] mb-4">Soil Moisture · {s.label}</p>
+                  <p className="text-[9px] font-black text-white/85 uppercase tracking-[0.3em] mb-4">Soil Moisture · {s.label}</p>
                   <p className="text-5xl font-black text-blue-400 mb-2">{s.value}%</p>
-                  <p className="text-[9px] text-white/30 font-medium mb-4">{s.note}</p>
+                  <p className="text-[9px] text-white/85 font-medium mb-4">{s.note}</p>
                   <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
                     <div className="h-full bg-linear-to-r from-blue-500 to-cyan-400 rounded-full" style={{ width: `${Math.min(100, parseFloat(s.value))}%` }} />
                   </div>
@@ -709,25 +709,25 @@ export default function RiceVisionWeather() {
             <SectionHeading>Agronomic Indicators</SectionHeading>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="glass glass-hover p-6 rounded-3xl border border-emerald-500/20 col-span-1 sm:col-span-2">
-                <p className="text-[9px] font-black text-white/40 uppercase tracking-[0.3em] mb-2">ET₀ Evapotranspiration Today</p>
-                <p className="text-5xl font-black text-emerald-400 mb-1">{et0Today} <span className="text-xl text-white/40">mm</span></p>
-                <p className="text-[10px] text-white/50 mt-2 leading-relaxed">Reference evapotranspiration (FAO-56) — the amount of water the crop would use under optimal conditions. Use this to plan daily irrigation volumes.</p>
+                <p className="text-[9px] font-black text-white/85 uppercase tracking-[0.3em] mb-2">ET₀ Evapotranspiration Today</p>
+                <p className="text-5xl font-black text-emerald-400 mb-1">{et0Today} <span className="text-xl text-white/85">mm</span></p>
+                <p className="text-[10px] text-white/85 mt-2 leading-relaxed">Reference evapotranspiration (FAO-56) — the amount of water the crop would use under optimal conditions. Use this to plan daily irrigation volumes.</p>
                 <div className={`mt-4 inline-block px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest ${parseFloat(et0Today) > 6 ? "bg-amber-500/20 text-amber-400 border border-amber-500/20" : parseFloat(et0Today) > 3 ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/20" : "bg-blue-500/10 text-blue-400 border border-blue-500/20"}`}>
                   {parseFloat(et0Today) > 6 ? "High demand — increase irrigation" : parseFloat(et0Today) > 3 ? "Moderate — normal irrigation" : "Low demand — reduce irrigation"}
                 </div>
               </div>
               <div className="glass glass-hover p-6 rounded-3xl border border-violet-500/20">
-                <p className="text-[9px] font-black text-white/40 uppercase tracking-[0.3em] mb-2">Vapour Pressure Deficit</p>
-                <p className="text-5xl font-black text-violet-400 mb-1">{vpd} <span className="text-xl text-white/40">kPa</span></p>
-                <p className="text-[9px] text-white/40 mt-2">VPD drives transpiration. High VPD → crop water stress.</p>
+                <p className="text-[9px] font-black text-white/85 uppercase tracking-[0.3em] mb-2">Vapour Pressure Deficit</p>
+                <p className="text-5xl font-black text-violet-400 mb-1">{vpd} <span className="text-xl text-white/85">kPa</span></p>
+                <p className="text-[9px] text-white/85 mt-2">VPD drives transpiration. High VPD → crop water stress.</p>
                 <p className={`mt-3 text-[9px] font-black uppercase ${parseFloat(vpd) > 2 ? "text-red-400" : parseFloat(vpd) > 1 ? "text-amber-400" : "text-emerald-400"}`}>
                   {parseFloat(vpd) > 2 ? "⚠️ Severe stress" : parseFloat(vpd) > 1 ? "Moderate stress" : "✓ Good conditions"}
                 </p>
               </div>
               <div className="glass glass-hover p-6 rounded-3xl border border-orange-500/20">
-                <p className="text-[9px] font-black text-white/40 uppercase tracking-[0.3em] mb-2">Solar Radiation Today</p>
-                <p className="text-5xl font-black text-orange-400 mb-1">{radToday} <span className="text-xl text-white/40">MJ/m²</span></p>
-                <p className="text-[9px] text-white/40 mt-2">Higher radiation drives more ET₀ and photosynthesis.</p>
+                <p className="text-[9px] font-black text-white/85 uppercase tracking-[0.3em] mb-2">Solar Radiation Today</p>
+                <p className="text-5xl font-black text-orange-400 mb-1">{radToday} <span className="text-xl text-white/85">MJ/m²</span></p>
+                <p className="text-[9px] text-white/85 mt-2">Higher radiation drives more ET₀ and photosynthesis.</p>
                 <p className={`mt-3 text-[9px] font-black uppercase ${parseFloat(radToday) > 20 ? "text-amber-400" : "text-emerald-400"}`}>
                   {parseFloat(radToday) > 20 ? "High radiation day" : "Normal radiation"}
                 </p>
@@ -752,7 +752,7 @@ export default function RiceVisionWeather() {
                     </span>
                   </div>
                   <p className="text-[11px] font-black text-white/90 mb-2">{a.title}</p>
-                  <p className="text-[9px] text-white/40 font-medium">{a.reason}</p>
+                  <p className="text-[9px] text-white/85 font-medium">{a.reason}</p>
                 </div>
               ))}
             </div>
@@ -771,13 +771,13 @@ export default function RiceVisionWeather() {
 
                 return (
                   <div key={idx} className="glass glass-hover p-5 rounded-3xl border border-white/10 text-center hover:-translate-y-1 transition-all duration-300">
-                    <p className="text-[9px] text-white/40 font-black mb-3 uppercase">
+                    <p className="text-[9px] text-white/85 font-black mb-3 uppercase">
                       {fmtDay(d.time[idx], true)}
                     </p>
 
                     <div className="text-4xl mb-3">{info.icon}</div>
 
-                    <p className="text-xs font-black text-white/60 mb-3">
+                    <p className="text-xs font-black text-white/85 mb-3">
                       {info.label}
                     </p>
 
@@ -785,7 +785,7 @@ export default function RiceVisionWeather() {
                       {Math.round(d.temperature_2m_max[idx])}°
                     </p>
 
-                    <p className="text-sm text-white/40 font-bold">
+                    <p className="text-sm text-white/85 font-bold">
                       {Math.round(d.temperature_2m_min[idx])}°
                     </p>
 
@@ -819,7 +819,7 @@ export default function RiceVisionWeather() {
                 <table className="w-full text-[10px] font-bold">
 
                   <thead>
-                    <tr className="text-white/40 uppercase tracking-widest border-b border-white/10">
+                    <tr className="text-white/85 uppercase tracking-widest border-b border-white/10">
                       {[
                         "Date",
                         "Cond",
@@ -921,7 +921,7 @@ export default function RiceVisionWeather() {
                 return (
                   <div key={idx} className="glass p-5 rounded-3xl border border-white/5 text-center opacity-80 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300">
 
-                    <p className="text-[9px] text-white/30 font-bold mb-3 uppercase">
+                    <p className="text-[9px] text-white/85 font-bold mb-3 uppercase">
                       {fmtDay(date, true)}
                     </p>
 
@@ -931,20 +931,20 @@ export default function RiceVisionWeather() {
                       {Math.round(d.temperature_2m_max[idx])}°
                     </p>
 
-                    <p className="text-sm text-white/30 font-bold">
+                    <p className="text-sm text-white/85 font-bold">
                       {Math.round(d.temperature_2m_min[idx])}°
                     </p>
 
                     <div className="mt-4 space-y-1">
-                      <p className="text-[8px] font-black text-white/30">
+                      <p className="text-[8px] font-black text-white/85">
                         {d.precipitation_sum[idx]?.toFixed(1)} mm
                       </p>
 
-                      <p className="text-[8px] text-white/20">
+                      <p className="text-[8px] text-white/85">
                         UV {d.uv_index_max[idx]}
                       </p>
 
-                      <p className="text-[8px] text-white/20">
+                      <p className="text-[8px] text-white/85">
                         ET₀ {d.et0_fao_evapotranspiration[idx]?.toFixed(1)} mm
                       </p>
                     </div>
@@ -962,7 +962,7 @@ export default function RiceVisionWeather() {
                 <table className="w-full text-[10px] font-bold">
 
                   <thead>
-                    <tr className="text-white/40 uppercase tracking-widest border-b border-white/10">
+                    <tr className="text-white/85 uppercase tracking-widest border-b border-white/10">
                       {[
                         "Date",
                         "Conditions",
