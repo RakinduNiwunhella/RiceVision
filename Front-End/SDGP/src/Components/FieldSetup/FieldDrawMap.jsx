@@ -217,6 +217,7 @@ export default function FieldDrawMap({
   const [paddyGeoJSON,      setPaddyGeoJSON]       = useState(null);
   const [loadingGeoJSON,    setLoadingGeoJSON]     = useState(false);
   const [basemap,           setBasemap]            = useState("satellite");
+  const [baseTileFailed,    setBaseTileFailed]     = useState(false);
 
   /* district search */
   const [districtSearch,    setDistrictSearch]     = useState("");
@@ -302,6 +303,7 @@ export default function FieldDrawMap({
   );
 
   const price = Math.ceil(acres * PRICE_PER_ACRE_LKR);
+  const activeBaseMap = baseTileFailed ? BASE_MAPS.street : BASE_MAPS[basemap];
 
   /* ── Render ── */
   return (
@@ -396,7 +398,10 @@ export default function FieldDrawMap({
             {Object.entries(BASE_MAPS).map(([key, bm]) => (
               <button
                 key={key}
-                onClick={() => setBasemap(key)}
+                onClick={() => {
+                  setBasemap(key);
+                  setBaseTileFailed(false);
+                }}
                 className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
                   basemap === key
                     ? "bg-emerald-500 border-emerald-400 text-white shadow-lg shadow-emerald-500/20"
@@ -462,9 +467,16 @@ export default function FieldDrawMap({
           zoomControl
         >
           <TileLayer
-            key={basemap}
-            url={BASE_MAPS[basemap].url}
-            attribution={BASE_MAPS[basemap].attribution}
+            key={baseTileFailed ? `${basemap}-fallback` : basemap}
+            url={activeBaseMap.url}
+            attribution={activeBaseMap.attribution}
+            eventHandlers={{
+              tileerror: () => {
+                if (!baseTileFailed) {
+                  setBaseTileFailed(true);
+                }
+              },
+            }}
           />
 
           {/* Paddy extent overlay (amber, shows known paddy zones) */}

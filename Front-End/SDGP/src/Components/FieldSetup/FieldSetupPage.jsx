@@ -4,6 +4,7 @@ import { FaSun, FaMoon } from "react-icons/fa";
 import { useTheme } from "../../context/ThemeContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { supabase } from "../../supabaseClient";
+import { saveUserField } from "../../api/api";
 import FieldDrawMap from "./FieldDrawMap";
 import TutorialTooltip from "../../Components/TutorialTooltip";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
@@ -101,25 +102,26 @@ export default function FieldSetupPage() {
     }
 
     setSaving(true);
-    const price_lkr = Math.ceil(acres * PRICE_PER_ACRE_LKR);
-    const { error } = await supabase.from("user_fields").upsert(
-      {
-        user_id:    user.id,
+    try {
+      const price_lkr = Math.ceil(acres * PRICE_PER_ACRE_LKR);
+      await saveUserField({
         field_name: fieldName || null,
-        geojson:    drawnFeature,
+        geojson: drawnFeature,
         area_acres: acres,
         price_lkr,
-        district:   district || null,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "user_id" }
-    );
-    setSaving(false);
-
-    if (error) {
+        district: district || null,
+      });
+    } catch (error) {
+      setSaving(false);
       alert(`Could not save field: ${error.message}`);
+
+      if ((error.message || "").toLowerCase().includes("401")) {
+        navigate("/signin");
+      }
       return;
     }
+
+    setSaving(false);
     navigate("/dashboard");
   };
 
