@@ -8,6 +8,8 @@ import autoTable from 'jspdf-autotable';
 import logoImg from '../assets/logo.png';
 import { apiFetch } from "../../api/apiFetch";
 import { useLanguage } from "../../context/LanguageContext";
+import { translateHealthCategory, translateStageCategory } from "../../utils/agriTranslations";
+import { translateDistrictName, SRI_LANKA_DISTRICTS } from "../../utils/locationTranslations";
 import TutorialTooltip from "../../Components/TutorialTooltip";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
 
@@ -44,6 +46,12 @@ const CustomSelect = ({ value, onChange, options, className = "" }) => {
     setOpen(!open);
   };
 
+  const normalizedOptions = options.map((opt) =>
+    typeof opt === "string" ? { value: opt, label: opt } : opt
+  );
+  const selectedLabel =
+    normalizedOptions.find((opt) => opt.value === value)?.label || value;
+
   return (
     <div className={`relative ${className}`} ref={wrapperRef}>
       <button
@@ -52,7 +60,7 @@ const CustomSelect = ({ value, onChange, options, className = "" }) => {
         onClick={handleToggle}
         className="w-full flex justify-between items-center bg-white/5 border border-white/10 text-[10px] px-4 py-3 rounded-xl font-bold text-white outline-none hover:bg-white/10 transition-all cursor-pointer"
       >
-        <span>{value}</span>
+        <span>{selectedLabel}</span>
 
         <span
           className="material-symbols-outlined text-sm text-white/85 transition-transform duration-200"
@@ -72,15 +80,15 @@ const CustomSelect = ({ value, onChange, options, className = "" }) => {
             }}
             className="max-h-52 overflow-y-auto rounded-xl border border-white/20 shadow-2xl pointer-events-auto"
           >
-            {options.map((opt) => (
+            {normalizedOptions.map((opt) => (
               <button
-                key={opt}
+                key={opt.value}
                 type="button"
                 onClick={() => {
-                  onChange(opt);
+                  onChange(opt.value);
                   setOpen(false);
                 }}
-                className={`w-full text-left px-4 py-2.5 text-[10px] font-bold flex items-center gap-2 transition-all ${value === opt
+                className={`w-full text-left px-4 py-2.5 text-[10px] font-bold flex items-center gap-2 transition-all ${value === opt.value
                   ? "text-emerald-400 bg-emerald-500/20"
                   : "text-white hover:bg-white/20"
                   }`}
@@ -88,13 +96,13 @@ const CustomSelect = ({ value, onChange, options, className = "" }) => {
                 <span
                   className="material-symbols-outlined text-xs"
                   style={{
-                    visibility: value === opt ? "visible" : "hidden"
+                    visibility: value === opt.value ? "visible" : "hidden"
                   }}
                 >
                   check
                 </span>
 
-                {opt}
+                {opt.label}
               </button>
             ))}
           </div>,
@@ -106,9 +114,13 @@ const CustomSelect = ({ value, onChange, options, className = "" }) => {
 
 const Report = () => {
   const location = useLocation();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const selectedDistrict = location.state?.district;
-  const districts = ["Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle", "Gampaha", "Hambantota", "Jaffna", "Kalutara", "Kandy", "Kegalle", "Kilinochchi", "Kurunegala", "Mannar", "Matale", "Matara", "Monaragala", "Mullaitivu", "Nuwara Eliya", "Polonnaruwa", "Puttalam", "Ratnapura", "Trincomalee", "Vavuniya"];
+  const districts = SRI_LANKA_DISTRICTS;
+  const districtOptions = districts.map((district) => ({
+    value: district,
+    label: translateDistrictName(district, language),
+  }));
 
   const [mode, setMode] = useState("single");
   const [availableDates, setAvailableDates] = useState([]);
@@ -305,7 +317,7 @@ const Report = () => {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(13);
     doc.setTextColor(...INK);
-    doc.text(config.district, M, 53.5);
+    doc.text(translateDistrictName(config.district, language), M, 53.5);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7);
     doc.setTextColor(...SUBTEXT);
@@ -415,10 +427,10 @@ const Report = () => {
     const pestLabel = report.metrics.pest_count === 0 ? 'Clear' : report.metrics.pest_count < 20 ? 'Moderate' : 'Critical';
 
     const fieldRows = [
-      ['Growth Stage', report.categories.current_stage, 'Health Status', report.categories.health_status],
-      ['Pest Incidents', `${report.metrics.pest_count} (${pestLabel})`, 'Risk Score', `${riskScore.toFixed(2)} / 10 (${riskLabel})`],
-      ['Severe Stress Area', `${report.metrics.stress_pct.toFixed(2)}%`, 'Est. Harvest Date', report.metrics.harvest_date],
-      ['Season', config.season, 'Data Date', config.date],
+      [t('reportGrowthStageLabel'), translateStageCategory(report.categories.current_stage, t), t('reportHealthStatusLabel'), translateHealthCategory(report.categories.health_status, t)],
+      [t('reportPestIncidentsLabel'), `${report.metrics.pest_count} (${pestLabel})`, t('reportRiskScoreLabel'), `${riskScore.toFixed(2)} / 10 (${riskLabel})`],
+      [t('reportSevereStressArea'), `${report.metrics.stress_pct.toFixed(2)}%`, t('reportEstHarvestDate'), report.metrics.harvest_date],
+      [t('mapSeason'), config.season, t('reportDataDate'), config.date],
     ];
     if (raw.percent_change !== undefined)
       fieldRows.push(['% vs Historical', `${parseFloat(raw.percent_change).toFixed(2)}%`, 'Pixels Analysed', raw.total_pixels !== undefined ? Number(raw.total_pixels).toLocaleString() : 'N/A']);
@@ -510,13 +522,13 @@ const Report = () => {
     autoTable(doc, {
       startY: y,
       margin: { left: M, right: M },
-      head: [['Risk Factor', 'Value', 'Status']],
+      head: [[t('reportHeadingRiskFactor'), t('reportHeadingValue'), t('reportHeadingStatus')]],
       body: [
-        ['Overall Risk Score', riskScore.toFixed(2), riskLabel],
-        ['Severe Stress Coverage', `${report.metrics.stress_pct.toFixed(2)}%`, report.metrics.stress_pct < 5 ? 'Acceptable' : 'Action Required'],
-        ['Pest Attack Incidents', String(report.metrics.pest_count), pestLabel],
-        ['Crop Health Status', report.categories.health_status, report.categories.health_status === 'Normal' ? 'Normal' : 'Warning'],
-        ['Growth Stage', report.categories.current_stage, '—'],
+        [t('reportOverallRiskScore'), riskScore.toFixed(2), riskLabel],
+        [t('reportSevereStressCoverage'), `${report.metrics.stress_pct.toFixed(2)}%`, report.metrics.stress_pct < 5 ? t('reportAcceptable') : t('reportActionRequired')],
+        [t('reportPestIncidentsLabel'), String(report.metrics.pest_count), pestLabel],
+        [t('reportCropHealthStatus'), translateHealthCategory(report.categories.health_status, t), report.categories.health_status === 'Normal' ? t('reportNormal') : t('reportWarning')],
+        [t('reportGrowthStageLabel'), translateStageCategory(report.categories.current_stage, t), '—'],
       ],
       theme: 'grid',
       headStyles: { fillColor: riskAccent, textColor: WHITE, fontSize: 7.5, fontStyle: 'bold', cellPadding: 4 },
@@ -630,7 +642,10 @@ const Report = () => {
     doc.setFontSize(12);
     doc.setTextColor(...INK);
 
-    doc.text(`${configA.district}  vs  ${configB.district}`, M, 53);
+    const districtADisplay = translateDistrictName(configA.district, language);
+    const districtBDisplay = translateDistrictName(configB.district, language);
+
+    doc.text(`${districtADisplay}  vs  ${districtBDisplay}`, M, 53);
 
     doc.setFontSize(7);
     doc.setTextColor(...SUBTEXT);
@@ -665,8 +680,8 @@ const Report = () => {
       doc.setFontSize(6);
       doc.setTextColor(...SUBTEXT);
 
-      doc.text(configA.district, x + 7, y + 21);
-      doc.text(configB.district, x + cardW / 2 + 7, y + 21);
+      doc.text(districtADisplay, x + 7, y + 21);
+      doc.text(districtBDisplay, x + cardW / 2 + 7, y + 21);
 
     };
 
@@ -719,7 +734,7 @@ const Report = () => {
       startY: y,
       margin: { left: M, right: M },
       head: [
-        ["Metric", configA.district, configB.district]
+        ["Metric", districtADisplay, districtBDisplay]
       ],
       body: [
         [
@@ -790,7 +805,7 @@ const Report = () => {
     doc.setTextColor(...INK);
 
     const winner =
-      diff > 0 ? configA.district : configB.district;
+      diff > 0 ? districtADisplay : districtBDisplay;
 
     doc.text(
       `${winner} shows higher predicted yield by ${Math.abs(Math.round(diff))} kg/ha.`,
@@ -893,7 +908,7 @@ const Report = () => {
             <CustomSelect
               value={config.district}
               onChange={(val) => setConfig({ ...config, district: val })}
-              options={districts}
+              options={districtOptions}
             />
           </div>
           <CustomSelect

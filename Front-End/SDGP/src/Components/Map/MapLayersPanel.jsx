@@ -1,7 +1,9 @@
 import React from "react";
+import { useLanguage } from "../../context/LanguageContext";
 const OVERLAY_KEYS = ["ndvi", "evi", "vv", "vh"];
 
 export default function MapLayersPanel({ layers, setLayers, districtSelected }) {
+  const { t } = useLanguage();
   const [open, setOpen] = React.useState(false);
 
   const toggleLayer = (layer) => {
@@ -31,9 +33,9 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
   };
 
   const layerList = [
-    { key: "paddyExtent", label: "Paddy Extent" },
-    { key: "showCircles", label: "Show Circles" },
-    { key: "showSatellite", label: "Satellite View" },
+    { key: "paddyExtent", label: t("mapLayerPaddyExtent") },
+    { key: "showCircles", label: t("mapLayerShowCircles") },
+    { key: "showSatellite", label: t("mapLayerSatelliteView") },
     { key: "ndvi", label: "NDVI", tag: "S2" },
     { key: "evi", label: "EVI", tag: "S2" },
     { key: "vv", label: "VV", tag: "S1" },
@@ -92,7 +94,7 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
       <div className={`${!districtSelected ? "blur-sm opacity-40 pointer-events-none" : ""}`}>
 
         <h2 className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/85 mb-6">
-          Map Layers
+          {t("mapLayersTitle")}
         </h2>
 
         <div className="space-y-2">
@@ -237,16 +239,16 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
 
         <div className="mt-8 pt-6 border-t border-white/10">
           <p className="text-[10px] text-white/85 italic">
-            Select layers to overlay specialized agricultural satellite telemetry.
+            {t("mapLayersHintIntro")}
           </p>
           <p className="text-[9px] text-white/85 mt-1">
-            S2 = Sentinel-2 optical · S1 = Sentinel-1 SAR
+            {t("mapLayersHintSensors")}
           </p>
           <div className="mt-3 space-y-1">
-            <p className="text-[9px] text-white/85">NDVI — Normalized Difference Vegetation Index</p>
-            <p className="text-[9px] text-white/85">EVI — Enhanced Vegetation Index</p>
-            <p className="text-[9px] text-white/85">VV — Vertical Transmit / Vertical Receive</p>
-            <p className="text-[9px] text-white/85">VH — Vertical Transmit / Horizontal Receive</p>
+            <p className="text-[9px] text-white/85">{t("mapLayersHintNDVI")}</p>
+            <p className="text-[9px] text-white/85">{t("mapLayersHintEVI")}</p>
+            <p className="text-[9px] text-white/85">{t("mapLayersHintVV")}</p>
+            <p className="text-[9px] text-white/85">{t("mapLayersHintVH")}</p>
           </div>
         </div>
 
@@ -265,7 +267,7 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
             </span>
 
             <p className="text-sm text-white font-medium px-6">
-              Please select a district to unlock the filters
+              {t("mapLayersSelectDistrict")}
             </p>
 
           </div>

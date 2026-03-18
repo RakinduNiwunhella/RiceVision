@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { apiFetch } from "../../api/apiFetch";
 import { useLanguage } from "../../context/LanguageContext";
+import { translateDistrictName } from "../../utils/locationTranslations";
 import { useNavigate } from "react-router-dom";
 import TutorialTooltip from "../../Components/TutorialTooltip";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
@@ -20,7 +21,7 @@ const healthColor = (health) => {
 
 const FieldData = () => {
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const [stats, setStats] = useState([]);
   const [districtData, setDistrictData] = useState([]);
@@ -181,7 +182,7 @@ const FieldData = () => {
                       <div className="text-center flex items-center gap-3">
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/50 group-hover/row:bg-emerald-400 transition-colors" />
                         <span className="font-black text-white group-hover/row:translate-x-1 transition-transform inline-block">
-                          {d.district}
+                          {translateDistrictName(d.district, language)}
                         </span>
                       </div>
                     </td>

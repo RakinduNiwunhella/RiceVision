@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { updateAlertStatus } from "../../api/api";
 import { apiFetch } from "../../api/apiFetch";
 import { useLanguage } from "../../context/LanguageContext";
+import { translateHealthCategory, translateStageCategory } from "../../utils/agriTranslations";
+import { translateDistrictName } from "../../utils/locationTranslations";
 import TutorialTooltip from "../../Components/TutorialTooltip";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
 
@@ -17,8 +19,8 @@ const formatTitle = (text) =>
 // Returns a plain string for disaster titles.
 const renderTitle = (title, isPest, isPast) => {
   if (!isPest) return title;
-  // Match: "District : NUMBER RISKS"
-  const match = title.match(/^(.+?:\s*)(\d+)(\s*RISKS)$/);
+  // Match: "District : NUMBER <suffix>"
+  const match = title.match(/^(.+?:\s*)(\d+)(\s*.+)$/);
   if (!match) return title;
   return (
     <span>
@@ -98,7 +100,7 @@ const ResolveModal = ({ onConfirm, onCancel, t }) => {
    MAIN COMPONENT
 ───────────────────────────────────────── */
 const Alerts = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const tabLabels = [t("disasters"), t("pestRisks"), t("pastAlerts")];
 
   // Tutorial setup - create once and memoize
@@ -213,7 +215,7 @@ const Alerts = () => {
           const mappedAlerts = (Array.isArray(data) ? data : []).map((a) => ({
             id: a.id,
             title: formatTitle(`${a.disaster_type} risk`),
-            description: `Stage: ${a.stage} | Health: ${a.health}`,
+            description: `${t("alertStage")}: ${translateStageCategory(a.stage, t)} | ${t("alertHealth")}: ${translateHealthCategory(a.health, t)}`,
             status: a.status || "Open",
             priority: "High",
             field: a.district,
@@ -230,8 +232,8 @@ const Alerts = () => {
             .filter((a) => a.risky_pixels > 0)
             .map((a) => ({
               id: a.district,
-              title: `${a.district} : ${a.risky_pixels} RISKS`,
-              description: "Multiple pest risks detected in this district.",
+              title: `${translateDistrictName(a.district, language)} : ${a.risky_pixels} ${t("alertRisksSuffix")}`,
+              description: t("alertMultiplePestRisks"),
               status: a.status || "Open",
               priority: "High",
               field: a.district,
@@ -249,9 +251,9 @@ const Alerts = () => {
           const mappedAlerts = (Array.isArray(data) ? data : []).map((a) => ({
             id: a.id,
             title: a.is_pest
-              ? `${a.district} : ${a.risk_count} RISKS`
+              ? `${translateDistrictName(a.district, language)} : ${a.risk_count} ${t("alertRisksSuffix")}`
               : formatTitle(`${a.disaster_type} risk`),
-            description: `Stage: ${a.stage_name} | Health: ${a.paddy_health}`,
+            description: `${t("alertStage")}: ${translateStageCategory(a.stage_name, t)} | ${t("alertHealth")}: ${translateHealthCategory(a.paddy_health, t)}`,
             status: a.status,
             field: a.district,
             health: a.paddy_health,
@@ -270,7 +272,7 @@ const Alerts = () => {
     };
 
     loadAlerts();
-  }, [activeTab]);
+  }, [activeTab, language, t]);
 
   /* ---------------- LOAD GLOBAL ALERT COUNTS ---------------- */
 

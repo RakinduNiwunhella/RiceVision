@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { getDSDivision } from "../../utils/geoUtils";
 import { useLanguage } from "../../context/LanguageContext";
+import { translateDistrictName, translatePlaceName } from "../../utils/locationTranslations";
 import TutorialTooltip from "../../Components/TutorialTooltip";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
 
@@ -338,6 +339,13 @@ export default function RiceVisionWeather() {
     { id: "history", labelKey: "tabHistory" },
   ];
 
+  const placeDisplayName = district?.name
+    ? translatePlaceName(district.name, language)
+    : "";
+  const districtDisplayName = district
+    ? translateDistrictName(district.district || district.name, language)
+    : "";
+
   return (
     <div className="min-h-screen -mx-6 -mt-6 p-4 sm:p-6 lg:p-10 font-sans text-white">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -354,12 +362,12 @@ export default function RiceVisionWeather() {
 
             {/* Main Location */}
             <h1 className="text-2xl sm:text-4xl md:text-6xl font-black text-white leading-tight tracking-tight">
-              {district?.name}
+              {placeDisplayName}
             </h1>
 
             {/* Admin hierarchy */}
             <p className="text-sm md:text-base text-white/85 font-semibold mt-1">
-              {district?.name} {t('dsDivision')} · {district?.district || t('colombo')} {t('district')}
+              {placeDisplayName} {t('dsDivision')} · {districtDisplayName || t('colombo')} {t('district')}
             </p>
 
             {/* Meta info */}
@@ -392,7 +400,7 @@ export default function RiceVisionWeather() {
                 className="glass px-5 py-2.5 rounded-2xl border border-white/10 text-[10px] font-black uppercase tracking-widest text-white/85 hover:border-emerald-500/30 hover:text-emerald-400 transition-all flex items-center gap-3 min-w-44 justify-between"
               >
                 <span className="material-symbols-outlined text-sm">location_on</span>
-                {district?.name}
+                {districtDisplayName || placeDisplayName}
                 <span className="material-symbols-outlined text-sm">{dropdownOpen ? "expand_less" : "expand_more"}</span>
               </button>
 
@@ -405,7 +413,7 @@ export default function RiceVisionWeather() {
                         onClick={() => { setDistrict(dst); setDropdownOpen(false); }}
                         className={`w-full text-left px-5 py-3 text-[10px] font-black uppercase tracking-widest transition-all hover:bg-emerald-500/10 hover:text-emerald-400 ${district?.name === dst.name ? "bg-emerald-500/15 text-emerald-400" : "text-white/85"}`}
                       >
-                        {dst.name}
+                        {translateDistrictName(dst.name, language)}
                       </button>
                     ))}
                   </div>

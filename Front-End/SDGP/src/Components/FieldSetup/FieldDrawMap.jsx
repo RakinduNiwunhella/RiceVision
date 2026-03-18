@@ -37,6 +37,8 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw";
 import "leaflet-draw/dist/leaflet.draw.css";
+import { useLanguage } from "../../context/LanguageContext";
+import { translateDistrictName } from "../../utils/locationTranslations";
 import { DISTRICTS, BASE_MAPS, SQM_PER_ACRE, PRICE_PER_ACRE_LKR } from "./fieldConstants";
 
 /* ── Constants ─────────────────────────────────────────────────────────────── */
@@ -213,6 +215,7 @@ export default function FieldDrawMap({
   readOnly = false,
   height   = "480px",
 }) {
+  const { t, language } = useLanguage();
   const [selectedDistrict,  setSelectedDistrict]  = useState(null);
   const [paddyGeoJSON,      setPaddyGeoJSON]       = useState(null);
   const [loadingGeoJSON,    setLoadingGeoJSON]     = useState(false);
@@ -298,7 +301,8 @@ export default function FieldDrawMap({
   };
 
   const filteredDistricts = DISTRICTS.filter((d) =>
-    d.name.toLowerCase().includes(districtSearch.toLowerCase())
+    d.name.toLowerCase().includes(districtSearch.toLowerCase()) ||
+    translateDistrictName(d.name, language).toLowerCase().includes(districtSearch.toLowerCase())
   );
 
   const price = Math.ceil(acres * PRICE_PER_ACRE_LKR);
@@ -315,7 +319,7 @@ export default function FieldDrawMap({
               onClick={() => setShowDistrictMenu((v) => !v)}>
               <span className="material-symbols-outlined text-emerald-400 text-base">location_on</span>
               <span className={selectedDistrict ? "text-white font-semibold" : "text-white/85"}>
-                {selectedDistrict ? selectedDistrict.name : "Select district"}
+                {selectedDistrict ? translateDistrictName(selectedDistrict.name, language) : t("mapSelectDistrictPrompt")}
               </span>
               <span className="material-symbols-outlined text-white/85 text-base ml-auto">expand_more</span>
             </div>
@@ -328,7 +332,7 @@ export default function FieldDrawMap({
                     type="text"
                     value={districtSearch}
                     onChange={(e) => setDistrictSearch(e.target.value)}
-                    placeholder="Filter districts..."
+                    placeholder={t("mapSearchDistrictPlaceholder")}
                     className="w-full px-3 py-1.5 text-xs rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/85 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                     onClick={(e) => e.stopPropagation()}
                   />
@@ -348,7 +352,7 @@ export default function FieldDrawMap({
                           : "text-white/85 hover:bg-white/5"
                       }`}
                     >
-                      {d.name}
+                      {translateDistrictName(d.name, language)}
                     </li>
                   ))}
                 </ul>

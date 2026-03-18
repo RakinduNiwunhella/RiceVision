@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 import { supabase } from "../../supabaseClient";
 import { FaCamera } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function ProfileForm() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({
@@ -44,31 +46,31 @@ export default function ProfileForm() {
     const text = (value || "").trim();
 
     if (name === "firstName") {
-      if (!text) return "First name is required.";
+      if (!text) return t("profileFirstNameRequired");
       if (!/^[A-Za-z][A-Za-z\s'-]{1,49}$/.test(text)) {
-        return "Use letters only for first name.";
+        return t("profileFirstNameFormatError");
       }
     }
 
     if (name === "lastName") {
-      if (!text) return "Surname is required.";
+      if (!text) return t("profileSurnameRequired");
       if (!/^[A-Za-z][A-Za-z\s'-]{1,49}$/.test(text)) {
-        return "Use letters only for surname.";
+        return t("profileSurnameFormatError");
       }
     }
 
     if (name === "phone") {
       const normalized = text.replace(/[\s-]/g, "");
-      if (!normalized) return "Phone number is required.";
+      if (!normalized) return t("profilePhoneRequired");
       if (!/^(\+94\d{9}|0\d{9})$/.test(normalized)) {
-        return "Use a valid phone number (e.g. +94 77 123 4567 or 0771234567).";
+        return t("profilePhoneFormatError");
       }
     }
 
     if (name === "email") {
-      if (!text) return "Email address is required.";
+      if (!text) return t("profileEmailRequired");
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text)) {
-        return "Email address is not valid.";
+        return t("profileEmailFormatError");
       }
     }
 
@@ -108,7 +110,7 @@ export default function ProfileForm() {
       }
     } catch (error) {
       console.error("Error loading user data:", error.message);
-      setStatus({ type: 'error', message: `Failed to load profile: ${error.message}` });
+      setStatus({ type: 'error', message: `${t("profileLoadError")}: ${error.message}` });
     } finally {
       setLoading(false);
     }
@@ -120,7 +122,7 @@ export default function ProfileForm() {
       setStatus(null);
 
       if (!event.target.files || event.target.files.length === 0) {
-        throw new Error("Please select an image to upload.");
+        throw new Error(t("profileSelectImage"));
       }
 
       const {
@@ -150,9 +152,9 @@ export default function ProfileForm() {
       if (updateError) throw updateError;
 
       setFormData((prev) => ({ ...prev, avatarUrl: publicUrl }));
-      setStatus({ type: 'success', message: 'Profile photo updated successfully.' });
+      setStatus({ type: 'success', message: t('profileUpdatedSuccess') });
     } catch (error) {
-      setStatus({ type: 'error', message: `Photo upload failed: ${error.message}` });
+      setStatus({ type: 'error', message: `${t("profilePhotoUploadFailed")}: ${error.message}` });
     } finally {
       setUploading(false);
     }
@@ -163,7 +165,7 @@ export default function ProfileForm() {
     setStatus(null);
 
     if (!validateForm()) {
-      setStatus({ type: "error", message: "Please fix the highlighted fields and try again." });
+      setStatus({ type: "error", message: t("profileUpdateFailed") });
       return;
     }
 
@@ -178,9 +180,9 @@ export default function ProfileForm() {
     });
 
     if (error) {
-      setStatus({ type: 'error', message: `Failed to update profile: ${error.message}` });
+      setStatus({ type: 'error', message: `${t("profileUpdateFailed")}: ${error.message}` });
     } else {
-      setStatus({ type: 'success', message: 'Profile updated successfully.' });
+      setStatus({ type: 'success', message: t('profileUpdatedSuccess') });
     }
 
     setLoading(false);
@@ -261,7 +263,7 @@ export default function ProfileForm() {
 
           {uploading && (
             <p className="text-[10px] text-emerald-400 mt-6 font-black uppercase tracking-[0.3em] animate-pulse">
-              Uploading photo...
+              {t("profileUploadingPhoto")}
             </p>
           )}
         </div>
@@ -277,9 +279,9 @@ export default function ProfileForm() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {[
-                { label: "First name", key: "firstName", type: "text", placeholder: "John" },
-                { label: "Surname", key: "lastName", type: "text", placeholder: "Doe" },
-                { label: "Phone number", key: "phone", type: "tel", placeholder: "+94 77 123 4567" },
+                { label: t("profileFirstName"), key: "firstName", type: "text", placeholder: "John" },
+                { label: t("profileSurname"), key: "lastName", type: "text", placeholder: "Doe" },
+                { label: t("profilePhone"), key: "phone", type: "tel", placeholder: "+94 77 123 4567" },
               ].map((field) => (
                 <div key={field.key} className="group/field space-y-2">
                   <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/85 ml-2 transition-colors duration-200 group-hover/field:text-emerald-300">
@@ -301,7 +303,7 @@ export default function ProfileForm() {
               ))}
               <div className="group/field space-y-2">
                 <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/85 ml-2 transition-colors duration-200 group-hover/field:text-emerald-300">
-                  Email address
+                  {t("profileEmail")}
                 </label>
                 <input
                   type="email"
@@ -333,7 +335,7 @@ export default function ProfileForm() {
                     {status?.type === 'success' ? 'verified' : 'shield_with_heart'}
                   </span>
                 )}
-                {loading ? "Saving..." : status?.type === 'success' ? "Saved" : "Save Profile"}
+                {loading ? t("profileSavingButton") : status?.type === 'success' ? t("profileSavedButton") : t("profileSaveButton")}
               </div>
             </button>
             
@@ -346,7 +348,7 @@ export default function ProfileForm() {
               <div className="absolute inset-x-0 bottom-0 h-[2px] bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.5)] group-hover:shadow-[0_0_25px_rgba(239,68,68,0.8)] transition-all duration-300" />
               <div className="relative flex items-center justify-center gap-2 text-red-400 text-sm font-bold tracking-wide">
                 <span className="material-symbols-outlined text-[20px]">logout</span>
-                Log Out
+                {t("profileLogoutButton")}
               </div>
             </button>
           </div>

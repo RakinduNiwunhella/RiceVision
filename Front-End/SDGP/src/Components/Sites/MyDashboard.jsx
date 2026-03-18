@@ -19,6 +19,8 @@ import { AlertTriangle, CloudRain, Bug } from "lucide-react";
 import TutorialOverlay from "../TutorialOverlay";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
 import { useNavigate } from "react-router-dom";
+import { translateDistrictName } from "../../utils/locationTranslations";
+import { translateStageCategory } from "../../utils/agriTranslations";
 
 import {
   fetchHealthSummary,
@@ -70,7 +72,7 @@ const ProgressWidget = ({ label, value, color }) => {
 /* ------------------ MAIN ------------------ */
 
 const MyDashboard = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [healthSummary, setHealthSummary] = useState(null);
   const [yieldForecast, setYieldForecast] = useState(null);
   const [bestYieldDistricts, setBestYieldDistricts] = useState([]);
@@ -159,6 +161,15 @@ const MyDashboard = () => {
     usePageTutorial("dashboard", tutorialSteps);
 
   const stageColors = ["#10b981", "#06b6d4", "#8b5cf6", "#f59e0b", "#ef4444", "#f97316"];
+
+  const translatedStageDistribution = useMemo(
+    () =>
+      stageDistribution.map((stage) => ({
+        ...stage,
+        stageLabel: translateStageCategory(stage.stage_name, t),
+      })),
+    [stageDistribution, t]
+  );
 
   const pieColors = ["#10b981", "#f59e0b", "#ef4444"]; // Emerald-500, Amber-500, Red-500
 
@@ -316,7 +327,7 @@ const MyDashboard = () => {
                   <div key={i} className="flex justify-between items-center group/item hover:translate-x-1 transition-transform">
                     <div className="flex items-center gap-3">
                       <span className="text-[10px] font-black text-white/85 w-4">{i + 1}</span>
-                      <span className="text-xs font-black text-white uppercase tracking-tight group-hover/item:text-cyan-400 transition-colors">{d.District}</span>
+                      <span className="text-xs font-black text-white uppercase tracking-tight group-hover/item:text-cyan-400 transition-colors">{translateDistrictName(d.District, language)}</span>
                     </div>
                     <span className="text-xs font-black text-white/90 tabular-nums">{formatMT(d.total_yield_kg_ha)} <span className="text-[10px] text-white/85">t</span></span>
                   </div>
@@ -380,7 +391,7 @@ const MyDashboard = () => {
                     {getOutbreakIcon(o.title)}
                   </div>
                   <div>
-                    <p className="font-black text-white text-sm uppercase tracking-tight">{o.title} — {o.district}</p>
+                    <p className="font-black text-white text-sm uppercase tracking-tight">{o.title} — {translateDistrictName(o.district, language)}</p>
                     <div className="flex items-center gap-3 mt-1 text-[10px] font-black text-white/85 uppercase tracking-widest">
                       <span>{o.event_date}</span>
                       <div className="w-1 h-1 rounded-full bg-white/10" />
@@ -424,8 +435,8 @@ const MyDashboard = () => {
             </p>
             <h3 className="text-xl font-black text-white tracking-tight uppercase mb-6">{t('cropStageDistribution')}</h3>
 
-            {stageDistribution.length > 0 ? (() => {
-              const total = stageDistribution.reduce((sum, d) => sum + d.stage_count, 0);
+            {translatedStageDistribution.length > 0 ? (() => {
+              const total = translatedStageDistribution.reduce((sum, d) => sum + d.stage_count, 0);
               return (
                 <>
                   {/* Total pill */}
@@ -437,9 +448,9 @@ const MyDashboard = () => {
                   {/* Bar chart */}
                   <div className="flex-1">
                     <ResponsiveContainer width="100%" height={320}>
-                      <BarChart data={stageDistribution} margin={{ top: 5, right: 5, left: -10, bottom: 40 }}>
+                      <BarChart data={translatedStageDistribution} margin={{ top: 5, right: 5, left: -10, bottom: 40 }}>
                         <XAxis
-                          dataKey="stage_name"
+                          dataKey="stageLabel"
                           tick={{ fill: "rgba(255,255,255,0.90)", fontSize: 9, fontWeight: 900 }}
                           axisLine={{ stroke: "rgba(255,255,255,0.05)" }}
                           tickLine={false}
@@ -463,7 +474,7 @@ const MyDashboard = () => {
                           formatter={(value) => [`${value.toLocaleString()} ${t('fieldsLabel')}`, t('countLabel')]}
                         />
                         <Bar dataKey="stage_count" radius={[8, 8, 0, 0]} maxBarSize={56}>
-                          {stageDistribution.map((_, i) => (
+                          {translatedStageDistribution.map((_, i) => (
                             <Cell
                               key={i}
                               fill={stageColors[i % stageColors.length]}
@@ -477,13 +488,13 @@ const MyDashboard = () => {
 
                   {/* Per-stage breakdown */}
                   <div className="mt-4 pt-5 border-t border-white/5 flex flex-col gap-2">
-                    {stageDistribution.map((d, i) => {
+                    {translatedStageDistribution.map((d, i) => {
                       const pct = total > 0 ? Math.round((d.stage_count / total) * 100) : 0;
                       const color = stageColors[i % stageColors.length];
                       return (
                         <div key={i} className="flex items-center gap-3 group">
                           <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: color, boxShadow: `0 0 6px ${color}` }} />
-                          <span className="text-[10px] font-black text-white/85 uppercase tracking-tight flex-1 group-hover:text-white/90 transition-colors truncate">{d.stage_name}</span>
+                          <span className="text-[10px] font-black text-white/85 uppercase tracking-tight flex-1 group-hover:text-white/90 transition-colors truncate">{d.stageLabel}</span>
                           <div className="w-24 h-1.5 bg-white/5 rounded-full overflow-hidden">
                             <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${pct}%`, background: color }} />
                           </div>
@@ -529,7 +540,7 @@ const MyDashboard = () => {
           <div className="flex items-center gap-3">
             <Bug size={14} className="text-rose-400" />
             <span className="text-xs font-black text-white/85 uppercase tracking-tight group-hover:text-white transition-colors">
-              {d.district}
+              {translateDistrictName(d.district, language)}
             </span>
           </div>
 
