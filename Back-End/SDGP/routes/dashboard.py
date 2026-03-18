@@ -5,12 +5,58 @@ router = APIRouter()
 
 @router.get("/yield")
 def get_yield():
-    response = supabase.table("yield_forecast_view") \
-        .select("total_yield_kgs") \
-        .single() \
+    response = supabase.table("Final_Dataset_Yield") \
+        .select("districtname, season, totalyield_kg") \
+        .limit(5000) \
         .execute()
 
-    return response.data
+    rows = response.data or []
+    if not rows:
+        return {
+            "season": None,
+            "total_yield_kgs": 0,
+            "district_count": 0,
+        }
+
+    season_groups = {}
+    for row in rows:
+        season_raw = (row.get("season") or "").strip()
+        district_raw = (row.get("districtname") or "").strip().lower()
+        total_yield = float(row.get("totalyield_kg") or 0)
+
+        if not season_raw or not district_raw:
+            continue
+
+        season_key = season_raw.lower()
+        group = season_groups.setdefault(season_key, {
+            "season": season_raw,
+            "districts": set(),
+            "total_yield_kgs": 0.0,
+            "rows": 0,
+        })
+
+        group["districts"].add(district_raw)
+        group["total_yield_kgs"] += total_yield
+        group["rows"] += 1
+
+    if not season_groups:
+        return {
+            "season": None,
+            "total_yield_kgs": 0,
+            "district_count": 0,
+        }
+
+    # Prefer the season that covers the most districts (expected: 25 districts).
+    best = max(
+        season_groups.values(),
+        key=lambda g: (len(g["districts"]), g["rows"], g["total_yield_kgs"]),
+    )
+
+    return {
+        "season": best["season"],
+        "total_yield_kgs": best["total_yield_kgs"],
+        "district_count": len(best["districts"]),
+    }
 
 
 
