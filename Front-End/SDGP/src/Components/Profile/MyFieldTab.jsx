@@ -6,14 +6,13 @@
  */
 
 import React, { useState, useEffect, useCallback } from "react";
-import { supabase } from "../../supabaseClient";
 import FieldDrawMap from "../FieldSetup/FieldDrawMap";
 import { PRICE_PER_ACRE_LKR } from "../FieldSetup/fieldConstants";
 import { useLanguage } from "../../context/LanguageContext";
+import { fetchUserField, removeUserField, saveUserField } from "../../api/api";
 
 export default function MyFieldTab() {
   const { t } = useLanguage();
-  const [user,          setUser]          = useState(null);
   const [existing,      setExisting]      = useState(null);   // row from user_fields
   const [loading,       setLoading]       = useState(true);
   const [editMode,      setEditMode]      = useState(false);
@@ -34,19 +33,15 @@ export default function MyFieldTab() {
   /* load user + existing field on mount */
   useEffect(() => {
     (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-      if (!user) { setLoading(false); return; }
-
-      const { data, error } = await supabase
-        .from("user_fields")
-        .select("*")
-        .eq("user_id", user.id)
-        .maybeSingle();
-
-      if (!error && data) {
-        setExisting(data);
-        if (data.field_name) setFieldName(data.field_name);
+      try {
+        const result = await fetchUserField();
+        const data = result?.data || null;
+        if (data) {
+          setExisting(data);
+          if (data.field_name) setFieldName(data.field_name);
+        }
+      } catch (error) {
+        setStatus({ type: "error", message: `Load failed: ${error.message}` });
       }
       setLoading(false);
     })();
@@ -65,53 +60,42 @@ export default function MyFieldTab() {
   }, []);
 
   const saveField = async () => {
-    if (!drawnFeature || !user) return;
+    if (!drawnFeature) return;
     setSaving(true);
 
     const price_lkr = Math.ceil(acres * PRICE_PER_ACRE_LKR);
-    const { data, error } = await supabase
-      .from("user_fields")
-      .upsert(
-        {
-          user_id:    user.id,
-          field_name: fieldName || null,
-          geojson:    drawnFeature,
-          area_acres: acres,
-          price_lkr,
-          district:   district || null,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "user_id" }
-      )
-      .select()
-      .maybeSingle();
+    try {
+      const result = await saveUserField({
+        field_name: fieldName || null,
+        geojson: drawnFeature,
+        area_acres: acres,
+        price_lkr,
+        district: district || null,
+      });
 
-    setSaving(false);
-
-    if (error) {
+      setSaving(false);
+      setExisting(result?.data || null);
+      setEditMode(false);
+      setDrawnFeature(null);
+      setStatus({ type: "success", message: "Field boundary saved to registry." });
+    } catch (error) {
+      setSaving(false);
       setStatus({ type: "error", message: `Save failed: ${error.message}` });
       return;
     }
-
-    setExisting(data);
-    setEditMode(false);
-    setDrawnFeature(null);
-    setStatus({ type: "success", message: "Field boundary saved to registry." });
   };
 
   const deleteField = async () => {
-    if (!existing || !user) return;
+    if (!existing) return;
     if (!window.confirm("Are you sure you want to remove your field registration? This cannot be undone.")) return;
 
-    const { error } = await supabase
-      .from("user_fields")
-      .delete()
-      .eq("user_id", user.id);
-
-    if (error) {
+    try {
+      await removeUserField();
+    } catch (error) {
       setStatus({ type: "error", message: `Delete failed: ${error.message}` });
       return;
     }
+
     setExisting(null);
     setEditMode(false);
     setDrawnFeature(null);

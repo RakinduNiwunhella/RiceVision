@@ -217,6 +217,7 @@ export default function FieldDrawMap({
   const [paddyGeoJSON,      setPaddyGeoJSON]       = useState(null);
   const [loadingGeoJSON,    setLoadingGeoJSON]     = useState(false);
   const [basemap,           setBasemap]            = useState("satellite");
+  const [baseTileFailed,    setBaseTileFailed]     = useState(false);
 
   /* district search */
   const [districtSearch,    setDistrictSearch]     = useState("");
@@ -302,10 +303,11 @@ export default function FieldDrawMap({
   );
 
   const price = Math.ceil(acres * PRICE_PER_ACRE_LKR);
+  const activeBaseMap = baseTileFailed ? BASE_MAPS.street : BASE_MAPS[basemap];
 
   /* ── Render ── */
   return (
-    <div className="flex flex-col gap-3" style={{ minHeight: height }}>
+    <div className="flex flex-col gap-3 w-full" style={{ height }}>
       {/* ── Controls row ── */}
       {!readOnly && (
         <div className="flex flex-wrap gap-2 items-start">
@@ -396,7 +398,10 @@ export default function FieldDrawMap({
             {Object.entries(BASE_MAPS).map(([key, bm]) => (
               <button
                 key={key}
-                onClick={() => setBasemap(key)}
+                onClick={() => {
+                  setBasemap(key);
+                  setBaseTileFailed(false);
+                }}
                 className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
                   basemap === key
                     ? "bg-emerald-500 border-emerald-400 text-white shadow-lg shadow-emerald-500/20"
@@ -437,7 +442,7 @@ export default function FieldDrawMap({
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-emerald-400 text-base">paid</span>
             <span className="text-white/85">Price:</span>
-            <span className="font-black text-emerald-400">Rs. {price.toLocaleString()} / year</span>
+            <span className="font-black text-emerald-400">Rs. {price.toLocaleString()} / month</span>
             <span className="text-white/85 text-xs">(Rs. {PRICE_PER_ACRE_LKR.toLocaleString()} per acre)</span>
           </div>
         </div>
@@ -445,8 +450,7 @@ export default function FieldDrawMap({
 
       {/* ── Map container ── */}
       <div
-        className="relative rounded-xl overflow-hidden border border-white/10 flex-1"
-        style={{ height }}
+        className="relative rounded-xl overflow-hidden border border-white/10 flex-1 w-full"
         onClick={() => setShowDistrictMenu(false)}
       >
         {loadingGeoJSON && (
@@ -458,13 +462,24 @@ export default function FieldDrawMap({
         <MapContainer
           center={SL_CENTER}
           zoom={7}
+          minZoom={5}
+          maxZoom={18}
           style={{ width: "100%", height: "100%" }}
+          preferCanvas={true}
+          className="h-full w-full rounded-lg"
           zoomControl
         >
           <TileLayer
-            key={basemap}
-            url={BASE_MAPS[basemap].url}
-            attribution={BASE_MAPS[basemap].attribution}
+            key={baseTileFailed ? `${basemap}-fallback` : basemap}
+            url={activeBaseMap.url}
+            attribution={activeBaseMap.attribution}
+            eventHandlers={{
+              tileerror: () => {
+                if (!baseTileFailed) {
+                  setBaseTileFailed(true);
+                }
+              },
+            }}
           />
 
           {/* Paddy extent overlay (amber, shows known paddy zones) */}
