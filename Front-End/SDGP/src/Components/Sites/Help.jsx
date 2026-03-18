@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   QuestionMarkCircleIcon,
   PhoneIcon,
   EnvelopeIcon,
   ExclamationTriangleIcon,
   ChevronDownIcon,
+  PlayCircleIcon,
 } from "@heroicons/react/24/outline";
-import { supabase } from "../../supabaseClient";
+import { fetchFaqs, submitComplaint } from "../../api/api";
+import { useLanguage } from "../../context/LanguageContext";
 
 const Help = () => {
+  const { t } = useLanguage();
   const [form, setForm] = useState({
     full_name: "",
     position: "",
@@ -20,28 +24,35 @@ const Help = () => {
 
   const [loading, setLoading] = useState(false);
 
-  // FAQ state
   const [faqs, setFaqs] = useState([]);
   const [faqLoading, setFaqLoading] = useState(true);
   const [openFaq, setOpenFaq] = useState(null);
+  const navigate = useNavigate();
+  const supportPhone = "+94 74 291 2929";
+  const supportEmail = "ricevisionlanka@gmail.com";
 
-  // Fetch FAQs from DB
+  const handleReplayTutorial = () => {
+    localStorage.setItem('ricevision_force_tutorial_replay', 'true');
+    navigate('/dashboard');
+  };
+  /* ---------------- FETCH FAQS ---------------- */
+
   useEffect(() => {
-    const fetchFaqs = async () => {
-      const { data, error } = await supabase
-        .from("faq")
-        .select("id, question, answer")
-        .order("created_at", { ascending: true });
-
-      if (!error) {
-        setFaqs(data || []);
+    const loadFaqs = async () => {
+      try {
+        const data = await fetchFaqs();
+        setFaqs(data);
+      } catch (err) {
+        console.error("Failed to load FAQs:", err);
+      } finally {
+        setFaqLoading(false);
       }
-
-      setFaqLoading(false);
     };
 
-    fetchFaqs();
+    loadFaqs();
   }, []);
+
+  /* ---------------- HANDLE FORM ---------------- */
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -49,39 +60,17 @@ const Help = () => {
 
   const handleSubmit = async () => {
     if (!form.full_name || !form.message) {
-      alert("Full name and complaint are required");
+      alert("Full name and complaint message are required");
       return;
     }
 
     setLoading(true);
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    try {
+      await submitComplaint(form);
 
-    const payload = {
-      user_id: user?.id || null,
-      full_name: form.full_name,
-      position: form.position || null,
-      province: form.province || null,
-      district: form.district || null,
-      complaint_type: form.complaint_type,
-      message: form.message,
-      is_anonymous: !user,
-    };
+      alert("Complaint submitted successfully");
 
-    const { error } = await supabase.from("complains").insert([payload]);
-
-    setLoading(false);
-
-    if (error) {
-      alert(error.message);
-    } else {
-      alert(
-        user
-          ? "Complaint submitted successfully"
-          : "Complaint submitted anonymously"
-      );
       setForm({
         full_name: "",
         position: "",
@@ -90,189 +79,214 @@ const Help = () => {
         complaint_type: "",
         message: "",
       });
+    } catch (err) {
+      console.error(err);
+      alert("Failed to submit complaint");
     }
+
+    setLoading(false);
   };
 
   const inputClass =
-    "w-full rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-4 py-2 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 dark:focus:ring-emerald-900/30 outline-none transition";
+    "w-full rounded-xl border border-white/10 bg-white/5 text-white px-4 py-2.5 focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all duration-300 placeholder:text-white/85 font-medium";
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-900 px-6 py-10">
-      <div className="max-w-7xl mx-auto bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6 space-y-12">
-        {/* Header */}
-        <div>
-          <h1 className="flex items-center gap-2 text-3xl font-bold text-slate-900 dark:text-white">
-            <QuestionMarkCircleIcon className="w-8 h-8" />
-            Help & Support
-          </h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-2 max-w-3xl">
-            Find answers to common questions or submit a complaint to our
-            support team. We’re here to help you.
-          </p>
+    <div className="min-h-full p-4 sm:p-6 lg:p-10 text-white font-sans">
+      <div className="max-w-7xl mx-auto space-y-10 pb-20">
+
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+          <div>
+            <h1 className="flex items-center gap-2 sm:gap-3 text-xl sm:text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
+              <QuestionMarkCircleIcon className="w-6 h-6 sm:w-8 sm:h-8 md:w-12 md:h-12 text-emerald-400" />
+              {t('helpSupport')}
+            </h1>
+            <p className="text-white/85 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em] max-w-2xl">
+              {/* Optional subtitle text */}
+            </p>
+          </div>
+          <button 
+            onClick={handleReplayTutorial}
+            className="flex items-center gap-2 glass px-4 py-2 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 rounded-xl uppercase tracking-widest text-[10px] font-black transition-all active:scale-95"
+          >
+            <PlayCircleIcon className="w-5 h-5" />
+            Replay Tutorials
+          </button>
         </div>
 
-        {/* Info Cards */}
+        {/* Quick Contact Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {[
             {
-              icon: <PhoneIcon className="w-5 h-5" />,
-              title: "Contact Support",
-              desc: "Reach out to our team for urgent issues or direct assistance.",
+              icon: <PhoneIcon className="w-5 h-5 text-emerald-400" />,
+              title: "Quick phone support",
+              desc: "Call our support team for urgent help with your dashboard, field setup, or report issues.",
+              action: `Call ${supportPhone}`,
+              href: `tel:${supportPhone.replace(/\s+/g, "")}`,
+              color: "emerald",
             },
             {
-              icon: <EnvelopeIcon className="w-5 h-5" />,
-              title: "Email Assistance",
-              desc: "Send detailed queries and we’ll respond as soon as possible.",
+              icon: <EnvelopeIcon className="w-5 h-5 text-cyan-400" />,
+              title: "Email support",
+              desc: "Send your issue details by email and our team will respond with a solution.",
+              action: `Email ${supportEmail}`,
+              href: `mailto:${supportEmail}?subject=RiceVision%20Support%20Request`,
+              color: "cyan",
             },
           ].map((card, idx) => (
             <div
               key={idx}
-              className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-6"
+              className="glass glass-hover p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl md:rounded-[2rem] border border-white/10 shadow-xl group transition-all duration-500"
             >
-              <h3 className="flex items-center gap-2 font-semibold text-lg mb-2 text-slate-900 dark:text-white">
-                {card.icon}
-                {card.title}
-              </h3>
-              <p className="text-slate-700 dark:text-slate-300 text-sm">
+              <div className="flex items-center gap-4 mb-4">
+                <div className={`p-3 rounded-2xl bg-white/5 border border-white/10 group-hover:scale-110 transition-transform`}>
+                  {card.icon}
+                </div>
+                <h3 className="font-black text-xl text-white tracking-tight">
+                  {card.title}
+                </h3>
+              </div>
+              <p className="text-white/85 text-sm leading-relaxed mb-6 font-medium">
                 {card.desc}
               </p>
+              <a
+                href={card.href}
+                className={`inline-flex items-center justify-center text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-lg border transition-all duration-300 ${idx === 0
+                    ? "border-emerald-500/70 bg-emerald-400/35 text-emerald-950 hover:bg-emerald-400/45"
+                    : "border-cyan-500/70 bg-cyan-400/35 text-cyan-950 hover:bg-cyan-400/45"
+                  }`}
+              >
+                {card.action}
+              </a>
             </div>
           ))}
         </div>
 
-        {/* Complaint Section */}
-        <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-6">
-          <h2 className="flex items-center gap-2 text-xl font-semibold mb-6 text-slate-900 dark:text-white">
-            <ExclamationTriangleIcon className="w-6 h-6" />
-            Submit a Complaint
-          </h2>
+        {/* Main Interface: Form & FAQs */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-10">
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 space-y-5">
-              {[
-                { label: "Full Name", name: "full_name" },
-                { label: "Position", name: "position" },
-              ].map((field) => (
-                <div key={field.name}>
-                  <label className="block text-sm font-medium mb-1 text-slate-500 dark:text-slate-400">
-                    {field.label}
-                  </label>
-                  <input
-                    type="text"
-                    name={field.name}
-                    value={form[field.name]}
-                    onChange={handleChange}
-                    className={inputClass}
-                  />
-                </div>
-              ))}
+          {/* Complaint Console */}
+          <div className="lg:col-span-3">
+            <div className="glass p-4 sm:p-6 md:p-8 lg:p-10 rounded-xl sm:rounded-2xl md:rounded-[2.5rem] border border-white/10 shadow-2xl space-y-6 sm:space-y-8">
+              <div className="flex items-center gap-3 border-b border-white/10 pb-6">
+                <ExclamationTriangleIcon className="w-6 h-6 text-amber-400" />
+                <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/85">Submit a complaint</h2>
+              </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                {["province", "district"].map((name) => (
-                  <div key={name}>
-                    <label className="block text-sm font-medium mb-1 capitalize text-slate-500 dark:text-slate-400">
-                      {name}
-                    </label>
-                    <input
-                      type="text"
-                      name={name}
-                      value={form[name]}
-                      onChange={handleChange}
-                      className={inputClass}
-                    />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-[10px] font-black uppercase tracking-widest text-white/85 mb-2 ml-1">{t('fullOperatorName')}</label>
+                    <input name="full_name" value={form.full_name} onChange={handleChange} className={inputClass} placeholder="John Doe" />
                   </div>
-                ))}
+                  <div>
+                    <label className="block text-[10px] font-black uppercase tracking-widest text-white/85 mb-2 ml-1">{t('assignedPosition')}</label>
+                    <input name="position" value={form.position} onChange={handleChange} className={inputClass} placeholder="Field Supervisor" />
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-white/85 mb-2 ml-1">{t('province')}</label>
+                      <input name="province" value={form.province} onChange={handleChange} className={inputClass} />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-white/85 mb-2 ml-1">{t('district')}</label>
+                      <input name="district" value={form.district} onChange={handleChange} className={inputClass} />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black uppercase tracking-widest text-white/85 mb-2 ml-1">{t('anomalyType')}</label>
+                    <select
+                      name="complaint_type"
+                      value={form.complaint_type}
+                      onChange={handleChange}
+                      className={inputClass + " appearance-none cursor-pointer"}
+                    >
+                      <option value="" className="bg-slate-900">Select issue type</option>
+                      <option className="bg-slate-900">Technical issue</option>
+                      <option className="bg-slate-900">Data mismatch</option>
+                      <option className="bg-slate-900">Account or access issue</option>
+                      <option className="bg-slate-900">Other</option>
+                    </select>
+                  </div>
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-1 text-slate-500 dark:text-slate-400">
-                  Complaint Type
-                </label>
-                <select
-                  name="complaint_type"
-                  value={form.complaint_type}
+              <div className="space-y-4">
+                <label className="block text-[10px] font-black uppercase tracking-widest text-white/85 mb-2 ml-1">{t('detailedMessage')}</label>
+                <textarea
+                  name="message"
+                  value={form.message}
                   onChange={handleChange}
-                  className={inputClass}
-                >
-                  <option value="">Select a type</option>
-                  <option>Technical Issue</option>
-                  <option>Data Error</option>
-                  <option>Account Issue</option>
-                  <option>Other</option>
-                </select>
+                  rows="6"
+                  className={inputClass + " resize-none"}
+                  placeholder={t('describeIssue')}
+                />
               </div>
-            </div>
-
-            <div className="flex flex-col">
-              <label className="block text-sm font-medium mb-1 text-slate-500 dark:text-slate-400">
-                Complaint Description
-              </label>
-              <textarea
-                name="message"
-                value={form.message}
-                onChange={handleChange}
-                rows="8"
-                className={inputClass + " resize-none"}
-              />
 
               <button
                 onClick={handleSubmit}
                 disabled={loading}
-                className="mt-5 bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-md transition disabled:opacity-50"
+                className="w-full glass bg-emerald-400/35 hover:bg-emerald-400/45 text-emerald-950 py-4 rounded-2xl font-black uppercase tracking-widest transition-all active:scale-[0.98] border border-emerald-500/60 shadow-xl shadow-emerald-500/10 disabled:opacity-50"
               >
-                {loading ? "Submitting..." : "Submit Complaint"}
+                {loading ? t('transmitting') : t('submitReport')}
               </button>
+            </div>
+          </div>
+
+          {/* Dynamic Knowledge Base (FAQs) */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="glass p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl md:rounded-[2.5rem] border border-white/10 shadow-xl h-fit">
+                <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/85 mb-8 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                {t('quickHelp')}
+              </h2>
+
+              {faqLoading && (
+                <div className="flex items-center gap-3 py-10 justify-center">
+                  <div className="w-4 h-4 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin" />
+                  <span className="text-xs font-black uppercase text-white/85">Loading FAQs...</span>
+                </div>
+              )}
+
+              <div className="space-y-3">
+                {faqs.map((faq) => (
+                  <div
+                    key={faq.id}
+                    className={`glass rounded-2xl border transition-all duration-300 ${openFaq === faq.id ? "bg-white/10 border-white/20" : "bg-white/5 border-white/5 hover:border-white/10"
+                      }`}
+                  >
+                    <button
+                      onClick={() => setOpenFaq(openFaq === faq.id ? null : faq.id)}
+                      className="w-full flex justify-between items-center px-5 py-4 text-left font-bold text-xs md:text-sm text-white/90 group"
+                    >
+                      <span className="group-hover:text-white transition-colors">{faq.question}</span>
+                      <ChevronDownIcon
+                        className={`w-4 h-4 text-white/85 transition-transform duration-500 ${openFaq === faq.id ? "rotate-180 text-emerald-400" : ""
+                          }`}
+                      />
+                    </button>
+
+                    {openFaq === faq.id && (
+                      <div className="px-5 pb-5 text-xs text-white/85 leading-relaxed font-medium animate-in fade-in slide-in-from-top-2 duration-300">
+                        {faq.answer}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Support Tag */}
+            <div className="glass p-6 rounded-3xl border border-white/10 text-center">
+              <p className="text-[10px] font-black uppercase text-white/85 tracking-tighter">System Version Alpha-1.0.4 • RiceVision Core</p>
             </div>
           </div>
         </div>
 
-        {/* FAQ Section */}
-        <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-6">
-          <h2 className="text-xl font-semibold mb-6 text-slate-900 dark:text-white">
-            Frequently Asked Questions
-          </h2>
 
-          {faqLoading && (
-            <p className="text-slate-500 dark:text-slate-400 text-sm">
-              Loading FAQs...
-            </p>
-          )}
-
-          {!faqLoading && faqs.length === 0 && (
-            <p className="text-slate-500 dark:text-slate-400 text-sm">
-              No FAQs available.
-            </p>
-          )}
-
-          <div className="space-y-3">
-            {faqs.map((faq) => (
-              <div
-                key={faq.id}
-                className="border border-slate-200 dark:border-slate-700 rounded-lg"
-              >
-                <button
-                  onClick={() => setOpenFaq(openFaq === faq.id ? null : faq.id)}
-                  className="w-full flex justify-between items-center px-4 py-3 text-left font-medium text-slate-900 dark:text-white hover:bg-emerald-50 dark:hover:bg-emerald-800/50 transition"
-                >
-                  {faq.question}
-                  <ChevronDownIcon
-                    className={`w-5 h-5 transition-transform ${
-                      openFaq === faq.id ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
-
-                {openFaq === faq.id && (
-                  <div className="px-4 pb-4">
-                    <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-4 text-slate-700 dark:text-slate-300 text-sm leading-relaxed">
-                      {faq.answer}
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
     </div>
   );

@@ -1,163 +1,627 @@
-import React, { useState, useMemo, useEffect } from "react";
-import { supabase } from "../../supabaseClient";
+import React, { useState, useMemo, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { updateAlertStatus } from "../../api/api";
+import { apiFetch } from "../../api/apiFetch";
+import { useLanguage } from "../../context/LanguageContext";
+import TutorialTooltip from "../../Components/TutorialTooltip";
+import { usePageTutorial } from "../../hooks/usePageTutorial";
 
-const tabOptions = ["Open", "Resolved", "Denied", "All"];
 
+
+const TAB_KEYS = ["Disasters", "Pest Risks", "Past Alerts"];
+
+const formatTitle = (text) =>
+  text.replace(/\b\w/g, (char) => char.toUpperCase());
+
+// Renders a pest title like "Kurunegala • 32 RISKS" with the number in red.
+// Returns a plain string for disaster titles.
+const renderTitle = (title, isPest, isPast) => {
+  if (!isPest) return title;
+  // Match: "District : NUMBER RISKS"
+  const match = title.match(/^(.+?:\s*)(\d+)(\s*RISKS)$/);
+  if (!match) return title;
+  return (
+    <span>
+      {match[1]}
+      <span className={`risk-count ${isPast ? "!text-white/85" : ""}`}>
+        {match[2]}
+        {match[3]}
+      </span>
+    </span>
+  );
+};
+
+// Groups pest alert rows by district, returns one card per district.
+// Used for both active Pest Risks tab and Past Alerts rendering.
+const groupPestAlertsByDistrict = (rows) => {
+  const groups = {};
+  rows.forEach((a) => {
+    const key = `${a.field}-${a.status}`;
+    if (!groups[key]) {
+      groups[key] = { ...a, count: a.count || 1 };
+    } else {
+      groups[key].count += a.count || 1;
+      if (!groups[key].note && a.note) groups[key].note = a.note;
+    }
+  });
+  return Object.values(groups);
+};
+
+/* ─────────────────────────────────────────
+   RESOLVE MODAL
+───────────────────────────────────────── */
+const ResolveModal = ({ onConfirm, onCancel }) => {
+  const [note, setNote] = useState("");
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      style={{ background: "rgba(0,0,0,0.6)" }}
+    >
+      <div className="glass rounded-3xl border border-white/20 p-8 w-full max-w-md mx-4 flex flex-col gap-5">
+        <h3 className="text-lg font-black text-white">Resolve Alert</h3>
+
+        <div className="flex flex-col gap-2">
+          <label className="text-xs font-bold uppercase text-white/85">
+            Resolution Note (optional)
+          </label>
+          <textarea
+            autoFocus
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder="Describe how this was resolved…"
+            rows={4}
+            className="bg-white/5 border border-white/10 rounded-2xl py-3 px-4 text-sm text-white placeholder:text-white/85 resize-none focus:outline-none focus:border-white/30"
+          />
+        </div>
+
+        <div className="flex gap-3 justify-end">
+          <button
+            onClick={onCancel}
+            className="glass-btn text-[10px] px-4 py-2 tracking-widest bg-white/10 hover:bg-white/20"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => onConfirm(note.trim() || null)}
+            className="px-6 py-2 bg-emerald-500/30 text-emerald-300 rounded-xl text-xs font-bold hover:bg-emerald-500/50 transition-colors"
+          >
+            Confirm
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ─────────────────────────────────────────
+   MAIN COMPONENT
+───────────────────────────────────────── */
 const Alerts = () => {
+  const { t } = useLanguage();
+  const tabLabels = [t("disasters"), t("pestRisks"), t("pastAlerts")];
+
+  // Tutorial setup - create once and memoize
+  const tutorialSteps = useMemo(() => [
+    {
+      title: "Alert Tabs",
+      action: "Click on different tabs to view different types of alerts",
+      outcome: "You'll see disasters, pest risks, or past resolved alerts",
+    },
+    {
+      title: "Search Alerts",
+      action: "Type in the search box to find specific alerts",
+      outcome: "The alert list filters to show only matching results",
+    },
+    {
+      title: "Resolve Alert",
+      action: "Click the 'Resolve' button on any active alert",
+      outcome: "A modal opens where you can add a resolution note",
+    },
+    {
+      title: "Ignore Alert",
+      action: "Click 'Ignore' to dismiss an alert without resolving",
+      outcome: "The alert moves to 'Past Alerts' tab",
+    },
+    {
+      title: "View on Map",
+      action: "Click 'View Map' to see the alert location",
+      outcome: "You're taken to the Field Map showing the affected area",
+    },
+  ], [])
+
+  const { currentStep, showTutorial, currentTutorialStep, hasMoreSteps, nextStep, prevStep, closeTutorial } =
+    usePageTutorial("alerts", tutorialSteps);
+
   const [alerts, setAlerts] = useState([]);
-  const [activeTab, setActiveTab] = useState("Open");
+  const [globalAlerts, setGlobalAlerts] = useState([]);
+  const [activeTab, setActiveTab] = useState(
+    () => localStorage.getItem("alerts_tab") || "Disasters",
+  );
   const [searchTerm, setSearchTerm] = useState("");
+  const [resolveModal, setResolveModal] = useState({
+    open: false,
+    alertId: null,
+    alertType: null,
+  });
+  const [exitingId, setExitingId] = useState(null);
+
+  // Refs for tutorial tooltips
+  const tabsRef = useRef(null);
+  const searchRef = useRef(null);
+  const resolveRef = useRef(null);
+  const ignoreRef = useRef(null);
+  const mapRef = useRef(null);
+
+  const navigate = useNavigate();
+
+  /* ---------------- FILTERED ALERTS ---------------- */
 
   const filteredAlerts = useMemo(() => {
+    const normalizedSearch = searchTerm.toLowerCase();
+
     return alerts.filter((alert) => {
-      const matchesTab = activeTab === "All" || alert.status === activeTab;
+      const title = (alert.title ?? "").toLowerCase();
+      const description = (alert.description ?? "").toLowerCase();
+
       const matchesSearch =
-        alert.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        alert.description.toLowerCase().includes(searchTerm.toLowerCase());
-      return matchesTab && matchesSearch;
+        title.includes(normalizedSearch) ||
+        description.includes(normalizedSearch);
+
+      if (activeTab === "Past Alerts") {
+        return (
+          matchesSearch &&
+          (alert.status === "Resolved" || alert.status === "Ignored")
+        );
+      }
+
+      // Hide resolved/ignored alerts from active tabs
+      return (
+        matchesSearch &&
+        alert.status !== "Resolved" &&
+        alert.status !== "Ignored"
+      );
     });
-  }, [alerts, activeTab, searchTerm]);
+  }, [alerts, searchTerm, activeTab]);
+
+  /* ---------------- LOAD TAB ALERTS ---------------- */
 
   useEffect(() => {
-    const fetchAlerts = async () => {
-      const { data, error } = await supabase
-        .from("alerts_overview_view")
-        .select("*")
-        .order("created_at", { ascending: false });
+    const loadAlerts = async () => {
+      try {
+        let endpoint = "";
 
-      if (error) {
-        console.error("Alerts fetch error:", error);
-        return;
+        if (activeTab === "Disasters") {
+          endpoint = "/api/alerts/disasters";
+        } else if (activeTab === "Pest Risks") {
+          endpoint = "/api/alerts/pest-risk";
+        } else if (activeTab === "Past Alerts") {
+          endpoint = "/api/alerts/past";
+        }
+
+        const response = await apiFetch(endpoint);
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch alerts");
+        }
+
+        const data = await response.json();
+
+        /* ---------------- DISASTER ALERTS ---------------- */
+
+        if (activeTab === "Disasters") {
+          const mappedAlerts = (Array.isArray(data) ? data : []).map((a) => ({
+            id: a.id,
+            title: formatTitle(`${a.disaster_type} risk`),
+            description: `Stage: ${a.stage} | Health: ${a.health}`,
+            status: a.status || "Open",
+            priority: "High",
+            field: a.district,
+            health: a.health,
+            timestamp: a.timestamp,
+            lat: a.lat,
+            lon: a.lon,
+          }));
+
+          setAlerts(mappedAlerts);
+        } else if (activeTab === "Pest Risks") {
+          /* ---------------- PEST ALERTS ---------------- */
+          const mappedAlerts = (Array.isArray(data) ? data : [])
+            .filter((a) => a.risky_pixels > 0)
+            .map((a) => ({
+              id: a.district,
+              title: `${a.district} : ${a.risky_pixels} RISKS`,
+              description: "Multiple pest risks detected in this district.",
+              status: a.status || "Open",
+              priority: "High",
+              field: a.district,
+              health: a.health || "Not Applicable",
+              count: a.risky_pixels,
+              locations: a.risky_pixel_locations || [],
+              timestamp: new Date().toISOString(),
+            }));
+
+          setAlerts(mappedAlerts);
+        } else if (activeTab === "Past Alerts") {
+          /* ---------------- PAST ALERTS ---------------- */
+          // Backend already groups pest rows by district and returns
+          // { is_pest, district, risk_count, disaster_type, status, note, timestamp, ... }
+          const mappedAlerts = (Array.isArray(data) ? data : []).map((a) => ({
+            id: a.id,
+            title: a.is_pest
+              ? `${a.district} : ${a.risk_count} RISKS`
+              : formatTitle(`${a.disaster_type} risk`),
+            description: `Stage: ${a.stage_name} | Health: ${a.paddy_health}`,
+            status: a.status,
+            field: a.district,
+            health: a.paddy_health,
+            timestamp: a.timestamp,
+            note: a.note || null,
+            isPest: a.is_pest,
+            lat: a.lat,
+            lon: a.lon,
+          }));
+
+          setAlerts(mappedAlerts);
+        }
+      } catch (err) {
+        console.error("Error fetching alerts:", err);
       }
-
-      // Map DB → existing UI shape
-      setAlerts(
-        data.map((a) => ({
-          id: a.id,
-          title: a.title,
-          description: a.description,
-          status: a.status, // always "Open" (Option A)
-          priority: a.priority,
-          field: a.district, // reuse field label as district
-          timestamp: a.created_at,
-        })),
-      );
     };
 
-    fetchAlerts();
+    loadAlerts();
+  }, [activeTab]);
+
+  /* ---------------- LOAD GLOBAL ALERT COUNTS ---------------- */
+
+  useEffect(() => {
+    const loadAllAlerts = async () => {
+      try {
+        const res = await apiFetch("/api/alerts/all");
+        const data = await res.json();
+        setGlobalAlerts(data);
+      } catch (err) {
+        console.error("Failed to load alert counters", err);
+      }
+    };
+
+    loadAllAlerts();
   }, []);
 
-  const counts = useMemo(() => {
-    const countObj = { Open: 0, Resolved: 0, Denied: 0 };
-    alerts.forEach((alert) => {
-      if (countObj[alert.status] !== undefined) {
-        countObj[alert.status]++;
-      }
-    });
-    countObj.All = alerts.length;
-    return countObj;
-  }, [alerts]);
+  /* ---------------- COUNTERS ---------------- */
 
-  const handleResolve = (id) => {
-    setAlerts((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, status: "Resolved" } : a)),
+  const counts = useMemo(() => {
+    const seenPest = new Set();
+    const countObj = { Open: 0, Resolved: 0, Ignored: 0 };
+
+    globalAlerts.forEach((alert) => {
+      const status = alert.status || "Open";
+      if (!(status in countObj)) return;
+
+      if (alert.is_pest) {
+        const key = `${alert.field}-${status}`;
+        if (seenPest.has(key)) return;
+        seenPest.add(key);
+      }
+
+      countObj[status]++;
+    });
+
+    return countObj;
+  }, [globalAlerts]);
+
+  /* ---------------- STATUS UPDATE (optimistic) ---------------- */
+
+  const updateStatus = async (id, newStatus, note = null) => {
+    const snapshot = alerts.find((a) => a.id === id);
+    if (!snapshot) return;
+
+    const isPest = activeTab === "Pest Risks";
+    const globalSnapshot = globalAlerts;
+
+    // Kick off exit animation, then remove after it completes
+    setExitingId(id);
+    setTimeout(() => {
+      setExitingId(null);
+      setAlerts((prev) => prev.filter((a) => a.id !== id));
+    }, 260);
+
+    // Optimistic counter update
+    setGlobalAlerts((prev) =>
+      prev.map((a) => {
+        const matches = isPest ? a.field === id : a.id === id;
+        return matches ? { ...a, status: newStatus } : a;
+      }),
     );
+
+    try {
+      await updateAlertStatus(id, newStatus, isPest ? "pest" : "normal", note);
+    } catch (err) {
+      console.error("Error updating alert:", err);
+      setAlerts((prev) => [snapshot, ...prev]);
+      setGlobalAlerts(globalSnapshot);
+    }
   };
 
-  const handleDeny = (id) => {
-    setAlerts((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, status: "Denied" } : a)),
-    );
+  /* ---------------- MODAL HANDLERS ---------------- */
+
+  const handleResolve = (id) => {
+    setResolveModal({
+      open: true,
+      alertId: id,
+      alertType: activeTab === "Pest Risks" ? "pest" : "normal",
+    });
+  };
+
+  const handleModalConfirm = (note) => {
+    const { alertId } = resolveModal;
+    setResolveModal({ open: false, alertId: null, alertType: null });
+    updateStatus(alertId, "Resolved", note);
+  };
+
+  const handleModalCancel = () => {
+    setResolveModal({ open: false, alertId: null, alertType: null });
+  };
+
+  const handleIgnore = (id) => updateStatus(id, "Ignored");
+
+  /* ---------------- MAP NAVIGATION ---------------- */
+
+  const handleViewInMap = (alert) => {
+    if (activeTab === "Pest Risks" && alert.locations?.length > 0) {
+      navigate("/field-map", {
+        state: {
+          type: "pest",
+          district: alert.field,
+          locations: alert.locations,
+          health: alert.health,
+        },
+      });
+    } else if (alert.lat != null && alert.lon != null) {
+      navigate("/field-map", {
+        state: {
+          type: "disaster",
+          district: alert.field,
+          disasterType: alert.title,
+          health: alert.health,
+          lat: alert.lat,
+          lon: alert.lon,
+        },
+      });
+    }
   };
 
   const formatTimestamp = (iso) => new Date(iso).toLocaleString();
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-900 p-6">
-      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6 max-w-6xl mx-auto text-slate-900 dark:text-white">
-        <h1 className="text-3xl font-bold mb-6 text-slate-900 dark:text-white">
-          Paddy Field Risk Alerts
-        </h1>
+    <div className="min-h-full p-6 lg:p-10 text-white font-sans">
+      {resolveModal.open && (
+        <ResolveModal
+          onConfirm={handleModalConfirm}
+          onCancel={handleModalCancel}
+        />
+      )}
 
-        {/* Tabs */}
-        <div className="flex gap-4 mb-6 border-b border-slate-200 dark:border-slate-700">
-          {tabOptions.map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`pb-2 px-4 font-semibold border-b-4 rounded transition ${
-                activeTab === tab
-                  ? "border-emerald-600 text-emerald-700 dark:text-emerald-400"
-                  : "border-transparent text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400"
-              }`}
-            >
-              {tab} ({counts[tab]})
-            </button>
-          ))}
+      <div className="max-w-7xl mx-auto space-y-8 pb-12">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+          <div>
+            <h1 className="text-3xl md:text-5xl font-black text-white">
+              {t("fieldRiskAlerts")}
+            </h1>
+            <p className="text-white/85 text-xs mt-1 font-bold uppercase tracking-[0.2em]">
+              Real-time Field Health intelligence
+            </p>
+          </div>
+
+          <div className="flex gap-3">
+            <div className="glass px-4 py-2 rounded-xl border-white/10">
+              <span className="text-[10px] font-black uppercase text-white/85 block">
+                {t("active")}
+              </span>
+              <span className="text-lg font-black text-red-400">
+                {counts.Open}
+              </span>
+            </div>
+
+            <div className="glass px-4 py-2 rounded-xl border-white/10">
+              <span className="text-[10px] font-black uppercase text-white/85 block">
+                {t("resolved")}
+              </span>
+              <span className="text-lg font-black text-emerald-400">
+                {counts.Resolved}
+              </span>
+            </div>
+          </div>
         </div>
 
-        {/* Search */}
-        <input
-          type="text"
-          placeholder="Search alerts..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full mb-6 px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition"
-        />
+        {/* Tabs */}
+        <div className="glass p-6 rounded-[2rem] border-white/20">
+          <div className="flex flex-col lg:flex-row gap-6 justify-between">
+            <div className="flex p-1 rounded-2xl bg-white/5 border border-white/10 w-full sm:w-fit overflow-x-auto no-scrollbar" ref={tabsRef}>
+              {TAB_KEYS.map((key, idx) => (
+                <button
+                  key={key}
+                  onClick={() => {
+                    setActiveTab(key);
+                    localStorage.setItem("alerts_tab", key);
+                  }}
+                  className={`px-5 py-2 rounded-xl text-xs font-bold transition-all ${activeTab === key
+                    ? "bg-white/15 text-white"
+                    : "text-white/85 hover:text-white/90"
+                    }`}
+                >
+                  {tabLabels[idx]}
+                </button>
+              ))}
+            </div>
 
-        {/* Alerts */}
-        <div className="space-y-5 max-h-[70vh] overflow-y-auto">
+            <input
+              type="text"
+              placeholder={t("findAnomaly")}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              ref={searchRef}
+              className="bg-white/5 border border-white/10 rounded-2xl py-3 px-6 text-sm text-white placeholder:text-white/85"
+            />
+          </div>
+        </div>
+
+        {/* Alerts List */}
+
+        <div className="space-y-6">
           {filteredAlerts.length === 0 && (
-            <p className="text-center text-slate-500 dark:text-slate-400">
-              No alerts found
-            </p>
+            <div className="glass p-8 sm:p-12 md:p-20 rounded-2xl sm:rounded-[2rem] text-center">
+              <p className="text-white/85 font-bold uppercase">
+                No Past threats detected
+              </p>
+            </div>
           )}
 
           {filteredAlerts.map((alert) => (
             <div
               key={alert.id}
-              className={`p-6 rounded-xl border-l-8 shadow-sm transition bg-white dark:bg-slate-800 ${
-                alert.status === "Open"
-                  ? "border-red-500"
-                  : alert.status === "Resolved"
-                    ? "border-emerald-500"
-                    : "border-gray-500"
-              }`}
+              className={`glass p-6 rounded-3xl border border-white/10${exitingId === alert.id ? " alert-exit" : ""}`}
             >
-              <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-                {alert.title}
-                <span className="text-sm text-slate-500 dark:text-slate-400 ml-2">
-                  ({alert.field})
-                </span>
-              </h2>
-
-              <p className="mt-2 text-slate-700 dark:text-slate-300">
-                {alert.description}
-              </p>
-
-              <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
-                Priority: {alert.priority} | {formatTimestamp(alert.timestamp)}
-              </p>
-
-              {alert.status === "Open" && (
-                <div className="flex gap-3 mt-4">
-                  <button
-                    onClick={() => handleResolve(alert.id)}
-                    className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 dark:hover:bg-emerald-500 transition"
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                  <h2
+                    className={`text-xl font-black ${activeTab === "Past Alerts" ? "text-white/85" : "text-emerald-400"}`}
                   >
-                    Resolve
-                  </button>
-                  <button
-                    onClick={() => handleDeny(alert.id)}
-                    className="px-4 py-2 bg-gray-700 dark:bg-gray-600 text-white rounded-lg hover:bg-gray-800 dark:hover:bg-gray-500 transition"
-                  >
-                    Deny
-                  </button>
+                    {renderTitle(
+                      alert.title,
+                      alert.isPest || activeTab === "Pest Risks",
+                      activeTab === "Past Alerts",
+                    )}
+                  </h2>
+
+                  <p className="text-white/85 text-sm mt-1">
+                    {alert.description}
+                  </p>
+
+                  <span className="text-xs text-white/85">
+                    {formatTimestamp(alert.timestamp)}
+                  </span>
+
+                  {activeTab === "Past Alerts" && alert.note && (
+                    <p className="text-white/85 text-xs mt-1">
+                      Note: {alert.note}
+                    </p>
+                  )}
                 </div>
-              )}
+
+                {alert.status === "Open" && activeTab !== "Past Alerts" && (
+                  <div className="flex gap-3">
+                    <button
+                      ref={currentStep === 2 && resolveRef || undefined}
+                      onClick={() => handleResolve(alert.id)}
+                      className="px-4 sm:px-6 py-2 bg-emerald-500/30 text-emerald-300 rounded-xl text-xs font-bold"
+                    >
+                      {t("resolveBtn")}
+                    </button>
+
+                    <button
+                      ref={currentStep === 3 && ignoreRef || undefined}
+                      onClick={() => handleIgnore(alert.id)}
+                      className="btn-ignore glass-btn text-[10px] px-3 py-1 tracking-widest bg-white/10 hover:bg-white/20"
+                    >
+                      Ignore
+                    </button>
+
+                    <button
+                      ref={currentStep === 4 && mapRef || undefined}
+                      onClick={() => handleViewInMap(alert)}
+                      className="glass-btn text-[10px] px-3 py-1 tracking-widest bg-white/10 hover:bg-white/20"
+                    >
+                      View Map
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           ))}
         </div>
+
+        {/* Tutorial Tooltips */}
+        {showTutorial && currentTutorialStep && (
+          <>
+            {currentStep === 0 && (
+              <TutorialTooltip
+                visible={true}
+                position="bottom"
+                title={currentTutorialStep.title}
+                action={currentTutorialStep.action}
+                outcome={currentTutorialStep.outcome}
+                elementRef={tabsRef}
+                step={currentStep}
+                totalSteps={tutorialSteps.length}
+                onNext={nextStep}
+                onPrevious={prevStep}
+                onDismiss={closeTutorial}
+              />
+            )}
+            {currentStep === 1 && (
+              <TutorialTooltip
+                visible={true}
+                position="top"
+                title={currentTutorialStep.title}
+                action={currentTutorialStep.action}
+                outcome={currentTutorialStep.outcome}
+                elementRef={searchRef}
+                step={currentStep}
+                totalSteps={tutorialSteps.length}
+                onNext={nextStep}
+                onPrevious={prevStep}
+                onDismiss={closeTutorial}
+              />
+            )}
+            {currentStep === 2 && resolveRef.current && (
+              <TutorialTooltip
+                visible={true}
+                position="top"
+                title={currentTutorialStep.title}
+                action={currentTutorialStep.action}
+                outcome={currentTutorialStep.outcome}
+                elementRef={resolveRef}
+                step={currentStep}
+                totalSteps={tutorialSteps.length}
+                onNext={nextStep}
+                onPrevious={prevStep}
+                onDismiss={closeTutorial}
+              />
+            )}
+            {currentStep === 3 && ignoreRef.current && (
+              <TutorialTooltip
+                visible={true}
+                position="top"
+                title={currentTutorialStep.title}
+                action={currentTutorialStep.action}
+                outcome={currentTutorialStep.outcome}
+                elementRef={ignoreRef}
+                step={currentStep}
+                totalSteps={tutorialSteps.length}
+                onNext={nextStep}
+                onPrevious={prevStep}
+                onDismiss={closeTutorial}
+              />
+            )}
+            {currentStep === 4 && mapRef.current && (
+              <TutorialTooltip
+                visible={true}
+                position="top"
+                title={currentTutorialStep.title}
+                action={currentTutorialStep.action}
+                outcome={currentTutorialStep.outcome}
+                elementRef={mapRef}
+                step={currentStep}
+                totalSteps={tutorialSteps.length}
+                onNext={nextStep}
+                onPrevious={prevStep}
+                onDismiss={closeTutorial}
+              />
+            )}
+          </>
+        )}
       </div>
     </div>
   );

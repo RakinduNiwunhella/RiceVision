@@ -1,775 +1,1133 @@
-import React, { useState, useEffect } from "react";
-import { supabase } from "../../supabaseClient";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import { CSVLink } from "react-csv";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  LineElement,
-  PointElement,
-  ArcElement,
-  RadialLinearScale,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-import { Line, Doughnut } from "react-chartjs-2";
+import React, { useState, useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
+import ReactDOM from "react-dom";
+import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
+import logoImg from '../assets/logo.png';
+import { apiFetch } from "../../api/apiFetch";
+import { useLanguage } from "../../context/LanguageContext";
+import TutorialTooltip from "../../Components/TutorialTooltip";
+import { usePageTutorial } from "../../hooks/usePageTutorial";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  LineElement,
-  PointElement,
-  ArcElement,
-  RadialLinearScale,
-  Title,
-  Tooltip,
-  Legend,
-);
-
-const monthsList = [
-  { label: "January", value: 1 },
-  { label: "February", value: 2 },
-  { label: "March", value: 3 },
-  { label: "April", value: 4 },
-  { label: "May", value: 5 },
-  { label: "June", value: 6 },
-  { label: "July", value: 7 },
-  { label: "August", value: 8 },
-  { label: "September", value: 9 },
-  { label: "October", value: 10 },
-  { label: "November", value: 11 },
-  { label: "December", value: 12 },
-];
-
-const districtsList = [
-  "Colombo",
-  "Gampaha",
-  "Kalutara",
-  "Kandy",
-  "Matale",
-  "Nuwara Eliya",
-  "Galle",
-  "Matara",
-  "Hambantota",
-  "Jaffna",
-  "Kilinochchi",
-  "Mannar",
-  "Vavuniya",
-  "Mullaitivu",
-  "Batticaloa",
-  "Ampara",
-  "Trincomalee",
-  "Kurunegala",
-  "Puttalam",
-  "Anuradhapura",
-  "Polonnaruwa",
-  "Badulla",
-  "Moneragala",
-  "Ratnapura",
-  "Kegalle",
-];
-
-const ReportPage = () => {
-  const [filterType, setFilterType] = useState("single"); // single or comparison
-  const [month, setMonth] = useState(12);
-  const [district1, setDistrict1] = useState("");
-  const [district2, setDistrict2] = useState("");
-  const [reports, setReports] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [isDark, setIsDark] = useState(
-    document.documentElement.classList.contains("dark"),
-  );
+const CustomSelect = ({ value, onChange, options, className = "" }) => {
+  const [open, setOpen] = useState(false);
+  const [dropdownStyle, setDropdownStyle] = useState({});
+  const wrapperRef = useRef(null);
+  const buttonRef = useRef(null);
 
   useEffect(() => {
-    const observer = new MutationObserver(() => {
-      setIsDark(document.documentElement.classList.contains("dark"));
-    });
+    const handleClickOutside = (e) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
 
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-
-    return () => observer.disconnect();
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
-  const labelColor = isDark ? "#e5e7eb" : "#111827"; // slate-200 / slate-900
-  const gridColor = isDark ? "#334155" : "#e5e7eb"; // slate-700 / slate-200
+  const handleToggle = () => {
+    if (!open && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
 
-  // Fetch data from Supabase
-  const fetchData = async () => {
-    if (!district1) return;
-    setLoading(true);
-    try {
-      const districts =
-        filterType === "comparison" && district2
-          ? [district1, district2]
-          : [district1];
-      const startDate = `2025-${month.toString().padStart(2, "0")}-01`;
-      const endDate = `2025-${month.toString().padStart(2, "0")}-31`;
-
-      const { data, error } = await supabase
-        .from("reports_analytics_table")
-        .select(
-          `
-          District,
-          Date,
-          total_yield_tons,
-          healthy_percentage,
-          risk_level,
-          mean_ndvi,
-          stage_name,
-          pest_risk
-        `,
-        )
-        .in("District", districts)
-        .gte("Date", startDate)
-        .lte("Date", endDate);
-
-      if (error) throw error;
-
-      setReports(data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, [filterType, month, district1, district2]);
-
-  // PDF Download
-  const downloadPDF = () => {
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
-
-    // Logo + Title
-    fetch("/logoSDGP.webp")
-      .then((res) => res.blob())
-      .then((blob) => {
-        const reader = new window.FileReader();
-        reader.onloadend = function () {
-          const base64data = reader.result;
-          doc.addImage(base64data, "PNG", (pageWidth - 40) / 2, 10, 40, 20);
-
-          doc.setFontSize(18);
-          doc.setTextColor(40);
-          doc.text("RiceVision Monthly Report", pageWidth / 2, 40, {
-            align: "center",
-          });
-
-          doc.setFontSize(11);
-          doc.setTextColor(80);
-          doc.text(
-            "This report presents yield, healthy percentage, mean NDVI, stage, and pest risk per district for the selected month.",
-            pageWidth / 2,
-            50,
-            { align: "center", maxWidth: pageWidth - 40 },
-          );
-
-          const districtsText =
-            filterType === "comparison" && district2
-              ? `${district1} & ${district2}`
-              : district1;
-          const monthName =
-            monthsList.find((m) => m.value === month)?.label || month;
-          doc.setFontSize(12);
-          doc.setTextColor(60);
-          doc.text(`District(s): ${districtsText}`, 14, 60);
-          doc.text(`Month: ${monthName}`, 14, 68);
-
-          // Table
-          autoTable(doc, {
-            startY: 75,
-            head: [
-              [
-                "Date",
-                "District",
-                "Yield (tons)",
-                "Healthy %",
-                "Risk Level",
-                "Mean NDVI",
-                "Stage Name",
-                "Pest Risk",
-              ],
-            ],
-            body: reports.map((r) => [
-              r.Date,
-              r.District,
-              r.total_yield_tons,
-              r.healthy_percentage,
-              r.risk_level,
-              r.mean_ndvi,
-              r.stage_name,
-              r.pest_risk,
-            ]),
-            headStyles: { fillColor: [200, 200, 200], textColor: 50 },
-            bodyStyles: { textColor: 40 },
-            alternateRowStyles: { fillColor: [245, 245, 245] },
-            margin: { left: 14, right: 14 },
-          });
-
-          const pageHeight = doc.internal.pageSize.getHeight();
-          doc.setFontSize(9);
-          doc.setTextColor(120);
-          doc.text(
-            "© 2025 RiceVision. All rights reserved.",
-            pageWidth / 2,
-            pageHeight - 10,
-            { align: "center" },
-          );
-
-          doc.save(`RiceVision_Report_Month_${month}.pdf`);
-        };
-        reader.readAsDataURL(blob);
+      setDropdownStyle({
+        position: "fixed",
+        top: rect.bottom + 4,
+        left: rect.left,
+        width: rect.width,
+        zIndex: 99999
       });
-  };
+    }
 
-  // Chart rendering functions
-  const renderSingleView = () => {
-    if (!reports.length) return null;
-    const filtered = reports.filter((r) => r.District === district1);
-
-    // Chart colors and options for professional look and dark mode
-    const yieldData = {
-      labels: filtered.map((r) => r.Date),
-      datasets: [
-        {
-          label: "Yield (tons)",
-          data: filtered.map((r) => r.total_yield_tons),
-          borderColor: "#1f7a4c",
-          backgroundColor: "rgba(31,122,76,0.2)",
-          tension: 0.3,
-          fill: true,
-        },
-      ],
-    };
-
-    const ndviData = {
-      labels: filtered.map((r) => r.Date),
-      datasets: [
-        {
-          label: "Mean NDVI",
-          data: filtered.map((r) => r.mean_ndvi),
-          borderColor: "#2a5d9f",
-          backgroundColor: "rgba(42,93,159,0.2)",
-          tension: 0.3,
-          fill: true,
-        },
-      ],
-    };
-
-    const avgHealth =
-      filtered.reduce((acc, r) => acc + parseFloat(r.healthy_percentage), 0) /
-      filtered.length;
-    const healthData = {
-      labels: ["Healthy", "Not Healthy"],
-      datasets: [
-        {
-          data: [avgHealth, 100 - avgHealth],
-          backgroundColor: ["#1f7a4c", "#6b7280"],
-        },
-      ],
-    };
-
-    const pestCounts = {};
-    filtered.forEach((r) => {
-      pestCounts[r.pest_risk] = (pestCounts[r.pest_risk] || 0) + 1;
-    });
-    const pestColors = {
-      High: "#f87171",
-      Moderate: "#d48806",
-      Low: "#34d399",
-    };
-    const pestData = {
-      labels: Object.keys(pestCounts),
-      datasets: [
-        {
-          data: Object.values(pestCounts),
-          backgroundColor: Object.keys(pestCounts).map(
-            (lvl) => pestColors[lvl] || "#6b7280",
-          ),
-        },
-      ],
-    };
-
-    // Chart options with dark mode support
-    const baseLineOptions = {
-      maintainAspectRatio: false,
-      responsive: true,
-      plugins: {
-        legend: {
-          labels: {
-            color: labelColor,
-            font: { size: 12, weight: "600" },
-          },
-        },
-      },
-      scales: {
-        x: {
-          grid: {
-            color: window.matchMedia("(prefers-color-scheme: dark)").matches
-              ? "#334155"
-              : "#d1d5db",
-          },
-          ticks: {
-            color: labelColor,
-            font: { size: 12, weight: "600" },
-          },
-        },
-        y: {
-          grid: {
-            color: labelColor,
-          },
-          ticks: {
-            color: labelColor,
-            font: { size: 12, weight: "600" },
-          },
-        },
-      },
-    };
-
-    const baseDoughnutOptions = {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          position: "bottom",
-          labels: {
-            color: labelColor,
-            font: { size: 12, weight: "600" },
-          },
-        },
-      },
-    };
-
-    return (
-      <>
-        {/* Summary Cards */}
-        <div className="flex gap-3 mb-4">
-          <div className="bg-white dark:bg-[#1e293b] p-4 rounded shadow w-1/3 text-center">
-            <p className="text-gray-500 dark:text-slate-400">Total Yield</p>
-            <p className="text-2xl font-bold dark:text-[#e2e8f0]">
-              {filtered
-                .reduce((acc, r) => acc + parseFloat(r.total_yield_tons), 0)
-                .toFixed(2)}{" "}
-              tons
-            </p>
-          </div>
-          <div className="bg-white dark:bg-[#1e293b] p-4 rounded shadow w-1/3 text-center">
-            <p className="text-gray-500 dark:text-slate-400">Average Health</p>
-            <p className="text-2xl font-bold dark:text-[#e2e8f0]">
-              {avgHealth.toFixed(1)}%
-            </p>
-          </div>
-          <div className="bg-white dark:bg-[#1e293b] p-4 rounded shadow w-1/3 text-center">
-            <p className="text-gray-500 dark:text-slate-400">Average NDVI</p>
-            <p className="text-2xl font-bold dark:text-[#e2e8f0]">
-              {(
-                filtered.reduce((acc, r) => acc + parseFloat(r.mean_ndvi), 0) /
-                filtered.length
-              ).toFixed(3)}
-            </p>
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-4">
-          <div className="p-4 bg-white dark:bg-[#1e293b] rounded-xl shadow-md hover:shadow-lg transition border border-gray-100 dark:border-gray-700">
-            <h2 className="font-semibold mb-2 text-black dark:text-[#e2e8f0] text-center">
-              Yield (tons)
-            </h2>
-            <div style={{ height: "200px" }}>
-              <Line
-                key={`yield-${isDark}`}
-                data={yieldData}
-                options={baseLineOptions}
-                height={200}
-              />
-            </div>
-          </div>
-          <div className="p-4 bg-white dark:bg-[#1e293b] rounded-xl shadow-md hover:shadow-lg transition border border-gray-100 dark:border-gray-700">
-            <h2 className="font-semibold mb-2 text-black dark:text-[#e2e8f0] text-center">
-              Mean NDVI
-            </h2>
-            <div style={{ height: "200px" }}>
-              <Line
-                key={`yield-${isDark}`}
-                data={ndviData}
-                options={baseLineOptions}
-                height={200}
-              />
-            </div>
-          </div>
-          <div className="p-4 bg-white dark:bg-[#1e293b] rounded-xl shadow-md hover:shadow-lg transition border border-gray-100 dark:border-gray-700 flex flex-col items-center">
-            <h2 className="font-semibold mb-2 text-black dark:text-[#e2e8f0] text-center">
-              Health %
-            </h2>
-            <div style={{ height: "180px", width: "180px" }}>
-              <Doughnut
-                key={`health-${isDark}`}
-                data={healthData}
-                options={baseDoughnutOptions}
-                height={180}
-              />
-            </div>
-          </div>
-          <div className="p-4 bg-white dark:bg-[#1e293b] rounded-xl shadow-md hover:shadow-lg transition border border-gray-100 dark:border-gray-700 flex flex-col items-center">
-            <h2 className="font-semibold mb-2 text-black dark:text-[#e2e8f0] text-center">
-              Pest Risk
-            </h2>
-            <div style={{ height: "180px", width: "180px" }}>
-              <Doughnut
-                key={`health-${isDark}`}
-                data={pestData}
-                options={baseDoughnutOptions}
-                height={180}
-              />
-            </div>
-          </div>
-        </div>
-      </>
-    );
-  };
-
-  const renderComparison = () => {
-    if (!reports.length || !district2) return null;
-
-    return (
-      <>
-        <div className="grid md:grid-cols-2 gap-4">
-          {[district1, district2].map((d, idx) => {
-            const filtered = reports.filter((r) => r.District === d);
-            const yieldData = {
-              labels: filtered.map((r) => r.Date),
-              datasets: [
-                {
-                  label: `Yield - ${d}`,
-                  data: filtered.map((r) => r.total_yield_tons),
-                  borderColor: idx === 0 ? "#1f7a4c" : "#2a5d9f",
-                  backgroundColor:
-                    idx === 0 ? "rgba(31,122,76,0.2)" : "rgba(42,93,159,0.2)",
-                  tension: 0.3,
-                  fill: true,
-                },
-              ],
-            };
-            const ndviData = {
-              labels: filtered.map((r) => r.Date),
-              datasets: [
-                {
-                  label: `NDVI - ${d}`,
-                  data: filtered.map((r) => r.mean_ndvi),
-                  borderColor: idx === 0 ? "#2a5d9f" : "#1f7a4c",
-                  backgroundColor:
-                    idx === 0 ? "rgba(42,93,159,0.2)" : "rgba(31,122,76,0.2)",
-                  tension: 0.3,
-                  fill: true,
-                },
-              ],
-            };
-            const avgHealth =
-              filtered.reduce(
-                (acc, r) => acc + parseFloat(r.healthy_percentage),
-                0,
-              ) / filtered.length;
-            const healthData = {
-              labels: ["Healthy", "Not Healthy"],
-              datasets: [
-                {
-                  data: [avgHealth, 100 - avgHealth],
-                  backgroundColor: [
-                    idx === 0 ? "#1f7a4c" : "#2a5d9f",
-                    "#6b7280",
-                  ],
-                },
-              ],
-            };
-            const pestCounts = {};
-            filtered.forEach((r) => {
-              pestCounts[r.pest_risk] = (pestCounts[r.pest_risk] || 0) + 1;
-            });
-            const pestColors = {
-              High: "#f87171",
-              Moderate: "#d48806",
-              Low: "#34d399",
-            };
-            const pestData = {
-              labels: Object.keys(pestCounts),
-              datasets: [
-                {
-                  data: Object.values(pestCounts),
-                  backgroundColor: Object.keys(pestCounts).map(
-                    (lvl) => pestColors[lvl] || "#6b7280",
-                  ),
-                },
-              ],
-            };
-            const baseLineOptions = {
-              maintainAspectRatio: false,
-              responsive: true,
-              plugins: {
-                legend: {
-                  labels: {
-                    color: window.matchMedia("(prefers-color-scheme: dark)")
-                      .matches
-                      ? "#f1f5f9"
-                      : "#000000",
-                    font: { size: 12, weight: "600" },
-                  },
-                },
-              },
-              scales: {
-                x: {
-                  grid: {
-                    color: window.matchMedia("(prefers-color-scheme: dark)")
-                      .matches
-                      ? "#334155"
-                      : "#d1d5db",
-                  },
-                  ticks: {
-                    color: window.matchMedia("(prefers-color-scheme: dark)")
-                      .matches
-                      ? "#f1f5f9"
-                      : "#000000",
-                    font: { size: 12, weight: "600" },
-                  },
-                },
-                y: {
-                  grid: {
-                    color: window.matchMedia("(prefers-color-scheme: dark)")
-                      .matches
-                      ? "#334155"
-                      : "#d1d5db",
-                  },
-                  ticks: {
-                    color: window.matchMedia("(prefers-color-scheme: dark)")
-                      .matches
-                      ? "#f1f5f9"
-                      : "#000000",
-                    font: { size: 12, weight: "600" },
-                  },
-                },
-              },
-            };
-            const baseDoughnutOptions = {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: {
-                legend: {
-                  position: "bottom",
-                  labels: {
-                    color: window.matchMedia("(prefers-color-scheme: dark)")
-                      .matches
-                      ? "#f1f5f9"
-                      : "#000000",
-                    font: { size: 12, weight: "600" },
-                  },
-                },
-              },
-            };
-            return (
-              <div
-                key={d}
-                className="p-4 bg-white dark:bg-[#1e293b] rounded-xl shadow-md hover:shadow-lg transition border border-gray-100 dark:border-gray-700"
-              >
-                <h2 className="font-semibold text-black dark:text-[#e2e8f0] mb-2 text-center">
-                  {d}
-                </h2>
-                <div style={{ height: "200px" }}>
-                  <Line
-                    key={`yield-${d}-${isDark}`}
-                    data={yieldData}
-                    options={baseLineOptions}
-                    height={200}
-                  />
-                </div>
-                <div style={{ height: "200px" }}>
-                  <Line
-                    key={`ndvi-${d}-${isDark}`}
-                    data={ndviData}
-                    options={baseLineOptions}
-                    height={200}
-                  />
-                </div>
-                <div className="flex flex-col items-center mt-2">
-                  <div style={{ height: "180px", width: "180px" }}>
-                    <Doughnut
-                      key={`health-${d}-${isDark}`}
-                      data={healthData}
-                      options={baseDoughnutOptions}
-                      height={180}
-                    />
-                  </div>
-                </div>
-                <div className="flex flex-col items-center mt-2">
-                  <div style={{ height: "180px", width: "180px" }}>
-                    <Doughnut
-                      key={`pest-${d}-${isDark}`}
-                      data={pestData}
-                      options={baseDoughnutOptions}
-                      height={180}
-                    />
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </>
-    );
+    setOpen(!open);
   };
 
   return (
-    <div className="p-6 bg-white dark:bg-[#050810] dark:text-slate-200">
-      <h1 className="text-3xl font-bold mb-2 text-black dark:text-[#e2e8f0]">
-        RiceVision Monthly Report
-      </h1>
-      <p className="mb-4 text-gray-600 dark:text-gray-400">
-        View the yield, healthy percentage, mean NDVI, stage, and pest risk for
-        selected districts for the month.
-      </p>
+    <div className={`relative ${className}`} ref={wrapperRef}>
+      <button
+        ref={buttonRef}
+        type="button"
+        onClick={handleToggle}
+        className="w-full flex justify-between items-center bg-white/5 border border-white/10 text-[10px] px-4 py-3 rounded-xl font-bold text-white outline-none hover:bg-white/10 transition-all cursor-pointer"
+      >
+        <span>{value}</span>
 
-      {/* Filter Type */}
-      <div className="flex gap-4 mb-4">
-        <button
-          className={`px-5 py-2 rounded-lg font-medium transition ${
-            filterType === "single"
-              ? "bg-[#1f7a4c] text-white shadow hover:bg-[#16623b]"
-              : "bg-white dark:bg-[#1e293b] border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-[#334155]"
-          }`}
-          onClick={() => setFilterType("single")}
+        <span
+          className="material-symbols-outlined text-sm text-white/85 transition-transform duration-200"
+          style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)" }}
         >
-          Single View
-        </button>
-        <button
-          className={`px-5 py-2 rounded-lg font-medium transition ${
-            filterType === "comparison"
-              ? "bg-[#1f7a4c] text-white shadow hover:bg-[#16623b]"
-              : "bg-white dark:bg-[#1e293b] border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-[#334155]"
-          }`}
-          onClick={() => setFilterType("comparison")}
-        >
-          District Comparison
-        </button>
-      </div>
+          expand_more
+        </span>
+      </button>
 
-      {/* Filters */}
-      <div className="flex flex-wrap gap-3 mb-4 p-4 bg-white dark:bg-[#1e293b] rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-        <select
-          value={month}
-          onChange={(e) => setMonth(Number(e.target.value))}
-          className="px-3 py-2 rounded border dark:bg-[#334155] dark:border-gray-700 dark:text-slate-200"
-        >
-          {monthsList.map((m) => (
-            <option key={m.value} value={m.value}>
-              {m.label}
-            </option>
-          ))}
-        </select>
-        <select
-          value={district1}
-          onChange={(e) => setDistrict1(e.target.value)}
-          className="px-3 py-2 rounded border dark:bg-[#334155] dark:border-gray-700 dark:text-slate-200"
-        >
-          <option value="">Select District 1</option>
-          {districtsList.map((d) => (
-            <option key={d} value={d}>
-              {d}
-            </option>
-          ))}
-        </select>
-        {filterType === "comparison" && (
-          <select
-            value={district2}
-            onChange={(e) => setDistrict2(e.target.value)}
-            className="px-3 py-2 rounded border dark:bg-[#334155] dark:border-gray-700 dark:text-slate-200"
+      {open &&
+        ReactDOM.createPortal(
+          <div
+            style={{
+              ...dropdownStyle,
+              background: "rgba(10,22,14,0.95)",
+              backdropFilter: "blur(24px)"
+            }}
+            className="max-h-52 overflow-y-auto rounded-xl border border-white/20 shadow-2xl pointer-events-auto"
           >
-            <option value="">Select District 2</option>
-            {districtsList.map((d) => (
-              <option key={d} value={d}>
-                {d}
-              </option>
+            {options.map((opt) => (
+              <button
+                key={opt}
+                type="button"
+                onClick={() => {
+                  onChange(opt);
+                  setOpen(false);
+                }}
+                className={`w-full text-left px-4 py-2.5 text-[10px] font-bold flex items-center gap-2 transition-all ${value === opt
+                  ? "text-emerald-400 bg-emerald-500/20"
+                  : "text-white hover:bg-white/20"
+                  }`}
+              >
+                <span
+                  className="material-symbols-outlined text-xs"
+                  style={{
+                    visibility: value === opt ? "visible" : "hidden"
+                  }}
+                >
+                  check
+                </span>
+
+                {opt}
+              </button>
             ))}
-          </select>
+          </div>,
+          document.body
         )}
-      </div>
-
-      {loading && <div>Loading...</div>}
-
-      {/* Charts */}
-      {filterType === "single" ? renderSingleView() : renderComparison()}
-
-      {/* Table & Export */}
-      {reports.length > 0 && (
-        <div className="mt-4 p-4 bg-white dark:bg-[#1e293b] rounded-xl shadow-md hover:shadow-lg transition border border-gray-100 dark:border-gray-700">
-          <div className="flex gap-3 mb-3">
-            <button
-              onClick={downloadPDF}
-              className="px-5 py-2 bg-[#1f7a4c] text-white rounded-lg hover:bg-[#16623b] transition"
-            >
-              Download PDF
-            </button>
-            <CSVLink
-              data={reports}
-              headers={[
-                { label: "Date", key: "Date" },
-                { label: "District", key: "District" },
-                { label: "Yield (tons)", key: "total_yield_tons" },
-                { label: "Healthy %", key: "healthy_percentage" },
-                { label: "Risk Level", key: "risk_level" },
-                { label: "Mean NDVI", key: "mean_ndvi" },
-                { label: "Stage Name", key: "stage_name" },
-                { label: "Pest Risk", key: "pest_risk" },
-              ]}
-              filename={`RiceVision_Full_Report_${month}.csv`}
-              className="px-5 py-2 bg-[#2a5d9f] text-white rounded-lg hover:bg-[#23497c] transition"
-            >
-              Download CSV
-            </CSVLink>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-sm">
-              <thead className="bg-gray-200 dark:bg-[#334155] text-left">
-                <tr>
-                  <th className="px-3 py-2">Date</th>
-                  <th className="px-3 py-2">District</th>
-                  <th className="px-3 py-2">Yield (tons)</th>
-                  <th className="px-3 py-2">Healthy %</th>
-                  <th className="px-3 py-2">Risk Level</th>
-                  <th className="px-3 py-2">Mean NDVI</th>
-                  <th className="px-3 py-2">Stage Name</th>
-                  <th className="px-3 py-2">Pest Risk</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white dark:bg-[#1e293b]">
-                {reports.map((r, i) => (
-                  <tr
-                    key={i}
-                    className={`border-t dark:border-gray-700 ${r.risk_level === "High Risk" ? "bg-red-50 dark:bg-[#4b1818]" : ""}`}
-                  >
-                    <td className="px-3 py-2">{r.Date}</td>
-                    <td className="px-3 py-2">{r.District}</td>
-                    <td className="px-3 py-2">{r.total_yield_tons}</td>
-                    <td className="px-3 py-2">{r.healthy_percentage}</td>
-                    <td className="px-3 py-2">{r.risk_level}</td>
-                    <td className="px-3 py-2">{r.mean_ndvi}</td>
-                    <td className="px-3 py-2">{r.stage_name}</td>
-                    <td className="px-3 py-2">{r.pest_risk}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
 
-export default ReportPage;
+const Report = () => {
+  const location = useLocation();
+  const { t } = useLanguage();
+  const selectedDistrict = location.state?.district;
+  const districts = ["Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle", "Gampaha", "Hambantota", "Jaffna", "Kalutara", "Kandy", "Kegalle", "Kilinochchi", "Kurunegala", "Mannar", "Matale", "Matara", "Monaragala", "Mullaitivu", "Nuwara Eliya", "Polonnaruwa", "Puttalam", "Ratnapura", "Trincomalee", "Vavuniya"];
+
+  const [mode, setMode] = useState("single");
+  const [availableDates, setAvailableDates] = useState([]);
+  const [configA, setConfigA] = useState({ district: selectedDistrict || "Anuradhapura", date: "", season: "Maha" });
+  const [configB, setConfigB] = useState({ district: "Gampaha", date: "", season: "Maha" });
+
+  useEffect(() => {
+    if (location.state?.district) {
+      setConfigA((prev) => ({
+        ...prev,
+        district: location.state.district,
+      }));
+    }
+  }, [location.state]);
+
+  const [dataA, setDataA] = useState(null);
+  const [dataB, setDataB] = useState(null);
+
+  // Tutorial Setup
+  const tutorialSteps = [
+    {
+      title: t("yieldReports") || "Yield Analytics Reports",
+      action: "Explore satellite-derived yield predictions and analysis",
+      outcome: "You will see detailed yield forecasts with comparative metrics and export options"
+    },
+    {
+      title: "Single vs Compare",
+      action: "Toggle between 'Single' report view and 'Compare' mode for side-by-side analysis",
+      outcome: "You can analyze one district or compare two districts' yield predictions"
+    },
+    {
+      title: "District Selection",
+      action: "Click to select a district and view its yield analytics",
+      outcome: "The report will load satellite data and yield predictions for the selected district"
+    },
+    {
+      title: "Yield Prediction",
+      action: "View the predicted yield and comparison with historical baseline",
+      outcome: "You will see the expected harvest (kg/ha) and how it compares to past years"
+    },
+    {
+      title: "Metrics & Export",
+      action: "Review pest count, risk factors, and other metrics. Use Export PDF to download the report",
+      outcome: "You get a comprehensive analysis document ready for sharing or storage"
+    }
+  ];
+
+  const {
+    currentStep,
+    showTutorial,
+    currentTutorialStep,
+    hasMoreSteps,
+    nextStep,
+    prevStep,
+    closeTutorial
+  } = usePageTutorial("report", tutorialSteps);
+
+  // Element refs for tutorial
+  const headerRef = useRef(null);
+  const modeToggleRef = useRef(null);
+  const districtSelectorRef = useRef(null);
+  const yieldHeroRef = useRef(null);
+  const metricsExportRef = useRef(null);
+
+  // Fetch available S3 dates once on mount and set the latest as default
+  useEffect(() => {
+    apiFetch("/api/available-dates")
+      .then((r) => r.json())
+      .then((json) => {
+        const dates = json.dates || [];
+        setAvailableDates(dates);
+        if (dates.length > 0) {
+          setConfigA((c) => ({ ...c, date: dates[0] }));
+          setConfigB((c) => ({ ...c, date: dates[0] }));
+        }
+      })
+      .catch(() => {
+        // Fall back to a known date if the endpoint fails
+        const fallback = "2026-03-06";
+        setAvailableDates([fallback]);
+        setConfigA((c) => ({ ...c, date: fallback }));
+        setConfigB((c) => ({ ...c, date: fallback }));
+      });
+  }, []);
+
+  const fetchData = async (conf, setter) => {
+    if (!conf.date) return;
+
+    try {
+      const res = await apiFetch(
+        `/api/detailed-report?date=${conf.date}&district=${conf.district}&season=${conf.season}`
+      );
+
+      const json = await res.json();
+
+      if (!res.ok) throw new Error(json.detail || "Data not found");
+      setter(json);
+
+
+    } catch (err) {
+      setter({ error: true, message: err.message });
+    }
+  };
+
+  useEffect(() => {
+    if (configA.date) fetchData(configA, setDataA);
+    if (mode === "compare" && configB.date) fetchData(configB, setDataB);
+  }, [configA, configB, mode]);
+
+  const generatePDF = async (report, config) => {
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const PW = 210;
+    const PH = 297;
+    const M = 14;
+
+    // ── PALETTE ───────────────────────────────────────────────────
+    const WHITE = [255, 255, 255];
+    const OFFWH = [248, 250, 252];
+    const GREEN = [16, 185, 129];   // single brand green throughout
+    const NAVY = [15, 23, 42];
+    const INK = [15, 23, 42];
+    const DARK = [30, 41, 59];
+    const SUBTEXT = [71, 85, 105];
+    const MUTED = [148, 163, 184];
+    const LGRAY = [241, 245, 249];
+    const BORDER = [226, 232, 240];
+    const ORANGE = [217, 119, 6];
+    const RED = [220, 38, 38];
+    const REDLT = [254, 242, 242];
+
+    // ── PAGE BACKGROUND ───────────────────────────────────────────
+    doc.setFillColor(...WHITE);
+    doc.rect(0, 0, PW, PH, 'F');
+
+    // ── LOAD LOGO (maintain aspect ratio) ─────────────────────────
+    let logoDataUrl = null;
+    let logoW = 0, logoH = 0;
+    try {
+      const imgEl = await new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = logoImg;
+      });
+      const maxH = 16;
+      const ratio = imgEl.naturalWidth / imgEl.naturalHeight;
+      logoH = maxH;
+      logoW = maxH * ratio;
+      const canvas = document.createElement('canvas');
+      canvas.width = imgEl.naturalWidth;
+      canvas.height = imgEl.naturalHeight;
+      canvas.getContext('2d').drawImage(imgEl, 0, 0);
+      logoDataUrl = canvas.toDataURL('image/png');
+    } catch (_) { /* logo is optional */ }
+
+    // ── HEADER (white background) ────────────────────────────────
+    doc.setFillColor(...WHITE);
+    doc.rect(0, 0, PW, 40, 'F');
+
+    // Dark green separator between header and district row
+    doc.setFillColor(0, 100, 50);
+    doc.rect(0, 40, PW, 2, 'F');
+
+    // Logo — vertically centred in header
+    const logoY = (39 - logoH) / 2;
+    if (logoDataUrl) {
+      doc.addImage(logoDataUrl, 'PNG', M, logoY, logoW, logoH);
+    }
+
+    // Centred title block
+    const cx = PW / 2;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(13);
+    doc.setTextColor(...INK);
+    doc.text('YIELD ANALYTICS REPORT', cx, 16, { align: 'center' });
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(...INK);
+    doc.text(
+      `Generated  ${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}`,
+      cx, 26, { align: 'center' }
+    );
+    doc.text(`Satellite data  ${config.date}`, cx, 36, { align: 'center' });
+
+    // ── DISTRICT ROW ──────────────────────────────────────────────
+    doc.setFillColor(...OFFWH);
+    doc.rect(0, 42, PW, 20, 'F');
+    doc.setDrawColor(...BORDER);
+    doc.setLineWidth(0.25);
+    doc.line(0, 62, PW, 62);
+
+    // District name + subtitle
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(13);
+    doc.setTextColor(...INK);
+    doc.text(config.district, M, 53.5);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7);
+    doc.setTextColor(...SUBTEXT);
+    doc.text('Sri Lanka  ·  District Yield Forecast', M, 59);
+
+    // Chips (right-aligned)
+    const chipH = 8;
+    const chipW = 34;
+    const chipY2 = 45;
+    const chip2X = PW - M - chipW;
+    const chip1X = chip2X - 4 - chipW;
+    const chipTY = chipY2 + chipH / 2 + 1.1;
+
+    // Season chip — white fill, green text
+    doc.setFillColor(...WHITE);
+    doc.roundedRect(chip1X, chipY2, chipW, chipH, 2, 2, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(6.5);
+    doc.setTextColor(...GREEN);
+    doc.text(`${config.season} Season`, chip1X + chipW / 2, chipTY, { align: 'center' });
+
+    // Date chip — light gray
+    doc.setFillColor(...LGRAY);
+    doc.roundedRect(chip2X, chipY2, chipW, chipH, 2, 2, 'F');
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(6.5);
+    doc.setTextColor(...DARK);
+    doc.text(config.date, chip2X + chipW / 2, chipTY, { align: 'center' });
+
+    // ── HELPERS ───────────────────────────────────────────────────
+    const raw = report.raw_data?.yield_csv || {};
+
+    const newPage = () => {
+      doc.addPage();
+      doc.setFillColor(...WHITE);
+      doc.rect(0, 0, PW, PH, 'F');
+      // slim green stripe on continuation pages
+      doc.setFillColor(...GREEN);
+      doc.rect(0, 0, PW, 6, 'F');
+      doc.setFillColor(10, 160, 110);
+      doc.rect(0, 5.5, PW, 0.5, 'F');
+      return 14;
+    };
+
+    const sectionHeading = (label, yy) => {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.setTextColor(...GREEN);
+      doc.text(label.toUpperCase(), M, yy);
+      doc.setDrawColor(...GREEN);
+      doc.setLineWidth(0.4);
+      doc.line(M, yy + 1.5, PW - M, yy + 1.5);
+    };
+
+    const drawStatCard = (x, cy, w, h, label, value, sub, accentColor = GREEN) => {
+      // card bg
+      doc.setFillColor(...OFFWH);
+      doc.roundedRect(x, cy, w, h, 2.5, 2.5, 'F');
+      // left accent
+      doc.setFillColor(...accentColor);
+      doc.roundedRect(x, cy, 3, h, 1.5, 1.5, 'F');
+      // label
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(6.5);
+      doc.setTextColor(...MUTED);
+      doc.text(label, x + 7, cy + 7);
+      // value
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      doc.setTextColor(...INK);
+      doc.text(String(value), x + 7, cy + 15.5);
+      // sub
+      if (sub) {
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(6);
+        doc.setTextColor(...SUBTEXT);
+        doc.text(sub, x + 7, cy + 21);
+      }
+    };
+
+    // ── KPI SUMMARY CARDS ─────────────────────────────────────────
+    let y = 70;
+    const gapVal = report.summary.gap;
+    const gapSign = gapVal >= 0 ? '+' : '';
+    const gapAccent = gapVal >= 0 ? GREEN : RED;
+    const pct = raw.percent_change !== undefined
+      ? parseFloat(raw.percent_change).toFixed(1)
+      : ((gapVal / report.summary.historical) * 100).toFixed(1);
+
+    const cW = (PW - M * 2 - 5) / 2;
+    const cH = 27;
+
+    drawStatCard(M, y, cW, cH, 'PREDICTED AVG YIELD', `${Math.round(report.summary.yield).toLocaleString()} kg/ha`, 'Satellite-derived ML forecast');
+    drawStatCard(M + cW + 5, y, cW, cH, 'HISTORICAL BASELINE', `${Math.round(report.summary.historical).toLocaleString()} kg/ha`, 'Long-term district average');
+    y += cH + 4;
+    drawStatCard(M, y, cW, cH, 'YIELD GAP', `${gapSign}${Math.round(gapVal).toLocaleString()} kg/ha`, `${gapSign}${pct}% vs baseline`, gapAccent);
+    drawStatCard(M + cW + 5, y, cW, cH, 'TOTAL PRODUCTION EST.', `${Math.round(report.summary.total_kg / 1000).toLocaleString()} MT`, 'Full district (metric tons)');
+    y += cH + 10;
+
+    // ── FIELD OVERVIEW TABLE ──────────────────────────────────────
+    sectionHeading('Field Overview', y);
+    y += 6;
+
+    const riskScore = report.metrics.risk_score;
+    const riskLabel = riskScore < 1 ? 'Low' : riskScore < 4 ? 'Moderate' : 'High';
+    const riskAccent = riskScore < 1 ? GREEN : riskScore < 4 ? ORANGE : RED;
+    const pestLabel = report.metrics.pest_count === 0 ? 'Clear' : report.metrics.pest_count < 20 ? 'Moderate' : 'Critical';
+
+    const fieldRows = [
+      ['Growth Stage', report.categories.current_stage, 'Health Status', report.categories.health_status],
+      ['Pest Incidents', `${report.metrics.pest_count} (${pestLabel})`, 'Risk Score', `${riskScore.toFixed(2)} / 10 (${riskLabel})`],
+      ['Severe Stress Area', `${report.metrics.stress_pct.toFixed(2)}%`, 'Est. Harvest Date', report.metrics.harvest_date],
+      ['Season', config.season, 'Data Date', config.date],
+    ];
+    if (raw.percent_change !== undefined)
+      fieldRows.push(['% vs Historical', `${parseFloat(raw.percent_change).toFixed(2)}%`, 'Pixels Analysed', raw.total_pixels !== undefined ? Number(raw.total_pixels).toLocaleString() : 'N/A']);
+    if (raw.health_index_z !== undefined)
+      fieldRows.push(['Health Index (Z)', parseFloat(raw.health_index_z).toFixed(3), 'Climate Stress Idx', raw.climate_stress_index !== undefined ? parseFloat(raw.climate_stress_index).toFixed(3) : 'N/A']);
+
+    autoTable(doc, {
+      startY: y,
+      margin: { left: M, right: M },
+      body: fieldRows,
+      theme: 'plain',
+      styles: { fontSize: 8, cellPadding: { top: 3.5, bottom: 3.5, left: 5, right: 5 }, textColor: INK, fillColor: WHITE },
+      alternateRowStyles: { fillColor: LGRAY },
+      columnStyles: {
+        0: { fontStyle: 'bold', textColor: SUBTEXT, cellWidth: 44 },
+        1: { cellWidth: 50 },
+        2: { fontStyle: 'bold', textColor: SUBTEXT, cellWidth: 44 },
+        3: { cellWidth: 'auto' },
+      },
+      tableLineColor: BORDER,
+      tableLineWidth: 0.2,
+    });
+    y = doc.lastAutoTable.finalY + 10;
+
+    // ── YIELD BREAKDOWN TABLE ─────────────────────────────────────
+    if (y > 240) y = newPage();
+    sectionHeading('Yield Forecast Breakdown', y);
+    y += 6;
+
+    autoTable(doc, {
+      startY: y,
+      margin: { left: M, right: M },
+      head: [['Metric', 'Value', 'Unit', 'Notes']],
+      body: [
+        ['Predicted Average Yield', Math.round(report.summary.yield).toLocaleString(), 'kg/ha', 'ML satellite forecast'],
+        ['Historical Average Yield', Math.round(report.summary.historical).toLocaleString(), 'kg/ha', 'District long-term baseline'],
+        ['Total Estimated Production', Math.round(report.summary.total_kg).toLocaleString(), 'kg', 'Full district acreage'],
+        ['Total Estimated Production', Math.round(report.summary.total_kg / 1000).toLocaleString(), 'MT', 'Metric tons (÷ 1,000)'],
+        ['Yield Gap', `${gapSign}${Math.round(gapVal).toLocaleString()}`, 'kg/ha', gapVal >= 0 ? 'Above historical average' : 'Below historical average'],
+        ['% Change vs Historical', `${gapSign}${pct}%`, '—', gapVal >= 0 ? 'Out-performing baseline' : 'Under-performing vs baseline'],
+      ],
+      theme: 'grid',
+      headStyles: { fillColor: GREEN, textColor: WHITE, fontSize: 7.5, fontStyle: 'bold', cellPadding: 4 },
+      bodyStyles: { fontSize: 7.5, textColor: INK, fillColor: WHITE, cellPadding: 3.5 },
+      alternateRowStyles: { fillColor: LGRAY },
+      columnStyles: {
+        0: { fontStyle: 'bold', textColor: DARK, cellWidth: 58 },
+        1: { cellWidth: 26, halign: 'right' },
+        2: { cellWidth: 16 },
+        3: { textColor: SUBTEXT },
+      },
+      tableLineColor: BORDER,
+      tableLineWidth: 0.2,
+    });
+    y = doc.lastAutoTable.finalY + 10;
+
+    // ── RISK & HEALTH ─────────────────────────────────────────────
+    if (y > 210) y = newPage();
+
+    // Reset state fully before heading (autoTable can leave stale draw color)
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(...GREEN);
+    doc.text('RISK & HEALTH ASSESSMENT', M, y);
+    doc.setDrawColor(...GREEN);
+    doc.setLineWidth(0.4);
+    doc.line(M, y + 1.5, PW - M, y + 1.5);
+    y += 9;
+
+    // Risk indicator bar
+    const barW = PW - M * 2;
+    const fillW = Math.max(barW * Math.min(riskScore / 10, 1), 4);
+    doc.setFillColor(...LGRAY);
+    doc.roundedRect(M, y, barW, 7, 1.5, 1.5, 'F');
+    doc.setFillColor(...riskAccent);
+    doc.roundedRect(M, y, fillW, 7, 1.5, 1.5, 'F');
+    y += 10;
+
+    // Label below the bar — always readable on white background
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(7.5);
+    doc.setTextColor(...riskAccent);
+    doc.text(`Risk Level: ${riskLabel}`, M, y);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...SUBTEXT);
+    doc.text(`Score: ${riskScore.toFixed(2)} / 10`, M + 30, y);
+    y += 8;
+
+    autoTable(doc, {
+      startY: y,
+      margin: { left: M, right: M },
+      head: [['Risk Factor', 'Value', 'Status']],
+      body: [
+        ['Overall Risk Score', riskScore.toFixed(2), riskLabel],
+        ['Severe Stress Coverage', `${report.metrics.stress_pct.toFixed(2)}%`, report.metrics.stress_pct < 5 ? 'Acceptable' : 'Action Required'],
+        ['Pest Attack Incidents', String(report.metrics.pest_count), pestLabel],
+        ['Crop Health Status', report.categories.health_status, report.categories.health_status === 'Normal' ? 'Normal' : 'Warning'],
+        ['Growth Stage', report.categories.current_stage, '—'],
+      ],
+      theme: 'grid',
+      headStyles: { fillColor: riskAccent, textColor: WHITE, fontSize: 7.5, fontStyle: 'bold', cellPadding: 4 },
+      bodyStyles: { fontSize: 7.5, textColor: INK, fillColor: WHITE, cellPadding: 3.5 },
+      alternateRowStyles: { fillColor: LGRAY },
+      columnStyles: {
+        0: { fontStyle: 'bold', textColor: DARK, cellWidth: 70 },
+        1: { cellWidth: 30, halign: 'center' },
+        2: { halign: 'center' },
+      },
+      tableLineColor: BORDER,
+      tableLineWidth: 0.2,
+    });
+    y = doc.lastAutoTable.finalY + 10;
+
+    // ── DISCLAIMER ────────────────────────────────────────────────
+    const disclaimerText = 'This report is generated from satellite imagery and machine-learning models. Data is indicative only — please use alongside on-ground verification. RiceVision assumes no liability for agricultural decisions made solely on the basis of this report.';
+    const textLines = doc.splitTextToSize(disclaimerText, PW - M * 2 - 10);
+    const boxH = textLines.length * 4.2 + 12;
+    if (y + boxH > PH - 18) y = newPage();
+
+    doc.setFillColor(...REDLT);
+    doc.roundedRect(M, y, PW - M * 2, boxH, 3, 3, 'F');
+    doc.setFillColor(...ORANGE);
+    doc.rect(M, y, 3, boxH, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(6.5);
+    doc.setTextColor(...ORANGE);
+    doc.text('DISCLAIMER', M + 8, y + 7);
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(6.5);
+    doc.setTextColor(120, 80, 30);
+    doc.text(textLines, M + 8, y + 12.5);
+
+    // ── FOOTER (all pages) ────────────────────────────────────────
+    const totalPages = doc.getNumberOfPages();
+    for (let p = 1; p <= totalPages; p++) {
+      doc.setPage(p);
+      doc.setDrawColor(...BORDER);
+      doc.setLineWidth(0.3);
+      doc.line(M, PH - 13, PW - M, PH - 13);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(6.5);
+      doc.setTextColor(...MUTED);
+      doc.text('RiceVision Analytics  |  Agricultural Intelligence Platform  |  Confidential', M, PH - 7);
+      doc.text(`Page ${p} of ${totalPages}`, PW - M, PH - 7, { align: 'right' });
+    }
+
+    doc.save(`RiceVision_${config.district}_${config.season}_${config.date}.pdf`);
+  };
+
+  const generateComparisonPDF = async () => {
+
+    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+
+    const PW = 210;
+    const PH = 297;
+    const M = 14;
+
+    const WHITE = [255, 255, 255];
+    const OFFWH = [248, 250, 252];
+    const GREEN = [16, 185, 129];
+    const DARK = [30, 41, 59];
+    const INK = [15, 23, 42];
+    const SUBTEXT = [71, 85, 105];
+    const MUTED = [148, 163, 184];
+    const LGRAY = [241, 245, 249];
+    const BORDER = [226, 232, 240];
+
+    doc.setFillColor(...WHITE);
+    doc.rect(0, 0, PW, PH, "F");
+
+    /* ---------------- HEADER ---------------- */
+
+    doc.setFillColor(...WHITE);
+    doc.rect(0, 0, PW, 40, "F");
+
+    doc.setFillColor(0, 100, 50);
+    doc.rect(0, 40, PW, 2, "F");
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    doc.setTextColor(...INK);
+
+    doc.text("DISTRICT YIELD COMPARISON REPORT", PW / 2, 16, { align: "center" });
+
+    doc.setFontSize(9);
+
+    doc.text(
+      `Generated ${new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" })}`,
+      PW / 2,
+      26,
+      { align: "center" }
+    );
+
+    doc.text(
+      `Satellite Data ${configA.date}`,
+      PW / 2,
+      36,
+      { align: "center" }
+    );
+
+    /* ---------------- DISTRICT TITLE ROW ---------------- */
+
+    doc.setFillColor(...OFFWH);
+    doc.rect(0, 42, PW, 20, "F");
+
+    doc.setDrawColor(...BORDER);
+    doc.line(0, 62, PW, 62);
+
+    doc.setFontSize(12);
+    doc.setTextColor(...INK);
+
+    doc.text(`${configA.district}  vs  ${configB.district}`, M, 53);
+
+    doc.setFontSize(7);
+    doc.setTextColor(...SUBTEXT);
+
+    doc.text("Sri Lanka · Comparative Yield Analytics", M, 59);
+
+    /* ---------------- SUMMARY CARDS ---------------- */
+
+    let y = 72;
+
+    const cardW = (PW - M * 2 - 5) / 2;
+    const cardH = 26;
+
+    const drawCard = (x, label, valA, valB) => {
+
+      doc.setFillColor(...OFFWH);
+      doc.roundedRect(x, y, cardW, cardH, 3, 3, "F");
+
+      doc.setFillColor(...GREEN);
+      doc.roundedRect(x, y, 3, cardH, 2, 2, "F");
+
+      doc.setFontSize(6.5);
+      doc.setTextColor(...MUTED);
+      doc.text(label, x + 7, y + 7);
+
+      doc.setFontSize(11);
+      doc.setTextColor(...INK);
+
+      doc.text(`${valA}`, x + 7, y + 15);
+      doc.text(`${valB}`, x + cardW / 2 + 7, y + 15);
+
+      doc.setFontSize(6);
+      doc.setTextColor(...SUBTEXT);
+
+      doc.text(configA.district, x + 7, y + 21);
+      doc.text(configB.district, x + cardW / 2 + 7, y + 21);
+
+    };
+
+    drawCard(
+      M,
+      "Predicted Yield (kg/ha)",
+      Math.round(dataA.summary.yield).toLocaleString(),
+      Math.round(dataB.summary.yield).toLocaleString()
+    );
+
+    drawCard(
+      M + cardW + 5,
+      "Historical Yield (kg/ha)",
+      Math.round(dataA.summary.historical).toLocaleString(),
+      Math.round(dataB.summary.historical).toLocaleString()
+    );
+
+    y += cardH + 5;
+
+    drawCard(
+      M,
+      "Total Production (MT)",
+      Math.round(dataA.summary.total_kg / 1000).toLocaleString(),
+      Math.round(dataB.summary.total_kg / 1000).toLocaleString()
+    );
+
+    drawCard(
+      M + cardW + 5,
+      "Risk Score",
+      dataA.metrics.risk_score.toFixed(2),
+      dataB.metrics.risk_score.toFixed(2)
+    );
+
+    y += cardH + 10;
+
+    /* ---------------- COMPARISON TABLE ---------------- */
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setTextColor(...GREEN);
+
+    doc.text("PERFORMANCE COMPARISON", M, y);
+
+    doc.setDrawColor(...GREEN);
+    doc.line(M, y + 1.5, PW - M, y + 1.5);
+
+    y += 6;
+
+    autoTable(doc, {
+      startY: y,
+      margin: { left: M, right: M },
+      head: [
+        ["Metric", configA.district, configB.district]
+      ],
+      body: [
+        [
+          "Predicted Yield (kg/ha)",
+          Math.round(dataA.summary.yield).toLocaleString(),
+          Math.round(dataB.summary.yield).toLocaleString()
+        ],
+        [
+          "Historical Yield (kg/ha)",
+          Math.round(dataA.summary.historical).toLocaleString(),
+          Math.round(dataB.summary.historical).toLocaleString()
+        ],
+        [
+          "Total Production (kg)",
+          Math.round(dataA.summary.total_kg).toLocaleString(),
+          Math.round(dataB.summary.total_kg).toLocaleString()
+        ],
+        [
+          "Pest Incidents",
+          dataA.metrics.pest_count,
+          dataB.metrics.pest_count
+        ],
+        [
+          "Risk Score",
+          dataA.metrics.risk_score.toFixed(2),
+          dataB.metrics.risk_score.toFixed(2)
+        ],
+        [
+          "Severe Stress %",
+          dataA.metrics.stress_pct.toFixed(2) + "%",
+          dataB.metrics.stress_pct.toFixed(2) + "%"
+        ]
+      ],
+      theme: "grid",
+      headStyles: {
+        fillColor: GREEN,
+        textColor: WHITE,
+        fontSize: 7.5,
+        fontStyle: "bold"
+      },
+      styles: {
+        fontSize: 7.5,
+        cellPadding: 3
+      },
+      alternateRowStyles: { fillColor: LGRAY },
+      tableLineColor: BORDER,
+      tableLineWidth: 0.2
+    });
+
+    y = doc.lastAutoTable.finalY + 12;
+
+    /* ---------------- WINNER INSIGHT ---------------- */
+
+    const diff = dataA.summary.yield - dataB.summary.yield;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setTextColor(...GREEN);
+
+    doc.text("KEY INSIGHT", M, y);
+
+    doc.line(M, y + 1.5, PW - M, y + 1.5);
+
+    y += 8;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(...INK);
+
+    const winner =
+      diff > 0 ? configA.district : configB.district;
+
+    doc.text(
+      `${winner} shows higher predicted yield by ${Math.abs(Math.round(diff))} kg/ha.`,
+      M,
+      y
+    );
+
+    /* ---------------- FOOTER ---------------- */
+
+    const totalPages = doc.getNumberOfPages();
+
+    for (let p = 1; p <= totalPages; p++) {
+
+      doc.setPage(p);
+
+      doc.setDrawColor(...BORDER);
+      doc.line(M, PH - 13, PW - M, PH - 13);
+
+      doc.setFontSize(6.5);
+      doc.setTextColor(...MUTED);
+
+      doc.text(
+        "RiceVision Analytics | Agricultural Intelligence Platform | Confidential",
+        M,
+        PH - 7
+      );
+
+      doc.text(
+        `Page ${p} of ${totalPages}`,
+        PW - M,
+        PH - 7,
+        { align: "right" }
+      );
+
+    }
+
+    doc.save(`RiceVision_Comparison_${configA.district}_vs_${configB.district}.pdf`);
+
+  };
+  const getPestStatus = (count) => {
+    if (count === 0) return { label: "SAFE", color: "text-emerald-400" };
+    if (count < 20) return { label: "MODERATE", color: "text-amber-400" };
+    return { label: "CRITICAL", color: "text-red-400" };
+  };
+
+  const getRiskStatus = (score) => {
+    if (score < 1) return { label: "STABLE", color: "text-emerald-400" };
+    if (score < 4) return { label: "WARNING", color: "text-amber-400" };
+    return { label: "HIGH RISK", color: "text-red-400" };
+  };
+
+  const ReportPane = ({ report, config, setConfig, title, districtSelectorRef, yieldHeroRef, metricsExportRef, isSingleMode = false }) => {
+    if (report?.error) return (
+      <div className="flex-1 glass p-6 sm:p-12 rounded-2xl sm:rounded-[3rem] text-center border border-red-500/20">
+        <span className="material-symbols-outlined text-5xl text-red-400/40 mb-4 block">signal_disconnected</span>
+        <h3 className="text-red-400 font-black uppercase tracking-widest mb-3 text-sm">Data Unavailable</h3>
+        <p className="text-xs text-white/85 mb-6">{report.message}</p>
+        {availableDates.length > 0 && (
+          <CustomSelect
+            value={config.date}
+            onChange={(val) => setConfig({ ...config, date: val })}
+            options={availableDates}
+          />
+        )}
+      </div>
+    );
+
+    if (!report) return (
+      <div className="flex-1 glass rounded-2xl sm:rounded-[3rem] p-8 sm:p-20 text-center animate-pulse">
+        <p className="text-white/85 font-black uppercase tracking-widest text-xs">Fetching Satellite Data...</p>
+      </div>
+    );
+
+    const chartData = [
+      { name: 'Yield', value: report.summary.yield, color: '#10b981' },
+      { name: 'Historical', value: report.summary.historical, color: '#6366f1' }
+    ];
+
+    return (
+      <div className="flex-1 glass glass-hover rounded-[2rem] sm:rounded-[3rem] p-5 sm:p-8 border border-white/10 shadow-2xl relative">
+        {/* Pane header */}
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          <div className="col-span-2 flex justify-between items-center mb-2">
+            <span className="text-[10px] font-black text-emerald-400 tracking-[0.2em] uppercase flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              {title} VIEW
+            </span>
+            <button
+              ref={metricsExportRef}
+              onClick={() => generatePDF(report, config)}
+              className={`flex items-center gap-2 text-[10px] font-black px-4 py-1.5 rounded-xl border transition-all duration-300 hover:scale-[1.02] cursor-pointer uppercase tracking-widest ${isSingleMode
+                ? "border-emerald-400/70 bg-emerald-500/10 hover:bg-emerald-500/20 hover:border-emerald-300"
+                : "border-white/10 hover:bg-white/10 hover:border-white/20"
+                }`}            >
+              <span className="material-symbols-outlined text-xs">download</span>
+              Export PDF
+            </button>
+          </div>
+          <div ref={districtSelectorRef}>
+            <CustomSelect
+              value={config.district}
+              onChange={(val) => setConfig({ ...config, district: val })}
+              options={districts}
+            />
+          </div>
+          <CustomSelect
+            value={config.season}
+            onChange={(val) => setConfig({ ...config, season: val })}
+            options={["Maha", "Yala"]}
+          />
+          {availableDates.length > 0 && (
+            <CustomSelect
+              className="col-span-2"
+              value={config.date}
+              onChange={(val) => setConfig({ ...config, date: val })}
+              options={availableDates}
+            />
+          )}
+
+        </div>
+
+        {/* Yield Hero */}
+        <div ref={yieldHeroRef} className="glass p-3 sm:p-5 rounded-xl sm:rounded-[2rem] border border-emerald-500/20 shadow-xl mb-6 relative overflow-hidden">
+          {/* subtle glow */}
+          <div className="absolute top-0 right-0 w-36 h-36 bg-emerald-500/10 blur-[50px] -mr-8 -mt-8 pointer-events-none rounded-full" />
+          <div className="relative z-10 flex flex-col">
+            <div className="text-center flex flex-col items-center justify-center py-1 sm:py-2">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/85 mb-1 flex items-center justify-center gap-2">
+                <span className="material-symbols-outlined text-emerald-400 text-sm">monitoring</span>
+                Predicted Average
+              </p>
+              <h2 className="text-3xl sm:text-5xl font-black tracking-tighter text-white leading-none">
+                {Math.round(report.summary.yield).toLocaleString()}
+                <span className="text-base font-normal text-white/85 ml-2">kg/ha</span>
+              </h2>
+            </div>
+            <div className="mt-2 pt-3 border-t border-white/5 grid grid-cols-2 gap-3">
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/85 mb-0.5">Total Yield</p>
+                <p className="text-base font-black text-white">{Math.round(report.summary.total_kg).toLocaleString()} <span className="text-xs font-bold text-white/85">kg</span></p>
+              </div>
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/85 mb-0.5">Historical Baseline</p>
+                <p className="text-base font-black text-white">{Math.round(report.summary.historical).toLocaleString()} <span className="text-xs font-bold text-white/85">kg/ha</span></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bar Chart */}
+        <div className="h-[200px] w-full mb-6">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={chartData}>
+              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 10, fontWeight: 'bold' }} />
+              <Tooltip
+                cursor={{ fill: 'rgba(255,255,255,0.03)' }}
+                contentStyle={{ background: 'rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '15px', backdropFilter: 'blur(10px)' }}
+                itemStyle={{ color: '#fff', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase' }}
+              />
+              <Bar dataKey="value" radius={[10, 10, 0, 0]} barSize={50}>
+                {chartData.map((entry, index) => <Cell key={index} fill={entry.color} />)}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Metric Cards */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="glass glass-hover p-5 rounded-3xl border border-white/10 group transition-all duration-300">
+            <p className="text-[9px] font-black text-white/85 uppercase tracking-widest mb-2">Pest Count</p>
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl font-black text-white">{report.metrics.pest_count}</span>
+              <span className={`text-[9px] font-black ${getPestStatus(report.metrics.pest_count).color}`}>
+                {getPestStatus(report.metrics.pest_count).label}
+              </span>
+            </div>
+          </div>
+          <div className="glass glass-hover p-5 rounded-3xl border border-white/10 group transition-all duration-300">
+            <p className="text-[9px] font-black text-white/85 uppercase tracking-widest mb-2">Risk Factor</p>
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl font-black text-white">{report.metrics.risk_score.toFixed(1)}</span>
+              <span className={`text-[9px] font-black ${getRiskStatus(report.metrics.risk_score).color}`}>
+                {getRiskStatus(report.metrics.risk_score).label}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-full p-4 sm:p-6 lg:p-10 text-white font-sans transition-all duration-500">
+      <div className="max-w-7xl mx-auto space-y-10 pb-20">
+
+        {/* Page Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6" ref={headerRef}>
+          <div>
+            <h1 className="text-xl sm:text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
+              {t('yieldReports')}
+            </h1>
+            <p className="text-white/85 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em]">
+              {t('satelliteDerivedAnalytics')}
+            </p>
+          </div>
+
+          {/* Mode Toggle */}
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4" ref={modeToggleRef}>
+            <div className="flex p-1 rounded-2xl bg-white/5 border border-white/10 w-fit">
+              <button
+                onClick={() => setMode("single")}
+                className={`px-4 sm:px-6 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${mode === "single" ? "glass bg-white/15 text-white shadow-lg border-white/20" : "text-white/85 hover:text-white/90"}`}
+              >
+                {t('single')}
+              </button>
+              <button
+                onClick={() => setMode("compare")}
+                className={`px-4 sm:px-6 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${mode === "compare" ? "glass bg-white/15 text-white shadow-lg border-white/20" : "text-white/85 hover:text-white/90"}`}
+              >
+                {t('compare')}
+              </button>
+            </div>
+            <div className="glass px-4 py-2 rounded-xl border-white/10 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-white/85">{t('liveData')}</span>
+            </div>
+            {mode === "compare" && dataA && dataB && (
+              <button
+                onClick={() => generateComparisonPDF()}
+                className="flex items-center gap-2 text-[10px] font-black px-4 py-2 rounded-xl border border-emerald-400/70 bg-emerald-500/10 transition-all duration-300 hover:bg-emerald-500/20 hover:border-emerald-300 hover:scale-[1.02] cursor-pointer uppercase tracking-widest"
+              >
+                <span className="material-symbols-outlined text-sm">compare</span>
+                Export Comparison Report
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Report Panes */}
+        <div className={`flex flex-col ${mode === "compare" ? "lg:flex-row" : "max-w-2xl mx-auto w-full"} gap-8`}>
+          <ReportPane
+            report={dataA}
+            config={configA}
+            setConfig={setConfigA}
+            title="PRIMARY"
+            districtSelectorRef={currentStep === 2 ? districtSelectorRef : undefined}
+            yieldHeroRef={currentStep === 3 ? yieldHeroRef : undefined}
+            metricsExportRef={currentStep === 4 ? metricsExportRef : undefined}
+            isSingleMode={mode === "single"}
+          />
+          {mode === "compare" && <ReportPane report={dataB} config={configB} setConfig={setConfigB} title="COMPARISON" />}
+        </div>
+
+      </div>
+      {/* ─── TUTORIAL TOOLTIPS ─── */}
+      {showTutorial && currentTutorialStep && (
+        <>
+          {currentStep === 0 && (
+            <TutorialTooltip
+              visible={true}
+              position="bottom"
+              title={currentTutorialStep.title}
+              action={currentTutorialStep.action}
+              outcome={currentTutorialStep.outcome}
+              elementRef={headerRef}
+              step={currentStep}
+              totalSteps={tutorialSteps.length}
+              onNext={nextStep}
+              onPrevious={prevStep}
+              onDismiss={closeTutorial}
+            />
+          )}
+          {currentStep === 1 && (
+            <TutorialTooltip
+              visible={true}
+              position="bottom"
+              title={currentTutorialStep.title}
+              action={currentTutorialStep.action}
+              outcome={currentTutorialStep.outcome}
+              elementRef={modeToggleRef}
+              step={currentStep}
+              totalSteps={tutorialSteps.length}
+              onNext={nextStep}
+              onPrevious={prevStep}
+              onDismiss={closeTutorial}
+            />
+          )}
+          {currentStep === 2 && (
+            <TutorialTooltip
+              visible={true}
+              position="bottom"
+              title={currentTutorialStep.title}
+              action={currentTutorialStep.action}
+              outcome={currentTutorialStep.outcome}
+              elementRef={districtSelectorRef}
+              step={currentStep}
+              totalSteps={tutorialSteps.length}
+              onNext={nextStep}
+              onPrevious={prevStep}
+              onDismiss={closeTutorial}
+            />
+          )}
+          {currentStep === 3 && (
+            <TutorialTooltip
+              visible={true}
+              position="bottom"
+              title={currentTutorialStep.title}
+              action={currentTutorialStep.action}
+              outcome={currentTutorialStep.outcome}
+              elementRef={yieldHeroRef}
+              step={currentStep}
+              totalSteps={tutorialSteps.length}
+              onNext={nextStep}
+              onPrevious={prevStep}
+              onDismiss={closeTutorial}
+            />
+          )}
+          {currentStep === 4 && (
+            <TutorialTooltip
+              visible={true}
+              position="bottom"
+              title={currentTutorialStep.title}
+              action={currentTutorialStep.action}
+              outcome={currentTutorialStep.outcome}
+              elementRef={metricsExportRef}
+              step={currentStep}
+              totalSteps={tutorialSteps.length}
+              onNext={nextStep}
+              onPrevious={prevStep}
+              onDismiss={closeTutorial}
+            />
+          )}
+        </>
+      )}
+    </div>
+
+  );
+};
+
+export default Report;

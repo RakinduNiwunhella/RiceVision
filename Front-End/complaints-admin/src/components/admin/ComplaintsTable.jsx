@@ -60,7 +60,7 @@ export default function ComplaintsTable({ complaints }) {
     <div className="space-y-6">
       {/* Page Header */}
       <div>
-        <h1 className="text-xl font-semibold text-gray-900">Complaints</h1>
+
         <p className="text-sm text-gray-500 mt-1">
           View, filter, and manage submitted complaints
         </p>
@@ -150,9 +150,8 @@ export default function ComplaintsTable({ complaints }) {
                   {/* Status Badge */}
                   <td className="px-4 py-3 text-center">
                     <span
-                      className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium capitalize ${
-                        STATUS_STYLES[statusKey] || "bg-gray-100 text-gray-700"
-                      }`}
+                      className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium capitalize ${STATUS_STYLES[statusKey] || "bg-gray-100 text-gray-700"
+                        }`}
                     >
                       <span className="w-2 h-2 rounded-full bg-current" />
                       {c.status || "New"}

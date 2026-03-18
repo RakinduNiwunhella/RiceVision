@@ -1,4 +1,19 @@
+import { useRef, useEffect, useState } from "react";
+
 export default function FiltersPanel({ filters, setFilters }) {
+  const [open, setOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const selectedDistrictRef = useRef(null);
+
+  useEffect(() => {
+    if (selectedDistrictRef.current) {
+      selectedDistrictRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }, [filters.districts]);
+
   // Alphabetically sorted district list
   const districts = [
     "Ampara",
@@ -20,7 +35,7 @@ export default function FiltersPanel({ filters, setFilters }) {
     "Matara",
     "Moneragala",
     "Mullaitivu",
-    "NuwaraEliya",
+    "Nuwara Eliya",
     "Polonnaruwa",
     "Puttalam",
     "Ratnapura",
@@ -28,48 +43,34 @@ export default function FiltersPanel({ filters, setFilters }) {
     "Vavuniya",
   ];
 
-  const healthStatuses = ["Healthy", "Stressed", "Damaged"];
-
-  const toggleArrayValue = (key, value) => {
-    setFilters((prev) => {
-      const exists = prev[key].includes(value);
-      return {
-        ...prev,
-        [key]: exists
-          ? prev[key].filter((v) => v !== value)
-          : [...prev[key], value],
-      };
-    });
-  };
+  const healthStatuses = [
+    "Normal",
+    "Mild Stress",
+    "Severe Stress",
+    "Not Applicable",
+  ];
 
   return (
-    <div className="w-72 bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
-      <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">Filters</h2>
+    <>
+      {/* Mobile Toggle Button */}
+      <button
+        onClick={() => setOpen(!open)}
+        className="md:hidden fixed top-20 left-4 z-[1000] bg-emerald-500 text-white p-3 rounded-full shadow-lg"
+      >
+        <span className="material-symbols-outlined">filter_list</span>
+      </button>
 
-      {/* District (Single Selection) */}
-      <div className="mb-9">
-        <p className="text-base font-medium text-gray-600 dark:text-gray-300 mb-2">District</p>
-        <div className="space-y-2 text-base max-h-64 overflow-y-auto">
-          {districts.map((d) => (
-            <label key={d} className="flex items-center gap-2 text-gray-700 dark:text-gray-200">
-              <input
-                type="radio"
-                name="district"
-                checked={filters.districts[0] === d}
-                onChange={() =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    districts: [d], // enforce single district
-                  }))
-                }
-              />
-              {d}
-            </label>
-          ))}
+      <div
+        className={`${open ? "block" : "hidden"} md:block fixed md:relative top-0 left-0 h-full md:h-auto w-72 md:w-80 glass p-4 sm:p-6 overflow-y-auto shadow-xl transition-transform duration-300 z-[999] md:translate-x-0`}
+      >
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-sm font-bold uppercase tracking-widest text-white/85">
+          Filters
+        </h2>
 
-          {/* Clear district */}
+        {filters.districts.length > 0 && (
           <button
-            className="text-sm text-blue-600 dark:text-blue-400 mt-2"
+            className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 hover:text-emerald-300"
             onClick={() =>
               setFilters((prev) => ({
                 ...prev,
@@ -77,43 +78,149 @@ export default function FiltersPanel({ filters, setFilters }) {
               }))
             }
           >
-            Clear district
+            Clear
           </button>
-        </div>
+        )}
       </div>
 
-      {/* Season */}
-      <div className="mb-9">
-        <p className="text-base font-medium text-gray-600 mb-2">Season</p>
-        <select
-          className="w-full border rounded-md px-2 py-1 text-base bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
-          value={filters.season}
+      {/* District (Searchable Dropdown) */}
+      <div className="mb-8 relative">
+        <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/40 mb-3">
+          District
+        </p>
+
+        <input
+          type="text"
+          placeholder="Search district..."
+          value={filters.districts[0] || ""}
           onChange={(e) =>
-            setFilters((prev) => ({ ...prev, season: e.target.value }))
+            setFilters((prev) => ({
+              ...prev,
+              districts: [e.target.value],
+            }))
           }
-        >
-          <option value="all">All seasons</option>
-          <option value="maha">Maha</option>
-          <option value="yala">Yala</option>
-        </select>
+          onFocus={() => setDropdownOpen(true)}
+          className="w-full px-4 pr-10 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder-white/40 focus:outline-none focus:border-emerald-400 focus:bg-white/10 transition"
+        />
+
+        {/* Dropdown list */}
+        {dropdownOpen && (
+          <div
+            className="relative w-full mt-2 max-h-64 overflow-y-auto custom-scrollbar rounded-xl bg-white/10 backdrop-blur-2xl border border-white/20 shadow-2xl z-[9999] ring-1 ring-white/10 animate-in fade-in zoom-in-95"
+            style={{ position: "relative" }}
+          >
+            {districts
+              .filter((d) =>
+                d.toLowerCase().includes((filters.districts[0] || "").toLowerCase())
+              )
+              .map((d) => (
+                <div
+                  key={d}
+                  onClick={() => {
+                    setFilters((prev) => ({
+                      ...prev,
+                      districts: [d],
+                    }));
+                    setDropdownOpen(false);
+                  }}
+                  className={`px-4 py-3 text-sm cursor-pointer transition-all duration-200 hover:bg-white/20 active:scale-[0.98] ${
+                    filters.districts[0] === d
+                      ? "bg-emerald-500/25 text-emerald-300 shadow-inner"
+                      : "text-white/80"
+                  }`}
+                >
+                  {d}
+                </div>
+              ))}
+          </div>
+        )}
       </div>
 
       {/* Health Status */}
-      <div className="mb-9">
-        <p className="text-base font-medium text-gray-600 mb-2">Health Status</p>
-        <div className="space-y-2 text-base">
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/85">
+            Crop Condition
+          </p>
+          {/* clear all by selecting 'All' or using button */}
+          {filters.health.length > 0 && (
+            <button
+              className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 hover:text-emerald-300"
+              onClick={() =>
+                setFilters((prev) => ({
+                  ...prev,
+                  health: [],
+                }))
+              }
+            >
+              Clear
+            </button>
+          )}
+        </div>
+        <div className="grid grid-cols-1 gap-2">
+          {/* explicit "All statuses" option */}
+          <label className="flex items-center justify-between px-3 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20 transition cursor-pointer">
+            <span className="text-sm font-medium text-white/90">All</span>
+            <input
+              type="radio"
+              name="health"
+              className="w-4 h-4 accent-emerald-500 cursor-pointer"
+              value=""
+              checked={filters.health.length === 0}
+              onChange={() =>
+                setFilters((prev) => ({
+                  ...prev,
+                  health: [],
+                }))
+              }
+            />
+          </label>
           {healthStatuses.map((s) => (
-            <label key={s} className="flex items-center gap-2 text-gray-700 dark:text-gray-200">
+            <label
+              key={s}
+              className="flex items-center justify-between px-3 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20 transition cursor-pointer"
+            >
+              <span className="text-sm font-medium text-white/90">{s}</span>
               <input
-                type="checkbox"
-                checked={filters.health.includes(s)}
-                onChange={() => toggleArrayValue("health", s)}
+                type="radio"
+                name="health"
+                className="w-4 h-4 accent-emerald-500 cursor-pointer"
+                value={s}
+                checked={filters.health[0] === s}
+                onChange={() =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    health: [s],
+                  }))
+                }
               />
-              {s}
             </label>
           ))}
         </div>
+
+        <div className="mt-4 pt-4 border-t border-white/10">
+          <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/85 mb-3">
+            Legend
+          </p>
+          <div className="space-y-2">
+            {[
+              { color: "#22c55e", label: "Normal" },
+              { color: "#eab308", label: "Mild Stress" },
+              { color: "#ef4444", label: "Severe Stress" },
+              { color: "#9ca3af", label: "Not Applicable" },
+            ].map(({ color, label }) => (
+              <div key={label} className="flex items-center gap-2">
+                <span
+                  className="w-3 h-3 rounded-full flex-shrink-0"
+                  style={{ backgroundColor: color }}
+                />
+                <span className="text-[11px] text-white/85">{label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

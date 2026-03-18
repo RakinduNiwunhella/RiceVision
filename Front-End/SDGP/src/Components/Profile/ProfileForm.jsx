@@ -1,200 +1,357 @@
-import React, { useState, useEffect } from 'react';
-import { supabase } from '../../supabaseClient';
-import { FaCamera } from 'react-icons/fa';
+import React, { useState, useEffect } from "react";
+import { supabase } from "../../supabaseClient";
+import { FaCamera } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 export default function ProfileForm() {
-    const [loading, setLoading] = useState(true);
-    const [uploading, setUploading] = useState(false);
-    const [formData, setFormData] = useState({
-        firstName: '',
-        lastName: '',
-        email: '',
-        phone: '',
-        nic: '',
-        district: '',
-        address: '',
-        avatarUrl: ''
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({
+    firstName: "",
+    lastName: "",
+    phone: "",
+    email: "",
+  });
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    avatarUrl: "",
+  });
+
+  const [status, setStatus] = useState(null); // { type: 'success' | 'error', message: string }
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/signin");
+  };
+
+  useEffect(() => {
+    getProfile();
+  }, []);
+
+  // Clear status after 5s
+  useEffect(() => {
+    if (status) {
+      const timer = setTimeout(() => setStatus(null), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [status]);
+
+  const validateField = (name, value) => {
+    const text = (value || "").trim();
+
+    if (name === "firstName") {
+      if (!text) return "First name is required.";
+      if (!/^[A-Za-z][A-Za-z\s'-]{1,49}$/.test(text)) {
+        return "Use letters only for first name.";
+      }
+    }
+
+    if (name === "lastName") {
+      if (!text) return "Surname is required.";
+      if (!/^[A-Za-z][A-Za-z\s'-]{1,49}$/.test(text)) {
+        return "Use letters only for surname.";
+      }
+    }
+
+    if (name === "phone") {
+      const normalized = text.replace(/[\s-]/g, "");
+      if (!normalized) return "Phone number is required.";
+      if (!/^(\+94\d{9}|0\d{9})$/.test(normalized)) {
+        return "Use a valid phone number (e.g. +94 77 123 4567 or 0771234567).";
+      }
+    }
+
+    if (name === "email") {
+      if (!text) return "Email address is required.";
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text)) {
+        return "Email address is not valid.";
+      }
+    }
+
+    return "";
+  };
+
+  const validateForm = () => {
+    const nextErrors = {
+      firstName: validateField("firstName", formData.firstName),
+      lastName: validateField("lastName", formData.lastName),
+      phone: validateField("phone", formData.phone),
+      email: validateField("email", formData.email),
+    };
+
+    setFieldErrors(nextErrors);
+    return !Object.values(nextErrors).some(Boolean);
+  };
+
+  async function getProfile() {
+    try {
+      setLoading(true);
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (user) {
+        const fullName = user.user_metadata?.full_name || "";
+        const nameParts = fullName.split(" ");
+
+        setFormData({
+          firstName: nameParts[0] || "",
+          lastName: nameParts.slice(1).join(" ") || "",
+          email: user.email || "",
+          phone: user.user_metadata?.phone || "",
+          avatarUrl: user.user_metadata?.avatar_url || "",
+        });
+      }
+    } catch (error) {
+      console.error("Error loading user data:", error.message);
+      setStatus({ type: 'error', message: `Failed to load profile: ${error.message}` });
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const uploadAvatar = async (event) => {
+    try {
+      setUploading(true);
+      setStatus(null);
+
+      if (!event.target.files || event.target.files.length === 0) {
+        throw new Error("Please select an image to upload.");
+      }
+
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      const file = event.target.files[0];
+      const fileExt = file.name.split(".").pop();
+      const filePath = `${user.id}/${Math.random()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("avatars")
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data } = supabase.storage
+        .from("avatars")
+        .getPublicUrl(filePath);
+
+      const publicUrl = data.publicUrl;
+
+      const { error: updateError } = await supabase.auth.updateUser({
+        data: { avatar_url: publicUrl },
+      });
+
+      if (updateError) throw updateError;
+
+      setFormData((prev) => ({ ...prev, avatarUrl: publicUrl }));
+      setStatus({ type: 'success', message: 'Profile photo updated successfully.' });
+    } catch (error) {
+      setStatus({ type: 'error', message: `Photo upload failed: ${error.message}` });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    setStatus(null);
+
+    if (!validateForm()) {
+      setStatus({ type: "error", message: "Please fix the highlighted fields and try again." });
+      return;
+    }
+
+    setLoading(true);
+
+    const { error } = await supabase.auth.updateUser({
+      data: {
+        full_name: `${formData.firstName} ${formData.lastName}`,
+        phone: formData.phone,
+        avatar_url: formData.avatarUrl,
+      },
     });
 
-    useEffect(() => {
-        getProfile();
-    }, []);
-
-    async function getProfile() {
-        try {
-            setLoading(true);
-            const { data: { user } } = await supabase.auth.getUser();
-
-            if (user) {
-                const fullName = user.user_metadata?.full_name || '';
-                const nameParts = fullName.split(' ');
-                
-                setFormData({
-                    firstName: nameParts[0] || '',
-                    lastName: nameParts.slice(1).join(' ') || '',
-                    email: user.email || '',
-                    phone: user.user_metadata?.phone || '',
-                    nic: user.user_metadata?.nic || '',
-                    district: user.user_metadata?.district || '',
-                    address: user.user_metadata?.address || '',
-                    avatarUrl: user.user_metadata?.avatar_url || ''
-                });
-            }
-        } catch (error) {
-            console.error('Error loading user data:', error.message);
-        } finally {
-            setLoading(false);
-        }
+    if (error) {
+      setStatus({ type: 'error', message: `Failed to update profile: ${error.message}` });
+    } else {
+      setStatus({ type: 'success', message: 'Profile updated successfully.' });
     }
 
-    const uploadAvatar = async (event) => {
-        try {
-            setUploading(true);
-            if (!event.target.files || event.target.files.length === 0) {
-                throw new Error('You must select an image to upload.');
-            }
-            const { data: { user } } = await supabase.auth.getUser();
-            const file = event.target.files[0];
-            const fileExt = file.name.split('.').pop();
-            const filePath = `${user.id}/${Math.random()}.${fileExt}`;
+    setLoading(false);
+  };
 
-            const { error: uploadError } = await supabase.storage
-                .from('avatars')
-                .upload(filePath, file);
-
-            if (uploadError) throw uploadError;
-
-            const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
-            const publicUrl = data.publicUrl;
-
-            const { error: updateError } = await supabase.auth.updateUser({
-                data: { avatar_url: publicUrl }
-            });
-
-            if (updateError) throw updateError;
-            setFormData(prev => ({ ...prev, avatarUrl: publicUrl }));
-            alert('Profile photo updated successfully!');
-        } catch (error) {
-            alert(`Upload failed: ${error.message}`);
-        } finally {
-            setUploading(false);
-        }
-    };
-
-    const handleUpdate = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        const { error } = await supabase.auth.updateUser({
-            data: { 
-                full_name: `${formData.firstName} ${formData.lastName}`,
-                phone: formData.phone,
-                nic: formData.nic,
-                district: formData.district,
-                address: formData.address,
-                avatar_url: formData.avatarUrl 
-            }
-        });
-
-        if (error) {
-            alert(error.message);
-        } else {
-            alert('Profile updated successfully!');
-        }
-        setLoading(false);
-    };
-
-    if (loading && !formData.email) {
-        return (
-            <div className="flex items-center justify-center min-h-screen bg-slate-50 dark:bg-slate-950">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
-            </div>
-        );
-    }
-
+  if (loading && !formData.email) {
     return (
-        <div className="font-sans transition-colors duration-300">
-            <div className="max-w-4xl mx-auto">
-                
-                {/* Avatar Upload Section */}
-                <div className="flex flex-col items-center mb-10">
-                    <div className="relative group">
-                        <div className="w-32 h-32 rounded-full overflow-hidden bg-green-100 dark:bg-green-900/30 flex items-center justify-center border-4 border-white dark:border-slate-800 shadow-md">
-                            {formData.avatarUrl ? (
-                                <img src={formData.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
-                            ) : (
-                                <span className="text-4xl font-bold text-green-600 dark:text-green-400 uppercase">
-                                    {formData.firstName.charAt(0)}{formData.lastName.charAt(0)}
-                                </span>
-                            )}
-                        </div>
-                        
-                        <label 
-                            htmlFor="avatar-upload" 
-                            className="absolute inset-0 flex items-center justify-center bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 cursor-pointer transition-all duration-200"
-                        >
-                            <FaCamera size={24} className="transform group-hover:scale-110 transition-transform" />
-                        </label>
-                        <input 
-                            type="file" id="avatar-upload" accept="image/*" 
-                            onChange={uploadAvatar} disabled={uploading} className="hidden" 
-                        />
-                    </div>
-                    {uploading && <p className="text-xs text-green-600 dark:text-green-400 mt-3 font-semibold animate-pulse">Uploading Image...</p>}
-                </div>
-
-                <form onSubmit={handleUpdate} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Input Component Wrapper for easier reading */}
-                        {[
-                            { label: 'First Name', key: 'firstName', type: 'text', placeholder: 'Enter your first name' },
-                            { label: 'Last Name', key: 'lastName', type: 'text', placeholder: 'Enter your last name' },
-                            { label: 'Email Address', key: 'email', type: 'email', disabled: true },
-                            { label: 'Phone Number', key: 'phone', type: 'text', placeholder: '07XXXXXXXX' },
-                            { label: 'NIC Number', key: 'nic', type: 'text', placeholder: '200012345678' },
-                            { label: 'District', key: 'district', type: 'text', placeholder: 'Enter your district' },
-                        ].map((field) => (
-                            <div key={field.key}>
-                                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
-                                    {field.label}
-                                </label>
-                                <input 
-                                    type={field.type}
-                                    value={formData[field.key]}
-                                    disabled={field.disabled}
-                                    onChange={(e) => setFormData({...formData, [field.key]: e.target.value})}
-                                    placeholder={field.placeholder}
-                                    className={`w-full px-4 py-3 rounded-xl border outline-none transition-all 
-                                        ${field.disabled 
-                                            ? 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-500 cursor-not-allowed' 
-                                            : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-green-500 dark:focus:ring-green-600'
-                                        }`}
-                                />
-                            </div>
-                        ))}
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">Address</label>
-                        <textarea 
-                            rows="3"
-                            value={formData.address}
-                            onChange={(e) => setFormData({...formData, address: e.target.value})}
-                            placeholder="Enter your permanent address"
-                            className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-green-500 dark:focus:ring-green-600 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
-                        ></textarea>
-                    </div>
-
-                    <div className="flex justify-end pt-4">
-                        <button 
-                            type="submit"
-                            disabled={loading || uploading}
-                            className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 text-white font-bold py-4 px-10 rounded-xl transition-all shadow-xl  active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            {loading ? 'Processing...' : 'Save Changes'}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+      <div className="flex flex-col items-center gap-4 py-20">
+        <div className="w-12 h-12 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+        <p className="text-white/85 font-black uppercase tracking-widest text-xs animate-pulse">Loading profile...</p>
+      </div>
     );
+  }
+
+  const inputClass = "w-full px-5 py-4 rounded-2xl border border-white/10 bg-white/5 text-white placeholder:text-white/85 focus:outline-none focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500/60 hover:border-white/25 hover:bg-white/[0.08] transition-all duration-200 font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed cursor-text";
+
+  const updateField = (key, value) => {
+    setFormData((prev) => ({ ...prev, [key]: value }));
+    setFieldErrors((prev) => ({ ...prev, [key]: validateField(key, value) }));
+  };
+
+  return (
+    <div className="font-sans relative">
+      {/* Global Status Banner */}
+      {status && (
+        <div className={`fixed top-24 left-1/2 -translate-x-1/2 z-[60] px-6 py-3 rounded-2xl border glass flex items-center gap-3 animate-in slide-in-from-top-4 duration-500 ${status.type === 'success' ? 'border-emerald-500/50 text-emerald-400' : 'border-red-500/50 text-red-400'}`}>
+          <span className="material-symbols-outlined text-[18px]">
+            {status.type === 'success' ? 'check_circle' : 'error'}
+          </span>
+          <span className="text-[11px] font-black uppercase tracking-widest">{status.message}</span>
+        </div>
+      )}
+
+      <div className="max-w-4xl mx-auto">
+        {/* Avatar Upload Section */}
+        <div className="flex flex-col items-center mb-10">
+          <div className="relative group">
+            <div className="w-40 h-40 rounded-full overflow-hidden glass border-4 border-white/10 flex items-center justify-center shadow-2xl relative transition-all duration-500 group-hover:scale-105 group-hover:border-emerald-500/50">
+              {formData.avatarUrl ? (
+                <img
+                  src={formData.avatarUrl}
+                  alt="Avatar"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="flex flex-col items-center gap-1">
+                  <span className="text-5xl font-black text-emerald-400 tracking-tighter uppercase drop-shadow-[0_0_10px_rgba(16,185,129,0.5)]">
+                    {formData.firstName?.charAt(0) || 'U'}
+                    {formData.lastName?.charAt(0) || 'O'}
+                  </span>
+                </div>
+              )}
+              {/* Overlay for glass effect */}
+              <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent pointer-events-none" />
+              {uploading && (
+                <div className="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-sm">
+                  <div className="w-8 h-8 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+                </div>
+              )}
+            </div>
+
+            <label
+              htmlFor="avatar-upload"
+              className="absolute bottom-2 right-2 p-3 bg-emerald-500 text-white rounded-2xl shadow-xl cursor-pointer hover:bg-emerald-400 hover:scale-110 active:scale-95 transition-all duration-300 border-4 border-white/20"
+            >
+              <FaCamera size={20} />
+            </label>
+
+            <input
+              type="file"
+              id="avatar-upload"
+              accept="image/*"
+              onChange={uploadAvatar}
+              disabled={uploading}
+              className="hidden"
+            />
+          </div>
+
+          {uploading && (
+            <p className="text-[10px] text-emerald-400 mt-6 font-black uppercase tracking-[0.3em] animate-pulse">
+              Uploading photo...
+            </p>
+          )}
+        </div>
+
+        <form onSubmit={handleUpdate} className="space-y-12">
+          {/* Basic profile section */}
+          <div className="space-y-8">
+            <div className="flex items-center gap-4">
+              <span className="h-px flex-1 bg-white/10"></span>
+              <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-white/85">Basic information</h3>
+              <span className="h-px flex-1 bg-white/10"></span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {[
+                { label: "First name", key: "firstName", type: "text", placeholder: "John" },
+                { label: "Surname", key: "lastName", type: "text", placeholder: "Doe" },
+                { label: "Phone number", key: "phone", type: "tel", placeholder: "+94 77 123 4567" },
+              ].map((field) => (
+                <div key={field.key} className="group/field space-y-2">
+                  <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/85 ml-2 transition-colors duration-200 group-hover/field:text-emerald-400/70">
+                    {field.label}
+                  </label>
+                  <input
+                    type={field.type}
+                    placeholder={field.placeholder}
+                    value={formData[field.key]}
+                    onChange={(e) => updateField(field.key, e.target.value)}
+                    onBlur={(e) => setFieldErrors((prev) => ({ ...prev, [field.key]: validateField(field.key, e.target.value) }))}
+                    className={`${inputClass} ${fieldErrors[field.key] ? "border-red-400/70 focus:border-red-400/80 focus:ring-red-500/20" : ""}`}
+                    required
+                  />
+                  {fieldErrors[field.key] && (
+                    <p className="text-[11px] text-red-300 font-semibold ml-2">{fieldErrors[field.key]}</p>
+                  )}
+                </div>
+              ))}
+              <div className="group/field space-y-2">
+                <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-white/85 ml-2 transition-colors duration-200 group-hover/field:text-emerald-400/70">
+                  Email address
+                </label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  disabled
+                  onBlur={(e) => setFieldErrors((prev) => ({ ...prev, email: validateField("email", e.target.value) }))}
+                  className={`${inputClass} ${fieldErrors.email ? "border-red-400/70" : ""}`}
+                />
+                {fieldErrors.email && (
+                  <p className="text-[11px] text-red-300 font-semibold ml-2">{fieldErrors.email}</p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-center pt-16 sm:pt-20 mt-4 flex-col items-center gap-4">
+            <button
+              type="submit"
+              disabled={loading || uploading}
+              className="group relative w-full md:w-80 h-14 rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-500/25 active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
+            >
+              <div className="absolute inset-0 bg-emerald-500/20 group-hover:bg-emerald-500/35 transition-colors duration-300" />
+              <div className="absolute inset-x-0 bottom-0 h-[2px] bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)] group-hover:shadow-[0_0_25px_rgba(16,185,129,0.8)] transition-all duration-300" />
+              <div className="relative flex items-center justify-center gap-2 text-emerald-300 text-sm font-bold tracking-wide">
+                {loading ? (
+                  <div className="w-4 h-4 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+                ) : (
+                  <span className="material-symbols-outlined text-[20px]">
+                    {status?.type === 'success' ? 'verified' : 'shield_with_heart'}
+                  </span>
+                )}
+                {loading ? "Saving..." : status?.type === 'success' ? "Saved" : "Save Profile"}
+              </div>
+            </button>
+            
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="group relative w-full md:w-80 h-14 rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-red-500/25 active:scale-95"
+            >
+              <div className="absolute inset-0 bg-red-500/10 group-hover:bg-red-500/20 transition-colors duration-300" />
+              <div className="absolute inset-x-0 bottom-0 h-[2px] bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.5)] group-hover:shadow-[0_0_25px_rgba(239,68,68,0.8)] transition-all duration-300" />
+              <div className="relative flex items-center justify-center gap-2 text-red-400 text-sm font-bold tracking-wide">
+                <span className="material-symbols-outlined text-[20px]">logout</span>
+                Log Out
+              </div>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 }
