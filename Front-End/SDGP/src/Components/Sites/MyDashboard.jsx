@@ -219,6 +219,43 @@ const MyDashboard = () => {
     return <AlertTriangle size={18} className="text-amber-400" />;
   };
 
+  const sortedDistrictHealth = useMemo(() => {
+    return [...districtHealth].sort((a, b) => {
+      const aPestRisk = 100 - Number(a?.normal_pct ?? 0);
+      const bPestRisk = 100 - Number(b?.normal_pct ?? 0);
+      return bPestRisk - aPestRisk;
+    });
+  }, [districtHealth]);
+
+  const districtOverview = useMemo(() => {
+    if (sortedDistrictHealth.length === 0) {
+      return { avgHealth: 0, avgPestRisk: 0, highRiskCount: 0 };
+    }
+
+    const totalHealth = sortedDistrictHealth.reduce(
+      (sum, district) => sum + Number(district?.normal_pct ?? 0),
+      0,
+    );
+
+    const avgHealth = Math.round(totalHealth / sortedDistrictHealth.length);
+    const avgPestRisk = Math.max(0, 100 - avgHealth);
+    const highRiskCount = sortedDistrictHealth.filter(
+      (district) => 100 - Number(district?.normal_pct ?? 0) > 70,
+    ).length;
+
+    return { avgHealth, avgPestRisk, highRiskCount };
+  }, [sortedDistrictHealth]);
+
+  const visibleDistricts = showAllDistricts
+    ? sortedDistrictHealth
+    : sortedDistrictHealth.slice(0, 12);
+
+  const getRiskMeta = (pestRiskPct) => {
+    if (pestRiskPct <= 30) return { label: "Low", color: "#10b981" };
+    if (pestRiskPct <= 70) return { label: "Medium", color: "#f59e0b" };
+    return { label: "High", color: "#ef4444" };
+  };
+
   /* ------------------ RENDER ------------------ */
 
   return (
@@ -513,75 +550,158 @@ const MyDashboard = () => {
           </div>
 
           {/* Regional Health / Pest Overview */}
-<div ref={districtTableRef} className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
-  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/85 mb-2 flex items-center gap-2">
-    <Bug className="text-rose-400 text-sm" />
-    District Overview
-  </p>
+          <div ref={districtTableRef} className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
+            <div className="flex flex-col gap-5 mb-6">
+              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-white/85">
+                <Bug className="text-rose-400" size={14} />
+                District Overview
+              </div>
 
-  <h3 className="text-xl font-black text-white tracking-tight uppercase mb-8">
-    District Pest & Health Status
-  </h3>
+              <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+                <h3 className="text-xl font-black text-white tracking-tight uppercase">
+                  District Pest & Health Status
+                </h3>
 
-  <div className="flex-1 space-y-2 no-scrollbar overflow-y-auto max-h-[420px] pr-2">
-    {(showAllDistricts ? districtHealth : districtHealth.slice(0, 12)).map((d, i) => {
-      const healthPct = Math.round(d.normal_pct);
-      const pestPct = Math.round(100 - d.normal_pct);
+                <div className="grid grid-cols-3 gap-2 w-full lg:w-auto lg:min-w-[340px]">
+                  <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-center">
+                    <p className="text-[9px] font-black uppercase tracking-[0.12em] text-white/50">Avg Pest Risk</p>
+                    <p className="text-sm font-black tabular-nums text-amber-400 mt-1">{districtOverview.avgPestRisk}%</p>
+                  </div>
+                  <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-center">
+                    <p className="text-[9px] font-black uppercase tracking-[0.12em] text-white/50">Avg Health</p>
+                    <p className="text-sm font-black tabular-nums text-emerald-400 mt-1">{districtOverview.avgHealth}%</p>
+                  </div>
+                  <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-center">
+                    <p className="text-[9px] font-black uppercase tracking-[0.12em] text-white/50">High Risk</p>
+                    <p className="text-sm font-black tabular-nums text-rose-400 mt-1">{districtOverview.highRiskCount}</p>
+                  </div>
+                </div>
+              </div>
 
-      const healthColor = healthPct >= 75 ? "#10b981" : healthPct >= 50 ? "#f59e0b" : "#ef4444";
-      const pestColor = pestPct <= 30 ? "#10b981" : pestPct <= 70 ? "#f59e0b" : "#ef4444";
-      const statusIcon = pestPct <= 30 ? "🟢" : pestPct <= 70 ? "🟡" : "🔴";
-
-      return (
-        <div
-          key={i}
-          className="flex justify-between items-center p-3 rounded-2xl bg-white/5 hover:bg-white/10 transition-all group"
-        >
-          <div className="flex items-center gap-3">
-            <Bug size={14} className="text-rose-400" />
-            <span className="text-xs font-black text-white/85 uppercase tracking-tight group-hover:text-white transition-colors">
-              {d.district}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <div className="w-20 h-1.5 bg-white/5 rounded-full overflow-hidden p-[1px]">
-              <div
-                className="h-full rounded-full transition-all duration-1000"
-                style={{ width: `${pestPct}%`, background: pestColor }}
-              />
+              <div className="flex items-center gap-4 text-[9px] font-black uppercase tracking-[0.14em] text-white/60">
+                <span className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                  Low: 0-30%
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-amber-500" />
+                  Medium: 31-70%
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-rose-500" />
+                  High: 71-100%
+                </span>
+              </div>
             </div>
 
-            <span className="text-[10px] font-black tabular-nums text-right" style={{ color: pestColor }}>
-              {pestPct}% {statusIcon}
-            </span>
+            {districtHealth.length > 0 ? (
+              <>
+                <div className="hidden md:grid grid-cols-12 gap-4 px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-[10px] font-black uppercase tracking-[0.14em] text-white/55">
+                  <span className="col-span-4">District</span>
+                  <span className="col-span-3 text-center">Pest Risk</span>
+                  <span className="col-span-3 text-center">Health</span>
+                  <span className="col-span-2 text-right">Status</span>
+                </div>
 
-            <div className="w-20 h-1.5 bg-white/5 rounded-full overflow-hidden p-[1px]">
-              <div
-                className="h-full rounded-full transition-all duration-1000"
-                style={{ width: `${healthPct}%`, background: healthColor }}
-              />
+                <div className="mt-3 flex-1 no-scrollbar overflow-y-auto max-h-[420px] pr-1 space-y-2">
+                  {visibleDistricts.map((district, i) => {
+                    const healthPct = Math.max(0, Math.min(100, Math.round(Number(district.normal_pct || 0))));
+                    const pestRiskPct = 100 - healthPct;
+                    const healthColor = healthPct >= 75 ? "#10b981" : healthPct >= 50 ? "#f59e0b" : "#ef4444";
+                    const riskMeta = getRiskMeta(pestRiskPct);
+
+                    return (
+                      <div
+                        key={`${district.district}-${i}`}
+                        className="grid grid-cols-1 md:grid-cols-12 items-center gap-3 md:gap-4 p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/20 transition-all"
+                      >
+                        <div className="md:col-span-4 flex items-center justify-between md:justify-start gap-3 min-w-0">
+                          <div className="w-6 h-6 rounded-lg border border-white/10 bg-white/5 text-[10px] font-black text-white/70 flex items-center justify-center shrink-0">
+                            {i + 1}
+                          </div>
+                          <span className="text-xs font-black text-white/90 uppercase tracking-tight truncate">
+                            {district.district}
+                          </span>
+                          <span
+                            className="md:hidden text-[9px] font-black uppercase tracking-[0.12em] px-2 py-1 rounded-full border"
+                            style={{
+                              color: riskMeta.color,
+                              borderColor: `${riskMeta.color}55`,
+                              backgroundColor: `${riskMeta.color}1a`,
+                            }}
+                          >
+                            {riskMeta.label} Risk
+                          </span>
+                        </div>
+
+                        <div className="md:col-span-3">
+                          <div className="flex items-center justify-between mb-1.5">
+                            <span className="md:hidden text-[9px] font-black uppercase tracking-[0.12em] text-white/55">Pest Risk</span>
+                            <span className="text-[10px] font-black tabular-nums" style={{ color: riskMeta.color }}>
+                              {pestRiskPct}%
+                            </span>
+                          </div>
+                          <div className="w-full h-2 rounded-full bg-white/5 border border-white/10 overflow-hidden">
+                            <div
+                              className="h-full rounded-full transition-all duration-1000"
+                              style={{ width: `${pestRiskPct}%`, background: riskMeta.color }}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="md:col-span-3">
+                          <div className="flex items-center justify-between mb-1.5">
+                            <span className="md:hidden text-[9px] font-black uppercase tracking-[0.12em] text-white/55">Health</span>
+                            <span className="text-[10px] font-black tabular-nums" style={{ color: healthColor }}>
+                              {healthPct}%
+                            </span>
+                          </div>
+                          <div className="w-full h-2 rounded-full bg-white/5 border border-white/10 overflow-hidden">
+                            <div
+                              className="h-full rounded-full transition-all duration-1000"
+                              style={{ width: `${healthPct}%`, background: healthColor }}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="hidden md:flex md:col-span-2 justify-end">
+                          <span
+                            className="text-[10px] font-black uppercase tracking-[0.12em] px-2.5 py-1 rounded-full border"
+                            style={{
+                              color: riskMeta.color,
+                              borderColor: `${riskMeta.color}55`,
+                              backgroundColor: `${riskMeta.color}1a`,
+                            }}
+                          >
+                            {riskMeta.label}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            ) : (
+              <div className="flex-1 min-h-48 flex items-center justify-center text-white/70 animate-pulse text-xs font-black uppercase tracking-widest">
+                Loading District Data...
+              </div>
+            )}
+
+            <div className="mt-8 pt-6 border-t border-white/5 text-center">
+              <button
+                ref={districtToggleBtnRef}
+                onClick={() => districtHealth.length > 12 && setShowAllDistricts(!showAllDistricts)}
+                disabled={districtHealth.length <= 12}
+                className={`text-[10px] font-black uppercase tracking-[0.4em] transition-colors ${districtHealth.length > 12 ? "text-white/85 hover:text-white" : "text-white/35 cursor-not-allowed"}`}
+              >
+                {districtHealth.length <= 12
+                  ? `Showing ${districtHealth.length} Districts`
+                  : showAllDistricts
+                    ? "Show Top 12"
+                    : `Show All (${districtHealth.length} Districts)`}
+              </button>
             </div>
-
-            <span className="text-[10px] font-black tabular-nums text-right" style={{ color: healthColor }}>
-              {healthPct}%
-            </span>
           </div>
-        </div>
-      );
-    })}
-  </div>
-
-  <div className="mt-8 pt-6 border-t border-white/5 text-center">
-    <button
-      ref={districtToggleBtnRef}
-      onClick={() => setShowAllDistricts(!showAllDistricts)}
-      className="text-[10px] font-black uppercase tracking-[0.4em] text-white/85 hover:text-white transition-colors"
-    >
-      {showAllDistricts ? "Show Less" : `Show All (${districtHealth.length} Items)`}
-    </button>
-  </div>
-</div>
 
         </div>
 
