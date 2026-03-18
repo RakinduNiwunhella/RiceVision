@@ -64,11 +64,11 @@ def get_yield():
 
 @router.get("/best-districts")
 def get_best_yield_districts():
-    # Primary source: precomputed yield view for all districts.
+    # Primary source: precomputed top-yield view for quick dashboard preview.
     response = supabase.table("best_yield_districts_view") \
         .select("District, total_yield_kg_ha") \
         .order("total_yield_kg_ha", desc=True) \
-        .limit(25) \
+        .limit(5) \
         .execute()
 
     ranked = [
@@ -76,8 +76,8 @@ def get_best_yield_districts():
         if (row.get("District") or "").strip() and row.get("total_yield_kg_ha") is not None
     ]
 
-    # Fallback: when the view returns fewer than 25 valid rows, compute from raw dataset.
-    if len(ranked) < 25:
+    # Fallback: when the view returns fewer than 5 valid rows, compute from raw dataset.
+    if len(ranked) < 5:
         raw = supabase.table("Final_Dataset_Yield") \
             .select("districtname, predictedyield_kg_ha") \
             .limit(5000) \
@@ -126,10 +126,79 @@ def get_best_yield_districts():
             ranked.append(row)
             seen.add(district_key)
 
-            if len(ranked) >= 25:
+            if len(ranked) >= 5:
                 break
 
-    return ranked[:25]
+    return ranked[:5]
+
+
+@router.get("/district-yields")
+def get_district_yields():
+    response = supabase.table("Final_Dataset_Yield") \
+        .select("districtname, predictedyield_kg_ha, totalyield_kg") \
+        .limit(5000) \
+        .execute()
+
+    rows = response.data or []
+    district_stats = {}
+
+    for row in rows:
+        district = (row.get("districtname") or "").strip()
+        if not district:
+            continue
+
+        district_key = district.lower()
+        stats = district_stats.setdefault(
+            district_key,
+            {
+                "districtname": district,
+                "sum_predicted": 0.0,
+                "predicted_count": 0,
+                "sum_total_yield": 0.0,
+            },
+        )
+
+        predicted_value = row.get("predictedyield_kg_ha")
+        total_yield_value = row.get("totalyield_kg")
+
+        try:
+            if predicted_value is not None:
+                stats["sum_predicted"] += float(predicted_value)
+                stats["predicted_count"] += 1
+        except (TypeError, ValueError):
+            pass
+
+        try:
+            if total_yield_value is not None:
+                stats["sum_total_yield"] += float(total_yield_value)
+        except (TypeError, ValueError):
+            pass
+
+    district_rows = []
+    for stats in district_stats.values():
+        predicted_avg = (
+            stats["sum_predicted"] / stats["predicted_count"]
+            if stats["predicted_count"] > 0
+            else 0.0
+        )
+
+        district_rows.append(
+            {
+                "districtname": stats["districtname"],
+                "predictedyield_kg_ha": predicted_avg,
+                "totalyield_kg": stats["sum_total_yield"],
+            }
+        )
+
+    district_rows.sort(
+        key=lambda item: (
+            float(item.get("totalyield_kg") or 0),
+            float(item.get("predictedyield_kg_ha") or 0),
+        ),
+        reverse=True,
+    )
+
+    return district_rows[:25]
 
 
 @router.get("/health-summary")

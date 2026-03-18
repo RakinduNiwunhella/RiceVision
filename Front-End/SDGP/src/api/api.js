@@ -22,6 +22,7 @@ async function get(path) {
 export const fetchHealthSummary = () => get("/health-summary");
 export const fetchYield = () => get("/yield");
 export const fetchBestDistricts = () => get("/best-districts");
+export const fetchDistrictYields = () => get("/district-yields");
 export const fetchOutbreaks = () => get("/outbreaks");
 export const fetchNDVITrend = () => get("/ndvi-trend");
 export const fetchDistrictHealth = () => get("/district-health");
