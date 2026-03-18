@@ -4,6 +4,7 @@ import { FaSun, FaMoon } from "react-icons/fa";
 import { useTheme } from "../../context/ThemeContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { supabase } from "../../supabaseClient";
+import { saveUserField } from "../../api/api";
 import FieldDrawMap from "./FieldDrawMap";
 import TutorialTooltip from "../../Components/TutorialTooltip";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
@@ -101,25 +102,26 @@ export default function FieldSetupPage() {
     }
 
     setSaving(true);
-    const price_lkr = Math.ceil(acres * PRICE_PER_ACRE_LKR);
-    const { error } = await supabase.from("user_fields").upsert(
-      {
-        user_id:    user.id,
+    try {
+      const price_lkr = Math.ceil(acres * PRICE_PER_ACRE_LKR);
+      await saveUserField({
         field_name: fieldName || null,
-        geojson:    drawnFeature,
+        geojson: drawnFeature,
         area_acres: acres,
         price_lkr,
-        district:   district || null,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "user_id" }
-    );
-    setSaving(false);
-
-    if (error) {
+        district: district || null,
+      });
+    } catch (error) {
+      setSaving(false);
       alert(`Could not save field: ${error.message}`);
+
+      if ((error.message || "").toLowerCase().includes("401")) {
+        navigate("/signin");
+      }
       return;
     }
+
+    setSaving(false);
     navigate("/dashboard");
   };
 
@@ -296,7 +298,7 @@ export default function FieldSetupPage() {
               onClear={handleClear}
               fieldName={fieldName}
               onFieldNameChange={setFieldName}
-              height="calc(100vh - 380px)"
+              height="calc(100vh - 320px)"
             />
 
             <div className="flex justify-between gap-3 pt-1">
@@ -348,7 +350,7 @@ export default function FieldSetupPage() {
                 </div>
 
                 <div className="border-t border-white/10 pt-4 space-y-2">
-                  <SummaryRow label={t('rateLabel')}       value={`Rs. ${PRICE_PER_ACRE_LKR.toLocaleString()} / acre / year`} />
+                  <SummaryRow label={t('rateLabel')}       value={`Rs. ${PRICE_PER_ACRE_LKR.toLocaleString()} / acre / month`} />
                   <div className="flex justify-between items-center">
                     <span className="text-[11px] font-black uppercase tracking-widest text-emerald-400">
                       {t('annualCostLabel')}
@@ -420,7 +422,7 @@ export default function FieldSetupPage() {
                   onClick={() => setPayClicked(true)}
                   className="w-full py-3.5 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-400 font-black text-sm hover:bg-amber-500/25 transition-all tracking-wide"
                 >
-                  Pay Rs. {price.toLocaleString()} / year
+                  Pay Rs. {price.toLocaleString()} / month
                 </button>
 
                 {payClicked && (

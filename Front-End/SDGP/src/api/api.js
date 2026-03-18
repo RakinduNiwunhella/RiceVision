@@ -153,3 +153,41 @@ export const fetchGEETileUrl = async ({
   }
   return res.json();
 };
+
+/* ------------------ USER FIELD ------------------ */
+export const fetchUserField = () => get("/user-field");
+
+export const saveUserField = async (payload) => {
+  const res = await apiFetch("/user-field", {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    let message = "Failed to save field";
+    try {
+      const data = await res.json();
+      message = data.detail || message;
+    } catch (_) {}
+    throw new Error(message);
+  }
+
+  return res.json();
+};
+
+export const removeUserField = async () => {
+  const res = await apiFetch("/user-field", {
+    method: "DELETE",
+  });
+
+  if (!res.ok) {
+    let message = "Failed to delete field";
+    try {
+      const data = await res.json();
+      message = data.detail || message;
+    } catch (_) {}
+    throw new Error(message);
+  }
+
+  return res.json();
+};
