@@ -920,11 +920,11 @@ export const translations = {
 
     // ── Dashboard ──
     welcomeTitle: "RiceVision වෙත සාදරයෙන් පිළිගනිමු",
-    welcomeSubtitle: "බුද්ධිමත් ගොවිතැන සඳහා අවබෝධය",
+    welcomeSubtitle: "නවීන කෘෂිකර්මය සඳහා බුද්ධිමත් මඟපෙන්වීම්",
     systemSynced: "පද්ධතිය සමමුහුර්ත කර ඇත",
     cropHealthDist: "බෝග සෞඛ්‍ය බෙදාහැරීම",
     analysing: "විශ්ලේෂණය කරමින්...",
-    optimal: "ශ්‍රේෂ්ඨ",
+    optimal: "නීරෝගී",
     mildStress: "මධ්‍යම ආතතිය",
     severeStress: "දැඩි ආතතිය",
     outputProjection: "නිෂ්පාදන අනාවැකිය",
@@ -1545,7 +1545,7 @@ export const translations = {
     stageMilk: "කිරි අවස්ථාව",
     stageDough: "පිටි අවස්ථාව",
     stageRipening: "ප්‍රswimmers ඔවුන්",
-    stageMaturity: "ඉඩ්ම අවස්ථාව",
+    stageMaturity: "",
 
     // ── Pest Risk Levels ──
     pestRiskNone: "නැත",
