@@ -278,11 +278,6 @@ const Help = () => {
                 ))}
               </div>
             </div>
-
-            {/* Support Tag */}
-            <div className="glass p-6 rounded-3xl border border-white/10 text-center">
-              <p className="text-[10px] font-black uppercase text-white/85 tracking-tighter">System Version Alpha-1.0.4 • RiceVision Core</p>
-            </div>
           </div>
         </div>
 
