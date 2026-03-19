@@ -81,6 +81,7 @@ const MyDashboard = () => {
   const [districtHealth, setDistrictHealth] = useState([]);
   const [showAllDistricts, setShowAllDistricts] = useState(false);
   const [stageDistribution, setStageDistribution] = useState([]);
+  const [outbreaks, setOutbreaks] = useState([]);
 
   // Refs for tutorial tooltips
   const headerRef = useRef(null);
@@ -88,6 +89,9 @@ const MyDashboard = () => {
   const healthCardRef = useRef(null);
   const yieldCardRef = useRef(null);
   const supplyCardRef = useRef(null);
+  const threatsCardRef = useRef(null);
+  const threatDetailsBtnRef = useRef(null);
+  const outbreaksToggleBtnRef = useRef(null);
   const yieldInsightsRef = useRef(null);
   const stageChartRef = useRef(null);
   const districtTableRef = useRef(null);
