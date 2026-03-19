@@ -10,6 +10,7 @@ import FieldDrawMap from "../FieldSetup/FieldDrawMap";
 import { PRICE_PER_ACRE_LKR } from "../FieldSetup/fieldConstants";
 import { useLanguage } from "../../context/LanguageContext";
 import { translateDistrictName } from "../../utils/locationTranslations";
+import { fetchUserField, saveUserField, removeUserField } from "../../api/api";
 
 export default function MyFieldTab() {
   const { t, language } = useLanguage();
@@ -212,6 +213,7 @@ export default function MyFieldTab() {
           <div className="rounded-2xl overflow-hidden border border-white/10">
             <FieldDrawMap
               initialFeature={existing.geojson}
+              initialDistrict={existing?.district}
               readOnly
               height="600px"
             />
@@ -235,6 +237,7 @@ export default function MyFieldTab() {
             fieldName={fieldName}
             onFieldNameChange={setFieldName}
             initialFeature={editMode ? existing?.geojson : null}
+            initialDistrict={editMode ? existing?.district : null}
             height="600px"
           />
 
