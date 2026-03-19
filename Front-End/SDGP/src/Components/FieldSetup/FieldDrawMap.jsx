@@ -37,10 +37,18 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw";
 import "leaflet-draw/dist/leaflet.draw.css";
+import { useLanguage } from "../../context/LanguageContext";
+import { translateDistrictName } from "../../utils/locationTranslations";
 import { DISTRICTS, BASE_MAPS, SQM_PER_ACRE, PRICE_PER_ACRE_LKR } from "./fieldConstants";
 
 /* ── Constants ─────────────────────────────────────────────────────────────── */
 const SL_CENTER = [7.8731, 80.7718];
+const BASE_MAP_LABEL_KEYS = {
+  satellite: "mapBasemapSatellite",
+  street: "mapBasemapStreet",
+  terrain: "mapBasemapTerrain",
+  dark: "mapBasemapDark",
+};
 
 /* ── geodesic area helper (provided by leaflet-draw) ─────────────────────── */
 function calcAreaM2(layer) {
@@ -222,6 +230,7 @@ export default function FieldDrawMap({
   readOnly = false,
   height   = "480px",
 }) {
+  const { t, language } = useLanguage();
   const [selectedDistrict,  setSelectedDistrict]  = useState(null);
   const [paddyGeoJSON,      setPaddyGeoJSON]       = useState(null);
   const [loadingGeoJSON,    setLoadingGeoJSON]     = useState(false);
@@ -288,10 +297,11 @@ export default function FieldDrawMap({
     if (q.length < 3) { setLocResults([]); return; }
     locDebounce.current = setTimeout(async () => {
       try {
+        const nominatimLang = language === "si" || language === "ta" ? language : "en";
         const res  = await fetch(
           `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
             q + " Sri Lanka"
-          )}&format=json&limit=5&countrycodes=lk`
+          )}&format=json&limit=5&countrycodes=lk&accept-language=${nominatimLang}`
         );
         const data = await res.json();
         setLocResults(data);
@@ -308,7 +318,8 @@ export default function FieldDrawMap({
   };
 
   const filteredDistricts = DISTRICTS.filter((d) =>
-    d.name.toLowerCase().includes(districtSearch.toLowerCase())
+    d.name.toLowerCase().includes(districtSearch.toLowerCase()) ||
+    translateDistrictName(d.name, language).toLowerCase().includes(districtSearch.toLowerCase())
   );
 
   const price = Math.ceil(acres * PRICE_PER_ACRE_LKR);
@@ -326,7 +337,7 @@ export default function FieldDrawMap({
               onClick={() => setShowDistrictMenu((v) => !v)}>
               <span className="material-symbols-outlined text-emerald-400 text-base">location_on</span>
               <span className={selectedDistrict ? "text-white font-semibold" : "text-white/85"}>
-                {selectedDistrict ? selectedDistrict.name : "Select district"}
+                {selectedDistrict ? translateDistrictName(selectedDistrict.name, language) : t("mapSelectDistrictPrompt")}
               </span>
               <span className="material-symbols-outlined text-white/85 text-base ml-auto">expand_more</span>
             </div>
@@ -339,8 +350,8 @@ export default function FieldDrawMap({
                     type="text"
                     value={districtSearch}
                     onChange={(e) => setDistrictSearch(e.target.value)}
-                    placeholder="Filter districts..."
-                    className="w-full px-3 py-1.5 text-xs rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                    placeholder={t("mapSearchDistrictPlaceholder")}
+                    className="w-full px-3 py-1.5 text-xs rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/85 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                     onClick={(e) => e.stopPropagation()}
                   />
                 </div>
@@ -356,10 +367,10 @@ export default function FieldDrawMap({
                       className={`px-4 py-2 text-sm cursor-pointer transition-colors ${
                         selectedDistrict?.file === d.file
                           ? "bg-emerald-500/20 text-emerald-400 font-semibold"
-                          : "text-white/80 hover:bg-white/5"
+                          : "text-white/85 hover:bg-white/5"
                       }`}
                     >
-                      {d.name}
+                      {translateDistrictName(d.name, language)}
                     </li>
                   ))}
                 </ul>
@@ -375,8 +386,8 @@ export default function FieldDrawMap({
                 type="text"
                 value={locSearch}
                 onChange={(e) => searchLocation(e.target.value)}
-                placeholder="Search location in Sri Lanka…"
-                className="flex-1 bg-transparent text-sm text-white placeholder-white/30 focus:outline-none"
+                placeholder={t("mapSearchLocationPlaceholder")}
+                className="flex-1 bg-transparent text-sm text-white placeholder-white/85 focus:outline-none"
               />
               {locSearch && (
                 <button
@@ -393,7 +404,7 @@ export default function FieldDrawMap({
                   <li
                     key={r.place_id}
                     onClick={() => flyToResult(r)}
-                    className="px-4 py-2.5 text-xs text-white/80 hover:bg-white/5 cursor-pointer truncate"
+                    className="px-4 py-2.5 text-xs text-white/85 hover:bg-white/5 cursor-pointer truncate"
                   >
                     {r.display_name}
                   </li>
@@ -417,7 +428,7 @@ export default function FieldDrawMap({
                     : "bg-white/5 border-white/10 text-white/85 hover:bg-white/10 hover:text-white"
                 }`}
               >
-                {bm.label}
+                {t(BASE_MAP_LABEL_KEYS[key] || bm.label)}
               </button>
             ))}
           </div>
@@ -432,8 +443,8 @@ export default function FieldDrawMap({
             type="text"
             value={fieldName}
             onChange={(e) => onFieldNameChange?.(e.target.value)}
-            placeholder="Name your field (e.g. North Paddy, Home Field…)"
-            className="flex-1 px-3 py-2 rounded-xl border border-white/15 bg-white/5 text-white text-sm placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500/50 transition-all"
+            placeholder={t("mapFieldNamePlaceholder")}
+            className="flex-1 px-3 py-2 rounded-xl border border-white/15 bg-white/5 text-white text-sm placeholder-white/85 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500/50 transition-all"
           />
         </div>
       )}
@@ -467,8 +478,8 @@ export default function FieldDrawMap({
         <div className="flex flex-wrap items-center gap-4 px-4 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-sm">
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-emerald-400 text-base">straighten</span>
-            <span className="text-white/85">Area:</span>
-            <span className="font-black text-emerald-400">{acres.toFixed(3)} acres</span>
+            <span className="text-white/85">{t("areaStat")}:</span>
+            <span className="font-black text-emerald-400">{acres.toFixed(3)} {t("unitAcres")}</span>
             <span className="text-white/85">({(acres * 4046.86).toFixed(0)} m²)</span>
           </div>
           <span className="h-4 w-px bg-white/20" />
@@ -566,9 +577,9 @@ export default function FieldDrawMap({
       {/* Hint text */}
       {!readOnly && (
         <p className="text-xs text-white/85 text-center">
-          <span className="text-amber-400/70">■</span> Yellow = known paddy areas &nbsp;·&nbsp;
-          <strong className="text-white/90">Polygon = custom shape</strong>, Rectangle = quick draw &nbsp;·&nbsp;
-          {initialFeature && <span><span className="text-blue-400/70">⬝</span> Dashed blue = your current field</span>}
+          <span className="text-amber-300">■</span> {t("mapHintKnownPaddy")} &nbsp;·&nbsp;
+          {t("mapHintUseToolPrefix")} <strong className="text-white/90">{t("mapHintToolName")}</strong> {t("mapHintUseToolSuffix")} &nbsp;·&nbsp;
+          {initialFeature && <span><span className="text-blue-300">⬝</span> {t("mapHintCurrentField")}</span>}
         </p>
       )}
     </div>

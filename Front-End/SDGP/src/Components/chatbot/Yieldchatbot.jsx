@@ -291,7 +291,7 @@ export default function YieldChatbot() {
           from { opacity: 0; transform: translateY(16px); }
           to   { opacity: 1; transform: translateY(0); }
         }
-        .chatbot-input::placeholder { color: rgba(255,255,255,0.25); }
+                .chatbot-input::placeholder { color: rgba(255,255,255,0.90); }
         .chatbot-input:focus { border-color: rgba(16,185,129,0.6) !important; }
         .chatbot-messages::-webkit-scrollbar { width: 4px; }
         .chatbot-messages::-webkit-scrollbar-track { background: transparent; }

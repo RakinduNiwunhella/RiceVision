@@ -3,6 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { updateAlertStatus } from "../../api/api";
 import { apiFetch } from "../../api/apiFetch";
 import { useLanguage } from "../../context/LanguageContext";
+import {
+  translateDisasterType,
+  translateHealthCategory,
+  translateStageCategory,
+} from "../../utils/agriTranslations";
+import { translateDistrictName } from "../../utils/locationTranslations";
 import TutorialTooltip from "../../Components/TutorialTooltip";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
 
@@ -10,15 +16,12 @@ import { usePageTutorial } from "../../hooks/usePageTutorial";
 
 const TAB_KEYS = ["Disasters", "Pest Risks", "Past Alerts"];
 
-const formatTitle = (text) =>
-  text.replace(/\b\w/g, (char) => char.toUpperCase());
-
 // Renders a pest title like "Kurunegala • 32 RISKS" with the number in red.
 // Returns a plain string for disaster titles.
 const renderTitle = (title, isPest, isPast) => {
   if (!isPest) return title;
-  // Match: "District : NUMBER RISKS"
-  const match = title.match(/^(.+?:\s*)(\d+)(\s*RISKS)$/);
+  // Match: "District : NUMBER <suffix>"
+  const match = title.match(/^(.+?:\s*)(\d+)(\s*.+)$/);
   if (!match) return title;
   return (
     <span>
@@ -50,7 +53,7 @@ const groupPestAlertsByDistrict = (rows) => {
 /* ─────────────────────────────────────────
    RESOLVE MODAL
 ───────────────────────────────────────── */
-const ResolveModal = ({ onConfirm, onCancel }) => {
+const ResolveModal = ({ onConfirm, onCancel, t }) => {
   const [note, setNote] = useState("");
 
   return (
@@ -59,17 +62,17 @@ const ResolveModal = ({ onConfirm, onCancel }) => {
       style={{ background: "rgba(0,0,0,0.6)" }}
     >
       <div className="glass rounded-3xl border border-white/20 p-8 w-full max-w-md mx-4 flex flex-col gap-5">
-        <h3 className="text-lg font-black text-white">Resolve Alert</h3>
+        <h3 className="text-lg font-black text-white">{t('resolveAlertTitle')}</h3>
 
         <div className="flex flex-col gap-2">
           <label className="text-xs font-bold uppercase text-white/85">
-            Resolution Note (optional)
+            {t('resolutionNoteOptional')}
           </label>
           <textarea
             autoFocus
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder="Describe how this was resolved…"
+            placeholder={t('resolutionNotePlaceholder')}
             rows={4}
             className="bg-white/5 border border-white/10 rounded-2xl py-3 px-4 text-sm text-white placeholder:text-white/85 resize-none focus:outline-none focus:border-white/30"
           />
@@ -80,13 +83,13 @@ const ResolveModal = ({ onConfirm, onCancel }) => {
             onClick={onCancel}
             className="glass-btn text-[10px] px-4 py-2 tracking-widest bg-white/10 hover:bg-white/20"
           >
-            Cancel
+            {t('cancelBtn')}
           </button>
           <button
             onClick={() => onConfirm(note.trim() || null)}
             className="px-6 py-2 bg-emerald-500/30 text-emerald-300 rounded-xl text-xs font-bold hover:bg-emerald-500/50 transition-colors"
           >
-            Confirm
+            {t('confirmBtn')}
           </button>
         </div>
       </div>
@@ -98,37 +101,37 @@ const ResolveModal = ({ onConfirm, onCancel }) => {
    MAIN COMPONENT
 ───────────────────────────────────────── */
 const Alerts = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const tabLabels = [t("disasters"), t("pestRisks"), t("pastAlerts")];
 
   // Tutorial setup - create once and memoize
   const tutorialSteps = useMemo(() => [
     {
-      title: "Alert Tabs",
-      action: "Click on different tabs to view different types of alerts",
-      outcome: "You'll see disasters, pest risks, or past resolved alerts",
+      title: t('alertsTutorialTabsTitle'),
+      action: t('alertsTutorialTabsAction'),
+      outcome: t('alertsTutorialTabsOutcome'),
     },
     {
-      title: "Search Alerts",
-      action: "Type in the search box to find specific alerts",
-      outcome: "The alert list filters to show only matching results",
+      title: t('alertsTutorialSearchTitle'),
+      action: t('alertsTutorialSearchAction'),
+      outcome: t('alertsTutorialSearchOutcome'),
     },
     {
-      title: "Resolve Alert",
-      action: "Click the 'Resolve' button on any active alert",
-      outcome: "A modal opens where you can add a resolution note",
+      title: t('alertsTutorialResolveTitle'),
+      action: t('alertsTutorialResolveAction'),
+      outcome: t('alertsTutorialResolveOutcome'),
     },
     {
-      title: "Ignore Alert",
-      action: "Click 'Ignore' to dismiss an alert without resolving",
-      outcome: "The alert moves to 'Past Alerts' tab",
+      title: t('alertsTutorialIgnoreTitle'),
+      action: t('alertsTutorialIgnoreAction'),
+      outcome: t('alertsTutorialIgnoreOutcome'),
     },
     {
-      title: "View on Map",
-      action: "Click 'View Map' to see the alert location",
-      outcome: "You're taken to the Field Map showing the affected area",
+      title: t('alertsTutorialMapTitle'),
+      action: t('alertsTutorialMapAction'),
+      outcome: t('alertsTutorialMapOutcome'),
     },
-  ], [])
+  ], [t])
 
   const { currentStep, showTutorial, currentTutorialStep, hasMoreSteps, nextStep, prevStep, closeTutorial } =
     usePageTutorial("alerts", tutorialSteps);
@@ -212,8 +215,8 @@ const Alerts = () => {
         if (activeTab === "Disasters") {
           const mappedAlerts = (Array.isArray(data) ? data : []).map((a) => ({
             id: a.id,
-            title: formatTitle(`${a.disaster_type} risk`),
-            description: `Stage: ${a.stage} | Health: ${a.health}`,
+            title: `${translateDisasterType(a.disaster_type, t)} ${t("alertRiskLabel")}`,
+            description: `${t("alertStage")}: ${translateStageCategory(a.stage, t)} | ${t("alertHealth")}: ${translateHealthCategory(a.health, t)}`,
             status: a.status || "Open",
             priority: "High",
             field: a.district,
@@ -230,8 +233,8 @@ const Alerts = () => {
             .filter((a) => a.risky_pixels > 0)
             .map((a) => ({
               id: a.district,
-              title: `${a.district} : ${a.risky_pixels} RISKS`,
-              description: "Multiple pest risks detected in this district.",
+              title: `${translateDistrictName(a.district, language)} : ${a.risky_pixels} ${t("alertRisksSuffix")}`,
+              description: t("alertMultiplePestRisks"),
               status: a.status || "Open",
               priority: "High",
               field: a.district,
@@ -249,9 +252,9 @@ const Alerts = () => {
           const mappedAlerts = (Array.isArray(data) ? data : []).map((a) => ({
             id: a.id,
             title: a.is_pest
-              ? `${a.district} : ${a.risk_count} RISKS`
-              : formatTitle(`${a.disaster_type} risk`),
-            description: `Stage: ${a.stage_name} | Health: ${a.paddy_health}`,
+              ? `${translateDistrictName(a.district, language)} : ${a.risk_count} ${t("alertRisksSuffix")}`
+              : `${translateDisasterType(a.disaster_type, t)} ${t("alertRiskLabel")}`,
+            description: `${t("alertStage")}: ${translateStageCategory(a.stage_name, t)} | ${t("alertHealth")}: ${translateHealthCategory(a.paddy_health, t)}`,
             status: a.status,
             field: a.district,
             health: a.paddy_health,
@@ -270,7 +273,7 @@ const Alerts = () => {
     };
 
     loadAlerts();
-  }, [activeTab]);
+  }, [activeTab, language, t]);
 
   /* ---------------- LOAD GLOBAL ALERT COUNTS ---------------- */
 
@@ -399,6 +402,7 @@ const Alerts = () => {
         <ResolveModal
           onConfirm={handleModalConfirm}
           onCancel={handleModalCancel}
+          t={t}
         />
       )}
 
@@ -410,7 +414,7 @@ const Alerts = () => {
               {t("fieldRiskAlerts")}
             </h1>
             <p className="text-white/85 text-xs mt-1 font-bold uppercase tracking-[0.2em]">
-              Real-time Field Health intelligence
+              {t('alertsRealtimeSubtitle')}
             </p>
           </div>
 
@@ -473,7 +477,7 @@ const Alerts = () => {
           {filteredAlerts.length === 0 && (
             <div className="glass p-8 sm:p-12 md:p-20 rounded-2xl sm:rounded-[2rem] text-center">
               <p className="text-white/85 font-bold uppercase">
-                No Past threats detected
+                {t('noPastThreats')}
               </p>
             </div>
           )}
@@ -505,7 +509,7 @@ const Alerts = () => {
 
                   {activeTab === "Past Alerts" && alert.note && (
                     <p className="text-white/85 text-xs mt-1">
-                      Note: {alert.note}
+                      {t('noteLabel')}: {alert.note}
                     </p>
                   )}
                 </div>
@@ -525,7 +529,7 @@ const Alerts = () => {
                       onClick={() => handleIgnore(alert.id)}
                       className="btn-ignore glass-btn text-[10px] px-3 py-1 tracking-widest bg-white/10 hover:bg-white/20"
                     >
-                      Ignore
+                      {t('ignoreBtn')}
                     </button>
 
                     <button
@@ -533,7 +537,7 @@ const Alerts = () => {
                       onClick={() => handleViewInMap(alert)}
                       className="glass-btn text-[10px] px-3 py-1 tracking-widest bg-white/10 hover:bg-white/20"
                     >
-                      View Map
+                      {t('viewInMap')}
                     </button>
                   </div>
                 )}

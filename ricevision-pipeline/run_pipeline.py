@@ -1,6 +1,7 @@
 import subprocess
 import sys
 import boto3
+import os
 from pathlib import Path
 from datetime import datetime
 
@@ -161,7 +162,8 @@ def run_pipeline():
     print("=== S3 UPLOAD COMPLETED ===")
 
     print("\n=== FULL RICEVISION PIPELINE COMPLETED ===")
+    time.sleep(30)
+    os.system("sudo shutdown -h now")
 
 if __name__ == "__main__":
     run_pipeline()
-    # Testing CICD

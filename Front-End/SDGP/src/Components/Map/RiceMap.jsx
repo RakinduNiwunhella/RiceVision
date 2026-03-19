@@ -10,6 +10,9 @@ import {
 } from "react-leaflet";
 import { useEffect, useState, useRef } from "react";
 import { useTheme } from "../../context/ThemeContext";
+import { useLanguage } from "../../context/LanguageContext";
+import { translateHealthCategory, translateStageCategory, translatePestRisk, translateDisasterRisk } from "../../utils/agriTranslations";
+import { translateDistrictName } from "../../utils/locationTranslations";
 import L from "leaflet";
 import { fetchMapFields, fetchGEETileUrl } from "../../api/api";
 import MarkerClusterGroup from "react-leaflet-cluster";
@@ -64,6 +67,7 @@ function getDisasterColor(risk) {
 
 function PointPopup({ p }) {
   const { isDark } = useTheme();
+  const { t, language } = useLanguage();
   const healthColor = getHealthColor(p.paddy_health);
   const pestInfo = getPestRiskLabel(p.pest_risk);
   const disasterColor = getDisasterColor(p.disaster_risk);
@@ -124,7 +128,7 @@ function PointPopup({ p }) {
         }}
       >
         <div style={{ fontSize: 13, fontWeight: 700, color: textPrimary }}>
-          {p.district}
+          {translateDistrictName(p.district, language)}
         </div>
         {p.date && (
           <div style={{ fontSize: 10, color: textMuted }}>{p.date}</div>
@@ -143,11 +147,11 @@ function PointPopup({ p }) {
           marginTop: 4,
         }}
       >
-        Crop Status
+        {t("mapCropStatus")}
       </div>
-      {row("Health", p.paddy_health, "", healthColor)}
-      {row("Growth Stage", p.stage)}
-      {row("Season", p.season)}
+      {row(t("mapHealth"), translateHealthCategory(p.paddy_health, t), "", healthColor)}
+      {row(t("mapGrowthStage"), translateStageCategory(p.stage, t))}
+      {row(t("mapSeason"), p.season)}
 
       {/* Risk */}
       <div
@@ -161,10 +165,10 @@ function PointPopup({ p }) {
           marginTop: 8,
         }}
       >
-        Risk Assessment
+        {t("mapRiskAssessment")}
       </div>
-      {row("Pest Risk", pestInfo.text, "", pestInfo.color)}
-      {row("Disaster Risk", p.disaster_risk || "N/A", "", disasterColor)}
+      {row(t("mapPestRisk"), translatePestRisk(p.pest_risk, t), "", pestInfo.color)}
+      {row(t("mapDisasterRisk"), translateDisasterRisk(p.disaster_risk, t), "", disasterColor)}
 
       {/* Vegetation */}
       <div
@@ -178,7 +182,7 @@ function PointPopup({ p }) {
           marginTop: 8,
         }}
       >
-        Vegetation Indices
+        {t("mapVegetationIndices")}
       </div>
       {row("NDVI", p.ndvi)}
       {row("EVI", p.evi)}
@@ -195,12 +199,12 @@ function PointPopup({ p }) {
           marginTop: 8,
         }}
       >
-        Weather
+        {t("mapWeather")}
       </div>
-      {row("Rainfall (7d)", p.rain_7d, " mm")}
-      {row("Rainfall (14d)", p.rain_14d, " mm")}
-      {row("Temperature", p.temp, " °C")}
-      {row("Humidity", p.humidity, " %")}
+      {row(t("mapRainfall7d"), p.rain_7d, " mm")}
+      {row(t("mapRainfall14d"), p.rain_14d, " mm")}
+      {row(t("mapTemperature"), p.temp, " °C")}
+      {row(t("mapHumidity"), p.humidity, " %")}
 
       {/* Terrain */}
       <div
@@ -214,10 +218,10 @@ function PointPopup({ p }) {
           marginTop: 8,
         }}
       >
-        Terrain
+        {t("mapTerrain")}
       </div>
-      {row("Elevation", p.elevation, " m")}
-      {row("Slope", p.slope, " °")}
+      {row(t("mapElevation"), p.elevation, " m")}
+      {row(t("mapSlope"), p.slope, " °")}
 
       {/* Coordinates */}
       <div

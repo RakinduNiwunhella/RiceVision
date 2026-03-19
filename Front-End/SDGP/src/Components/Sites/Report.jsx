@@ -7,9 +7,18 @@ import 'jspdf-autotable';
 import autoTable from 'jspdf-autotable';
 import logoImg from '../assets/logo.png';
 import { apiFetch } from "../../api/apiFetch";
-import { useLanguage } from "../../context/LanguageContext";
+import { translations, useLanguage } from "../../context/LanguageContext";
+import { translateHealthCategory, translateStageCategory } from "../../utils/agriTranslations";
+import { translateDistrictName, SRI_LANKA_DISTRICTS } from "../../utils/locationTranslations";
 import TutorialTooltip from "../../Components/TutorialTooltip";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
+
+const getByPath = (obj, key) => {
+  if (!obj || !key) return undefined;
+  return key.split('.').reduce((acc, part) => (acc == null ? undefined : acc[part]), obj);
+};
+
+const tEn = (key) => getByPath(translations.en, key) ?? key;
 
 const CustomSelect = ({ value, onChange, options, className = "" }) => {
   const [open, setOpen] = useState(false);
@@ -44,6 +53,12 @@ const CustomSelect = ({ value, onChange, options, className = "" }) => {
     setOpen(!open);
   };
 
+  const normalizedOptions = options.map((opt) =>
+    typeof opt === "string" ? { value: opt, label: opt } : opt
+  );
+  const selectedLabel =
+    normalizedOptions.find((opt) => opt.value === value)?.label || value;
+
   return (
     <div className={`relative ${className}`} ref={wrapperRef}>
       <button
@@ -52,7 +67,7 @@ const CustomSelect = ({ value, onChange, options, className = "" }) => {
         onClick={handleToggle}
         className="w-full flex justify-between items-center bg-white/5 border border-white/10 text-[10px] px-4 py-3 rounded-xl font-bold text-white outline-none hover:bg-white/10 transition-all cursor-pointer"
       >
-        <span>{value}</span>
+        <span>{selectedLabel}</span>
 
         <span
           className="material-symbols-outlined text-sm text-white/85 transition-transform duration-200"
@@ -72,15 +87,15 @@ const CustomSelect = ({ value, onChange, options, className = "" }) => {
             }}
             className="max-h-52 overflow-y-auto rounded-xl border border-white/20 shadow-2xl pointer-events-auto"
           >
-            {options.map((opt) => (
+            {normalizedOptions.map((opt) => (
               <button
-                key={opt}
+                key={opt.value}
                 type="button"
                 onClick={() => {
-                  onChange(opt);
+                  onChange(opt.value);
                   setOpen(false);
                 }}
-                className={`w-full text-left px-4 py-2.5 text-[10px] font-bold flex items-center gap-2 transition-all ${value === opt
+                className={`w-full text-left px-4 py-2.5 text-[10px] font-bold flex items-center gap-2 transition-all ${value === opt.value
                   ? "text-emerald-400 bg-emerald-500/20"
                   : "text-white hover:bg-white/20"
                   }`}
@@ -88,13 +103,13 @@ const CustomSelect = ({ value, onChange, options, className = "" }) => {
                 <span
                   className="material-symbols-outlined text-xs"
                   style={{
-                    visibility: value === opt ? "visible" : "hidden"
+                    visibility: value === opt.value ? "visible" : "hidden"
                   }}
                 >
                   check
                 </span>
 
-                {opt}
+                {opt.label}
               </button>
             ))}
           </div>,
@@ -106,9 +121,13 @@ const CustomSelect = ({ value, onChange, options, className = "" }) => {
 
 const Report = () => {
   const location = useLocation();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const selectedDistrict = location.state?.district;
-  const districts = ["Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle", "Gampaha", "Hambantota", "Jaffna", "Kalutara", "Kandy", "Kegalle", "Kilinochchi", "Kurunegala", "Mannar", "Matale", "Matara", "Monaragala", "Mullaitivu", "Nuwara Eliya", "Polonnaruwa", "Puttalam", "Ratnapura", "Trincomalee", "Vavuniya"];
+  const districts = SRI_LANKA_DISTRICTS;
+  const districtOptions = districts.map((district) => ({
+    value: district,
+    label: translateDistrictName(district, language),
+  }));
 
   const [mode, setMode] = useState("single");
   const [availableDates, setAvailableDates] = useState([]);
@@ -131,28 +150,28 @@ const Report = () => {
   const tutorialSteps = [
     {
       title: t("yieldReports") || "Yield Analytics Reports",
-      action: "Explore satellite-derived yield predictions and analysis",
-      outcome: "You will see detailed yield forecasts with comparative metrics and export options"
+      action: t("reportTutorialOverviewAction"),
+      outcome: t("reportTutorialOverviewOutcome")
     },
     {
-      title: "Single vs Compare",
-      action: "Toggle between 'Single' report view and 'Compare' mode for side-by-side analysis",
-      outcome: "You can analyze one district or compare two districts' yield predictions"
+      title: t("reportTutorialModeTitle"),
+      action: t("reportTutorialModeAction"),
+      outcome: t("reportTutorialModeOutcome")
     },
     {
-      title: "District Selection",
-      action: "Click to select a district and view its yield analytics",
-      outcome: "The report will load satellite data and yield predictions for the selected district"
+      title: t("reportTutorialDistrictTitle"),
+      action: t("reportTutorialDistrictAction"),
+      outcome: t("reportTutorialDistrictOutcome")
     },
     {
-      title: "Yield Prediction",
-      action: "View the predicted yield and comparison with historical baseline",
-      outcome: "You will see the expected harvest (kg/ha) and how it compares to past years"
+      title: t("reportTutorialYieldTitle"),
+      action: t("reportTutorialYieldAction"),
+      outcome: t("reportTutorialYieldOutcome")
     },
     {
-      title: "Metrics & Export",
-      action: "Review pest count, risk factors, and other metrics. Use Export PDF to download the report",
-      outcome: "You get a comprehensive analysis document ready for sharing or storage"
+      title: t("reportTutorialMetricsTitle"),
+      action: t("reportTutorialMetricsAction"),
+      outcome: t("reportTutorialMetricsOutcome")
     }
   ];
 
@@ -219,6 +238,8 @@ const Report = () => {
   }, [configA, configB, mode]);
 
   const generatePDF = async (report, config) => {
+    const t = tEn;
+    const language = "en";
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
     const PW = 210;
     const PH = 297;
@@ -305,7 +326,7 @@ const Report = () => {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(13);
     doc.setTextColor(...INK);
-    doc.text(config.district, M, 53.5);
+    doc.text(translateDistrictName(config.district, language), M, 53.5);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7);
     doc.setTextColor(...SUBTEXT);
@@ -415,10 +436,10 @@ const Report = () => {
     const pestLabel = report.metrics.pest_count === 0 ? 'Clear' : report.metrics.pest_count < 20 ? 'Moderate' : 'Critical';
 
     const fieldRows = [
-      ['Growth Stage', report.categories.current_stage, 'Health Status', report.categories.health_status],
-      ['Pest Incidents', `${report.metrics.pest_count} (${pestLabel})`, 'Risk Score', `${riskScore.toFixed(2)} / 10 (${riskLabel})`],
-      ['Severe Stress Area', `${report.metrics.stress_pct.toFixed(2)}%`, 'Est. Harvest Date', report.metrics.harvest_date],
-      ['Season', config.season, 'Data Date', config.date],
+      [t('reportGrowthStageLabel'), translateStageCategory(report.categories.current_stage, t), t('reportHealthStatusLabel'), translateHealthCategory(report.categories.health_status, t)],
+      [t('reportPestIncidentsLabel'), `${report.metrics.pest_count} (${pestLabel})`, t('reportRiskScoreLabel'), `${riskScore.toFixed(2)} / 10 (${riskLabel})`],
+      [t('reportSevereStressArea'), `${report.metrics.stress_pct.toFixed(2)}%`, t('reportEstHarvestDate'), report.metrics.harvest_date],
+      [t('mapSeason'), config.season, t('reportDataDate'), config.date],
     ];
     if (raw.percent_change !== undefined)
       fieldRows.push(['% vs Historical', `${parseFloat(raw.percent_change).toFixed(2)}%`, 'Pixels Analysed', raw.total_pixels !== undefined ? Number(raw.total_pixels).toLocaleString() : 'N/A']);
@@ -510,13 +531,13 @@ const Report = () => {
     autoTable(doc, {
       startY: y,
       margin: { left: M, right: M },
-      head: [['Risk Factor', 'Value', 'Status']],
+      head: [[t('reportHeadingRiskFactor'), t('reportHeadingValue'), t('reportHeadingStatus')]],
       body: [
-        ['Overall Risk Score', riskScore.toFixed(2), riskLabel],
-        ['Severe Stress Coverage', `${report.metrics.stress_pct.toFixed(2)}%`, report.metrics.stress_pct < 5 ? 'Acceptable' : 'Action Required'],
-        ['Pest Attack Incidents', String(report.metrics.pest_count), pestLabel],
-        ['Crop Health Status', report.categories.health_status, report.categories.health_status === 'Normal' ? 'Normal' : 'Warning'],
-        ['Growth Stage', report.categories.current_stage, '—'],
+        [t('reportOverallRiskScore'), riskScore.toFixed(2), riskLabel],
+        [t('reportSevereStressCoverage'), `${report.metrics.stress_pct.toFixed(2)}%`, report.metrics.stress_pct < 5 ? t('reportAcceptable') : t('reportActionRequired')],
+        [t('reportPestIncidentsLabel'), String(report.metrics.pest_count), pestLabel],
+        [t('reportCropHealthStatus'), translateHealthCategory(report.categories.health_status, t), report.categories.health_status === 'Normal' ? t('reportNormal') : t('reportWarning')],
+        [t('reportGrowthStageLabel'), translateStageCategory(report.categories.current_stage, t), '—'],
       ],
       theme: 'grid',
       headStyles: { fillColor: riskAccent, textColor: WHITE, fontSize: 7.5, fontStyle: 'bold', cellPadding: 4 },
@@ -569,6 +590,7 @@ const Report = () => {
   };
 
   const generateComparisonPDF = async () => {
+    const language = "en";
 
     const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
 
@@ -630,7 +652,10 @@ const Report = () => {
     doc.setFontSize(12);
     doc.setTextColor(...INK);
 
-    doc.text(`${configA.district}  vs  ${configB.district}`, M, 53);
+    const districtADisplay = translateDistrictName(configA.district, language);
+    const districtBDisplay = translateDistrictName(configB.district, language);
+
+    doc.text(`${districtADisplay}  vs  ${districtBDisplay}`, M, 53);
 
     doc.setFontSize(7);
     doc.setTextColor(...SUBTEXT);
@@ -665,8 +690,8 @@ const Report = () => {
       doc.setFontSize(6);
       doc.setTextColor(...SUBTEXT);
 
-      doc.text(configA.district, x + 7, y + 21);
-      doc.text(configB.district, x + cardW / 2 + 7, y + 21);
+      doc.text(districtADisplay, x + 7, y + 21);
+      doc.text(districtBDisplay, x + cardW / 2 + 7, y + 21);
 
     };
 
@@ -719,7 +744,7 @@ const Report = () => {
       startY: y,
       margin: { left: M, right: M },
       head: [
-        ["Metric", configA.district, configB.district]
+        ["Metric", districtADisplay, districtBDisplay]
       ],
       body: [
         [
@@ -790,7 +815,7 @@ const Report = () => {
     doc.setTextColor(...INK);
 
     const winner =
-      diff > 0 ? configA.district : configB.district;
+      diff > 0 ? districtADisplay : districtBDisplay;
 
     doc.text(
       `${winner} shows higher predicted yield by ${Math.abs(Math.round(diff))} kg/ha.`,
@@ -831,22 +856,22 @@ const Report = () => {
 
   };
   const getPestStatus = (count) => {
-    if (count === 0) return { label: "SAFE", color: "text-emerald-400" };
-    if (count < 20) return { label: "MODERATE", color: "text-amber-400" };
-    return { label: "CRITICAL", color: "text-red-400" };
+    if (count === 0) return { label: t("statusSafe"), color: "text-emerald-400" };
+    if (count < 20) return { label: t("statusModerate"), color: "text-amber-400" };
+    return { label: t("statusCritical"), color: "text-red-400" };
   };
 
   const getRiskStatus = (score) => {
-    if (score < 1) return { label: "STABLE", color: "text-emerald-400" };
-    if (score < 4) return { label: "WARNING", color: "text-amber-400" };
-    return { label: "HIGH RISK", color: "text-red-400" };
+    if (score < 1) return { label: t("statusStable"), color: "text-emerald-400" };
+    if (score < 4) return { label: t("statusWarning"), color: "text-amber-400" };
+    return { label: t("statusHighRisk"), color: "text-red-400" };
   };
 
   const ReportPane = ({ report, config, setConfig, title, districtSelectorRef, yieldHeroRef, metricsExportRef, isSingleMode = false }) => {
     if (report?.error) return (
       <div className="flex-1 glass p-6 sm:p-12 rounded-2xl sm:rounded-[3rem] text-center border border-red-500/20">
-        <span className="material-symbols-outlined text-5xl text-red-400/40 mb-4 block">signal_disconnected</span>
-        <h3 className="text-red-400 font-black uppercase tracking-widest mb-3 text-sm">Data Unavailable</h3>
+        <span className="material-symbols-outlined text-5xl text-red-300 mb-4 block">signal_disconnected</span>
+        <h3 className="text-red-400 font-black uppercase tracking-widest mb-3 text-sm">{t('dataUnavailable')}</h3>
         <p className="text-xs text-white/85 mb-6">{report.message}</p>
         {availableDates.length > 0 && (
           <CustomSelect
@@ -860,13 +885,13 @@ const Report = () => {
 
     if (!report) return (
       <div className="flex-1 glass rounded-2xl sm:rounded-[3rem] p-8 sm:p-20 text-center animate-pulse">
-        <p className="text-white/85 font-black uppercase tracking-widest text-xs">Fetching Satellite Data...</p>
+        <p className="text-white/85 font-black uppercase tracking-widest text-xs">{t('fetchingSatelliteData')}</p>
       </div>
     );
 
     const chartData = [
-      { name: 'Yield', value: report.summary.yield, color: '#10b981' },
-      { name: 'Historical', value: report.summary.historical, color: '#6366f1' }
+      { name: t('predictedAverage'), value: report.summary.yield, color: '#10b981' },
+      { name: t('historicalBaseline'), value: report.summary.historical, color: '#6366f1' }
     ];
 
     return (
@@ -876,7 +901,7 @@ const Report = () => {
           <div className="col-span-2 flex justify-between items-center mb-2">
             <span className="text-[10px] font-black text-emerald-400 tracking-[0.2em] uppercase flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              {title} VIEW
+              {title} {t('viewLabel')}
             </span>
             <button
               ref={metricsExportRef}
@@ -886,14 +911,14 @@ const Report = () => {
                 : "border-white/10 hover:bg-white/10 hover:border-white/20"
                 }`}            >
               <span className="material-symbols-outlined text-xs">download</span>
-              Export PDF
+              {t('downloadPdf')}
             </button>
           </div>
           <div ref={districtSelectorRef}>
             <CustomSelect
               value={config.district}
               onChange={(val) => setConfig({ ...config, district: val })}
-              options={districts}
+              options={districtOptions}
             />
           </div>
           <CustomSelect
@@ -920,7 +945,7 @@ const Report = () => {
             <div className="text-center flex flex-col items-center justify-center py-1 sm:py-2">
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/85 mb-1 flex items-center justify-center gap-2">
                 <span className="material-symbols-outlined text-emerald-400 text-sm">monitoring</span>
-                Predicted Average
+                {t('predictedAverage')}
               </p>
               <h2 className="text-3xl sm:text-5xl font-black tracking-tighter text-white leading-none">
                 {Math.round(report.summary.yield).toLocaleString()}
@@ -929,11 +954,11 @@ const Report = () => {
             </div>
             <div className="mt-2 pt-3 border-t border-white/5 grid grid-cols-2 gap-3">
               <div>
-                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/85 mb-0.5">Total Yield</p>
+                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/85 mb-0.5">{t('totalYieldLabel')}</p>
                 <p className="text-base font-black text-white">{Math.round(report.summary.total_kg).toLocaleString()} <span className="text-xs font-bold text-white/85">kg</span></p>
               </div>
               <div>
-                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/85 mb-0.5">Historical Baseline</p>
+                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/85 mb-0.5">{t('historicalBaseline')}</p>
                 <p className="text-base font-black text-white">{Math.round(report.summary.historical).toLocaleString()} <span className="text-xs font-bold text-white/85">kg/ha</span></p>
               </div>
             </div>
@@ -944,7 +969,7 @@ const Report = () => {
         <div className="h-[200px] w-full mb-6">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData}>
-              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 10, fontWeight: 'bold' }} />
+              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'rgba(255,255,255,0.90)', fontSize: 10, fontWeight: 'bold' }} />
               <Tooltip
                 cursor={{ fill: 'rgba(255,255,255,0.03)' }}
                 contentStyle={{ background: 'rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '15px', backdropFilter: 'blur(10px)' }}
@@ -960,7 +985,7 @@ const Report = () => {
         {/* Metric Cards */}
         <div className="grid grid-cols-2 gap-4">
           <div className="glass glass-hover p-5 rounded-3xl border border-white/10 group transition-all duration-300">
-            <p className="text-[9px] font-black text-white/85 uppercase tracking-widest mb-2">Pest Count</p>
+            <p className="text-[9px] font-black text-white/85 uppercase tracking-widest mb-2">{t('pestCount')}</p>
             <div className="flex items-baseline gap-2">
               <span className="text-2xl font-black text-white">{report.metrics.pest_count}</span>
               <span className={`text-[9px] font-black ${getPestStatus(report.metrics.pest_count).color}`}>
@@ -969,7 +994,7 @@ const Report = () => {
             </div>
           </div>
           <div className="glass glass-hover p-5 rounded-3xl border border-white/10 group transition-all duration-300">
-            <p className="text-[9px] font-black text-white/85 uppercase tracking-widest mb-2">Risk Factor</p>
+            <p className="text-[9px] font-black text-white/85 uppercase tracking-widest mb-2">{t('riskFactor')}</p>
             <div className="flex items-baseline gap-2">
               <span className="text-2xl font-black text-white">{report.metrics.risk_score.toFixed(1)}</span>
               <span className={`text-[9px] font-black ${getRiskStatus(report.metrics.risk_score).color}`}>
@@ -1023,7 +1048,7 @@ const Report = () => {
                 className="flex items-center gap-2 text-[10px] font-black px-4 py-2 rounded-xl border border-emerald-400/70 bg-emerald-500/10 transition-all duration-300 hover:bg-emerald-500/20 hover:border-emerald-300 hover:scale-[1.02] cursor-pointer uppercase tracking-widest"
               >
                 <span className="material-symbols-outlined text-sm">compare</span>
-                Export Comparison Report
+                {t('exportComparisonReport')}
               </button>
             )}
           </div>
@@ -1035,13 +1060,13 @@ const Report = () => {
             report={dataA}
             config={configA}
             setConfig={setConfigA}
-            title="PRIMARY"
+            title={t('primaryLabel')}
             districtSelectorRef={currentStep === 2 ? districtSelectorRef : undefined}
             yieldHeroRef={currentStep === 3 ? yieldHeroRef : undefined}
             metricsExportRef={currentStep === 4 ? metricsExportRef : undefined}
             isSingleMode={mode === "single"}
           />
-          {mode === "compare" && <ReportPane report={dataB} config={configB} setConfig={setConfigB} title="COMPARISON" />}
+          {mode === "compare" && <ReportPane report={dataB} config={configB} setConfig={setConfigB} title={t('comparisonLabel')} />}
         </div>
 
       </div>
