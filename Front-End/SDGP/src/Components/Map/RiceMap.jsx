@@ -1,6 +1,18 @@
-import { MapContainer, TileLayer, CircleMarker, Circle, GeoJSON, Tooltip, Popup, useMap } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  CircleMarker,
+  Circle,
+  GeoJSON,
+  Tooltip,
+  Popup,
+  useMap,
+} from "react-leaflet";
 import { useEffect, useState, useRef } from "react";
 import { useTheme } from "../../context/ThemeContext";
+import { useLanguage } from "../../context/LanguageContext";
+import { translateHealthCategory, translateStageCategory, translatePestRisk, translateDisasterRisk } from "../../utils/agriTranslations";
+import { translateDistrictName } from "../../utils/locationTranslations";
 import L from "leaflet";
 import { fetchMapFields, fetchGEETileUrl } from "../../api/api";
 import MarkerClusterGroup from "react-leaflet-cluster";
@@ -15,6 +27,10 @@ const SRI_LANKA_BOUNDS = [
   [5.8, 79.4],
   [10.2, 82.2],
 ];
+
+function districtToFile(district) {
+  return district.replace(/\s+/g, "");
+}
 
 const SRI_LANKA_ZOOM = 7;
 
@@ -51,6 +67,7 @@ function getDisasterColor(risk) {
 
 function PointPopup({ p }) {
   const { isDark } = useTheme();
+  const { t, language } = useLanguage();
   const healthColor = getHealthColor(p.paddy_health);
   const pestInfo = getPestRiskLabel(p.pest_risk);
   const disasterColor = getDisasterColor(p.disaster_risk);
@@ -67,21 +84,51 @@ function PointPopup({ p }) {
   const row = (label, value, unit = "", color = null) => {
     if (value == null || value === "") return null;
     return (
-      <div style={{ display: "flex", justifyContent: "space-between", padding: "3px 0", borderBottom: `1px solid ${border}` }}>
-        <span style={{ color: textSecondary, fontSize: 11, fontWeight: 500 }}>{label}</span>
-        <span style={{ fontWeight: 600, fontSize: 11, color: color || textValue }}>
-          {value}{unit}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          padding: "3px 0",
+          borderBottom: `1px solid ${border}`,
+        }}
+      >
+        <span style={{ color: textSecondary, fontSize: 11, fontWeight: 500 }}>
+          {label}
+        </span>
+        <span
+          style={{ fontWeight: 600, fontSize: 11, color: color || textValue }}
+        >
+          {value}
+          {unit}
         </span>
       </div>
     );
   };
 
   return (
-    <div style={{ minWidth: 220, fontFamily: "'Inter', system-ui, sans-serif", lineHeight: 1.5, backgroundColor: bg, color: textPrimary, borderRadius: 12, margin: -10, marginBottom: -14, padding: "10px 14px" }}>
+    <div
+      style={{
+        minWidth: 220,
+        fontFamily: "'Inter', system-ui, sans-serif",
+        lineHeight: 1.5,
+        backgroundColor: bg,
+        color: textPrimary,
+        borderRadius: 12,
+        margin: -10,
+        marginBottom: -14,
+        padding: "10px 14px",
+      }}
+    >
       {/* Header */}
-      <div style={{ borderBottom: `2px solid ${headerBorder}`, paddingBottom: 6, marginBottom: 6 }}>
+      <div
+        style={{
+          borderBottom: `2px solid ${headerBorder}`,
+          paddingBottom: 6,
+          marginBottom: 6,
+        }}
+      >
         <div style={{ fontSize: 13, fontWeight: 700, color: textPrimary }}>
-          {p.district}
+          {translateDistrictName(p.district, language)}
         </div>
         {p.date && (
           <div style={{ fontSize: 10, color: textMuted }}>{p.date}</div>
@@ -89,35 +136,102 @@ function PointPopup({ p }) {
       </div>
 
       {/* Crop Status */}
-      <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: sectionColor, marginBottom: 2, marginTop: 4 }}>Crop Status</div>
-      {row("Health", p.paddy_health, "", healthColor)}
-      {row("Growth Stage", p.stage)}
-      {row("Season", p.season)}
+      <div
+        style={{
+          fontSize: 10,
+          fontWeight: 700,
+          textTransform: "uppercase",
+          letterSpacing: 1,
+          color: sectionColor,
+          marginBottom: 2,
+          marginTop: 4,
+        }}
+      >
+        {t("mapCropStatus")}
+      </div>
+      {row(t("mapHealth"), translateHealthCategory(p.paddy_health, t), "", healthColor)}
+      {row(t("mapGrowthStage"), translateStageCategory(p.stage, t))}
+      {row(t("mapSeason"), p.season)}
 
       {/* Risk */}
-      <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: sectionColor, marginBottom: 2, marginTop: 8 }}>Risk Assessment</div>
-      {row("Pest Risk", pestInfo.text, "", pestInfo.color)}
-      {row("Disaster Risk", p.disaster_risk || "N/A", "", disasterColor)}
+      <div
+        style={{
+          fontSize: 10,
+          fontWeight: 700,
+          textTransform: "uppercase",
+          letterSpacing: 1,
+          color: sectionColor,
+          marginBottom: 2,
+          marginTop: 8,
+        }}
+      >
+        {t("mapRiskAssessment")}
+      </div>
+      {row(t("mapPestRisk"), translatePestRisk(p.pest_risk, t), "", pestInfo.color)}
+      {row(t("mapDisasterRisk"), translateDisasterRisk(p.disaster_risk, t), "", disasterColor)}
 
       {/* Vegetation */}
-      <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: sectionColor, marginBottom: 2, marginTop: 8 }}>Vegetation Indices</div>
+      <div
+        style={{
+          fontSize: 10,
+          fontWeight: 700,
+          textTransform: "uppercase",
+          letterSpacing: 1,
+          color: sectionColor,
+          marginBottom: 2,
+          marginTop: 8,
+        }}
+      >
+        {t("mapVegetationIndices")}
+      </div>
       {row("NDVI", p.ndvi)}
       {row("EVI", p.evi)}
 
       {/* Weather */}
-      <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: sectionColor, marginBottom: 2, marginTop: 8 }}>Weather</div>
-      {row("Rainfall (7d)", p.rain_7d, " mm")}
-      {row("Rainfall (14d)", p.rain_14d, " mm")}
-      {row("Temperature", p.temp, " °C")}
-      {row("Humidity", p.humidity, " %")}
+      <div
+        style={{
+          fontSize: 10,
+          fontWeight: 700,
+          textTransform: "uppercase",
+          letterSpacing: 1,
+          color: sectionColor,
+          marginBottom: 2,
+          marginTop: 8,
+        }}
+      >
+        {t("mapWeather")}
+      </div>
+      {row(t("mapRainfall7d"), p.rain_7d, " mm")}
+      {row(t("mapRainfall14d"), p.rain_14d, " mm")}
+      {row(t("mapTemperature"), p.temp, " °C")}
+      {row(t("mapHumidity"), p.humidity, " %")}
 
       {/* Terrain */}
-      <div style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: sectionColor, marginBottom: 2, marginTop: 8 }}>Terrain</div>
-      {row("Elevation", p.elevation, " m")}
-      {row("Slope", p.slope, " °")}
+      <div
+        style={{
+          fontSize: 10,
+          fontWeight: 700,
+          textTransform: "uppercase",
+          letterSpacing: 1,
+          color: sectionColor,
+          marginBottom: 2,
+          marginTop: 8,
+        }}
+      >
+        {t("mapTerrain")}
+      </div>
+      {row(t("mapElevation"), p.elevation, " m")}
+      {row(t("mapSlope"), p.slope, " °")}
 
       {/* Coordinates */}
-      <div style={{ marginTop: 8, fontSize: 9, color: textMuted, textAlign: "center" }}>
+      <div
+        style={{
+          marginTop: 8,
+          fontSize: 9,
+          color: textMuted,
+          textAlign: "center",
+        }}
+      >
         {p.lat?.toFixed(5)}, {p.lng?.toFixed(5)}
       </div>
     </div>
@@ -198,7 +312,6 @@ function AlertMarker({ flyTo }) {
 }
 
 export default function RiceMap({ filters, layers, flyTo }) {
-
   const { isDark } = useTheme();
 
   const [points, setPoints] = useState([]);
@@ -209,6 +322,7 @@ export default function RiceMap({ filters, layers, flyTo }) {
   const [eviTileUrl, setEviTileUrl] = useState(null);
   const [vvTileUrl, setVvTileUrl] = useState(null);
   const [vhTileUrl, setVhTileUrl] = useState(null);
+  const [satelliteTileFailed, setSatelliteTileFailed] = useState(false);
 
   const mapRef = useRef(null);
 
@@ -217,41 +331,40 @@ export default function RiceMap({ filters, layers, flyTo }) {
 
   const overlayOpacity = layers.overlayOpacity ?? 0.75;
 
+  useEffect(() => {
+    setSatelliteTileFailed(false);
+  }, [layers.showSatellite, selectedDistrict]);
+
   /* ---------- LOAD PADDY EXTENT ---------- */
 
   useEffect(() => {
-
     if (!selectedDistrict || !layers.paddyExtent) {
       setPaddyGeo(null);
       return;
     }
 
-    fetch(`/${selectedDistrict}.geojson`)
-      .then(res => res.json())
+    fetch(`/${districtToFile(selectedDistrict)}.geojson`)
+      .then((res) => res.json())
       .then(setPaddyGeo)
       .catch(console.error);
-
   }, [selectedDistrict, layers.paddyExtent]);
 
   /* ---------- LOAD DISTRICT BOUNDARY ---------- */
 
   useEffect(() => {
-
     setDistrictBoundary(null);
 
     if (!selectedDistrict) return;
 
-    fetch(`/${selectedDistrict}_District_Boundary.geojson`)
-      .then(res => res.json())
+    fetch(`/${districtToFile(selectedDistrict)}_District_Boundary.geojson`)
+      .then((res) => res.json())
       .then(setDistrictBoundary)
       .catch(console.error);
-
   }, [selectedDistrict]);
 
   /* ---------- ZOOM LOGIC ---------- */
 
   useEffect(() => {
-
     if (!mapRef.current) return;
 
     if (districtBoundary) {
@@ -265,7 +378,6 @@ export default function RiceMap({ filters, layers, flyTo }) {
         padding: [40, 40],
       });
     }
-
   }, [districtBoundary]);
 
   /* ---------- LOAD SATELLITE TILES ---------- */
@@ -273,207 +385,214 @@ export default function RiceMap({ filters, layers, flyTo }) {
   useEffect(() => {
     if (!selectedDistrict || !layers.ndvi) return setNdviTileUrl(null);
     fetchGEETileUrl({ type: "ndvi", district: selectedDistrict })
-      .then(res => setNdviTileUrl(res.tile_url))
+      .then((res) => setNdviTileUrl(res.tile_url))
       .catch(() => setNdviTileUrl(null));
   }, [selectedDistrict, layers.ndvi]);
 
   useEffect(() => {
     if (!selectedDistrict || !layers.evi) return setEviTileUrl(null);
     fetchGEETileUrl({ type: "evi", district: selectedDistrict })
-      .then(res => setEviTileUrl(res.tile_url))
+      .then((res) => setEviTileUrl(res.tile_url))
       .catch(() => setEviTileUrl(null));
   }, [selectedDistrict, layers.evi]);
 
   useEffect(() => {
     if (!selectedDistrict || !layers.vv) return setVvTileUrl(null);
     fetchGEETileUrl({ type: "vv", district: selectedDistrict })
-      .then(res => setVvTileUrl(res.tile_url))
+      .then((res) => setVvTileUrl(res.tile_url))
       .catch(() => setVvTileUrl(null));
   }, [selectedDistrict, layers.vv]);
 
   useEffect(() => {
     if (!selectedDistrict || !layers.vh) return setVhTileUrl(null);
     fetchGEETileUrl({ type: "vh", district: selectedDistrict })
-      .then(res => setVhTileUrl(res.tile_url))
+      .then((res) => setVhTileUrl(res.tile_url))
       .catch(() => setVhTileUrl(null));
   }, [selectedDistrict, layers.vh]);
 
   /* ---------- FETCH ML POINTS ---------- */
 
-useEffect(() => {
-
-  if (!selectedDistrict || !layers.showCircles) {
-    setPoints([]);
-    return;
-  }
-
-  let cancelled = false;
-
-  const loadPoints = async () => {
-    try {
-
-      const result = await fetchMapFields({
-        districts: [selectedDistrict],
-        health: selectedHealth,
-      });
-
-      console.log(`[MAP] Backend count: ${result.count}`);
-      console.log(`[MAP] Data array length: ${result.data.length}`);
-      const valid = result.data.filter(p => p.lat != null && p.lng != null);
-      console.log(`[MAP] Valid points (non-null lat/lng): ${valid.length}`);
-      if (valid.length !== result.data.length) {
-        console.warn(`[MAP] ${result.data.length - valid.length} points dropped due to null lat/lng`);
-      }
-
-      if (!cancelled) setPoints(valid);
-
-    } catch (err) {
-
-      if (!cancelled) {
-        console.error(err);
-        setPoints([]);
-      }
-
+  useEffect(() => {
+    if (!selectedDistrict || !layers.showCircles) {
+      setPoints([]);
+      return;
     }
-  };
 
-  loadPoints();
+    let cancelled = false;
 
-  return () => { cancelled = true; };
+    const loadPoints = async () => {
+      try {
+        const result = await fetchMapFields({
+          districts: [selectedDistrict],
+          health: selectedHealth,
+        });
 
-}, [selectedDistrict, selectedHealth, layers.showCircles]);
+        console.log(`[MAP] Backend count: ${result.count}`);
+        console.log(`[MAP] Data array length: ${result.data.length}`);
+        const valid = result.data.filter((p) => p.lat != null && p.lng != null);
+        console.log(`[MAP] Valid points (non-null lat/lng): ${valid.length}`);
+        if (valid.length !== result.data.length) {
+          console.warn(
+            `[MAP] ${result.data.length - valid.length} points dropped due to null lat/lng`,
+          );
+        }
+
+        if (!cancelled) setPoints(valid);
+      } catch (err) {
+        if (!cancelled) {
+          console.error(err);
+          setPoints([]);
+        }
+      }
+    };
+
+    loadPoints();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedDistrict, selectedHealth, layers.showCircles]);
 
   /* ---------- RENDER ---------- */
 
   return (
+    <MapContainer
+      ref={mapRef}
+      center={SRI_LANKA_CENTER}
+      zoom={SRI_LANKA_ZOOM}
+      minZoom={7}
+      maxZoom={18}
+      maxBounds={!selectedDistrict ? SRI_LANKA_BOUNDS : undefined}
+      maxBoundsViscosity={1.0}
+      preferCanvas={true}
+      className="h-screen min-h-screen w-full md:h-full md:min-h-0 rounded-none md:rounded-3xl"
+    >
+      <FlyToController flyTo={flyTo} />
+      <AlertMarker flyTo={flyTo} />
 
-<MapContainer
-  ref={mapRef}
-  center={SRI_LANKA_CENTER}
-  zoom={SRI_LANKA_ZOOM}
-  minZoom={7}
-  maxZoom={18}
-  maxBounds={!selectedDistrict ? SRI_LANKA_BOUNDS : undefined}
-  maxBoundsViscosity={1.0}
-  preferCanvas={true}
-  className="h-full w-full rounded-3xl"
->
+      {/* ---------- DEFAULT MAP ---------- */}
 
-<FlyToController flyTo={flyTo} />
-<AlertMarker flyTo={flyTo} />
+      {!layers.showSatellite && (
+        <>
+          <TileLayer
+            key={isDark ? "dark-map" : "light-map"}
+            attribution="© Carto"
+            url={
+              isDark
+                ? "https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png"
+                : "https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png"
+            }
+          />
 
-{/* ---------- DEFAULT MAP ---------- */}
+          <TileLayer
+            key={isDark ? "dark-labels" : "light-labels"}
+            attribution="© Carto"
+            url={
+              isDark
+                ? "https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}.png"
+                : "https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png"
+            }
+          />
+        </>
+      )}
 
-{!layers.showSatellite && (
-  <>
-    <TileLayer
-      key={isDark ? "dark-map" : "light-map"}
-      attribution="© Carto"
-      url={
-        isDark
-          ? "https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png"
-          : "https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png"
-      }
-    />
+      {/* ---------- SATELLITE ---------- */}
 
-    <TileLayer
-      key={isDark ? "dark-labels" : "light-labels"}
-      attribution="© Carto"
-      url={
-        isDark
-          ? "https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}.png"
-          : "https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png"
-      }
-    />
-  </>
-)}
+      {layers.showSatellite && (
+        <>
+          {!satelliteTileFailed ? (
+            <TileLayer
+              attribution="© Esri"
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+              eventHandlers={{
+                tileerror: () => {
+                  if (!satelliteTileFailed) setSatelliteTileFailed(true);
+                },
+              }}
+            />
+          ) : (
+            <TileLayer
+              attribution="© OpenStreetMap contributors"
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+          )}
 
-{/* ---------- SATELLITE ---------- */}
+          {layers.showRoadOverlay && (
+            <>
+              <TileLayer
+                attribution="© OpenStreetMap"
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                opacity={layers.roadOpacity}
+              />
 
-{layers.showSatellite && (
-  <>
-    <TileLayer
-      attribution="© Esri"
-      url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-    />
+              <TileLayer
+                attribution="© Carto"
+                url={
+                  isDark
+                    ? "https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}.png"
+                    : "https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png"
+                }
+                opacity={1}
+              />
+            </>
+          )}
+        </>
+      )}
 
-    {layers.showRoadOverlay && (
-      <>
-        <TileLayer
-          attribution="© OpenStreetMap"
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          opacity={layers.roadOpacity}
-        />
+      {districtBoundary && (
+        <GeoJSON data={districtBoundary} style={districtBoundaryStyle} />
+      )}
 
-        <TileLayer
-          attribution="© Carto"
-          url={
-            isDark
-              ? "https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}.png"
-              : "https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png"
-          }
-          opacity={1}
-        />
-      </>
-    )}
-  </>
-)}
+      {selectedDistrict && layers.paddyExtent && paddyGeo && (
+        <GeoJSON data={paddyGeo} style={paddyStyle} />
+      )}
 
-{districtBoundary && (
-  <GeoJSON data={districtBoundary} style={districtBoundaryStyle} />
-)}
+      {layers.ndvi && ndviTileUrl && (
+        <TileLayer url={ndviTileUrl} opacity={overlayOpacity} />
+      )}
 
-{selectedDistrict && layers.paddyExtent && paddyGeo && (
-  <GeoJSON data={paddyGeo} style={paddyStyle} />
-)}
+      {layers.evi && eviTileUrl && (
+        <TileLayer url={eviTileUrl} opacity={overlayOpacity} />
+      )}
 
-{layers.ndvi && ndviTileUrl && (
-  <TileLayer url={ndviTileUrl} opacity={overlayOpacity} />
-)}
+      {layers.vv && vvTileUrl && (
+        <TileLayer url={vvTileUrl} opacity={overlayOpacity} />
+      )}
 
-{layers.evi && eviTileUrl && (
-  <TileLayer url={eviTileUrl} opacity={overlayOpacity} />
-)}
+      {layers.vh && vhTileUrl && (
+        <TileLayer url={vhTileUrl} opacity={overlayOpacity} />
+      )}
 
-{layers.vv && vvTileUrl && (
-  <TileLayer url={vvTileUrl} opacity={overlayOpacity} />
-)}
-
-{layers.vh && vhTileUrl && (
-  <TileLayer url={vhTileUrl} opacity={overlayOpacity} />
-)}
-
-{layers.showCircles && points && points.length > 0 && (
-  <MarkerClusterGroup
-  key={`cluster-${selectedDistrict}-${selectedHealth.join(",")}-${points.length}`}
-  disableClusteringAtZoom={10}
-  spiderfyOnMaxZoom={false}
-  showCoverageOnHover={false}
-  maxClusterRadius={30}
->
-
-{points.map((p, idx) => (
-<CircleMarker
-  key={idx}
-  center={[p.lat, p.lng]}
-  radius={5}
-  pathOptions={{
-    color: getHealthColor(p.paddy_health),
-    fillColor: getHealthColor(p.paddy_health),
-    fillOpacity: 0.8,
-    weight: 1,
-  }}
->
-  <Popup maxWidth={280} className={`point-popup ${isDark ? "point-popup-dark" : ""}`}>
-    <PointPopup p={p} />
-  </Popup>
-</CircleMarker>
-))}
-
-</MarkerClusterGroup>
-)}
-
-</MapContainer>
-
+      {layers.showCircles && points && points.length > 0 && (
+        <MarkerClusterGroup
+          key={`cluster-${selectedDistrict}-${selectedHealth.join(",")}-${points.length}`}
+          disableClusteringAtZoom={10}
+          spiderfyOnMaxZoom={false}
+          showCoverageOnHover={false}
+          maxClusterRadius={30}
+        >
+          {points.map((p, idx) => (
+            <CircleMarker
+              key={idx}
+              center={[p.lat, p.lng]}
+              radius={5}
+              pathOptions={{
+                color: getHealthColor(p.paddy_health),
+                fillColor: getHealthColor(p.paddy_health),
+                fillOpacity: 0.8,
+                weight: 1,
+              }}
+            >
+              <Popup
+                maxWidth={280}
+                className={`point-popup ${isDark ? "point-popup-dark" : ""}`}
+              >
+                <PointPopup p={p} />
+              </Popup>
+            </CircleMarker>
+          ))}
+        </MarkerClusterGroup>
+      )}
+    </MapContainer>
   );
 }

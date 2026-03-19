@@ -37,10 +37,18 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw";
 import "leaflet-draw/dist/leaflet.draw.css";
+import { useLanguage } from "../../context/LanguageContext";
+import { translateDistrictName } from "../../utils/locationTranslations";
 import { DISTRICTS, BASE_MAPS, SQM_PER_ACRE, PRICE_PER_ACRE_LKR } from "./fieldConstants";
 
 /* ── Constants ─────────────────────────────────────────────────────────────── */
 const SL_CENTER = [7.8731, 80.7718];
+const BASE_MAP_LABEL_KEYS = {
+  satellite: "mapBasemapSatellite",
+  street: "mapBasemapStreet",
+  terrain: "mapBasemapTerrain",
+  dark: "mapBasemapDark",
+};
 
 /* ── geodesic area helper (provided by leaflet-draw) ─────────────────────── */
 function calcAreaM2(layer) {
@@ -78,6 +86,15 @@ function DrawControl({ onDraw, onClear }) {
   useEffect(() => {
     if (!L.Control || !L.Control.Draw) return;
 
+    // Clear, task-specific labels make the toolbar easier to understand.
+    L.drawLocal.draw.toolbar.buttons.polygon = "Draw field boundary";
+    L.drawLocal.draw.toolbar.buttons.rectangle = "Draw quick rectangle";
+    L.drawLocal.edit.toolbar.buttons.edit = "Edit boundary points";
+    L.drawLocal.edit.toolbar.buttons.remove = "Delete boundary";
+    L.drawLocal.draw.handlers.polygon.tooltip.start = "Click to start your boundary";
+    L.drawLocal.draw.handlers.polygon.tooltip.cont = "Click more points to match your field shape";
+    L.drawLocal.draw.handlers.polygon.tooltip.end = "Click first point or double-click to finish";
+
     // create the FeatureGroup once and keep it in a ref
     const drawnItems = new L.FeatureGroup();
     drawnRef.current = drawnItems;
@@ -91,20 +108,20 @@ function DrawControl({ onDraw, onClear }) {
           allowIntersection: false,
           showArea: true,
           shapeOptions: {
-            color:       "#10b981",
+            color:       "#059669",
             fillColor:   "#10b981",
-            fillOpacity: 0.3,
-            weight:      2,
+            fillOpacity: 0.35,
+            weight:      3,
           },
-          guidelineDistance: 20,
+          guidelineDistance: 25,
           metric: true,
         },
         rectangle: {
           shapeOptions: {
-            color:       "#10b981",
+            color:       "#059669",
             fillColor:   "#10b981",
-            fillOpacity: 0.3,
-            weight:      2,
+            fillOpacity: 0.35,
+            weight:      3,
           },
         },
         polyline:     false,
@@ -213,10 +230,12 @@ export default function FieldDrawMap({
   readOnly = false,
   height   = "480px",
 }) {
+  const { t, language } = useLanguage();
   const [selectedDistrict,  setSelectedDistrict]  = useState(null);
   const [paddyGeoJSON,      setPaddyGeoJSON]       = useState(null);
   const [loadingGeoJSON,    setLoadingGeoJSON]     = useState(false);
   const [basemap,           setBasemap]            = useState("satellite");
+  const [baseTileFailed,    setBaseTileFailed]     = useState(false);
 
   /* district search */
   const [districtSearch,    setDistrictSearch]     = useState("");
@@ -278,10 +297,11 @@ export default function FieldDrawMap({
     if (q.length < 3) { setLocResults([]); return; }
     locDebounce.current = setTimeout(async () => {
       try {
+        const nominatimLang = language === "si" || language === "ta" ? language : "en";
         const res  = await fetch(
           `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
             q + " Sri Lanka"
-          )}&format=json&limit=5&countrycodes=lk`
+          )}&format=json&limit=5&countrycodes=lk&accept-language=${nominatimLang}`
         );
         const data = await res.json();
         setLocResults(data);
@@ -298,14 +318,16 @@ export default function FieldDrawMap({
   };
 
   const filteredDistricts = DISTRICTS.filter((d) =>
-    d.name.toLowerCase().includes(districtSearch.toLowerCase())
+    d.name.toLowerCase().includes(districtSearch.toLowerCase()) ||
+    translateDistrictName(d.name, language).toLowerCase().includes(districtSearch.toLowerCase())
   );
 
   const price = Math.ceil(acres * PRICE_PER_ACRE_LKR);
+  const activeBaseMap = baseTileFailed ? BASE_MAPS.street : BASE_MAPS[basemap];
 
   /* ── Render ── */
   return (
-    <div className="flex flex-col gap-3" style={{ minHeight: height }}>
+    <div className="flex flex-col gap-3 w-full" style={{ height }}>
       {/* ── Controls row ── */}
       {!readOnly && (
         <div className="flex flex-wrap gap-2 items-start">
@@ -314,10 +336,10 @@ export default function FieldDrawMap({
             <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-white/15 bg-white/5 text-white text-sm w-48 cursor-pointer hover:border-emerald-500/50 transition-all"
               onClick={() => setShowDistrictMenu((v) => !v)}>
               <span className="material-symbols-outlined text-emerald-400 text-base">location_on</span>
-              <span className={selectedDistrict ? "text-white font-semibold" : "text-white/40"}>
-                {selectedDistrict ? selectedDistrict.name : "Select district"}
+              <span className={selectedDistrict ? "text-white font-semibold" : "text-white/85"}>
+                {selectedDistrict ? translateDistrictName(selectedDistrict.name, language) : t("mapSelectDistrictPrompt")}
               </span>
-              <span className="material-symbols-outlined text-white/30 text-base ml-auto">expand_more</span>
+              <span className="material-symbols-outlined text-white/85 text-base ml-auto">expand_more</span>
             </div>
 
             {showDistrictMenu && (
@@ -328,8 +350,8 @@ export default function FieldDrawMap({
                     type="text"
                     value={districtSearch}
                     onChange={(e) => setDistrictSearch(e.target.value)}
-                    placeholder="Filter districts..."
-                    className="w-full px-3 py-1.5 text-xs rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                    placeholder={t("mapSearchDistrictPlaceholder")}
+                    className="w-full px-3 py-1.5 text-xs rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/85 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                     onClick={(e) => e.stopPropagation()}
                   />
                 </div>
@@ -345,10 +367,10 @@ export default function FieldDrawMap({
                       className={`px-4 py-2 text-sm cursor-pointer transition-colors ${
                         selectedDistrict?.file === d.file
                           ? "bg-emerald-500/20 text-emerald-400 font-semibold"
-                          : "text-white/80 hover:bg-white/5"
+                          : "text-white/85 hover:bg-white/5"
                       }`}
                     >
-                      {d.name}
+                      {translateDistrictName(d.name, language)}
                     </li>
                   ))}
                 </ul>
@@ -359,18 +381,18 @@ export default function FieldDrawMap({
           {/* Location search */}
           <div className="relative flex-1 min-w-45">
             <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-white/15 bg-white/5">
-              <span className="material-symbols-outlined text-white/40 text-base">search</span>
+              <span className="material-symbols-outlined text-white/85 text-base">search</span>
               <input
                 type="text"
                 value={locSearch}
                 onChange={(e) => searchLocation(e.target.value)}
-                placeholder="Search location in Sri Lanka…"
-                className="flex-1 bg-transparent text-sm text-white placeholder-white/30 focus:outline-none"
+                placeholder={t("mapSearchLocationPlaceholder")}
+                className="flex-1 bg-transparent text-sm text-white placeholder-white/85 focus:outline-none"
               />
               {locSearch && (
                 <button
                   onClick={() => { setLocSearch(""); setLocResults([]); }}
-                  className="text-white/30 hover:text-white/60 transition-colors"
+                  className="text-white/85 hover:text-white/90 transition-colors"
                 >
                   <span className="material-symbols-outlined text-base">close</span>
                 </button>
@@ -382,7 +404,7 @@ export default function FieldDrawMap({
                   <li
                     key={r.place_id}
                     onClick={() => flyToResult(r)}
-                    className="px-4 py-2.5 text-xs text-white/80 hover:bg-white/5 cursor-pointer truncate"
+                    className="px-4 py-2.5 text-xs text-white/85 hover:bg-white/5 cursor-pointer truncate"
                   >
                     {r.display_name}
                   </li>
@@ -396,14 +418,17 @@ export default function FieldDrawMap({
             {Object.entries(BASE_MAPS).map(([key, bm]) => (
               <button
                 key={key}
-                onClick={() => setBasemap(key)}
+                onClick={() => {
+                  setBasemap(key);
+                  setBaseTileFailed(false);
+                }}
                 className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
                   basemap === key
                     ? "bg-emerald-500 border-emerald-400 text-white shadow-lg shadow-emerald-500/20"
-                    : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10 hover:text-white"
+                    : "bg-white/5 border-white/10 text-white/85 hover:bg-white/10 hover:text-white"
                 }`}
               >
-                {bm.label}
+                {t(BASE_MAP_LABEL_KEYS[key] || bm.label)}
               </button>
             ))}
           </div>
@@ -413,14 +438,38 @@ export default function FieldDrawMap({
       {/* ── Field name input ── */}
       {!readOnly && (
         <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-white/40 text-base shrink-0">badge</span>
+          <span className="material-symbols-outlined text-white/85 text-base shrink-0">badge</span>
           <input
             type="text"
             value={fieldName}
             onChange={(e) => onFieldNameChange?.(e.target.value)}
-            placeholder="Name your field (e.g. North Paddy, Home Field…)"
-            className="flex-1 px-3 py-2 rounded-xl border border-white/15 bg-white/5 text-white text-sm placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500/50 transition-all"
+            placeholder={t("mapFieldNamePlaceholder")}
+            className="flex-1 px-3 py-2 rounded-xl border border-white/15 bg-white/5 text-white text-sm placeholder-white/85 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500/50 transition-all"
           />
+        </div>
+      )}
+
+      {/* ── Drawing guide ── */}
+      {!readOnly && (
+        <div className="rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-4 py-3 text-xs text-white/90">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="material-symbols-outlined text-emerald-400 text-base">gesture</span>
+            <span className="font-black uppercase tracking-[0.2em] text-emerald-300">How To Draw Your Field</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+            <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2">
+              <strong className="text-white">1. Pick Polygon Tool</strong>
+              <p className="text-white/75 mt-1">Use the top-right polygon icon for custom shapes.</p>
+            </div>
+            <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2">
+              <strong className="text-white">2. Click Field Corners</strong>
+              <p className="text-white/75 mt-1">Click multiple points around your land, then double-click to finish.</p>
+            </div>
+            <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2">
+              <strong className="text-white">3. Edit If Needed</strong>
+              <p className="text-white/75 mt-1">Use the edit tool to drag points and adjust the boundary.</p>
+            </div>
+          </div>
         </div>
       )}
 
@@ -429,26 +478,31 @@ export default function FieldDrawMap({
         <div className="flex flex-wrap items-center gap-4 px-4 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-sm">
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-emerald-400 text-base">straighten</span>
-            <span className="text-white/70">Area:</span>
-            <span className="font-black text-emerald-400">{acres.toFixed(3)} acres</span>
-            <span className="text-white/30">({(acres * 4046.86).toFixed(0)} m²)</span>
+            <span className="text-white/85">{t("areaStat")}:</span>
+            <span className="font-black text-emerald-400">{acres.toFixed(3)} {t("unitAcres")}</span>
+            <span className="text-white/85">({(acres * 4046.86).toFixed(0)} m²)</span>
           </div>
           <span className="h-4 w-px bg-white/20" />
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-emerald-400 text-base">paid</span>
-            <span className="text-white/70">Price:</span>
-            <span className="font-black text-emerald-400">Rs. {price.toLocaleString()} / year</span>
-            <span className="text-white/30 text-xs">(Rs. {PRICE_PER_ACRE_LKR.toLocaleString()} per acre)</span>
+            <span className="text-white/85">Price:</span>
+            <span className="font-black text-emerald-400">Rs. {price.toLocaleString()} / month</span>
+            <span className="text-white/85 text-xs">(Rs. {PRICE_PER_ACRE_LKR.toLocaleString()} per acre)</span>
           </div>
         </div>
       )}
 
       {/* ── Map container ── */}
       <div
-        className="relative rounded-xl overflow-hidden border border-white/10 flex-1"
-        style={{ height }}
+        className="relative rounded-xl overflow-hidden border border-white/10 flex-1 w-full"
         onClick={() => setShowDistrictMenu(false)}
       >
+        {!readOnly && (
+          <div className="absolute left-3 top-3 z-999 px-2.5 py-1.5 rounded-lg border border-white/15 bg-slate-900/80 backdrop-blur-sm text-[11px] text-white/90 pointer-events-none">
+            Draw tools are on the top-right of the map
+          </div>
+        )}
+
         {loadingGeoJSON && (
           <div className="absolute inset-0 z-999 flex items-center justify-center bg-black/50 backdrop-blur-sm pointer-events-none">
             <div className="w-8 h-8 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
@@ -458,13 +512,24 @@ export default function FieldDrawMap({
         <MapContainer
           center={SL_CENTER}
           zoom={7}
+          minZoom={5}
+          maxZoom={18}
           style={{ width: "100%", height: "100%" }}
+          preferCanvas={true}
+          className="h-full w-full rounded-lg"
           zoomControl
         >
           <TileLayer
-            key={basemap}
-            url={BASE_MAPS[basemap].url}
-            attribution={BASE_MAPS[basemap].attribution}
+            key={baseTileFailed ? `${basemap}-fallback` : basemap}
+            url={activeBaseMap.url}
+            attribution={activeBaseMap.attribution}
+            eventHandlers={{
+              tileerror: () => {
+                if (!baseTileFailed) {
+                  setBaseTileFailed(true);
+                }
+              },
+            }}
           />
 
           {/* Paddy extent overlay (amber, shows known paddy zones) */}
@@ -511,10 +576,10 @@ export default function FieldDrawMap({
 
       {/* Hint text */}
       {!readOnly && (
-        <p className="text-xs text-white/30 text-center">
-          <span className="text-amber-400/70">■</span> Yellow = known paddy areas &nbsp;·&nbsp;
-          Use the <strong className="text-white/50">polygon / rectangle tool</strong> (top-right of map) to outline your field &nbsp;·&nbsp;
-          {initialFeature && <span><span className="text-blue-400/70">⬝</span> Dashed blue = your current field</span>}
+        <p className="text-xs text-white/85 text-center">
+          <span className="text-amber-300">■</span> {t("mapHintKnownPaddy")} &nbsp;·&nbsp;
+          {t("mapHintUseToolPrefix")} <strong className="text-white/90">{t("mapHintToolName")}</strong> {t("mapHintUseToolSuffix")} &nbsp;·&nbsp;
+          {initialFeature && <span><span className="text-blue-300">⬝</span> {t("mapHintCurrentField")}</span>}
         </p>
       )}
     </div>

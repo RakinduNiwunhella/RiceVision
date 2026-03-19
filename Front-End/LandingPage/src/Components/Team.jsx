@@ -62,8 +62,7 @@ function Team() {
             Our team
           </h2>
           <p className="mt-4 text-lg leading-8 text-gray-600 dark:text-gray-300">
-            We’re a dynamic group of individuals who are passionate about what we
-            do and dedicated to delivering the best results for our clients.
+            We're a team of developers, engineers, and designers passionate about using satellite technology and machine learning to support sustainable rice farming in Sri Lanka.
           </p>
         </div>
 

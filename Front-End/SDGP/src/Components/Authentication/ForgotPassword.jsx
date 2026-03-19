@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { supabase } from "../../supabaseClient";
 import { useLanguage } from "../../context/LanguageContext";
 
 export default function ForgotPassword() {
@@ -12,14 +11,22 @@ export default function ForgotPassword() {
     e.preventDefault();
     setLoading(true);
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: "http://localhost:3000/reset-password",
-    });
+    try {
+      const res = await fetch("http://127.0.0.1:8000/api/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
 
-    if (error) {
-      setMessage(error.message);
-    } else {
-      setMessage("Password reset email sent! Check your inbox.");
+      const data = await res.json();
+
+      if (!res.ok) {
+        setMessage(data.detail || t('failedToSendResetEmail'));
+      } else {
+        setMessage(t('resetEmailSent'));
+      }
+    } catch (err) {
+      setMessage(t('networkErrorTryAgain'));
     }
 
     setLoading(false);

@@ -36,3 +36,15 @@ venv/
 .venv/
 *.py[cod]
 *.pyc
+
+# AWS Lambda packaging artifacts and credentials
+AWS/Lambda/**/__pycache__/
+AWS/Lambda/**/*.pyc
+AWS/Lambda/**/*.pyo
+AWS/Lambda/**/*.so
+AWS/Lambda/**/*.dist-info/
+AWS/Lambda/**/*.libs/
+AWS/Lambda/**/bin/
+AWS/Lambda/**/*.zip
+AWS/Lambda/**/gee_auth.json
+ricevision-pipeline/google-chrome-stable_current_x86_64.rpm

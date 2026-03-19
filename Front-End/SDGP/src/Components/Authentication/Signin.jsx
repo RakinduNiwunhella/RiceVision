@@ -11,6 +11,7 @@ import {
 } from "react-icons/fa";
 import { useTheme } from "../../context/ThemeContext";
 import { useLanguage } from "../../context/LanguageContext";
+import { API_BASE } from "../../config/apiBase";
 
 export default function LoginPage() {
   const { isDark, toggleTheme } = useTheme();
@@ -31,20 +32,43 @@ export default function LoginPage() {
     setLoading(true);
     setErrorMessage("");
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const res = await fetch(`${API_BASE}/api/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
 
-    if (error) {
-      setErrorMessage(error.message);
-      setLoading(false);
-    } else {
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.detail || t('loginFailed'));
+      }
+
+      console.log("Login success:", data);
+
+      // store token
+      localStorage.setItem("access_token", data.access_token);
+
       navigate("/dashboard");
+
+    } catch (err) {
+      console.error(err);
+      setErrorMessage(err.message);
     }
+
+    setLoading(false);
   };
 
   const handleGoogleLogin = async () => {
+    // Reset tutorials on login - set to empty object instead of removing
+    localStorage.setItem('ricevision_tutorial_pages', JSON.stringify({}));
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
@@ -65,26 +89,32 @@ export default function LoginPage() {
     e.preventDefault();
 
     if (!email) {
-      setResetError("Please enter your email.");
+      setResetError(t('pleaseEnterEmail'));
       return;
     }
 
     setResetLoading(true);
     setResetError("");
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: import.meta.env.DEV
-        ? "http://localhost:5173/reset-password"
-        : "https://app.ricevisionlanka.com/reset-password",
-    });
+    try {
+      const res = await fetch(`${API_BASE}/api/reset-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setResetError(data.detail || t('failedToSendResetEmail'));
+      } else {
+        setResetSuccess(true);
+      }
+    } catch (err) {
+      setResetError(t('networkErrorTryAgain'));
+    }
 
     setResetLoading(false);
-
-    if (error) {
-      setResetError(error.message);
-    } else {
-      setResetSuccess(true);
-    }
   };
 
   return (

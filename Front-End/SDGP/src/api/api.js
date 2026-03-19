@@ -1,9 +1,20 @@
-const API_BASE = "https://ricevision-cakt.onrender.com";
+import { apiFetch } from "./apiFetch";
 
-// helper
+// Authenticated helper for all backend GET requests
 async function get(path) {
-  const res = await fetch(`${API_BASE}${path}`);
-  if (!res.ok) throw new Error("API error");
+  const res = await apiFetch(path);
+  if (!res.ok) {
+    let detail = "";
+    try {
+      const payload = await res.json();
+      detail = payload?.detail || payload?.message || "";
+    } catch {
+      // Ignore JSON parse errors and fall back to status text.
+    }
+
+    const suffix = detail || res.statusText || "Request failed";
+    throw new Error(`API error (${res.status}): ${suffix}`);
+  }
   return res.json();
 }
 
@@ -11,6 +22,7 @@ async function get(path) {
 export const fetchHealthSummary = () => get("/health-summary");
 export const fetchYield = () => get("/yield");
 export const fetchBestDistricts = () => get("/best-districts");
+export const fetchDistrictYields = () => get("/district-yields");
 export const fetchOutbreaks = () => get("/outbreaks");
 export const fetchNDVITrend = () => get("/ndvi-trend");
 export const fetchDistrictHealth = () => get("/district-health");
@@ -18,7 +30,7 @@ export const fetchStageDistribution = () => get("/stage-distribution");
 export const fetchReportData = (districts, month) =>
   get(`/api/report-data?districts=${districts}&month=${month}`);
 
-// Called directly from the browser — Open-Meteo is free, no API key needed
+// Called directly from the browser — Open-Meteo is a public API, no token needed
 export const fetchWeather = async () => {
   const url =
     "https://api.open-meteo.com/v1/forecast" +
@@ -45,12 +57,11 @@ export const updateAlertStatus = async (
 ) => {
   const endpoint =
     type === "pest"
-      ? `${API_BASE}/api/alerts/pest/${id}`
-      : `${API_BASE}/api/alerts/${id}`;
+      ? `/api/alerts/pest/${id}`
+      : `/api/alerts/${id}`;
 
-  const res = await fetch(endpoint, {
+  const res = await apiFetch(endpoint, {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ status, note }),
   });
 
@@ -60,9 +71,8 @@ export const updateAlertStatus = async (
 };
 
 export const submitComplaint = async (payload) => {
-  const res = await fetch(`${API_BASE}/api/help/complaints`, {
+  const res = await apiFetch("/api/help/complaints", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
 
@@ -85,7 +95,7 @@ export const fetchMapFields = async ({ districts = [], health = [] }) => {
   districts.forEach((d) => params.append("districts", d));
   health.forEach((h) => params.append("health", h));
 
-  const res = await fetch(`${API_BASE}/map-fields?${params.toString()}`);
+  const res = await apiFetch(`/map-fields?${params.toString()}`);
 
   if (!res.ok) {
     throw new Error("Failed to fetch map fields");
@@ -112,7 +122,7 @@ export const fetchMapOverlay = async ({ type, districts = [] }) => {
   const params = new URLSearchParams({ type });
   districts.forEach((d) => params.append("districts", d));
 
-  const res = await fetch(`${API_BASE}/map-overlay?${params.toString()}`);
+  const res = await apiFetch(`/map-overlay?${params.toString()}`);
   if (!res.ok) throw new Error("Failed to fetch overlay data");
 
   const result = await res.json();
@@ -137,10 +147,48 @@ export const fetchGEETileUrl = async ({
   if (startDate) params.set("start_date", startDate);
   if (endDate) params.set("end_date", endDate);
 
-  const res = await fetch(`${API_BASE}/map-gee-tiles?${params.toString()}`);
+  const res = await apiFetch(`/map-gee-tiles?${params.toString()}`);
   if (!res.ok) {
     const data = await res.json().catch(() => ({}));
     throw new Error(data.detail || "GEE tile fetch failed");
   }
+  return res.json();
+};
+
+/* ------------------ USER FIELD ------------------ */
+export const fetchUserField = () => get("/user-field");
+
+export const saveUserField = async (payload) => {
+  const res = await apiFetch("/user-field", {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    let message = "Failed to save field";
+    try {
+      const data = await res.json();
+      message = data.detail || message;
+    } catch (_) {}
+    throw new Error(message);
+  }
+
+  return res.json();
+};
+
+export const removeUserField = async () => {
+  const res = await apiFetch("/user-field", {
+    method: "DELETE",
+  });
+
+  if (!res.ok) {
+    let message = "Failed to delete field";
+    try {
+      const data = await res.json();
+      message = data.detail || message;
+    } catch (_) {}
+    throw new Error(message);
+  }
+
   return res.json();
 };

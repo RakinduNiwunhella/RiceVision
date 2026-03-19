@@ -4,6 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { FaSun, FaMoon } from "react-icons/fa";
 import { useTheme } from "../../context/ThemeContext";
 import { useLanguage } from "../../context/LanguageContext";
+import { API_BASE } from "../../config/apiBase";
 
 export default function SignupPage() {
   const { isDark, toggleTheme } = useTheme();
@@ -23,7 +24,7 @@ export default function SignupPage() {
   const validateEmail = (value) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (value && !regex.test(value)) {
-      setEmailError("Please enter a valid email address");
+      setEmailError(t('validEmailAddressError'));
     } else {
       setEmailError("");
     }
@@ -31,13 +32,13 @@ export default function SignupPage() {
 
   const validatePasswords = (pass, confirm) => {
     if (pass.length > 0 && pass.length < 6) {
-      setPasswordLengthError("Password must be at least 6 characters");
+      setPasswordLengthError(t('passwordMinLengthError'));
     } else {
       setPasswordLengthError("");
     }
 
     if (confirm && pass !== confirm) {
-      setPasswordError("Passwords do not match");
+      setPasswordError(t('passwordsNoMatchError'));
     } else {
       setPasswordError("");
     }
@@ -48,23 +49,32 @@ export default function SignupPage() {
     if (emailError || passwordError || passwordLengthError) return;
 
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: fullName },
-      },
-    });
+    try {
+      const res = await fetch(`${API_BASE}/api/signup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ full_name: fullName, email, password }),
+      });
 
-    if (error) {
-      alert(error.message);
-    } else {
-      navigate("/field-setup", { state: { fromSignup: true } });
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.detail || t('signupFailed'));
+      } else {
+        // Reset tutorials on signup - set to empty object instead of removing
+        localStorage.setItem('ricevision_tutorial_pages', JSON.stringify({}));
+        navigate("/field-setup", { state: { fromSignup: true } });
+      }
+    } catch (err) {
+      alert(t('networkErrorTryAgain'));
     }
     setLoading(false);
   };
 
   const handleGoogleSignup = async () => {
+    // Reset tutorials on signup - set to empty object instead of removing
+    localStorage.setItem('ricevision_tutorial_pages', JSON.stringify({}));
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
@@ -112,7 +122,7 @@ export default function SignupPage() {
             {t('createAccount')}
           </h2>
           <p className="text-slate-500 dark:text-slate-400 mb-6">
-            {t('registerPaddySubtitle')}
+            {t('createAccountSubtitle')}
           </p>
 
           <form onSubmit={handleSignup} className="space-y-4">
@@ -139,11 +149,10 @@ export default function SignupPage() {
                 type="email"
                 required
                 placeholder="name@company.com"
-                className={`w-full px-4 py-2.5 sm:py-3.5 rounded-xl border bg-slate-50 dark:bg-slate-900/50 outline-none transition-all focus:ring-2 ${
-                  emailError
-                    ? "border-red-500 focus:ring-red-500/20"
-                    : "border-slate-200 dark:border-slate-800 focus:ring-indigo-500"
-                }`}
+                className={`w-full px-4 py-2.5 sm:py-3.5 rounded-xl border bg-slate-50 dark:bg-slate-900/50 outline-none transition-all focus:ring-2 ${emailError
+                  ? "border-red-500 focus:ring-red-500/20"
+                  : "border-slate-200 dark:border-slate-800 focus:ring-indigo-500"
+                  }`}
                 onChange={(e) => {
                   setEmail(e.target.value);
                   validateEmail(e.target.value);
@@ -164,11 +173,10 @@ export default function SignupPage() {
                   type="password"
                   required
                   placeholder="••••••••"
-                  className={`w-full px-4 py-2.5 sm:py-3.5 rounded-xl border bg-slate-50 dark:bg-slate-900/50 outline-none transition-all focus:ring-2 ${
-                    passwordLengthError
-                      ? "border-red-500 focus:ring-red-500/20"
-                      : "border-slate-200 dark:border-slate-800 focus:ring-indigo-500"
-                  }`}
+                  className={`w-full px-4 py-2.5 sm:py-3.5 rounded-xl border bg-slate-50 dark:bg-slate-900/50 outline-none transition-all focus:ring-2 ${passwordLengthError
+                    ? "border-red-500 focus:ring-red-500/20"
+                    : "border-slate-200 dark:border-slate-800 focus:ring-indigo-500"
+                    }`}
                   onChange={(e) => {
                     setPassword(e.target.value);
                     validatePasswords(e.target.value, confirmPassword);
@@ -189,11 +197,10 @@ export default function SignupPage() {
                   type="password"
                   required
                   placeholder="••••••••"
-                  className={`w-full px-4 py-2.5 sm:py-3.5 rounded-xl border bg-slate-50 dark:bg-slate-900/50 outline-none transition-all focus:ring-2 ${
-                    passwordError
-                      ? "border-red-500 focus:ring-red-500/20"
-                      : "border-slate-200 dark:border-slate-800 focus:ring-indigo-500"
-                  }`}
+                  className={`w-full px-4 py-2.5 sm:py-3.5 rounded-xl border bg-slate-50 dark:bg-slate-900/50 outline-none transition-all focus:ring-2 ${passwordError
+                    ? "border-red-500 focus:ring-red-500/20"
+                    : "border-slate-200 dark:border-slate-800 focus:ring-indigo-500"
+                    }`}
                   onChange={(e) => {
                     setConfirmPassword(e.target.value);
                     validatePasswords(password, e.target.value);
@@ -217,7 +224,7 @@ export default function SignupPage() {
             {/* Divider */}
             <div className="flex items-center">
               <div className="flex-grow h-px bg-slate-300 dark:bg-slate-700"></div>
-              <span className="px-4 text-sm text-slate-500">OR</span>
+              <span className="px-4 text-sm text-slate-500">{t('orDivider')}</span>
               <div className="flex-grow h-px bg-slate-300 dark:bg-slate-700"></div>
             </div>
 

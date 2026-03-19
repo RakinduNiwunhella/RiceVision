@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { FaSun, FaMoon } from "react-icons/fa";
 import { useTheme } from "../../context/ThemeContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { supabase } from "../../supabaseClient";
+import { saveUserField } from "../../api/api";
 import FieldDrawMap from "./FieldDrawMap";
+import TutorialTooltip from "../../Components/TutorialTooltip";
+import { usePageTutorial } from "../../hooks/usePageTutorial";
 import { PRICE_PER_ACRE_LKR } from "./fieldConstants";
 
 /* ────────────────────────────────────────────────────────────────────────────
@@ -31,6 +34,47 @@ export default function FieldSetupPage() {
   const [payClicked,     setPayClicked]     = useState(false);
   const [fieldName,      setFieldName]      = useState("");
 
+  // Tutorial refs
+  const getStartedBtnRef = useRef(null);
+  const reviewBtnRef = useRef(null);
+  const completeBtnRef = useRef(null);
+  const downloadBtnRef = useRef(null);
+
+  // Tutorial setup
+  const tutorialSteps = useMemo(() => t("fieldSetupTutorial") ? [
+    {
+      ref: getStartedBtnRef,
+      title: t("fieldSetupTutorial.getStarted.title"),
+      action: t("fieldSetupTutorial.getStarted.action"),
+      outcome: t("fieldSetupTutorial.getStarted.outcome"),
+      position: "bottom",
+    },
+    {
+      ref: reviewBtnRef,
+      title: t("fieldSetupTutorial.review.title"),
+      action: t("fieldSetupTutorial.review.action"),
+      outcome: t("fieldSetupTutorial.review.outcome"),
+      position: "bottom",
+    },
+    {
+      ref: completeBtnRef,
+      title: t("fieldSetupTutorial.complete.title"),
+      action: t("fieldSetupTutorial.complete.action"),
+      outcome: t("fieldSetupTutorial.complete.outcome"),
+      position: "bottom",
+    },
+    {
+      ref: downloadBtnRef,
+      title: t("fieldSetupTutorial.download.title"),
+      action: t("fieldSetupTutorial.download.action"),
+      outcome: t("fieldSetupTutorial.download.outcome"),
+      position: "bottom",
+    },
+  ] : [], [t]);
+
+  const { currentStep, showTutorial, currentTutorialStep, nextStep, prevStep, closeTutorial } = 
+    usePageTutorial("fieldSetup", tutorialSteps);
+
   /* fetch current auth user */
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => setUser(user));
@@ -52,31 +96,32 @@ export default function FieldSetupPage() {
     if (!drawnFeature) return;
 
     if (!user) {
-      alert("Please confirm your email and log in before saving your field.");
+      alert(t("confirmEmailLoginBeforeSave"));
       navigate("/signin");
       return;
     }
 
     setSaving(true);
-    const price_lkr = Math.ceil(acres * PRICE_PER_ACRE_LKR);
-    const { error } = await supabase.from("user_fields").upsert(
-      {
-        user_id:    user.id,
+    try {
+      const price_lkr = Math.ceil(acres * PRICE_PER_ACRE_LKR);
+      await saveUserField({
         field_name: fieldName || null,
-        geojson:    drawnFeature,
+        geojson: drawnFeature,
         area_acres: acres,
         price_lkr,
-        district:   district || null,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "user_id" }
-    );
-    setSaving(false);
-
-    if (error) {
+        district: district || null,
+      });
+    } catch (error) {
+      setSaving(false);
       alert(`Could not save field: ${error.message}`);
+
+      if ((error.message || "").toLowerCase().includes("401")) {
+        navigate("/signin");
+      }
       return;
     }
+
+    setSaving(false);
     navigate("/dashboard");
   };
 
@@ -128,7 +173,7 @@ export default function FieldSetupPage() {
                         ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/40"
                         : step > n
                         ? "bg-emerald-500/30 text-emerald-400"
-                        : "bg-white/10 text-white/30"
+                        : "bg-white/10 text-white/85"
                     }`}
                   >
                     {step > n
@@ -138,7 +183,7 @@ export default function FieldSetupPage() {
                   </div>
                   <span
                     className={`text-xs font-semibold hidden md:block transition-colors ${
-                      step === n ? "text-emerald-400" : "text-white/30"
+                      step === n ? "text-emerald-400" : "text-white/85"
                     }`}
                   >
                     {label}
@@ -183,7 +228,7 @@ export default function FieldSetupPage() {
               <h1 className="text-5xl font-black tracking-tight mb-5 leading-tight">
                 {t('registerPaddyTitle')}
               </h1>
-              <p className="text-white/55 text-lg leading-relaxed">
+              <p className="text-white/85 text-lg leading-relaxed">
                 {t('registerPaddySubtitle')}
               </p>
             </div>
@@ -217,7 +262,7 @@ export default function FieldSetupPage() {
                   <span className={`material-symbols-outlined text-2xl mt-0.5 ${accent}`}>{icon}</span>
                   <div>
                     <h3 className="font-bold text-sm mb-1.5">{t(titleKey)}</h3>
-                    <p className="text-white/45 text-xs leading-relaxed">{t(descKey)}</p>
+                    <p className="text-white/85 text-xs leading-relaxed">{t(descKey)}</p>
                   </div>
                 </div>
               ))}
@@ -230,7 +275,7 @@ export default function FieldSetupPage() {
               </button>
               <button
                 onClick={() => navigate("/dashboard")}
-                className="text-white/35 hover:text-white/60 text-sm transition-colors"
+                className="text-white/85 hover:text-white/90 text-sm transition-colors"
               >
                 {t('skipForNow')}
               </button>
@@ -243,7 +288,7 @@ export default function FieldSetupPage() {
           <div className="flex flex-col gap-5">
             <div>
               <h2 className="text-3xl font-black mb-2">{t('drawYourPaddyField')}</h2>
-              <p className="text-white/50 text-sm leading-relaxed max-w-2xl">
+              <p className="text-white/85 text-sm leading-relaxed max-w-2xl">
                 {t('drawYourPaddyDesc')}
               </p>
             </div>
@@ -253,7 +298,7 @@ export default function FieldSetupPage() {
               onClear={handleClear}
               fieldName={fieldName}
               onFieldNameChange={setFieldName}
-              height="calc(100vh - 380px)"
+              height="calc(100vh - 320px)"
             />
 
             <div className="flex justify-between gap-3 pt-1">
@@ -276,14 +321,14 @@ export default function FieldSetupPage() {
           <div className="flex flex-col gap-6">
             <div>
               <h2 className="text-3xl font-black mb-2">{t('reviewPaymentTitle')}</h2>
-              <p className="text-white/50 text-sm">{t('reviewPaymentDesc')}</p>
+              <p className="text-white/85 text-sm">{t('reviewPaymentDesc')}</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
               {/* ── Field summary card ── */}
               <div className="p-6 rounded-2xl bg-white/5 border border-white/10 space-y-5">
-                <h3 className="text-[11px] font-black uppercase tracking-[0.35em] text-white/50">
+                <h3 className="text-[11px] font-black uppercase tracking-[0.35em] text-white/85">
                   {t('fieldSummaryTitle')}
                 </h3>
 
@@ -305,7 +350,7 @@ export default function FieldSetupPage() {
                 </div>
 
                 <div className="border-t border-white/10 pt-4 space-y-2">
-                  <SummaryRow label={t('rateLabel')}       value={`Rs. ${PRICE_PER_ACRE_LKR.toLocaleString()} / acre / year`} />
+                  <SummaryRow label={t('rateLabel')}       value={`Rs. ${PRICE_PER_ACRE_LKR.toLocaleString()} / acre / month`} />
                   <div className="flex justify-between items-center">
                     <span className="text-[11px] font-black uppercase tracking-widest text-emerald-400">
                       {t('annualCostLabel')}
@@ -331,7 +376,7 @@ export default function FieldSetupPage() {
               {/* ── Payment gateway mock ── */}
               <div className="p-6 rounded-2xl bg-white/5 border border-white/10 space-y-5">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-[11px] font-black uppercase tracking-[0.35em] text-white/50">
+                  <h3 className="text-[11px] font-black uppercase tracking-[0.35em] text-white/85">
                     {t('securePaymentTitle')}
                   </h3>
                   <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30 uppercase tracking-widest">
@@ -342,8 +387,8 @@ export default function FieldSetupPage() {
                 {/* Order line */}
                 <div className="flex items-center justify-between px-4 py-3 rounded-xl bg-white/5 border border-white/10">
                   <div>
-                    <p className="text-xs font-bold text-white/80">RiceVision Field Monitoring</p>
-                    <p className="text-[10px] text-white/40">{district || "Sri Lanka"} · {acres.toFixed(3)} acres</p>
+                    <p className="text-xs font-bold text-white/85">{t("fieldMonitoringTitle")}</p>
+                    <p className="text-[10px] text-white/85">{district || t("sriLanka")} · {acres.toFixed(3)} acres</p>
                   </div>
                   <span className="font-black text-emerald-400">Rs. {price.toLocaleString()}</span>
                 </div>
@@ -351,7 +396,7 @@ export default function FieldSetupPage() {
                 {/* Mock card fields */}
                 <div className="space-y-3 opacity-50 pointer-events-none select-none">
                   <div>
-                    <label className="block text-[10px] text-white/50 uppercase tracking-wider mb-1.5">
+                    <label className="block text-[10px] text-white/85 uppercase tracking-wider mb-1.5">
                       {t('cardNumberLabel')}
                     </label>
                     <input
@@ -362,11 +407,11 @@ export default function FieldSetupPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-[10px] text-white/50 uppercase tracking-wider mb-1.5">{t('expiryLabel')}</label>
+                      <label className="block text-[10px] text-white/85 uppercase tracking-wider mb-1.5">{t('expiryLabel')}</label>
                       <input disabled value="MM / YY" className="w-full px-4 py-3 text-sm rounded-xl bg-white/5 border border-white/10 text-white cursor-not-allowed" />
                     </div>
                     <div>
-                      <label className="block text-[10px] text-white/50 uppercase tracking-wider mb-1.5">{t('cvvLabel')}</label>
+                      <label className="block text-[10px] text-white/85 uppercase tracking-wider mb-1.5">{t('cvvLabel')}</label>
                       <input disabled value="•••" className="w-full px-4 py-3 text-sm rounded-xl bg-white/5 border border-white/10 text-white font-mono cursor-not-allowed" />
                     </div>
                   </div>
@@ -377,7 +422,7 @@ export default function FieldSetupPage() {
                   onClick={() => setPayClicked(true)}
                   className="w-full py-3.5 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-400 font-black text-sm hover:bg-amber-500/25 transition-all tracking-wide"
                 >
-                  Pay Rs. {price.toLocaleString()} / year
+                  Pay Rs. {price.toLocaleString()} / month
                 </button>
 
                 {payClicked && (
@@ -388,7 +433,7 @@ export default function FieldSetupPage() {
                 )}
 
                 {/* Security note */}
-                <div className="flex items-center gap-2 text-white/25 text-[10px]">
+                <div className="flex items-center gap-2 text-white/85 text-[10px]">
                   <span className="material-symbols-outlined text-base">lock</span>
                   <span>{t('securedSSL')}</span>
                 </div>
@@ -422,6 +467,23 @@ export default function FieldSetupPage() {
         )}
 
       </div>
+
+      {/* Tutorial Tooltips */}
+      {showTutorial && currentTutorialStep && tutorialSteps[currentStep] && (
+        <TutorialTooltip
+          visible={true}
+          title={currentTutorialStep.title}
+          action={currentTutorialStep.action}
+          outcome={currentTutorialStep.outcome}
+          elementRef={tutorialSteps[currentStep].ref}
+          position={tutorialSteps[currentStep].position || "bottom"}
+          step={currentStep}
+          totalSteps={tutorialSteps.length}
+          onNext={nextStep}
+          onPrevious={prevStep}
+          onDismiss={closeTutorial}
+        />
+      )}
     </div>
   );
 }
@@ -430,7 +492,7 @@ export default function FieldSetupPage() {
 function SummaryRow({ label, value }) {
   return (
     <div className="flex justify-between items-center text-sm">
-      <span className="text-white/45">{label}</span>
+      <span className="text-white/85">{label}</span>
       <span className="font-semibold text-white">{value}</span>
     </div>
   );
