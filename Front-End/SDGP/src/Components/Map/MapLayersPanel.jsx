@@ -89,8 +89,6 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
         className={`${open ? "block" : "hidden"} md:block fixed md:relative top-0 right-0 h-full md:h-auto w-72 glass p-4 sm:p-6 shadow-xl transition-transform duration-300 z-[999] md:translate-x-0`}
       >
 
-      <div className="relative h-full">
-
       {/* BLURRED PANEL CONTENT */}
 
       <div className={`${!districtSelected ? "blur-sm opacity-40 pointer-events-none" : ""}`}>
@@ -241,16 +239,16 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
 
         <div className="mt-8 pt-6 border-t border-white/10">
           <p className="text-[10px] text-white/85 italic">
-            Select layers to overlay specialized agricultural satellite telemetry.
+            {t("mapLayersHintIntro")}
           </p>
           <p className="text-[9px] text-white/85 mt-1">
-            S2 = Sentinel-2 optical · S1 = Sentinel-1 SAR
+            {t("mapLayersHintSensors")}
           </p>
           <div className="mt-3 space-y-1">
-            <p className="text-[9px] text-white/85">NDVI — Normalized Difference Vegetation Index</p>
-            <p className="text-[9px] text-white/85">EVI — Enhanced Vegetation Index</p>
-            <p className="text-[9px] text-white/85">VV — Vertical Transmit / Vertical Receive</p>
-            <p className="text-[9px] text-white/85">VH — Vertical Transmit / Horizontal Receive</p>
+            <p className="text-[9px] text-white/85">{t("mapLayersHintNDVI")}</p>
+            <p className="text-[9px] text-white/85">{t("mapLayersHintEVI")}</p>
+            <p className="text-[9px] text-white/85">{t("mapLayersHintVV")}</p>
+            <p className="text-[9px] text-white/85">{t("mapLayersHintVH")}</p>
           </div>
         </div>
 
@@ -261,7 +259,7 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
 
       {!districtSelected && (
 
-        <div className="absolute inset-0 z-20 grid place-items-center text-center">
+        <div className="absolute inset-0 flex items-center justify-center text-center z-20 animate-fade">
 
           <div className="flex flex-col items-center">
 
@@ -270,7 +268,7 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
             </span>
 
             <p className="text-sm text-white font-medium px-6">
-              {t("Select District to unlock layers")}
+              {t("mapLayersSelectDistrict")}
             </p>
 
           </div>
@@ -278,8 +276,6 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
         </div>
 
       )}
-
-      </div>
 
       </div>
     </>

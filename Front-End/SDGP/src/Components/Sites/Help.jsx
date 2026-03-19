@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import {
   QuestionMarkCircleIcon,
   PhoneIcon,
   EnvelopeIcon,
   ExclamationTriangleIcon,
   ChevronDownIcon,
+  DocumentTextIcon,
 } from "@heroicons/react/24/outline";
 import { fetchFaqs, submitComplaint } from "../../api/api";
 import { useLanguage } from "../../context/LanguageContext";
@@ -327,8 +329,7 @@ const Help = () => {
                 {faqs.map((faq) => (
                   <div
                     key={faq.id}
-                    className={`glass rounded-2xl border transition-all duration-300 ${openFaq === faq.id ? "bg-white/10 border-white/20" : "bg-white/5 border-white/5 hover:border-white/10"
-                      }`}
+                    className={`glass rounded-2xl border transition-all duration-300 ${openFaq === faq.id ? "bg-white/10 border-white/20" : "bg-white/5 border-white/5 hover:border-white/10"}`}
                   >
                     <button
                       onClick={() => setOpenFaq(openFaq === faq.id ? null : faq.id)}
@@ -336,11 +337,9 @@ const Help = () => {
                     >
                       <span className="group-hover:text-white transition-colors">{getFaqText(faq, "question")}</span>
                       <ChevronDownIcon
-                        className={`w-4 h-4 text-white/85 transition-transform duration-500 ${openFaq === faq.id ? "rotate-180 text-emerald-400" : ""
-                          }`}
+                        className={`w-4 h-4 text-white/85 transition-transform duration-500 ${openFaq === faq.id ? "rotate-180 text-emerald-400" : ""}`}
                       />
                     </button>
-
                     {openFaq === faq.id && (
                       <div className="px-5 pb-5 text-xs text-white/85 leading-relaxed font-medium animate-in fade-in slide-in-from-top-2 duration-300">
                         {getFaqText(faq, "answer")}
@@ -348,16 +347,64 @@ const Help = () => {
                     )}
                   </div>
                 ))}
-              </div>
-            </div>
-
-            {/* Support Tag */}
-            <div className="glass p-6 rounded-3xl border border-white/10 text-center">
-              <p className="text-[10px] font-black uppercase text-white/85 tracking-tighter">{t('systemVersionTag')}</p>
             </div>
           </div>
         </div>
 
+        {/* Close the main grid grid-cols-1 lg:grid-cols-5 */}
+        </div>
+
+        {/* ── Legal & Policies — full-width footer bar ── */}
+        <div className="glass rounded-3xl border border-white/10 p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+            {/* Label */}
+            <div className="flex items-center gap-2 shrink-0">
+              <DocumentTextIcon className="w-4 h-4 text-white/40" />
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">
+                Legal &amp; Policies
+              </span>
+            </div>
+
+            {/* Divider (desktop) */}
+            <div className="hidden sm:block w-px h-8 bg-white/10 mx-2" />
+
+            {/* Links */}
+            <div className="flex flex-wrap gap-3 flex-1">
+              {[
+                { label: "Privacy Policy",     to: "/privacy-policy", icon: "privacy_tip"       },
+                { label: "Terms & Conditions", to: "/terms",          icon: "gavel"             },
+                { label: "Return Policy",      to: "/return-policy",  icon: "assignment_return" },
+              ].map(({ label, to, icon }) => (
+                <Link
+                  key={to}
+                  to={to}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/8 hover:border-white/20 transition-all group flex-1 sm:flex-none"
+                >
+                  <span className="material-symbols-outlined text-[15px] text-emerald-400">
+                    {icon}
+                  </span>
+                  <span className="text-xs font-semibold text-white/70 group-hover:text-white transition-colors">
+                    {label}
+                  </span>
+                  <span className="material-symbols-outlined text-[12px] text-white/25 group-hover:text-white/50 transition-colors ml-auto sm:ml-0">
+                    open_in_new
+                  </span>
+                </Link>
+              ))}
+            </div>
+
+            {/* Contact email (desktop only) */}
+            <a
+              href="mailto:support@ricevisionlanka.com"
+              className="hidden lg:flex items-center gap-2 text-[10px] text-white/30 hover:text-white/60 transition-colors shrink-0"
+            >
+              <span className="material-symbols-outlined text-[14px]">mail</span>
+              support@ricevisionlanka.com
+            </a>
+          </div>
+        </div>
 
       </div>
     </div>
