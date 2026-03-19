@@ -265,11 +265,20 @@ export default function FieldDrawMap({
       if (!cancelled) setLoadingGeoJSON(true);
     }, 0);
     fetch(`/${selectedDistrict.file}.geojson`)
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error("Failed to load paddy extent overlay");
+        return r.json();
+      })
       .then((data) => {
         if (!cancelled) { setPaddyGeoJSON(data); setLoadingGeoJSON(false); }
       })
-      .catch(() => { if (!cancelled) setLoadingGeoJSON(false); });
+      .catch((err) => {
+        if (!cancelled) {
+          setPaddyGeoJSON(null);
+          setLoadingGeoJSON(false);
+          // Show error overlay (handled in render)
+        }
+      });
     return () => { cancelled = true; clearTimeout(t); };
   }, [selectedDistrict]);
 
@@ -506,6 +515,15 @@ export default function FieldDrawMap({
         {loadingGeoJSON && (
           <div className="absolute inset-0 z-999 flex items-center justify-center bg-black/50 backdrop-blur-sm pointer-events-none">
             <div className="w-8 h-8 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+          </div>
+        )}
+
+        {/* Overlay load error */}
+        {!loadingGeoJSON && selectedDistrict && !paddyGeoJSON && (
+          <div className="absolute inset-0 z-999 flex items-center justify-center bg-black/60 backdrop-blur-sm pointer-events-none">
+            <div className="text-red-400 text-sm font-bold bg-white/10 px-6 py-4 rounded-xl border border-red-500/30">
+              Failed to load paddy extent overlay for this district.
+            </div>
           </div>
         )}
 

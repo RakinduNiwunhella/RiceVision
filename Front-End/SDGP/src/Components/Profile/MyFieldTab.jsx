@@ -6,11 +6,13 @@
  */
 
 import React, { useState, useEffect, useCallback } from "react";
+import { supabase } from "../../supabaseClient";
 import FieldDrawMap from "../FieldSetup/FieldDrawMap";
 import { PRICE_PER_ACRE_LKR } from "../FieldSetup/fieldConstants";
 import { useLanguage } from "../../context/LanguageContext";
 import { translateDistrictName } from "../../utils/locationTranslations";
 import { fetchUserField, saveUserField, removeUserField } from "../../api/api";
+import PayHereCheckout from "../FieldSetup/PayHereCheckout";
 
 export default function MyFieldTab() {
   const { t, language } = useLanguage();
@@ -36,6 +38,11 @@ export default function MyFieldTab() {
   useEffect(() => {
     (async () => {
       try {
+        // Fetch Supabase user
+        const { data: { user: supaUser } } = await supabase.auth.getUser();
+        setUser(supaUser || null);
+
+        // Fetch user field
         const result = await fetchUserField();
         const data = result?.data || null;
         if (data) {
@@ -65,7 +72,10 @@ export default function MyFieldTab() {
   }, []);
 
   const saveField = async () => {
-    if (!drawnFeature) return;
+    if (!drawnFeature || !district) {
+      setStatus({ type: "error", message: "Please select a district and draw your field." });
+      return;
+    }
     setSaving(true);
 
     const price_lkr = Math.ceil(acres * PRICE_PER_ACRE_LKR);
@@ -83,6 +93,11 @@ export default function MyFieldTab() {
       setEditMode(false);
       setDrawnFeature(null);
       setStatus({ type: "success", message: "Field boundary saved to registry." });
+      // Reload user field after save to ensure UI is up to date
+      try {
+        const reload = await fetchUserField();
+        setExisting(reload?.data || null);
+      } catch {}
     } catch (error) {
       setSaving(false);
       setStatus({ type: "error", message: `Save failed: ${error.message}` });
@@ -185,6 +200,13 @@ export default function MyFieldTab() {
       </div>
 
       {/* ── READ-ONLY view of existing field ── */}
+      {/* Debug output for troubleshooting payment panel visibility */}
+      <div style={{ background: '#222', color: '#fff', padding: '8px', borderRadius: '8px', marginBottom: '12px', fontSize: '12px' }}>
+        <strong>DEBUG:</strong> user: {user ? JSON.stringify(user) : 'null'}<br />
+        existing: {existing ? JSON.stringify(existing) : 'null'}<br />
+        editMode: {String(editMode)}
+      </div>
+
       {existing && !editMode && (
         <div className="space-y-4">
           {/* Stats row */}
@@ -218,6 +240,24 @@ export default function MyFieldTab() {
               height="600px"
             />
           </div>
+
+          {/* Payment option */}
+          {user && (
+            <PayHereCheckout
+              price={existing.price_lkr}
+              acres={existing.area_acres}
+              district={existing.district}
+              fieldName={existing.field_name}
+              drawnFeature={existing.geojson}
+              user={user}
+              onPaymentSuccess={async () => {
+                // Optionally refresh field or show a message
+                const reload = await fetchUserField();
+                setExisting(reload?.data || null);
+                setStatus({ type: "success", message: "Payment successful!" });
+              }}
+            />
+          )}
         </div>
       )}
 
