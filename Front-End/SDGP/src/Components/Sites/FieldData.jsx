@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { apiFetch } from "../../api/apiFetch";
 import { useLanguage } from "../../context/LanguageContext";
+import { translateDistrictName } from "../../utils/locationTranslations";
 import { useNavigate } from "react-router-dom";
 import TutorialTooltip from "../../Components/TutorialTooltip";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
@@ -20,7 +21,7 @@ const healthColor = (health) => {
 
 const FieldData = () => {
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const [stats, setStats] = useState([]);
   const [districtData, setDistrictData] = useState([]);
@@ -29,24 +30,24 @@ const FieldData = () => {
   // Tutorial setup
   const tutorialSteps = [
     {
-      title: "Field Data Overview",
-      action: "This page shows a summary of all your field statistics",
-      outcome: "You'll see total fields, healthy count, stressed crops, and critical alerts",
+      title: t('fieldDataOverviewTitle'),
+      action: t('fieldDataOverviewAction'),
+      outcome: t('fieldDataOverviewOutcome'),
     },
     {
-      title: "Summary Statistics",
-      action: "Check the stat cards for quick field health metrics",
-      outcome: "Green = Healthy fields, Yellow = Stressed fields, Red = Critical alerts. Total count helps track overall land area",
+      title: t('fieldDataSummaryTitle'),
+      action: t('fieldDataSummaryAction'),
+      outcome: t('fieldDataSummaryOutcome'),
     },
     {
-      title: "District Comparison Table",
-      action: "Scroll through the table to see field data for each district",
-      outcome: "Compare health percentages, total yield, and average stress levels across districts. Sort by clicking column headers",
+      title: t('fieldDataDistrictTableTitle'),
+      action: t('fieldDataDistrictTableAction'),
+      outcome: t('fieldDataDistrictTableOutcome'),
     },
     {
-      title: "View on Map",
-      action: "Click 'View Map' button next to any district to navigate to Field Map",
-      outcome: "Satellite visualization zooms to that district for detailed location-based analysis",
+      title: t('fieldDataViewMapTitle'),
+      action: t('fieldDataViewMapAction'),
+      outcome: t('fieldDataViewMapOutcome'),
     },
   ];
 
@@ -112,7 +113,7 @@ const FieldData = () => {
         <div ref={headerRef} className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
             <h1 className="text-xl sm:text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
-              Field Data
+              {t('fieldData')}
             </h1>
             <p className="text-white/85 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em]">
               {t('liveStream')}
@@ -160,14 +161,14 @@ const FieldData = () => {
             <table className="w-full text-xs border-collapse">
               <thead>
                 <tr className="text-white/85 uppercase text-[10px] font-black tracking-widest border-b border-white/5 whitespace-nowrap">
-                  <th className="px-3 sm:px-6 md:px-8 py-3 sm:py-5 text-left font-black whitespace-nowrap">District</th>
-                  <th className="px-3 sm:px-6 py-3 sm:py-5 text-left font-black whitespace-nowrap">Total Fields</th>
-                  <th className="px-3 sm:px-6 py-3 sm:py-5 text-left font-black whitespace-nowrap">Healthy</th>
-                  <th className="px-3 sm:px-6 py-3 sm:py-5 text-left font-black whitespace-nowrap">Stressed</th>
-                  <th className="px-3 sm:px-6 py-3 sm:py-5 text-left font-black whitespace-nowrap">Critical</th>
-                  <th className="hidden sm:table-cell px-3 sm:px-6 py-3 sm:py-5 text-left font-black whitespace-nowrap">Avg Yield</th>
-                  <th className="hidden sm:table-cell px-3 sm:px-6 md:px-8 py-3 sm:py-5 text-right font-black whitespace-nowrap">Total Yield</th>
-                  <th className="px-3 sm:px-6 py-3 sm:py-5 text-center font-black whitespace-nowrap">Action</th>
+                  <th className="px-3 sm:px-6 md:px-8 py-3 sm:py-5 text-left font-black whitespace-nowrap">{t('colDistrict')}</th>
+                  <th className="px-3 sm:px-6 py-3 sm:py-5 text-left font-black whitespace-nowrap">{t('colTotalFields')}</th>
+                  <th className="px-3 sm:px-6 py-3 sm:py-5 text-left font-black whitespace-nowrap">{t('colHealthy')}</th>
+                  <th className="px-3 sm:px-6 py-3 sm:py-5 text-left font-black whitespace-nowrap">{t('colStressed')}</th>
+                  <th className="px-3 sm:px-6 py-3 sm:py-5 text-left font-black whitespace-nowrap">{t('colCritical')}</th>
+                  <th className="hidden sm:table-cell px-3 sm:px-6 py-3 sm:py-5 text-left font-black whitespace-nowrap">{t('colAvgYield')}</th>
+                  <th className="hidden sm:table-cell px-3 sm:px-6 md:px-8 py-3 sm:py-5 text-right font-black whitespace-nowrap">{t('colTotalYield')}</th>
+                  <th className="px-3 sm:px-6 py-3 sm:py-5 text-center font-black whitespace-nowrap">{t('actionLabel')}</th>
                 </tr>
               </thead>
 
@@ -181,7 +182,7 @@ const FieldData = () => {
                       <div className="text-center flex items-center gap-3">
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/50 group-hover/row:bg-emerald-400 transition-colors" />
                         <span className="font-black text-white group-hover/row:translate-x-1 transition-transform inline-block">
-                          {d.district}
+                          {translateDistrictName(d.district, language)}
                         </span>
                       </div>
                     </td>
@@ -203,7 +204,7 @@ const FieldData = () => {
                     </td>
                     <td className="hidden sm:table-cell px-3 sm:px-6 py-3 sm:py-5 text-center">
                       <div className="flex flex-col">
-                        <span className="text-white/80">{d.avg_yield_kg_ha}</span>
+                        <span className="text-white/85">{d.avg_yield_kg_ha}</span>
                         <span className="text-[10px] text-white/85 uppercase font-black tracking-tighter">kg/Ha</span>
                       </div>
                     </td>
@@ -217,14 +218,14 @@ const FieldData = () => {
                           onClick={() => handleViewMap(d.district)}
                           className="glass-btn text-[10px] px-3 py-1 tracking-widest bg-white/10 hover:bg-white/20"
                         >
-                          View Map
+                          {t('viewInMap')}
                         </button>
 
                         <button
                           onClick={() => navigate("/report", { state: { district: d.district } })}
                           className="glass-btn text-[10px] px-3 py-1 tracking-widest bg-white/10 hover:bg-white/20"
                         >
-                          View Report
+                          {t('viewReportBtn')}
                         </button>
                       </div>
                     </td>

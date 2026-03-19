@@ -21,12 +21,12 @@ export default function ForgotPassword() {
       const data = await res.json();
 
       if (!res.ok) {
-        setMessage(data.detail || "Failed to send reset email.");
+        setMessage(data.detail || t('failedToSendResetEmail'));
       } else {
-        setMessage("Password reset email sent! Check your inbox.");
+        setMessage(t('resetEmailSent'));
       }
     } catch (err) {
-      setMessage("Network error. Please try again.");
+      setMessage(t('networkErrorTryAgain'));
     }
 
     setLoading(false);
