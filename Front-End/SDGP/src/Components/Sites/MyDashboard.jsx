@@ -1,6 +1,9 @@
 // MyDashboard.jsx
 import { useState, useEffect, useRef, useMemo } from "react";
 import {
+  LineChart,
+  Line,
+  CartesianGrid,
   XAxis,
   YAxis,
   Tooltip,
@@ -16,6 +19,9 @@ import { useLanguage } from "../../context/LanguageContext";
 import { Bug } from "lucide-react";
 import TutorialOverlay from "../TutorialOverlay";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
+import { useNavigate } from "react-router-dom";
+import { translateDistrictName } from "../../utils/locationTranslations";
+import { translateDisasterType, translateStageCategory } from "../../utils/agriTranslations";
 
 import {
   fetchHealthSummary,
@@ -37,7 +43,7 @@ const StatWidget = ({ title, value, subtitle, icon }) => (
     </div>
     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/85 mb-2 sm:mb-3">{title}</p>
     <p className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tighter drop-shadow-2xl">{value}</p>
-    {subtitle && <p className="text-[10px] font-bold text-emerald-400/60 mt-2 sm:mt-3 uppercase tracking-widest">{subtitle}</p>}
+    {subtitle && <p className="text-[10px] font-bold text-emerald-300 mt-2 sm:mt-3 uppercase tracking-widest">{subtitle}</p>}
   </div>
 );
 
@@ -67,7 +73,7 @@ const ProgressWidget = ({ label, value, color }) => {
 /* ------------------ MAIN ------------------ */
 
 const MyDashboard = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [healthSummary, setHealthSummary] = useState(null);
   const [yieldForecast, setYieldForecast] = useState(null);
   const [bestYieldDistricts, setBestYieldDistricts] = useState([]);
@@ -75,6 +81,7 @@ const MyDashboard = () => {
   const [districtHealth, setDistrictHealth] = useState([]);
   const [showAllDistricts, setShowAllDistricts] = useState(false);
   const [stageDistribution, setStageDistribution] = useState([]);
+  const [outbreaks, setOutbreaks] = useState([]);
 
   // Refs for tutorial tooltips
   const headerRef = useRef(null);
@@ -86,58 +93,84 @@ const MyDashboard = () => {
   const stageChartRef = useRef(null);
   const districtTableRef = useRef(null);
   const districtToggleBtnRef = useRef(null);
+  const threatsCardRef = useRef(null);
+  const threatDetailsBtnRef = useRef(null);
+  const outbreaksToggleBtnRef = useRef(null);
 
   // Tutorial setup - cards, icons, and key actions on dashboard
   const tutorialSteps = useMemo(() => {
     const steps = [
       {
         ref: headerRef,
-        title: "Welcome! This is your field control center overview.",
+        title: t("dashboardTutorialWelcome"),
       },
       {
         ref: syncBadgeRef,
-        title: "Check this icon to ensure your data is freshly synced.",
+        title: t("dashboardTutorialSync"),
       },
       {
         ref: healthCardRef,
-        title: "See crop health as a pie chart. Green means optimal.",
+        title: t("dashboardTutorialHealth"),
       },
       {
         ref: yieldCardRef,
-        title: "View your expected total harvest here in metric tons.",
+        title: t("dashboardTutorialYield"),
       },
       {
         ref: supplyCardRef,
-        title: "Track expected shortfalls and national demand saturation risks quickly.",
+        title: t("dashboardTutorialSupply"),
       },
       {
-        ref: yieldInsightsRef,
-        title: "Review district-level yield rankings and season momentum.",
+        ref: threatsCardRef,
+        title: t("dashboardTutorialThreats"),
       },
     ]
+
+    if (outbreaks.length > 0) {
+      steps.push({
+        ref: threatDetailsBtnRef,
+        title: t("dashboardTutorialThreatDetails"),
+      })
+    }
+
+    if (outbreaks.length > 5) {
+      steps.push({
+        ref: outbreaksToggleBtnRef,
+        title: t("dashboardTutorialThreatToggle"),
+      })
+    }
 
     steps.push(
       {
         ref: stageChartRef,
-        title: "Check what percentage of your crops are in each growth stage.",
+        title: t("dashboardTutorialStageChart"),
       },
       {
         ref: districtTableRef,
-        title: "Compare health metrics across all your districts in one table.",
+        title: t("dashboardTutorialDistrictTable"),
       },
       {
         ref: districtToggleBtnRef,
-        title: "Use this button to expand the full district list.",
+        title: t("dashboardTutorialDistrictToggle"),
       },
     )
 
     return steps
-  }, [bestYieldDistricts.length])
+  }, [outbreaks.length, t])
 
   const { currentStep, showTutorial, nextStep, prevStep, closeTutorial } =
     usePageTutorial("dashboard", tutorialSteps);
 
   const stageColors = ["#10b981", "#06b6d4", "#8b5cf6", "#f59e0b", "#ef4444", "#f97316"];
+
+  const translatedStageDistribution = useMemo(
+    () =>
+      stageDistribution.map((stage) => ({
+        ...stage,
+        stageLabel: translateStageCategory(stage.stage_name, t),
+      })),
+    [stageDistribution, t]
+  );
 
   const pieColors = ["#10b981", "#f59e0b", "#ef4444"]; // Emerald-500, Amber-500, Red-500
 
@@ -156,34 +189,13 @@ const MyDashboard = () => {
       .slice(0, 5);
   }, [bestYieldDistricts]);
 
-  const yieldPanelOverview = useMemo(() => {
-    if (districtYieldData.length === 0) {
-      return { topYieldMT: 0, avgYieldMT: 0, lowestYieldMT: 0, spreadMT: 0, totalYieldMT: 0 };
-    }
-
-    const valuesMT = districtYieldData.map((district) => Number(district?.totalyield_kg ?? 0) / 1000);
-    const topYieldMT = Math.max(...valuesMT);
-    const lowestYieldMT = Math.min(...valuesMT);
-    const avgYieldMT = valuesMT.reduce((sum, value) => sum + value, 0) / valuesMT.length;
-    const totalYieldMT = valuesMT.reduce((sum, value) => sum + value, 0);
-
-    return {
-      topYieldMT,
-      avgYieldMT,
-      lowestYieldMT,
-      spreadMT: Math.max(0, topYieldMT - lowestYieldMT),
-      totalYieldMT,
-    };
-  }, [districtYieldData]);
-
   const healthPieData = healthSummary
     ? [
       { name: t('optimal'), value: healthSummary.normal_pct },
       { name: t('mildStress'), value: healthSummary.mild_stress_pct },
       { name: t('severeStress'), value: healthSummary.severe_stress_pct },
     ]
-    : [];
-
+    : []
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -231,27 +243,29 @@ const MyDashboard = () => {
       (a, b) => Number(b?.totalyield_kg ?? 0) - Number(a?.totalyield_kg ?? 0),
     );
 
-    const totalYieldMT = sortedRows.reduce(
-      (sum, district) => sum + Number(district?.totalyield_kg ?? 0) / 1000,
-      0,
-    );
-    const leaderYieldMT = Number(sortedRows[0]?.totalyield_kg ?? 0) / 1000;
-
     return sortedRows.map((district, index) => {
       const yieldMT = Number(district?.totalyield_kg ?? 0) / 1000;
-      const sharePct = totalYieldMT > 0 ? (yieldMT / totalYieldMT) * 100 : 0;
-      const relativePct = leaderYieldMT > 0 ? (yieldMT / leaderYieldMT) * 100 : 0;
 
       return {
         rank: index + 1,
         district: district.districtname,
         yieldMT,
         predictedYieldKgHa: Number(district?.predictedyield_kg_ha ?? 0),
-        sharePct,
-        relativePct,
       };
     });
   }, [districtYieldData]);
+
+  const yieldAxisDomain = useMemo(() => {
+    if (districtYieldRows.length === 0) return [0, 100];
+
+    const values = districtYieldRows.map((row) => Number(row?.yieldMT ?? 0));
+    const maxValue = Math.max(...values);
+    const minValue = Math.min(...values);
+    const spread = Math.max(1, maxValue - minValue);
+    const padding = spread * 0.12;
+
+    return [Math.max(0, minValue - padding), maxValue + padding];
+  }, [districtYieldRows]);
 
   const sortedDistrictHealth = useMemo(() => {
     return [...districtHealth].sort((a, b) => {
@@ -300,10 +314,10 @@ const MyDashboard = () => {
         <div ref={currentStep === 0 ? headerRef : undefined} className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
             <h1 className="text-xl sm:text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
-            Welcome to RiceVision
+            {t('welcomeTitle')}
             </h1>
-            <p className="text-white/40 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em]">
-              {t('Satellite-driven insights for national food security')}
+            <p className="text-white/85 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em]">
+              {t('welcomeSubtitle')}
             </p>
           </div>
 
@@ -318,7 +332,7 @@ const MyDashboard = () => {
 
           {/* Field Health Distribution */}
           <div ref={healthCardRef} className="glass glass-hover p-4 sm:p-6 md:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col items-center">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-8 self-start flex items-center gap-2">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/85 mb-8 self-start flex items-center gap-2">
               <span className="material-symbols-outlined text-emerald-400 text-sm">radiology</span>
               {t('cropHealthDist')}
             </p>
@@ -373,7 +387,7 @@ const MyDashboard = () => {
 
           {/* Yield Forecast */}
           <div ref={yieldCardRef} className="glass glass-hover p-4 sm:p-6 md:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-6 flex items-center gap-2">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/85 mb-6 flex items-center gap-2">
               <span className="material-symbols-outlined text-cyan-400 text-sm">trending_up</span>
               {t('outputProjection')}
             </p>
@@ -394,7 +408,7 @@ const MyDashboard = () => {
                   <div key={i} className="flex justify-between items-center group/item hover:translate-x-1 transition-transform">
                     <div className="flex items-center gap-3">
                       <span className="text-[10px] font-black text-white/85 w-4">{i + 1}</span>
-                      <span className="text-xs font-black text-white uppercase tracking-tight group-hover/item:text-cyan-400 transition-colors">{d.District}</span>
+                      <span className="text-xs font-black text-white uppercase tracking-tight group-hover/item:text-cyan-400 transition-colors">{translateDistrictName(d.District, language)}</span>
                     </div>
                     <span className="text-xs font-black text-white/90 tabular-nums">{formatDistrictMT(Number(d.total_yield_kg_ha || 0) / 1000)} <span className="text-[10px] text-white/85">MT</span></span>
                   </div>
@@ -436,7 +450,7 @@ const MyDashboard = () => {
           </div>
         </div>
 
-        {/* ── National Yield Section (3-Tile Layout) ── */}
+        {/* ── National Yield Section (District Cards) ── */}
         <div ref={yieldInsightsRef} className="glass p-2 sm:p-1 rounded-[1.5rem] sm:rounded-[3rem] border border-white/10 shadow-2xl overflow-hidden">
           <div className="p-4 sm:p-8 border-b border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/85 flex items-center gap-3">
@@ -453,88 +467,94 @@ const MyDashboard = () => {
             </div>
           </div>
 
-          <div className="p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-            <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-4 sm:p-5">
-              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-white/65 mb-4">National Snapshot</p>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-xl border border-white/10 bg-black/20 p-3">
-                  <p className="text-[9px] uppercase tracking-[0.12em] text-white/55 font-black">Top District</p>
-                  <p className="mt-1 text-lg font-black tabular-nums text-cyan-300">{formatDistrictMT(yieldPanelOverview.topYieldMT)}</p>
-                  <p className="text-[9px] text-white/50 uppercase tracking-[0.1em]">MT</p>
-                </div>
-                <div className="rounded-xl border border-white/10 bg-black/20 p-3">
-                  <p className="text-[9px] uppercase tracking-[0.12em] text-white/55 font-black">District Avg</p>
-                  <p className="mt-1 text-lg font-black tabular-nums text-amber-300">{formatDistrictMT(yieldPanelOverview.avgYieldMT)}</p>
-                  <p className="text-[9px] text-white/50 uppercase tracking-[0.1em]">MT</p>
-                </div>
-                <div className="rounded-xl border border-white/10 bg-black/20 p-3">
-                  <p className="text-[9px] uppercase tracking-[0.12em] text-white/55 font-black">All Districts Total</p>
-                  <p className="mt-1 text-lg font-black tabular-nums text-emerald-300">{formatDistrictMT(yieldPanelOverview.totalYieldMT)}</p>
-                  <p className="text-[9px] text-white/50 uppercase tracking-[0.1em]">MT</p>
-                </div>
-                <div className="rounded-xl border border-white/10 bg-black/20 p-3">
-                  <p className="text-[9px] uppercase tracking-[0.12em] text-white/55 font-black">Distribution Gap</p>
-                  <p className="mt-1 text-lg font-black tabular-nums text-rose-300">{formatDistrictMT(yieldPanelOverview.spreadMT)}</p>
-                  <p className="text-[9px] text-white/50 uppercase tracking-[0.1em]">MT</p>
-                </div>
+          <div className="p-4 sm:p-6 grid grid-cols-1 xl:grid-cols-5 gap-4">
+            <div className="xl:col-span-3 rounded-2xl border border-white/10 bg-black/20 p-3 sm:p-4">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-[10px] font-black uppercase tracking-[0.15em] text-white/70">Total Yield by District (MT)</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.12em] text-white/45">Scrollable</p>
               </div>
-              <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between">
-                <span className="text-[10px] font-black uppercase tracking-[0.12em] text-white/55">Projected National</span>
-                <span className="text-sm font-black tabular-nums text-emerald-300">
-                  {yieldForecast ? `${formatDistrictMT(Number(yieldForecast.total_yield_kgs || 0) / 1000)} MT` : "---"}
-                </span>
-              </div>
-            </div>
 
-            <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-4 sm:p-5">
-              <div className="flex items-center justify-between gap-2 mb-3">
-                <p className="text-[10px] font-black uppercase tracking-[0.18em] text-white/65">District Ranking</p>
-                <p className="text-[10px] font-black uppercase tracking-[0.12em] text-white/45">All 25</p>
-              </div>
-              <div className="space-y-2 max-h-[420px] overflow-y-auto pr-1">
-                {districtYieldRows.map((row) => (
-                  <div key={`${row.district}-${row.rank}`} className="rounded-xl border border-white/10 bg-black/15 p-2.5">
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="text-[11px] font-black text-white/90 tracking-[0.03em] truncate">
-                        #{row.rank} {row.district}
-                      </p>
-                      <p className="text-[11px] font-black tabular-nums text-cyan-200">{formatDistrictMT(row.yieldMT)} MT</p>
-                    </div>
-                    <div className="mt-2 w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
-                      <div
-                        className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-emerald-500"
-                        style={{ width: `${Math.max(3, row.relativePct)}%` }}
-                      />
+              {districtYieldRows.length > 0 ? (
+                <div className="flex gap-0 h-[320px]">
+                  <div className="w-12 shrink-0 border-r border-white/10 bg-transparent pr-1">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={districtYieldRows} margin={{ top: 8, right: 0, left: 0, bottom: 56 }}>
+                        <YAxis
+                          domain={yieldAxisDomain}
+                          tick={{ fill: "rgba(255,255,255,0.55)", fontSize: 10, fontWeight: 800 }}
+                          axisLine={false}
+                          tickLine={false}
+                          width={56}
+                          tickFormatter={(value) => `${Number(value).toFixed(0)}`}
+                        />
+                        <Line dataKey="yieldMT" stroke="transparent" dot={false} isAnimationActive={false} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  <div className="flex-1 overflow-x-auto pb-2 custom-scrollbar">
+                    <div style={{ width: `${Math.max(900, districtYieldRows.length * 72)}px`, height: "320px" }}>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={districtYieldRows} margin={{ top: 8, right: 14, left: 0, bottom: 56 }}>
+                          <CartesianGrid stroke="rgba(255,255,255,0.08)" strokeDasharray="3 3" vertical={false} />
+                          <XAxis
+                            dataKey="district"
+                            tick={{ fill: "rgba(255,255,255,0.62)", fontSize: 10, fontWeight: 800 }}
+                            axisLine={{ stroke: "rgba(255,255,255,0.15)" }}
+                            tickLine={false}
+                            interval={0}
+                            angle={-32}
+                            textAnchor="end"
+                            height={60}
+                          />
+                          <YAxis hide domain={yieldAxisDomain} />
+                          <Tooltip
+                            contentStyle={{ background: "rgba(8,13,22,0.96)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px" }}
+                            labelStyle={{ color: "#fff", fontSize: "11px", fontWeight: "700" }}
+                            itemStyle={{ color: "#9be7d0", fontSize: "11px", fontWeight: "700" }}
+                            labelFormatter={(value, payload) => {
+                              const rank = payload?.[0]?.payload?.rank;
+                              return rank ? `#${rank} ${value}` : value;
+                            }}
+                            formatter={(value) => [`${formatDistrictMT(value)} MT`, "Total yield"]}
+                          />
+                          <Line
+                            type="monotone"
+                            dataKey="yieldMT"
+                            stroke="#34d399"
+                            strokeWidth={2.5}
+                            dot={{ r: 2.5, fill: "#34d399", stroke: "#34d399" }}
+                            activeDot={{ r: 5 }}
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
                     </div>
                   </div>
-                ))}
-              </div>
+                </div>
+              ) : (
+                <div className="min-h-[220px] flex items-center justify-center text-xs font-black uppercase tracking-[0.15em] text-white/55">
+                  Loading District Yields...
+                </div>
+              )}
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-4 sm:p-5">
-              <div className="flex items-center justify-between gap-2 mb-3">
-                <p className="text-[10px] font-black uppercase tracking-[0.18em] text-white/65">District Yield Table</p>
-                <p className="text-[10px] font-black uppercase tracking-[0.12em] text-white/45">MT + Predicted + Share</p>
-              </div>
-              <div className="max-h-[420px] overflow-y-auto rounded-xl border border-white/10">
+            <div className="xl:col-span-2 rounded-2xl border border-white/10 bg-black/20 p-3 sm:p-4">
+              <p className="text-[10px] font-black uppercase tracking-[0.15em] text-white/70 mb-3">District Yield Table</p>
+              <div className="max-h-[380px] overflow-y-auto rounded-xl border border-white/10 custom-scrollbar">
                 <table className="w-full border-collapse">
-                  <thead className="sticky top-0 bg-[#0c1420]">
+                  <thead className="sticky top-0 bg-[#0a1320]">
                     <tr className="text-[10px] uppercase tracking-[0.14em] text-white/65">
-                      <th className="px-3 py-2.5 text-left font-black">#</th>
                       <th className="px-3 py-2.5 text-left font-black">District</th>
                       <th className="px-3 py-2.5 text-right font-black">MT</th>
-                      <th className="px-3 py-2.5 text-right font-black">Pred (kg/ha)</th>
-                      <th className="px-3 py-2.5 text-right font-black">Share</th>
+                      <th className="px-3 py-2.5 text-right font-black">kg/ha</th>
                     </tr>
                   </thead>
                   <tbody>
                     {districtYieldRows.map((row) => (
                       <tr key={`table-${row.district}-${row.rank}`} className="border-t border-white/5 odd:bg-white/[0.02] even:bg-transparent">
-                        <td className="px-3 py-2.5 text-xs font-black text-white/75 tabular-nums">{row.rank}</td>
                         <td className="px-3 py-2.5 text-xs font-black text-white/90 uppercase tracking-[0.03em]">{row.district}</td>
                         <td className="px-3 py-2.5 text-xs font-black text-right tabular-nums text-emerald-300">{formatDistrictMT(row.yieldMT)}</td>
                         <td className="px-3 py-2.5 text-xs font-black text-right tabular-nums text-cyan-200">{Number(row.predictedYieldKgHa || 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
-                        <td className="px-3 py-2.5 text-xs font-black text-right tabular-nums text-white/80">{row.sharePct.toFixed(1)}%</td>
                       </tr>
                     ))}
                   </tbody>
@@ -549,14 +569,14 @@ const MyDashboard = () => {
 
           {/* Stage Distribution */}
           <div ref={stageChartRef} className="glass glass-hover p-4 sm:p-6 md:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-2 flex items-center gap-2">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/85 mb-2 flex items-center gap-2">
               <span className="material-symbols-outlined text-purple-400 text-sm">bar_chart</span>
               {t('growthAnalysis')}
             </p>
             <h3 className="text-xl font-black text-white tracking-tight uppercase mb-6">{t('cropStageDistribution')}</h3>
 
-            {stageDistribution.length > 0 ? (() => {
-              const total = stageDistribution.reduce((sum, d) => sum + d.stage_count, 0);
+            {translatedStageDistribution.length > 0 ? (() => {
+              const total = translatedStageDistribution.reduce((sum, d) => sum + d.stage_count, 0);
               return (
                 <>
                   {/* Total pill */}
@@ -568,10 +588,10 @@ const MyDashboard = () => {
                   {/* Bar chart */}
                   <div className="flex-1">
                     <ResponsiveContainer width="100%" height={320}>
-                      <BarChart data={stageDistribution} margin={{ top: 5, right: 5, left: -10, bottom: 40 }}>
+                      <BarChart data={translatedStageDistribution} margin={{ top: 5, right: 5, left: -10, bottom: 40 }}>
                         <XAxis
-                          dataKey="stage_name"
-                          tick={{ fill: "rgba(255,255,255,0.45)", fontSize: 9, fontWeight: 900 }}
+                          dataKey="stageLabel"
+                          tick={{ fill: "rgba(255,255,255,0.90)", fontSize: 9, fontWeight: 900 }}
                           axisLine={{ stroke: "rgba(255,255,255,0.05)" }}
                           tickLine={false}
                           angle={-35}
@@ -580,7 +600,7 @@ const MyDashboard = () => {
                           height={55}
                         />
                         <YAxis
-                          tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 9, fontWeight: 900 }}
+                          tick={{ fill: "rgba(255,255,255,0.90)", fontSize: 9, fontWeight: 900 }}
                           axisLine={false}
                           tickLine={false}
                           width={40}
@@ -591,10 +611,10 @@ const MyDashboard = () => {
                           labelStyle={{ color: "#fff", fontSize: "10px", fontWeight: "900", textTransform: "uppercase", letterSpacing: "0.15em" }}
                           itemStyle={{ color: "#a78bfa", fontSize: "11px", fontWeight: "bold" }}
                           cursor={{ fill: "rgba(255,255,255,0.02)" }}
-                          formatter={(value) => [`${value.toLocaleString()} fields`, "Count"]}
+                          formatter={(value) => [`${value.toLocaleString()} ${t('fieldsLabel')}`, t('countLabel')]}
                         />
                         <Bar dataKey="stage_count" radius={[8, 8, 0, 0]} maxBarSize={56}>
-                          {stageDistribution.map((_, i) => (
+                          {translatedStageDistribution.map((_, i) => (
                             <Cell
                               key={i}
                               fill={stageColors[i % stageColors.length]}
@@ -608,13 +628,13 @@ const MyDashboard = () => {
 
                   {/* Per-stage breakdown */}
                   <div className="mt-4 pt-5 border-t border-white/5 flex flex-col gap-2">
-                    {stageDistribution.map((d, i) => {
+                    {translatedStageDistribution.map((d, i) => {
                       const pct = total > 0 ? Math.round((d.stage_count / total) * 100) : 0;
                       const color = stageColors[i % stageColors.length];
                       return (
                         <div key={i} className="flex items-center gap-3 group">
                           <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: color, boxShadow: `0 0 6px ${color}` }} />
-                          <span className="text-[10px] font-black text-white/85 uppercase tracking-tight flex-1 group-hover:text-white/90 transition-colors truncate">{d.stage_name}</span>
+                          <span className="text-[10px] font-black text-white/85 uppercase tracking-tight flex-1 group-hover:text-white/90 transition-colors truncate">{d.stageLabel}</span>
                           <div className="w-24 h-1.5 bg-white/5 rounded-full overflow-hidden">
                             <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${pct}%`, background: color }} />
                           </div>
@@ -627,7 +647,7 @@ const MyDashboard = () => {
               );
             })() : (
               <div className="flex-1 min-h-75 flex items-center justify-center text-white/85 animate-pulse text-xs font-black uppercase tracking-widest">
-                Loading Stage Data...
+                {t('loadingStageData')}
               </div>
             )}
           </div>
@@ -686,7 +706,7 @@ const MyDashboard = () => {
                   <span className="col-span-2 text-right">Status</span>
                 </div>
 
-                <div className="mt-3 flex-1 no-scrollbar overflow-y-auto max-h-[420px] pr-1 space-y-2">
+                <div className="mt-3 flex-1 custom-scrollbar overflow-y-auto max-h-[420px] pr-1 space-y-2">
                   {visibleDistricts.map((district, i) => {
                     const healthPct = Math.max(0, Math.min(100, Math.round(Number(district.normal_pct || 0))));
                     const pestRiskPct = 100 - healthPct;

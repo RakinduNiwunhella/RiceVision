@@ -1,8 +1,13 @@
 import { useRef, useEffect, useState } from "react";
+import { useLanguage } from "../../context/LanguageContext";
+import { translateHealthCategory, HEALTH_FILTER_VALUES } from "../../utils/agriTranslations";
+import { translateDistrictName, getCanonicalDistrictName } from "../../utils/locationTranslations";
 
 export default function FiltersPanel({ filters, setFilters }) {
+  const { t, language } = useLanguage();
   const [open, setOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [districtQuery, setDistrictQuery] = useState("");
   const selectedDistrictRef = useRef(null);
 
   useEffect(() => {
@@ -13,6 +18,11 @@ export default function FiltersPanel({ filters, setFilters }) {
       });
     }
   }, [filters.districts]);
+
+  useEffect(() => {
+    const selected = filters.districts[0];
+    setDistrictQuery(selected ? translateDistrictName(selected, language) : "");
+  }, [filters.districts, language]);
 
   // Alphabetically sorted district list
   const districts = [
@@ -43,12 +53,8 @@ export default function FiltersPanel({ filters, setFilters }) {
     "Vavuniya",
   ];
 
-  const healthStatuses = [
-    "Normal",
-    "Mild Stress",
-    "Severe Stress",
-    "Not Applicable",
-  ];
+  // Use imported HEALTH_FILTER_VALUES constant instead of local definition
+  const healthStatuses = HEALTH_FILTER_VALUES;
 
   return (
     <>
@@ -65,7 +71,7 @@ export default function FiltersPanel({ filters, setFilters }) {
       >
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-sm font-bold uppercase tracking-widest text-white/85">
-          Filters
+          {t("mapFiltersTitle")}
         </h2>
 
         {filters.districts.length > 0 && (
@@ -78,29 +84,24 @@ export default function FiltersPanel({ filters, setFilters }) {
               }))
             }
           >
-            Clear
+            {t("mapClearBtn")}
           </button>
         )}
       </div>
 
       {/* District (Searchable Dropdown) */}
       <div className="mb-8 relative">
-        <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/40 mb-3">
-          District
+        <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/85 mb-3">
+          {t("mapDistrictLabel")}
         </p>
 
         <input
           type="text"
-          placeholder="Search district..."
-          value={filters.districts[0] || ""}
-          onChange={(e) =>
-            setFilters((prev) => ({
-              ...prev,
-              districts: [e.target.value],
-            }))
-          }
+          placeholder={t("mapSearchDistrictPlaceholder")}
+          value={districtQuery}
+          onChange={(e) => setDistrictQuery(e.target.value)}
           onFocus={() => setDropdownOpen(true)}
-          className="w-full px-4 pr-10 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder-white/40 focus:outline-none focus:border-emerald-400 focus:bg-white/10 transition"
+          className="w-full px-4 pr-10 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder-white/85 focus:outline-none focus:border-emerald-400 focus:bg-white/10 transition"
         />
 
         {/* Dropdown list */}
@@ -110,26 +111,33 @@ export default function FiltersPanel({ filters, setFilters }) {
             style={{ position: "relative" }}
           >
             {districts
-              .filter((d) =>
-                d.toLowerCase().includes((filters.districts[0] || "").toLowerCase())
-              )
+              .filter((d) => {
+                const q = districtQuery.trim().toLowerCase();
+                if (!q) return true;
+                return (
+                  d.toLowerCase().includes(q) ||
+                  translateDistrictName(d, language).toLowerCase().includes(q)
+                );
+              })
               .map((d) => (
                 <div
                   key={d}
                   onClick={() => {
+                    const canonical = getCanonicalDistrictName(d);
                     setFilters((prev) => ({
                       ...prev,
-                      districts: [d],
+                      districts: [canonical],
                     }));
+                    setDistrictQuery(translateDistrictName(canonical, language));
                     setDropdownOpen(false);
                   }}
                   className={`px-4 py-3 text-sm cursor-pointer transition-all duration-200 hover:bg-white/20 active:scale-[0.98] ${
                     filters.districts[0] === d
                       ? "bg-emerald-500/25 text-emerald-300 shadow-inner"
-                      : "text-white/80"
+                      : "text-white/85"
                   }`}
                 >
-                  {d}
+                  {translateDistrictName(d, language)}
                 </div>
               ))}
           </div>
@@ -140,7 +148,7 @@ export default function FiltersPanel({ filters, setFilters }) {
       <div>
         <div className="flex items-center justify-between mb-3">
           <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/85">
-            Crop Condition
+            {t("mapCropConditionLabel")}
           </p>
           {/* clear all by selecting 'All' or using button */}
           {filters.health.length > 0 && (
@@ -153,14 +161,14 @@ export default function FiltersPanel({ filters, setFilters }) {
                 }))
               }
             >
-              Clear
+              {t("mapClearBtn")}
             </button>
           )}
         </div>
         <div className="grid grid-cols-1 gap-2">
           {/* explicit "All statuses" option */}
           <label className="flex items-center justify-between px-3 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20 transition cursor-pointer">
-            <span className="text-sm font-medium text-white/90">All</span>
+            <span className="text-sm font-medium text-white/90">{t("mapAllStatuses")}</span>
             <input
               type="radio"
               name="health"
@@ -180,7 +188,7 @@ export default function FiltersPanel({ filters, setFilters }) {
               key={s}
               className="flex items-center justify-between px-3 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20 transition cursor-pointer"
             >
-              <span className="text-sm font-medium text-white/90">{s}</span>
+              <span className="text-sm font-medium text-white/90">{translateHealthCategory(s, t)}</span>
               <input
                 type="radio"
                 name="health"
@@ -200,7 +208,7 @@ export default function FiltersPanel({ filters, setFilters }) {
 
         <div className="mt-4 pt-4 border-t border-white/10">
           <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/85 mb-3">
-            Legend
+            {t("mapLegendLabel")}
           </p>
           <div className="space-y-2">
             {[
@@ -214,7 +222,7 @@ export default function FiltersPanel({ filters, setFilters }) {
                   className="w-3 h-3 rounded-full flex-shrink-0"
                   style={{ backgroundColor: color }}
                 />
-                <span className="text-[11px] text-white/85">{label}</span>
+                <span className="text-[11px] text-white/85">{translateHealthCategory(label, t)}</span>
               </div>
             ))}
           </div>

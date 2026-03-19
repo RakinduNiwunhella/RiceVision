@@ -3,3 +3,17 @@ Back-End/ricevision-pipeline/credentials
 Back-End/ricevision-pipeline/data/final
 Back-End/ricevision-pipeline/.venv
 Back-End/ricevision-pipeline/preprocessing/.venv
+# Secrets
+.env
+.env.*
+credentials/
+*.pem
+*.json
+
+# Python
+__pycache__/
+*.pyc
+venv/
+
+# OS
+.DS_Store

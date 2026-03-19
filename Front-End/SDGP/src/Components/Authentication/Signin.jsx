@@ -47,7 +47,7 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.detail || "Login failed");
+        throw new Error(data.detail || t('loginFailed'));
       }
 
       console.log("Login success:", data);
@@ -89,7 +89,7 @@ export default function LoginPage() {
     e.preventDefault();
 
     if (!email) {
-      setResetError("Please enter your email.");
+      setResetError(t('pleaseEnterEmail'));
       return;
     }
 
@@ -106,12 +106,12 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setResetError(data.detail || "Failed to send reset email.");
+        setResetError(data.detail || t('failedToSendResetEmail'));
       } else {
         setResetSuccess(true);
       }
     } catch (err) {
-      setResetError("Network error. Please try again.");
+      setResetError(t('networkErrorTryAgain'));
     }
 
     setResetLoading(false);
