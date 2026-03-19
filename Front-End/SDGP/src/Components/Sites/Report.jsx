@@ -884,10 +884,21 @@ const Report = () => {
               className={`flex items-center gap-2 text-[10px] font-black px-4 py-1.5 rounded-xl border transition-all duration-300 hover:scale-[1.02] cursor-pointer uppercase tracking-widest ${isSingleMode
                 ? "border-emerald-400/70 bg-emerald-500/10 hover:bg-emerald-500/20 hover:border-emerald-300"
                 : "border-white/10 hover:bg-white/10 hover:border-white/20"
-                }`}            >
+                }`}
+            >
               <span className="material-symbols-outlined text-xs">download</span>
-              Export PDF
+              Instant PDF
             </button>
+
+            <a
+              href={`https://ricevision-cakt.onrender.com/api/download-pdf?date=${config.date}&district=${config.district}&season=${config.season}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-[10px] font-black px-4 py-1.5 rounded-xl border border-blue-400/70 bg-blue-500/10 transition-all duration-300 hover:bg-blue-500/20 hover:border-blue-300 hover:scale-[1.02] cursor-pointer uppercase tracking-widest no-underline"
+            >
+              <span className="material-symbols-outlined text-xs">auto_awesome</span>
+              Official AI Report
+            </a>
           </div>
           <div ref={districtSelectorRef}>
             <CustomSelect

@@ -12,6 +12,7 @@
  */
 
 import { useState, useRef, useEffect } from "react";
+import { jsPDF } from "jspdf";
 import { supabase } from "../../supabaseClient";
 import { apiFetch } from "../../api/apiFetch";
 import { useTheme } from "../../context/ThemeContext";
@@ -129,6 +130,50 @@ export default function YieldChatbot() {
         chipText: isDark ? "rgba(255,255,255,0.95)" : "#334155",
         shadow: isDark ? "0 24px 64px rgba(0,0,0,0.7)" : "0 20px 50px rgba(0,0,0,0.1)",
         backdrop: isDark ? "blur(40px) saturate(180%)" : "blur(20px)",
+    };
+
+    // Helper to render basic markdown links [text](url)
+    const RenderMessage = ({ content, role }) => {
+        const parts = content.split(/(\[.*?\]\(.*?\))/g);
+        return parts.map((part, i) => {
+            const match = part.match(/\[(.*?)\]\((.*?)\)/);
+            if (match) {
+                return (
+                    <a
+                        key={i}
+                        href={match[2]}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                            color: role === "user" ? "#fff" : theme.emerald,
+                            textDecoration: "underline",
+                            fontWeight: "600"
+                        }}
+                    >
+                        {match[1]}
+                    </a>
+                );
+            }
+            return part;
+        });
+    };
+
+    const downloadMessageAsPDF = (content) => {
+        const doc = new jsPDF();
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(18);
+        doc.setTextColor(46, 125, 50);
+        doc.text("RiceVision Chat Export", 20, 20);
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(11);
+        doc.setTextColor(0, 0, 0);
+
+        // Split text for multi-line
+        const splitText = doc.splitTextToSize(content.replace(/\[(.*?)\]\((.*?)\)/g, "$1"), 170);
+        doc.text(splitText, 20, 35);
+
+        doc.save(`RiceVision_Chat_${new Date().getTime()}.pdf`);
     };
 
     const dynamicStyles = {
@@ -384,7 +429,39 @@ export default function YieldChatbot() {
                                 {m.role === "assistant" && (
                                     <div style={dynamicStyles.botAvatar}>🌾</div>
                                 )}
-                                <div style={dynamicStyles.bubble(m.role)}>{m.content}</div>
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 4, maxWidth: '78%' }}>
+                                    <div style={dynamicStyles.bubble(m.role)}>
+                                        <RenderMessage content={m.content} role={m.role} />
+                                    </div>
+                                    {m.role === "assistant" && (
+                                        <button
+                                            onClick={() => downloadMessageAsPDF(m.content)}
+                                            style={{
+                                                background: 'none',
+                                                border: 'none',
+                                                color: theme.emerald,
+                                                fontSize: '11px',
+                                                cursor: 'pointer',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: 4,
+                                                padding: '2px 6px',
+                                                borderRadius: '4px',
+                                                transition: 'background 0.2s',
+                                                fontWeight: '600',
+                                            }}
+                                            onMouseEnter={(e) => e.target.style.background = theme.headerBg}
+                                            onMouseLeave={(e) => e.target.style.background = 'none'}
+                                        >
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                                <polyline points="7 10 12 15 17 10" />
+                                                <line x1="12" y1="15" x2="12" y2="3" />
+                                            </svg>
+                                            Download PDF
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                         ))}
 

@@ -80,10 +80,32 @@ def get_stress_analysis(year: Optional[int] = None):
         return f"Error analyzing stress: {str(e)}"
 
 
+@tool
+async def get_prediction_report(date: str, district: str, season: str):
+    """
+    Generates and provides a download link for a detailed agricultural PDF report.
+    Required: date (YYYY-MM-DD), district, and season (Maha/Yala).
+    """
+    try:
+        # Determine base URL (default to Render, fallback to local if context suggests)
+        # In a real app, this might come from a config or env
+        base_url = os.getenv("BACKEND_URL", "https://ricevision-cakt.onrender.com")
+        
+        download_url = f"{base_url}/api/download-pdf?date={date}&district={district}&season={season}"
+        
+        return (
+            f"I have generated the detailed report for {district} ({season} season) based on data from {date}. "
+            f"You can download it here: [Download PDF Report]({download_url})"
+        )
+    except Exception as e:
+        return f"Error preparing report link: {str(e)}"
+
+
 tools = [
     get_yield_summary,
     get_district_details,
-    get_stress_analysis
+    get_stress_analysis,
+    get_prediction_report
 ]
 
 # ─── SYSTEM PROMPT ────────────────────────────────────────────────────────────
@@ -94,15 +116,12 @@ You are an expert agricultural data analyst for a crop yield dashboard.
 CRITICAL INSTRUCTIONS:
 1. ALWAYS use tools to fetch data.
 2. If a user mentions a year, pass it into tool calls.
-3. Format answers as professional reports.
-4. If no data is found, say it clearly.
-5. NEVER hallucinate values.
-
-COLUMNS:
-- districtname
-- year
-- predictedyield_kg_ha
-- risk_score
+3. PROACTIVELY offer the 'get_prediction_report' tool if the user asks for detailed analysis per district.
+4. If a user asks for a "report" or "PDF" or "download", MUST use the get_prediction_report tool.
+   Example: "Can I have a report for Ampara for Maha 2024-03-01?"
+5. Format answers as professional reports.
+6. If no data is found, say it clearly.
+7. NEVER hallucinate values.
 """
 
 # ─── REQUEST MODELS ───────────────────────────────────────────────────────────
