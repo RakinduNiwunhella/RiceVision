@@ -3,7 +3,8 @@ from pydantic import BaseModel, Field
 from typing import Any, Optional
 
 from ..auth import get_current_user
-from ..db import supabase
+from ..db import supabase, url, key
+from supabase import create_client, ClientOptions
 
 router = APIRouter(prefix="/user-field", tags=["User Field"])
 
@@ -19,8 +20,12 @@ class UserFieldUpsert(BaseModel):
 @router.get("")
 def get_user_field(current_user: dict = Depends(get_current_user)):
     try:
+        # Create scoped client so it respects RLS
+        opts = ClientOptions(headers={"Authorization": f"Bearer {current_user['token']}"})
+        scoped_supabase = create_client(url, key, options=opts)
+
         response = (
-            supabase.table("user_fields")
+            scoped_supabase.table("user_fields")
             .select("*")
             .eq("user_id", current_user["user_id"])
             .maybe_single()
@@ -44,6 +49,17 @@ def get_user_field(current_user: dict = Depends(get_current_user)):
 @router.put("")
 def upsert_user_field(payload: UserFieldUpsert, current_user: dict = Depends(get_current_user)):
     try:
+        import logging
+        import json
+        logging.warning(f"[DEBUG] current_user: {json.dumps(current_user, default=str)}")
+        user_obj = current_user.get('user')
+        if user_obj:
+            logging.warning(f"[DEBUG] user.id: {getattr(user_obj, 'id', None)}")
+            logging.warning(f"[DEBUG] user.email: {getattr(user_obj, 'email', None)}")
+            logging.warning(f"[DEBUG] user.user_metadata: {getattr(user_obj, 'user_metadata', None)}")
+            if hasattr(user_obj, 'identities'):
+                logging.warning(f"[DEBUG] user.identities: {getattr(user_obj, 'identities', None)}")
+
         row = {
             "user_id": current_user["user_id"],
             "field_name": payload.field_name,
@@ -53,16 +69,21 @@ def upsert_user_field(payload: UserFieldUpsert, current_user: dict = Depends(get
             "district": payload.district,
         }
 
+        # Create scoped client authenticated as current_user 
+        # so Supabase RLS accepts the insert/upsert
+        opts = ClientOptions(headers={"Authorization": f"Bearer {current_user['token']}"})
+        scoped_supabase = create_client(url, key, options=opts)
+
         # Supabase Python sync client in this project does not support
         # chaining select() directly after upsert(). Do write then read.
         (
-            supabase.table("user_fields")
+            scoped_supabase.table("user_fields")
             .upsert(row, on_conflict="user_id")
             .execute()
         )
 
         response = (
-            supabase.table("user_fields")
+            scoped_supabase.table("user_fields")
             .select("*")
             .eq("user_id", current_user["user_id"])
             .maybe_single()
@@ -75,14 +96,20 @@ def upsert_user_field(payload: UserFieldUpsert, current_user: dict = Depends(get
             "data": response.data,
         }
     except Exception as exc:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=400, detail=f"Failed to save user field: {str(exc)}")
 
 
 @router.delete("")
 def delete_user_field(current_user: dict = Depends(get_current_user)):
     try:
+        # Create scoped client so it respects RLS
+        opts = ClientOptions(headers={"Authorization": f"Bearer {current_user['token']}"})
+        scoped_supabase = create_client(url, key, options=opts)
+
         (
-            supabase.table("user_fields")
+            scoped_supabase.table("user_fields")
             .delete()
             .eq("user_id", current_user["user_id"])
             .execute()
