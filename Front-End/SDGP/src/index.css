@@ -17,6 +17,11 @@
     --glass-inset-bottom: rgba(0, 0, 0, 0.05);
 }
 
+:root, body, #root {
+        /* Scale everything to 80% */
+        /* zoom: 0.8; */
+}
+
 /* DARK MODE VALUES */
 .dark {
     --glass-bg: rgba(10, 18, 35, 0.52);

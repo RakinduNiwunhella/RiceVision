@@ -89,13 +89,13 @@ const MyDashboard = () => {
   const healthCardRef = useRef(null);
   const yieldCardRef = useRef(null);
   const supplyCardRef = useRef(null);
+  const threatsCardRef = useRef(null);
+  const threatDetailsBtnRef = useRef(null);
+  const outbreaksToggleBtnRef = useRef(null);
   const yieldInsightsRef = useRef(null);
   const stageChartRef = useRef(null);
   const districtTableRef = useRef(null);
   const districtToggleBtnRef = useRef(null);
-  const threatsCardRef = useRef(null);
-  const threatDetailsBtnRef = useRef(null);
-  const outbreaksToggleBtnRef = useRef(null);
 
   // Tutorial setup - cards, icons, and key actions on dashboard
   const tutorialSteps = useMemo(() => {
