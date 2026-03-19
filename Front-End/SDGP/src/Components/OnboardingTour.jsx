@@ -43,13 +43,29 @@ const OnboardingTour = ({
       }
     };
 
-    updateSpotlight();
+    // Scroll element into view on step change
+    const element = document.querySelector(steps[currentStep].target);
+    const container = document.getElementById("app-scroll-container");
+
+    if (element && container) {
+      const elementTop = element.offsetTop;
+
+      container.scrollTo({
+        top: elementTop - container.clientHeight / 2 + element.clientHeight / 2,
+        behavior: "smooth",
+      });
+    }
+
+    // Initial update with slight delay for scroll
+    setTimeout(updateSpotlight, 150);
+
+    // Keep updating during resize/scroll
     window.addEventListener("resize", updateSpotlight);
-    window.addEventListener("scroll", updateSpotlight);
+    window.addEventListener("scroll", updateSpotlight, true);
 
     return () => {
       window.removeEventListener("resize", updateSpotlight);
-      window.removeEventListener("scroll", updateSpotlight);
+      window.removeEventListener("scroll", updateSpotlight, true);
     };
   }, [currentStep, isVisible, steps]);
 
@@ -67,17 +83,35 @@ const OnboardingTour = ({
     }
   }, [currentStep]);
 
-  const handleSkip = useCallback(() => {
+  // Shared cleanup: scroll to top and restore scroll behavior
+  const handleTourEnd = useCallback(() => {
     localStorage.setItem(storageKey, "true");
-    setIsVisible(false);
+
+    // Scroll FIRST while component is still mounted
+    const container = document.getElementById("app-scroll-container");
+
+    if (container) {
+      container.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }
+
+    // THEN hide tour
+    setTimeout(() => {
+      setIsVisible(false);
+    }, 50);
+  }, [storageKey]);
+
+  const handleSkip = useCallback(() => {
+    handleTourEnd();
     onSkip?.();
-  }, [storageKey, onSkip]);
+  }, [handleTourEnd, onSkip]);
 
   const handleComplete = useCallback(() => {
-    localStorage.setItem(storageKey, "true");
-    setIsVisible(false);
+    handleTourEnd();
     onComplete?.();
-  }, [storageKey, onComplete]);
+  }, [handleTourEnd, onComplete]);
 
   if (!isVisible || steps.length === 0) return null;
 

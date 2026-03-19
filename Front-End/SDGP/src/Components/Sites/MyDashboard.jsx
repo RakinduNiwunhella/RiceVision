@@ -162,12 +162,12 @@ const MyDashboard = () => {
   const { currentStep, showTutorial, nextStep, prevStep, closeTutorial } =
     usePageTutorial("dashboard", tutorialSteps);
 
-  // First-time user onboarding tour (5 core steps)
+  // First-time user onboarding tour (6 core steps)
   const onboardingSteps = [
     {
-      target: '[data-tour="dashboard-overview"]',
-      title: 'Welcome to RiceVision',
-      description: 'View key farming insights and system status',
+      target: '[data-tour="navigation-bar"]',
+      title: 'Navigation Bar',
+      description: 'Access maps, alerts, weather, and reports',
     },
     {
       target: '[data-tour="crop-health"]',
@@ -185,9 +185,14 @@ const MyDashboard = () => {
       description: 'Identify shortages and demand gaps',
     },
     {
-      target: '[data-tour="navigation-bar"]',
-      title: 'Navigation Bar',
-      description: 'Access maps, alerts, weather, and reports',
+      target: '[data-tour="bottom-section"]',
+      title: 'Detailed Insights',
+      description: 'Explore district-level data and analytics',
+    },
+    {
+      target: '[data-tour="chatbot"]',
+      title: 'AI Assistant',
+      description: 'Ask questions and get farming insights instantly',
     },
   ];
 
@@ -341,7 +346,7 @@ const MyDashboard = () => {
       <div className="max-w-7xl mx-auto space-y-6 sm:space-y-10 lg:space-y-12 pb-16 sm:pb-20">
 
         {/* ── Page Header ── */}
-        <div ref={currentStep === 0 ? headerRef : undefined} data-tour="dashboard-overview" className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div ref={currentStep === 0 ? headerRef : undefined} className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
             <h1 className="text-xl sm:text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
             {t('welcomeTitle')}
@@ -595,7 +600,7 @@ const MyDashboard = () => {
         </div>
 
         {/* ── Analytical Depth Row ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 pb-10 sm:pb-12">
+        <div data-tour="bottom-section" className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 pb-10 sm:pb-12">
 
           {/* Stage Distribution */}
           <div ref={stageChartRef} className="glass glass-hover p-4 sm:p-6 md:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
