@@ -1,5 +1,3 @@
-this is main.py
-
 import os
 
 from fastapi import FastAPI, Depends
