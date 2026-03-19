@@ -113,7 +113,7 @@ export default function ResetPassword() {
                   d="M4 12a8 8 0 018-8V0C5.37 0 0 5.37 0 12h4z"
                 />
               </svg>
-              Updating...
+              {t('updating')}
             </>
           ) : (
             t('updatePasswordBtn')

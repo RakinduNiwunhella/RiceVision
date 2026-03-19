@@ -580,7 +580,7 @@ const Header = () => {
               <Link
                 ref={profileBtnRef}
                 to="/profile"
-                className="hidden md:flex w-8 h-8 rounded-lg items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition"
+                className="hidden md:flex w-8 h-8 rounded-lg items-center justify-center text-white/85 hover:text-white hover:bg-white/10 transition"
                 title="View Profile"
               >
                 {profileAvatarUrl ? (
@@ -606,7 +606,7 @@ const Header = () => {
                     const nextLang = order[(currentIndex + 1) % order.length];
                     setLanguage(nextLang);
                   }}
-                  className="w-9 h-9 rounded-lg flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition"
+                  className="w-9 h-9 rounded-lg flex items-center justify-center text-white/85 hover:text-white hover:bg-white/10 transition"
                   title="Change Language"
                 >
                   <span className="material-symbols-outlined text-[20px]">language</span>
@@ -614,7 +614,7 @@ const Header = () => {
 
                 <button
                   ref={themeBtnRef}
-                  className="w-9 h-9 rounded-lg flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition"
+                  className="w-9 h-9 rounded-lg flex items-center justify-center text-white/85 hover:text-white hover:bg-white/10 transition"
                   onClick={toggleTheme}
                   title="Toggle Theme"
                 >
@@ -629,7 +629,7 @@ const Header = () => {
                 <Link
                   ref={profileBtnRef}
                   to="/profile"
-                  className="w-9 h-9 rounded-lg flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition"
+                  className="w-9 h-9 rounded-lg flex items-center justify-center text-white/85 hover:text-white hover:bg-white/10 transition"
                   title="View Profile"
                 >
                   <span className="material-symbols-outlined text-[20px]">
