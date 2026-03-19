@@ -34,10 +34,6 @@ const FAQ_TRANSLATION_KEYS = {
     question: "helpFaqWhatIsQ",
     answer: "helpFaqWhatIsA",
   },
-  "how often is data updated": {
-    question: "helpFaqDataUpdateQ",
-    answer: "helpFaqDataUpdateA",
-  },
   "who can use ricevision": {
     question: "helpFaqWhoCanUseQ",
     answer: "helpFaqWhoCanUseA",
@@ -50,6 +46,26 @@ const normalizeFaqLookup = (value) =>
     .replace(/[^a-z0-9\s]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
+
+const HIDDEN_FAQ_QUESTIONS = new Set([
+  normalizeFaqLookup("How often is data updated?"),
+]);
+
+const shouldHideFaq = (faq) => {
+  const candidates = [
+    faq?.question,
+    faq?.question_en,
+    faq?.question_si,
+    faq?.question_ta,
+    faq?.translations?.en?.question,
+    faq?.translations?.si?.question,
+    faq?.translations?.ta?.question,
+  ];
+
+  return candidates.some((candidate) =>
+    HIDDEN_FAQ_QUESTIONS.has(normalizeFaqLookup(candidate))
+  );
+};
 
 const Help = () => {
   const { t, language } = useLanguage();
@@ -75,7 +91,10 @@ const Help = () => {
     const loadFaqs = async () => {
       try {
         const data = await fetchFaqs();
-        setFaqs(data);
+        const filteredFaqs = Array.isArray(data)
+          ? data.filter((faq) => !shouldHideFaq(faq))
+          : [];
+        setFaqs(filteredFaqs);
       } catch (err) {
         console.error("Failed to load FAQs:", err);
       } finally {

@@ -43,6 +43,12 @@ import { DISTRICTS, BASE_MAPS, SQM_PER_ACRE, PRICE_PER_ACRE_LKR } from "./fieldC
 
 /* ── Constants ─────────────────────────────────────────────────────────────── */
 const SL_CENTER = [7.8731, 80.7718];
+const BASE_MAP_LABEL_KEYS = {
+  satellite: "mapBasemapSatellite",
+  street: "mapBasemapStreet",
+  terrain: "mapBasemapTerrain",
+  dark: "mapBasemapDark",
+};
 
 /* ── geodesic area helper (provided by leaflet-draw) ─────────────────────── */
 function calcAreaM2(layer) {
@@ -281,10 +287,11 @@ export default function FieldDrawMap({
     if (q.length < 3) { setLocResults([]); return; }
     locDebounce.current = setTimeout(async () => {
       try {
+        const nominatimLang = language === "si" || language === "ta" ? language : "en";
         const res  = await fetch(
           `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
             q + " Sri Lanka"
-          )}&format=json&limit=5&countrycodes=lk`
+          )}&format=json&limit=5&countrycodes=lk&accept-language=${nominatimLang}`
         );
         const data = await res.json();
         setLocResults(data);
@@ -368,7 +375,7 @@ export default function FieldDrawMap({
                 type="text"
                 value={locSearch}
                 onChange={(e) => searchLocation(e.target.value)}
-                placeholder="Search location in Sri Lanka…"
+                placeholder={t("mapSearchLocationPlaceholder")}
                 className="flex-1 bg-transparent text-sm text-white placeholder-white/85 focus:outline-none"
               />
               {locSearch && (
@@ -407,7 +414,7 @@ export default function FieldDrawMap({
                     : "bg-white/5 border-white/10 text-white/85 hover:bg-white/10 hover:text-white"
                 }`}
               >
-                {bm.label}
+                {t(BASE_MAP_LABEL_KEYS[key] || bm.label)}
               </button>
             ))}
           </div>
@@ -422,7 +429,7 @@ export default function FieldDrawMap({
             type="text"
             value={fieldName}
             onChange={(e) => onFieldNameChange?.(e.target.value)}
-            placeholder="Name your field (e.g. North Paddy, Home Field…)"
+            placeholder={t("mapFieldNamePlaceholder")}
             className="flex-1 px-3 py-2 rounded-xl border border-white/15 bg-white/5 text-white text-sm placeholder-white/85 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500/50 transition-all"
           />
         </div>
@@ -433,16 +440,16 @@ export default function FieldDrawMap({
         <div className="flex flex-wrap items-center gap-4 px-4 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-sm">
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-emerald-400 text-base">straighten</span>
-            <span className="text-white/85">Area:</span>
-            <span className="font-black text-emerald-400">{acres.toFixed(3)} acres</span>
+            <span className="text-white/85">{t("areaStat")}:</span>
+            <span className="font-black text-emerald-400">{acres.toFixed(3)} {t("unitAcres")}</span>
             <span className="text-white/85">({(acres * 4046.86).toFixed(0)} m²)</span>
           </div>
           <span className="h-4 w-px bg-white/20" />
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-emerald-400 text-base">paid</span>
-            <span className="text-white/85">Price:</span>
-            <span className="font-black text-emerald-400">Rs. {price.toLocaleString()} / year</span>
-            <span className="text-white/85 text-xs">(Rs. {PRICE_PER_ACRE_LKR.toLocaleString()} per acre)</span>
+            <span className="text-white/85">{t("mapPriceLabel")}:</span>
+            <span className="font-black text-emerald-400">Rs. {price.toLocaleString()} {t("mapPerYearSuffix")}</span>
+            <span className="text-white/85 text-xs">(Rs. {PRICE_PER_ACRE_LKR.toLocaleString()} {t("mapPerAcreSuffix")})</span>
           </div>
         </div>
       )}
@@ -516,9 +523,9 @@ export default function FieldDrawMap({
       {/* Hint text */}
       {!readOnly && (
         <p className="text-xs text-white/85 text-center">
-          <span className="text-amber-300">■</span> Yellow = known paddy areas &nbsp;·&nbsp;
-          Use the <strong className="text-white/90">polygon / rectangle tool</strong> (top-right of map) to outline your field &nbsp;·&nbsp;
-          {initialFeature && <span><span className="text-blue-300">⬝</span> Dashed blue = your current field</span>}
+          <span className="text-amber-300">■</span> {t("mapHintKnownPaddy")} &nbsp;·&nbsp;
+          {t("mapHintUseToolPrefix")} <strong className="text-white/90">{t("mapHintToolName")}</strong> {t("mapHintUseToolSuffix")} &nbsp;·&nbsp;
+          {initialFeature && <span><span className="text-blue-300">⬝</span> {t("mapHintCurrentField")}</span>}
         </p>
       )}
     </div>

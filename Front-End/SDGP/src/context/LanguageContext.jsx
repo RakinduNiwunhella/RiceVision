@@ -183,7 +183,7 @@ export const translations = {
       "RiceVision combines satellite imagery, weather signals, and machine-learning models to detect crop health patterns, stress zones, and risk indicators in paddy fields.",
     helpFaqSatelliteUpdateQ: "How often is satellite data updated?",
     helpFaqSatelliteUpdateA:
-      "Satellite-based updates are refreshed regularly as new cloud-free scenes are available, typically on a weekly cycle depending on weather conditions.",
+      "Satellite-based updates are refreshed each 5 days, when the satellite orbits the earth",
     helpFaqSpecialEquipmentQ: "Do farmers need special equipment?",
     helpFaqSpecialEquipmentA:
       "No special equipment is required. A phone or computer with internet access is enough to view field insights in RiceVision.",
@@ -196,9 +196,7 @@ export const translations = {
     helpFaqWhatIsQ: "What is RiceVision?",
     helpFaqWhatIsA:
       "RiceVision is a digital agricultural intelligence platform that helps monitor paddy fields, identify risks early, and support better crop planning.",
-    helpFaqDataUpdateQ: "How often is data updated?",
-    helpFaqDataUpdateA:
-      "Operational data such as map layers and alerts is refreshed as new source data arrives, commonly in frequent scheduled updates.",
+   
     helpFaqWhoCanUseQ: "Who can use RiceVision?",
     helpFaqWhoCanUseA:
       "Farmers, agricultural officers, researchers, and related institutions can use RiceVision to monitor and manage paddy cultivation.",
@@ -245,9 +243,9 @@ export const translations = {
 
     // ── Profile ──
     operatorAuth: "Operator Authorization",
-    identityProfile: "Identity Profile",
+    identityProfile: "Profile Details",
     profileDesc:
-      "Keep your profile details up to date for a better experience in RiceVision.",
+      "Update your name, phone number, email address, and profile photo.",
     personalId: "Personal Identification",
     sectorReg: "Sector Registration",
     givenName: "Given Name",
@@ -297,7 +295,7 @@ export const translations = {
     // ── Profile Tabs ──
     myPaddyField: "My Paddy Field",
     paddyFieldDesc:
-      "View, draw, or update your registered paddy field boundary. Pricing is Rs. 1,000 per acre per year.",
+      "View and manage your registered paddy field information.",
 
     // ── ProfileForm extra ──
     districtSector: "District Sector",
@@ -759,6 +757,7 @@ export const translations = {
     advisoryStatusHold: "Hold",
     weatherRainShort: "Rain",
 
+
     // ── Map & Filter Labels ──
     mapLayersTitle: "Map Layers",
     mapClearBtn: "Clear",
@@ -776,7 +775,23 @@ export const translations = {
     mapLayersHintEVI: "EVI — Enhanced Vegetation Index",
     mapLayersHintVV: "VV — Vertical Transmit / Vertical Receive",
     mapLayersHintVH: "VH — Vertical Transmit / Horizontal Receive",
-
+    mapSelectDistrictPrompt: "Select district",
+    mapBasemapSatellite: "Satellite",
+    mapBasemapStreet: "Street",
+    mapBasemapTerrain: "Terrain",
+    mapBasemapDark: "Dark",
+    mapSearchLocationPlaceholder: "Search location in Sri Lanka...",
+    mapFieldNamePlaceholder: "Name your field (e.g. North Paddy, Home Field...)",
+    mapPriceLabel: "Price",
+    mapPerYearSuffix: "/ year",
+    mapPerAcreSuffix: "per acre",
+    unitAcres: "acres",
+    mapHintKnownPaddy: "Yellow = known paddy areas",
+    mapHintUseToolPrefix: "Use the",
+    mapHintToolName: "polygon / rectangle tool",
+    mapHintUseToolSuffix: "(top-right of map) to outline your field",
+    mapHintCurrentField: "Dashed blue = your current field",
+  
 
     // ── Crop Health Categories ──
     healthNormal: "Normal",
@@ -1043,12 +1058,12 @@ export const translations = {
     submitReport: "වාර්තාව ඉදිරිපත් කරන්න",
     quickHelp: "ඉක්මන් උදව්",
     decryptingFaqs: "නිතර අසන ප්‍රශ්න පූරණය කරමින්...",
-    helpFaqMonitorFieldsQ: "RiceVision නෙල් කෙත්වතු නිරීක්ෂණය කරන්නේ කෙසේද?",
+    helpFaqMonitorFieldsQ: "RiceVision  කෙත් වතු නිරීක්ෂණය කරන්නේ කෙසේද?",
     helpFaqMonitorFieldsA:
-      "RiceVision නෙල් කෙත්වල සෞඛ්‍ය රටා, ආතති ප්‍රදේශ සහ අවදානම් දර්ශක හඳුනාගැනීමට අභ්‍යවකාශ දෘශ්‍ය, කාලගුණ සංඥා සහ යන්ත්‍ර-ඉගෙනීමේ ආකෘති එක් කරයි.",
+      "RiceVision කෙත්වල සෞඛ්‍ය රටා, ආතති ප්‍රදේශ සහ අවදානම් දර්ශක හඳුනාගැනීමට අභ්‍යවකාශ දෘශ්‍ය, කාලගුණ සංඥා සහ යන්ත්‍ර-ඉගෙනීමේ ආකෘති එක් කරයි.",
     helpFaqSatelliteUpdateQ: "සැටලයිට් දත්ත කොපමණ වාරයක් යාවත්කාලීන වේද?",
     helpFaqSatelliteUpdateA:
-      "නව වලාකුළු රහිත දර්ශන ලැබෙන විට සැටලයිට් යාවත්කාලීන නිතර සිදු වේ. කාලගුණ තත්ත්වය අනුව සාමාන්‍යයෙන් සතිපතා චක්‍රයකින් යාවත්කාලීන වේ.",
+      "චන්ද්‍රිකාව පෘථිවිය වටා කක්ෂගත වන විට, සෑම දින 5 කට වරක් චන්ද්‍රිකා පාදක යාවත්කාලීන කිරීම් නැවුම් කරනු ලැබේ.",
     helpFaqSpecialEquipmentQ: "ගොවීන්ට විශේෂ උපකරණ අවශ්‍යද?",
     helpFaqSpecialEquipmentA:
       "විශේෂ උපකරණ අවශ්‍ය නැත. අන්තර්ජාල සම්බන්ධතාව ඇති දුරකථනයක් හෝ පරිගණකයක් තිබීම පමණක් ප්‍රමාණවත්ය.",
@@ -1060,13 +1075,11 @@ export const translations = {
       "කෘෂිකාර්මික පද්ධතියේ ලියාපදිංචි සහ අනුමත පරිශීලකයන්ට, ගොවීන්ට සහ නිලධාරීන්ට RiceVision වෙත ප්‍රවේශ විය හැක.",
     helpFaqWhatIsQ: "RiceVision යනු කුමක්ද?",
     helpFaqWhatIsA:
-      "RiceVision යනු නෙල් කෙත්වතු නිරීක්ෂණය කිරීමට, අවදානම් මුල් අදියරේ හඳුනාගැනීමට සහ බෝග සැලසුම් කිරීම වැඩිදියුණු කිරීමට උපකාර කරන ඩිජිටල් කෘෂි බුද්ධි වේදිකාවකි.",
-    helpFaqDataUpdateQ: "දත්ත කොපමණ වාරයක් යාවත්කාලීන වේද?",
-    helpFaqDataUpdateA:
-      "නව මූලාශ්‍ර දත්ත ලැබෙන සෑම අවස්ථාවකම සිතියම් ස්තර සහ ඇඟවීම් වැනි ක්‍රියාකාරී දත්ත නියමිත පරිදි නැවත යාවත්කාලීන වේ.",
+      "RiceVision යනු  කෙත්වතු නිරීක්ෂණය කිරීමට, අවදානම් මුල් අදියරේ හඳුනාගැනීමට සහ බෝග සැලසුම් කිරීම වැඩිදියුණු කිරීමට උපකාර කරන ඩිජිටල් කෘෂි බුද්ධි වේදිකාවකි.",
+    
     helpFaqWhoCanUseQ: "RiceVision භාවිතා කළ හැක්කේ කවුද?",
     helpFaqWhoCanUseA:
-      "ගොවීන්, කෘෂි නිලධාරීන්, පර්යේෂකයන් සහ සම්බන්ධ ආයතන නෙල් වගාව නිරීක්ෂණය කර කළමනාකරණය කිරීමට RiceVision භාවිතා කළ හැක.",
+      "ගොවීන්, කෘෂි නිලධාරීන්, පර්යේෂකයන් සහ සම්බන්ධ ආයතන කෙත්වතු වගාව නිරීක්ෂණය කර කළමනාකරණය කිරීමට RiceVision භාවිතා කළ හැක.",
 
     // ── Field Data ──
     fieldIntelligence: "කෙත් බුද්ධිය",
@@ -1110,9 +1123,9 @@ export const translations = {
 
     // ── Profile ──
     operatorAuth: "ක්‍රියාකරු අනුමැතිය",
-    identityProfile: "අනන්‍යතා විස්තරය",
+    identityProfile: "අනන්‍යතා  විස්තරය",
     profileDesc:
-      "RiceVision තුළ හොඳ අත්දැකීමක් සඳහා ඔබේ පැතිකඩ තොරතුරු යාවත්කාලීනව තබා ගන්න.",
+      "RiceVision තුළ හොඳ අත්දැකීමක් සඳහා ඔබේ තොරතුරු යාවත්කාලීනව තබා ගන්න.",
     personalId: "පෞද්ගලික හඳුනාගැනීම",
     sectorReg: "ක්ෂේත්‍ර ලියාපදිංචිය",
     givenName: "ලබා දුන් නාමය",
@@ -1160,9 +1173,9 @@ export const translations = {
     logout: "ලොග් අවුට්",
 
     // ── Profile Tabs ──
-    myPaddyField: "මගේ ගොළු කෙත",
+    myPaddyField: "මගේ කෙත",
     paddyFieldDesc:
-      "ඔබේ ලියාපදිංචි ගොළු කෙත් සීමාව බලන්න, ඇඳීම් කරන්න, හෝ යාවත්කාලීන කරන්න.",
+      "ඔබේ ලියාපදිංචි කෙත් සීමාව බලන්න, ඇඳීම් කරන්න, හෝ යාවත්කාලීන කරන්න.",
 
     // ── ProfileForm extra ──
     districtSector: "දිස්ත්‍රික් ක්ෂේත්‍රය",
@@ -1232,13 +1245,29 @@ export const translations = {
     backToMapBtn: "← සිතියමට ආපසු",
     savingField: "සුරකිමින්...",
     completeRegistrationBtn: "ලියාපදිංචිය සම්පූර්ණ කරන්න",
+    mapSelectDistrictPrompt: "දිස්ත්‍රික්කය තෝරන්න",
+    mapBasemapSatellite: "චන්ද්‍රිකා",
+    mapBasemapStreet: "වීදි",
+    mapBasemapTerrain: "කඳුකර",
+    mapBasemapDark: "අඳුරු",
+    mapSearchLocationPlaceholder: "ශ්‍රී ලංකාවේ ස්ථානය සොයන්න...",
+    mapFieldNamePlaceholder: "ඔබේ කෙතට නමක් දෙන්න (උදා: උතුරු වී කෙත...)",
+    mapPriceLabel: "මිල",
+    mapPerYearSuffix: "/ වසරකට",
+    mapPerAcreSuffix: "එක් අක්කරයකට",
+    unitAcres: "අක්කර",
+    mapHintKnownPaddy: "කහ = දැනට හඳුනාගත් වී වගා ප්‍රදේශ",
+    mapHintUseToolPrefix: "ඔබේ කෙත සීමා කිරීමට",
+    mapHintToolName: "බහුකෝණ / සෘජුකෝණාස්‍ර මෙවලම",
+    mapHintUseToolSuffix: "(සිතියේ ඉහළ දකුණ) භාවිත කරන්න",
+    mapHintCurrentField: "ඉරි නිල් = ඔබේ වත්මන් කෙත",
 
     // ── My Field Tab ──
     fieldRegistry: "කෙත් ලේඛනාගාරය",
     fieldRegistryExisting:
-      "ඔබේ ලියාපදිංචි ගොළු කෙත. සීමාව යාවත්කාලීන කිරීමට සංස්කරණය කරන්න හෝ ප්‍රතිස්ථාපනය සඳහා නව බහුකෝණයක් ඇඳන්න.",
+      "ඔබේ ලියාපදිංචි කෙත. සීමාව යාවත්කාලීන කිරීමට සංස්කරණය කරන්න හෝ ප්‍රතිස්ථාපනය සඳහා නව බහුකෝණයක් ඇඳන්න.",
     fieldRegistryNew:
-      "ඔබ තවම ගොළු කෙතක් ලියාපදිංචි කර නැත. පහත ඔබේ කෙත් සීමාව ඇඳීම කරන්න.",
+      "ඔබ තවම කෙතක් ලියාපදිංචි කර නැත. පහත ඔබේ කෙත් සීමාව ඇඳීම කරන්න.",
     editBtn: "සංස්කරණය",
     removeBtn: "ඉවත් කරන්න",
     loadingFieldData: "කෙත් දත්ත පූරණය",
@@ -1668,10 +1697,10 @@ export const translations = {
     mapSlope: "බෑවුම",
 
     // ── Profile Form Labels & Validation ──
-    profileFirstName: "පළමු නම",
-    profileSurname: "පවුලේ නම",
+    profileFirstName: "මුල් නම",
+    profileSurname: "වාසගම",
     profilePhone: "දුරකතන අංකය",
-    profileEmail: "ඉ-තැපෙල් ලිපිනය",
+    profileEmail: "ඊමේල් ලිපිනය",
     profileAddress: "ලිපිනය",
     profileFirstNameRequired: "පළමු නම අවශ්‍යයි.",
     profileFirstNameFormatError: "පළමු නම සඳහා අකුරු පමණක් භාවිත කරන්න.",
@@ -1687,7 +1716,7 @@ export const translations = {
     profileUpdatedSuccess: "සුයවිවරය සාර්ථකව යාවත්කාලීන කරන ලදී",
     profileUpdateFailed: "සුයවිවරය යාවත්කාලීන කිරීමට අසමත්",
     profilePhotoUploadFailed: "ඡායාරූපය පූරණය කිරීමට අසමත්",
-    profileSaveButton: "සුයවිවරය සුරකින්න",
+    profileSaveButton: "සුරකින්න",
     profileSavingButton: "සුරකින පිටුවට...",
     profileSavedButton: "සුරකින ලදී",
     profileLogoutButton: "ඉවත් වන්න",
@@ -1903,9 +1932,7 @@ export const translations = {
     helpFaqWhatIsQ: "RiceVision என்றால் என்ன?",
     helpFaqWhatIsA:
       "RiceVision என்பது நெல் வயல்களை கண்காணிக்க, அபாயங்களை முன்கூட்டியே கண்டறிய, மேலும் சிறந்த பயிர் திட்டமிடலை ஆதரிக்க உதவும் ஒரு டிஜிட்டல் விவசாய நுண்ணறிவு தளம்.",
-    helpFaqDataUpdateQ: "தரவு எவ்வளவு அடிக்கடி புதுப்பிக்கப்படுகிறது?",
-    helpFaqDataUpdateA:
-      "வரைபட அடுக்குகள் மற்றும் எச்சரிக்கைகள் போன்ற செயல்பாட்டு தரவுகள் புதிய மூலத் தரவு கிடைக்கும் போதெல்லாம் திட்டமிட்ட வகையில் புதுப்பிக்கப்படுகின்றன.",
+    
     helpFaqWhoCanUseQ: "RiceVision-ஐ யார் பயன்படுத்தலாம்?",
     helpFaqWhoCanUseA:
       "விவசாயிகள், வேளாண்மை அதிகாரிகள், ஆய்வாளர்கள் மற்றும் தொடர்புடைய நிறுவனங்கள் நெல் சாகுபடியை கண்காணிக்கவும் நிர்வகிக்கவும் RiceVision-ஐ பயன்படுத்தலாம்.",
@@ -2077,6 +2104,21 @@ export const translations = {
     backToMapBtn: "← வரைபடத்திற்கு திரும்பவும்",
     savingField: "சேமிக்கிறது...",
     completeRegistrationBtn: "பதிவை முடிக்கவும்",
+    mapBasemapSatellite: "செயற்கைக்கோள்",
+    mapBasemapStreet: "தெரு",
+    mapBasemapTerrain: "பரப்பு",
+    mapBasemapDark: "இருள்",
+    mapSearchLocationPlaceholder: "இலங்கையில் இடத்தை தேடுங்கள்...",
+    mapFieldNamePlaceholder: "உங்கள் வயலுக்கு பெயர் இடுங்கள் (எ.கா.: வட நெல் வயல்...)",
+    mapPriceLabel: "விலை",
+    mapPerYearSuffix: "/ வருடம்",
+    mapPerAcreSuffix: "ஏக்கருக்கு",
+    unitAcres: "ஏக்கர்",
+    mapHintKnownPaddy: "மஞ்சள் = அறியப்பட்ட நெல் பயிர் பகுதிகள்",
+    mapHintUseToolPrefix: "உங்கள் வயலை வரையறுக்க",
+    mapHintToolName: "பலகோணம் / செவ்வகம் கருவி",
+    mapHintUseToolSuffix: "(வரைபடத்தின் மேல் வலப்பக்கம்) பயன்படுத்தவும்",
+    mapHintCurrentField: "புள்ளியிட்ட நீலம் = உங்கள் தற்போதைய வயல்",
 
     // ── My Field Tab ──
     fieldRegistry: "வயல் பதிவேடு",
