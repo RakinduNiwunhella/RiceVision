@@ -140,6 +140,22 @@ export const translations = {
     resolveBtn: "Resolve",
     ignoreBtn: "Ignore",
     viewInMap: "View in Map",
+    alertRiskLabel: "Risk",
+    alertRisksSuffix: "RISKS",
+    alertMultiplePestRisks: "Multiple pest risks detected in this district",
+    disasterTypeWind: "Wind",
+    disasterTypeCyclone: "Cyclone",
+    disasterTypeStorm: "Storm",
+    disasterTypeThunderstorm: "Thunderstorm",
+    disasterTypeFlood: "Flood",
+    disasterTypeDrought: "Drought",
+    disasterTypeLandslide: "Landslide",
+    disasterTypeHeatWave: "Heat Wave",
+    disasterTypeFire: "Fire",
+    disasterTypeHeavyRain: "Heavy Rain",
+    disasterTypePest: "Pest",
+    disasterTypeDisease: "Disease",
+    disasterTypeTsunami: "Tsunami",
 
     // ── Help ──
     helpSupport: "Help & Support",
@@ -162,6 +178,30 @@ export const translations = {
     submitReport: "Submit Your Report",
     quickHelp: "Quick Help",
     decryptingFaqs: "Loading FAQs...",
+    helpFaqMonitorFieldsQ: "How does RiceVision monitor paddy fields?",
+    helpFaqMonitorFieldsA:
+      "RiceVision combines satellite imagery, weather signals, and machine-learning models to detect crop health patterns, stress zones, and risk indicators in paddy fields.",
+    helpFaqSatelliteUpdateQ: "How often is satellite data updated?",
+    helpFaqSatelliteUpdateA:
+      "Satellite-based updates are refreshed regularly as new cloud-free scenes are available, typically on a weekly cycle depending on weather conditions.",
+    helpFaqSpecialEquipmentQ: "Do farmers need special equipment?",
+    helpFaqSpecialEquipmentA:
+      "No special equipment is required. A phone or computer with internet access is enough to view field insights in RiceVision.",
+    helpFaqAccuracyQ: "How accurate are the crop health insights?",
+    helpFaqAccuracyA:
+      "Insights are designed to be highly reliable for trend monitoring. For critical farming decisions, use them together with on-ground field verification.",
+    helpFaqWhoCanAccessQ: "Who can access RiceVision?",
+    helpFaqWhoCanAccessA:
+      "Registered users in the agriculture ecosystem, including authorized farmers, officers, and stakeholders, can access RiceVision features.",
+    helpFaqWhatIsQ: "What is RiceVision?",
+    helpFaqWhatIsA:
+      "RiceVision is a digital agricultural intelligence platform that helps monitor paddy fields, identify risks early, and support better crop planning.",
+    helpFaqDataUpdateQ: "How often is data updated?",
+    helpFaqDataUpdateA:
+      "Operational data such as map layers and alerts is refreshed as new source data arrives, commonly in frequent scheduled updates.",
+    helpFaqWhoCanUseQ: "Who can use RiceVision?",
+    helpFaqWhoCanUseA:
+      "Farmers, agricultural officers, researchers, and related institutions can use RiceVision to monitor and manage paddy cultivation.",
 
     // ── Field Data ──
     fieldIntelligence: "Field Intelligence",
@@ -965,6 +1005,22 @@ export const translations = {
     resolveBtn: "විසඳන්න",
     ignoreBtn: "නොසලකන්න",
     viewInMap: "සිතියමේ බලන්න",
+    alertRiskLabel: "අවදානම",
+    alertRisksSuffix: "අවදානම්",
+    alertMultiplePestRisks: "මෙම දිස්ත්‍රික්කයේ බහු පළිබෝධ අවදානම් අනාවරණය වී ඇත.",
+    disasterTypeWind: "සුළං",
+    disasterTypeCyclone: "සුළි කුණාටු",
+    disasterTypeStorm: "කුණාටු",
+    disasterTypeThunderstorm: "ගිගුරුම් කුණාටු",
+    disasterTypeFlood: "ගංවතුර",
+    disasterTypeDrought: "නියඟය",
+    disasterTypeLandslide: "නායයෑම",
+    disasterTypeHeatWave: "උෂ්ණ තරංගය",
+    disasterTypeFire: "ගින්න",
+    disasterTypeHeavyRain: "අධික වැසි",
+    disasterTypePest: "පළිබෝධ",
+    disasterTypeDisease: "රෝග",
+    disasterTypeTsunami: "සුනාමි",
 
     // ── Help ──
     helpSupport: "උදව් සහ සහාය",
@@ -987,6 +1043,30 @@ export const translations = {
     submitReport: "වාර්තාව ඉදිරිපත් කරන්න",
     quickHelp: "ඉක්මන් උදව්",
     decryptingFaqs: "නිතර අසන ප්‍රශ්න පූරණය කරමින්...",
+    helpFaqMonitorFieldsQ: "RiceVision නෙල් කෙත්වතු නිරීක්ෂණය කරන්නේ කෙසේද?",
+    helpFaqMonitorFieldsA:
+      "RiceVision නෙල් කෙත්වල සෞඛ්‍ය රටා, ආතති ප්‍රදේශ සහ අවදානම් දර්ශක හඳුනාගැනීමට අභ්‍යවකාශ දෘශ්‍ය, කාලගුණ සංඥා සහ යන්ත්‍ර-ඉගෙනීමේ ආකෘති එක් කරයි.",
+    helpFaqSatelliteUpdateQ: "සැටලයිට් දත්ත කොපමණ වාරයක් යාවත්කාලීන වේද?",
+    helpFaqSatelliteUpdateA:
+      "නව වලාකුළු රහිත දර්ශන ලැබෙන විට සැටලයිට් යාවත්කාලීන නිතර සිදු වේ. කාලගුණ තත්ත්වය අනුව සාමාන්‍යයෙන් සතිපතා චක්‍රයකින් යාවත්කාලීන වේ.",
+    helpFaqSpecialEquipmentQ: "ගොවීන්ට විශේෂ උපකරණ අවශ්‍යද?",
+    helpFaqSpecialEquipmentA:
+      "විශේෂ උපකරණ අවශ්‍ය නැත. අන්තර්ජාල සම්බන්ධතාව ඇති දුරකථනයක් හෝ පරිගණකයක් තිබීම පමණක් ප්‍රමාණවත්ය.",
+    helpFaqAccuracyQ: "බෝග සෞඛ්‍ය දැනුම්දීම් කොපමණ නිවැරදිද?",
+    helpFaqAccuracyA:
+      "ප්‍රවණතා නිරීක්ෂණය සඳහා මෙම දැනුම්දීම් විශ්වාසනීය ලෙස සැලසුම් කර ඇත. වැදගත් ගොවිතැන් තීරණ සඳහා භූමියේ සෘජු පරීක්ෂාව සමඟ භාවිතා කරන්න.",
+    helpFaqWhoCanAccessQ: "RiceVision වෙත ප්‍රවේශ විය හැක්කේ කවුද?",
+    helpFaqWhoCanAccessA:
+      "කෘෂිකාර්මික පද්ධතියේ ලියාපදිංචි සහ අනුමත පරිශීලකයන්ට, ගොවීන්ට සහ නිලධාරීන්ට RiceVision වෙත ප්‍රවේශ විය හැක.",
+    helpFaqWhatIsQ: "RiceVision යනු කුමක්ද?",
+    helpFaqWhatIsA:
+      "RiceVision යනු නෙල් කෙත්වතු නිරීක්ෂණය කිරීමට, අවදානම් මුල් අදියරේ හඳුනාගැනීමට සහ බෝග සැලසුම් කිරීම වැඩිදියුණු කිරීමට උපකාර කරන ඩිජිටල් කෘෂි බුද්ධි වේදිකාවකි.",
+    helpFaqDataUpdateQ: "දත්ත කොපමණ වාරයක් යාවත්කාලීන වේද?",
+    helpFaqDataUpdateA:
+      "නව මූලාශ්‍ර දත්ත ලැබෙන සෑම අවස්ථාවකම සිතියම් ස්තර සහ ඇඟවීම් වැනි ක්‍රියාකාරී දත්ත නියමිත පරිදි නැවත යාවත්කාලීන වේ.",
+    helpFaqWhoCanUseQ: "RiceVision භාවිතා කළ හැක්කේ කවුද?",
+    helpFaqWhoCanUseA:
+      "ගොවීන්, කෘෂි නිලධාරීන්, පර්යේෂකයන් සහ සම්බන්ධ ආයතන නෙල් වගාව නිරීක්ෂණය කර කළමනාකරණය කිරීමට RiceVision භාවිතා කළ හැක.",
 
     // ── Field Data ──
     fieldIntelligence: "කෙත් බුද්ධිය",
@@ -1347,7 +1427,7 @@ export const translations = {
     historicalBaseline: "ඉතිහාස මූලික අගය",
     pestCount: "පළිබෝධ ගණන",
     riskFactor: "අවදානම් සාධකය",
-    exportComparisonReport: "සංසන්දන වාර්තාව නිර්යාත කරන්න",
+    exportComparisonReport: "සංසන්දන වාර්තාව බාගත කරන්න",
     loginFailed: "ලොගින් අසාර්ථකයි",
     pleaseEnterEmail: "කරුණාකර ඊමේල් ලිපිනය ඇතුළත් කරන්න.",
     failedToSendResetEmail: "නැවත සැකසුම් ඊමේල් යැවීමට අසමත් විය.",
@@ -1767,6 +1847,22 @@ export const translations = {
     resolveBtn: "தீர்க்கவும்",
     ignoreBtn: "புறக்கணிக்க",
     viewInMap: "வரைபடத்தில் காண்க",
+    alertRiskLabel: "அபாயம்",
+    alertRisksSuffix: "அபாயங்கள்",
+    alertMultiplePestRisks: "இந்த மாவட்டத்தில் பல பூச்சி அபாயங்கள் கண்டறியப்பட்டன",
+    disasterTypeWind: "காற்று",
+    disasterTypeCyclone: "சூறாவளி",
+    disasterTypeStorm: "புயல்",
+    disasterTypeThunderstorm: "இடி மின்னல் புயல்",
+    disasterTypeFlood: "வெள்ளம்",
+    disasterTypeDrought: "வறட்சி",
+    disasterTypeLandslide: "மண் சரிவு",
+    disasterTypeHeatWave: "வெப்ப அலை",
+    disasterTypeFire: "தீ",
+    disasterTypeHeavyRain: "கனமழை",
+    disasterTypePest: "பூச்சி",
+    disasterTypeDisease: "நோய்",
+    disasterTypeTsunami: "சுனாமி",
 
     // ── Help ──
     helpSupport: "உதவி & ஆதரவு",
@@ -1789,6 +1885,30 @@ export const translations = {
     submitReport: "அறிக்கையை சமர்ப்பிக்கவும்",
     quickHelp: "விரைவு உதவி",
     decryptingFaqs: "அடிக்கடி கேட்கப்படும் கேள்விகள் ஏற்றப்படுகிறது...",
+    helpFaqMonitorFieldsQ: "RiceVision நெல் வயல்களை எப்படி கண்காணிக்கிறது?",
+    helpFaqMonitorFieldsA:
+      "RiceVision செயற்கைக்கோள் படங்கள், வானிலை சிக்னல்கள் மற்றும் இயந்திரக் கற்றல் மாதிரிகளை இணைத்து பயிர் ஆரோக்கியம், அழுத்தப் பகுதிகள் மற்றும் அபாய குறியீடுகளை கண்டறிகிறது.",
+    helpFaqSatelliteUpdateQ: "செயற்கைக்கோள் தரவு எவ்வளவு அடிக்கடி புதுப்பிக்கப்படுகிறது?",
+    helpFaqSatelliteUpdateA:
+      "புதிய மேகமில்லா காட்சிகள் கிடைக்கும் போதெல்லாம் செயற்கைக்கோள் புதுப்பிப்புகள் நடைமுறையாக புதுப்பிக்கப்படுகின்றன. வானிலை அடிப்படையில் பொதுவாக வாராந்திர சுழற்சியில் புதுப்பிக்கப்படும்.",
+    helpFaqSpecialEquipmentQ: "விவசாயிகளுக்கு சிறப்பு உபகரணங்கள் தேவையா?",
+    helpFaqSpecialEquipmentA:
+      "சிறப்பு உபகரணங்கள் தேவையில்லை. இணைய இணைப்புடன் கூடிய கைபேசி அல்லது கணினி இருந்தால் RiceVision தகவல்களைப் பார்க்கலாம்.",
+    helpFaqAccuracyQ: "பயிர் ஆரோக்கிய பகுப்பாய்வுகள் எவ்வளவு துல்லியமானவை?",
+    helpFaqAccuracyA:
+      "போக்குகளை கண்காணிக்க இந்த தகவல்கள் நம்பகமாக வடிவமைக்கப்பட்டுள்ளன. முக்கிய விவசாய முடிவுகளுக்கு நில மட்ட சரிபார்ப்புடன் சேர்த்து பயன்படுத்தவும்.",
+    helpFaqWhoCanAccessQ: "RiceVision-ஐ அணுக யாருக்கு முடியும்?",
+    helpFaqWhoCanAccessA:
+      "விவசாய சூழலில் பதிவுசெய்யப்பட்ட மற்றும் அங்கீகரிக்கப்பட்ட பயனர்கள், விவசாயிகள், அதிகாரிகள் மற்றும் தொடர்புடைய தரப்புகள் RiceVision-ஐ அணுகலாம்.",
+    helpFaqWhatIsQ: "RiceVision என்றால் என்ன?",
+    helpFaqWhatIsA:
+      "RiceVision என்பது நெல் வயல்களை கண்காணிக்க, அபாயங்களை முன்கூட்டியே கண்டறிய, மேலும் சிறந்த பயிர் திட்டமிடலை ஆதரிக்க உதவும் ஒரு டிஜிட்டல் விவசாய நுண்ணறிவு தளம்.",
+    helpFaqDataUpdateQ: "தரவு எவ்வளவு அடிக்கடி புதுப்பிக்கப்படுகிறது?",
+    helpFaqDataUpdateA:
+      "வரைபட அடுக்குகள் மற்றும் எச்சரிக்கைகள் போன்ற செயல்பாட்டு தரவுகள் புதிய மூலத் தரவு கிடைக்கும் போதெல்லாம் திட்டமிட்ட வகையில் புதுப்பிக்கப்படுகின்றன.",
+    helpFaqWhoCanUseQ: "RiceVision-ஐ யார் பயன்படுத்தலாம்?",
+    helpFaqWhoCanUseA:
+      "விவசாயிகள், வேளாண்மை அதிகாரிகள், ஆய்வாளர்கள் மற்றும் தொடர்புடைய நிறுவனங்கள் நெல் சாகுபடியை கண்காணிக்கவும் நிர்வகிக்கவும் RiceVision-ஐ பயன்படுத்தலாம்.",
 
     // ── Field Data ──
     fieldIntelligence: "வயல் நுண்ணறிவு",

@@ -7,11 +7,18 @@ import 'jspdf-autotable';
 import autoTable from 'jspdf-autotable';
 import logoImg from '../assets/logo.png';
 import { apiFetch } from "../../api/apiFetch";
-import { useLanguage } from "../../context/LanguageContext";
+import { translations, useLanguage } from "../../context/LanguageContext";
 import { translateHealthCategory, translateStageCategory } from "../../utils/agriTranslations";
 import { translateDistrictName, SRI_LANKA_DISTRICTS } from "../../utils/locationTranslations";
 import TutorialTooltip from "../../Components/TutorialTooltip";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
+
+const getByPath = (obj, key) => {
+  if (!obj || !key) return undefined;
+  return key.split('.').reduce((acc, part) => (acc == null ? undefined : acc[part]), obj);
+};
+
+const tEn = (key) => getByPath(translations.en, key) ?? key;
 
 const CustomSelect = ({ value, onChange, options, className = "" }) => {
   const [open, setOpen] = useState(false);
@@ -231,6 +238,8 @@ const Report = () => {
   }, [configA, configB, mode]);
 
   const generatePDF = async (report, config) => {
+    const t = tEn;
+    const language = "en";
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
     const PW = 210;
     const PH = 297;
@@ -581,6 +590,7 @@ const Report = () => {
   };
 
   const generateComparisonPDF = async () => {
+    const language = "en";
 
     const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
 
@@ -880,8 +890,8 @@ const Report = () => {
     );
 
     const chartData = [
-      { name: 'Yield', value: report.summary.yield, color: '#10b981' },
-      { name: 'Historical', value: report.summary.historical, color: '#6366f1' }
+      { name: t('predictedAverage'), value: report.summary.yield, color: '#10b981' },
+      { name: t('historicalBaseline'), value: report.summary.historical, color: '#6366f1' }
     ];
 
     return (

@@ -20,7 +20,7 @@ import TutorialOverlay from "../TutorialOverlay";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
 import { useNavigate } from "react-router-dom";
 import { translateDistrictName } from "../../utils/locationTranslations";
-import { translateStageCategory } from "../../utils/agriTranslations";
+import { translateDisasterType, translateStageCategory } from "../../utils/agriTranslations";
 
 import {
   fetchHealthSummary,
@@ -390,7 +390,9 @@ const MyDashboard = () => {
                     {getOutbreakIcon(o.title)}
                   </div>
                   <div>
-                    <p className="font-black text-white text-sm uppercase tracking-tight">{o.title} — {translateDistrictName(o.district, language)}</p>
+                    <p className="font-black text-white text-sm uppercase tracking-tight">
+                      {translateDisasterType(o.title, t)} — {translateDistrictName(o.district, language)}
+                    </p>
                     <div className="flex items-center gap-3 mt-1 text-[10px] font-black text-white/85 uppercase tracking-widest">
                       <span>{o.event_date}</span>
                       <div className="w-1 h-1 rounded-full bg-white/10" />

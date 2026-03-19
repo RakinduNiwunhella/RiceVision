@@ -80,6 +80,75 @@ export function translateDisasterRisk(value, t) {
   return value;
 }
 
+const DISASTER_TYPE_KEY_MAP = {
+  wind: "disasterTypeWind",
+  cyclone: "disasterTypeCyclone",
+  storm: "disasterTypeStorm",
+  thunderstorm: "disasterTypeThunderstorm",
+  flood: "disasterTypeFlood",
+  drought: "disasterTypeDrought",
+  landslide: "disasterTypeLandslide",
+  heatwave: "disasterTypeHeatWave",
+  wildfire: "disasterTypeFire",
+  fire: "disasterTypeFire",
+  heavyrain: "disasterTypeHeavyRain",
+  rain: "disasterTypeHeavyRain",
+  pest: "disasterTypePest",
+  disease: "disasterTypeDisease",
+  tsunami: "disasterTypeTsunami",
+};
+
+function toTitleCase(value) {
+  return String(value || "")
+    .toLowerCase()
+    .split(/[_\s-]+/)
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
+function normalizeDisasterType(value) {
+  return String(value || "")
+    .toLowerCase()
+    .trim()
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ");
+}
+
+function resolveDisasterTypeKey(value) {
+  const normalized = normalizeDisasterType(value);
+  const compact = normalized.replace(/\s+/g, "");
+
+  if (DISASTER_TYPE_KEY_MAP[compact]) return DISASTER_TYPE_KEY_MAP[compact];
+  if (DISASTER_TYPE_KEY_MAP[normalized]) return DISASTER_TYPE_KEY_MAP[normalized];
+
+  if (normalized.includes("wind")) return "disasterTypeWind";
+  if (normalized.includes("cyclone")) return "disasterTypeCyclone";
+  if (normalized.includes("thunder")) return "disasterTypeThunderstorm";
+  if (normalized.includes("storm")) return "disasterTypeStorm";
+  if (normalized.includes("flood")) return "disasterTypeFlood";
+  if (normalized.includes("drought")) return "disasterTypeDrought";
+  if (normalized.includes("landslide")) return "disasterTypeLandslide";
+  if (normalized.includes("heat")) return "disasterTypeHeatWave";
+  if (normalized.includes("fire")) return "disasterTypeFire";
+  if (normalized.includes("heavy rain")) return "disasterTypeHeavyRain";
+  if (normalized.includes("rain")) return "disasterTypeHeavyRain";
+  if (normalized.includes("pest")) return "disasterTypePest";
+  if (normalized.includes("disease")) return "disasterTypeDisease";
+  if (normalized.includes("tsunami")) return "disasterTypeTsunami";
+
+  return null;
+}
+
+export function translateDisasterType(value, t) {
+  if (!value) return t("mapNotAvailable");
+
+  const key = resolveDisasterTypeKey(value);
+  if (key) return t(key);
+
+  return toTitleCase(value);
+}
+
 // Export canonical health filter values
 export const HEALTH_FILTER_VALUES = [
   'Normal',

@@ -192,7 +192,7 @@ export default function ProfileForm() {
     return (
       <div className="flex flex-col items-center gap-4 py-20">
         <div className="w-12 h-12 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
-        <p className="text-white/85 font-black uppercase tracking-widest text-xs animate-pulse">Loading profile...</p>
+        <p className="text-white/85 font-black uppercase tracking-widest text-xs animate-pulse">{t("synchronizing")}</p>
       </div>
     );
   }
@@ -224,7 +224,7 @@ export default function ProfileForm() {
               {formData.avatarUrl ? (
                 <img
                   src={formData.avatarUrl}
-                  alt="Avatar"
+                  alt={t("myProfile")}
                   className="w-full h-full object-cover"
                 />
               ) : (
@@ -273,7 +273,7 @@ export default function ProfileForm() {
           <div className="space-y-8">
             <div className="flex items-center gap-4">
               <span className="h-px flex-1 bg-white/10"></span>
-              <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-white/85">Basic information</h3>
+              <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-white/85">{t("personalId")}</h3>
               <span className="h-px flex-1 bg-white/10"></span>
             </div>
 

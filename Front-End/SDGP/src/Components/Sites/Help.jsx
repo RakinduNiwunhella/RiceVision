@@ -9,8 +9,50 @@ import {
 import { fetchFaqs, submitComplaint } from "../../api/api";
 import { useLanguage } from "../../context/LanguageContext";
 
+const FAQ_TRANSLATION_KEYS = {
+  "how does ricevision monitor paddy fields": {
+    question: "helpFaqMonitorFieldsQ",
+    answer: "helpFaqMonitorFieldsA",
+  },
+  "how often is satellite data updated": {
+    question: "helpFaqSatelliteUpdateQ",
+    answer: "helpFaqSatelliteUpdateA",
+  },
+  "do farmers need special equipment": {
+    question: "helpFaqSpecialEquipmentQ",
+    answer: "helpFaqSpecialEquipmentA",
+  },
+  "how accurate are the crop health insights": {
+    question: "helpFaqAccuracyQ",
+    answer: "helpFaqAccuracyA",
+  },
+  "who can access ricevision": {
+    question: "helpFaqWhoCanAccessQ",
+    answer: "helpFaqWhoCanAccessA",
+  },
+  "what is ricevision": {
+    question: "helpFaqWhatIsQ",
+    answer: "helpFaqWhatIsA",
+  },
+  "how often is data updated": {
+    question: "helpFaqDataUpdateQ",
+    answer: "helpFaqDataUpdateA",
+  },
+  "who can use ricevision": {
+    question: "helpFaqWhoCanUseQ",
+    answer: "helpFaqWhoCanUseA",
+  },
+};
+
+const normalizeFaqLookup = (value) =>
+  String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
 const Help = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [form, setForm] = useState({
     full_name: "",
     position: "",
@@ -81,6 +123,32 @@ const Help = () => {
 
   const inputClass =
     "w-full rounded-xl border border-white/10 bg-white/5 text-white px-4 py-2.5 focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all duration-300 placeholder:text-white/85 font-medium";
+
+  const getFaqFallbackText = (faq, kind) => {
+    const englishQuestion =
+      faq?.translations?.en?.question || faq?.question_en || faq?.question || "";
+    const entry = FAQ_TRANSLATION_KEYS[normalizeFaqLookup(englishQuestion)];
+    if (!entry?.[kind]) return "";
+
+    const translated = t(entry[kind]);
+    return translated && translated !== entry[kind] ? translated : "";
+  };
+
+  const getFaqText = (faq, kind) => {
+    const lang = language === "si" || language === "ta" ? language : "en";
+    const fallbackLocalized = getFaqFallbackText(faq, kind);
+    const fallbacks = [
+      faq?.translations?.[lang]?.[kind],
+      faq?.translations?.en?.[kind],
+      faq?.[`${kind}_${lang}`],
+      faq?.[`${kind}_${lang.toUpperCase()}`],
+      fallbackLocalized,
+      faq?.[kind],
+    ];
+
+    const value = fallbacks.find((candidate) => typeof candidate === "string" && candidate.trim());
+    return value || "";
+  };
 
   return (
     <div className="min-h-full p-4 sm:p-6 lg:p-10 text-white font-sans">
@@ -247,7 +315,7 @@ const Help = () => {
                       onClick={() => setOpenFaq(openFaq === faq.id ? null : faq.id)}
                       className="w-full flex justify-between items-center px-5 py-4 text-left font-bold text-xs md:text-sm text-white/90 group"
                     >
-                      <span className="group-hover:text-white transition-colors">{faq.question}</span>
+                      <span className="group-hover:text-white transition-colors">{getFaqText(faq, "question")}</span>
                       <ChevronDownIcon
                         className={`w-4 h-4 text-white/85 transition-transform duration-500 ${openFaq === faq.id ? "rotate-180 text-emerald-400" : ""
                           }`}
@@ -256,7 +324,7 @@ const Help = () => {
 
                     {openFaq === faq.id && (
                       <div className="px-5 pb-5 text-xs text-white/85 leading-relaxed font-medium animate-in fade-in slide-in-from-top-2 duration-300">
-                        {faq.answer}
+                        {getFaqText(faq, "answer")}
                       </div>
                     )}
                   </div>

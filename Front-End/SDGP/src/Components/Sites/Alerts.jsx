@@ -3,7 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { updateAlertStatus } from "../../api/api";
 import { apiFetch } from "../../api/apiFetch";
 import { useLanguage } from "../../context/LanguageContext";
-import { translateHealthCategory, translateStageCategory } from "../../utils/agriTranslations";
+import {
+  translateDisasterType,
+  translateHealthCategory,
+  translateStageCategory,
+} from "../../utils/agriTranslations";
 import { translateDistrictName } from "../../utils/locationTranslations";
 import TutorialTooltip from "../../Components/TutorialTooltip";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
@@ -11,9 +15,6 @@ import { usePageTutorial } from "../../hooks/usePageTutorial";
 
 
 const TAB_KEYS = ["Disasters", "Pest Risks", "Past Alerts"];
-
-const formatTitle = (text) =>
-  text.replace(/\b\w/g, (char) => char.toUpperCase());
 
 // Renders a pest title like "Kurunegala • 32 RISKS" with the number in red.
 // Returns a plain string for disaster titles.
@@ -214,7 +215,7 @@ const Alerts = () => {
         if (activeTab === "Disasters") {
           const mappedAlerts = (Array.isArray(data) ? data : []).map((a) => ({
             id: a.id,
-            title: formatTitle(`${a.disaster_type} risk`),
+            title: `${translateDisasterType(a.disaster_type, t)} ${t("alertRiskLabel")}`,
             description: `${t("alertStage")}: ${translateStageCategory(a.stage, t)} | ${t("alertHealth")}: ${translateHealthCategory(a.health, t)}`,
             status: a.status || "Open",
             priority: "High",
@@ -252,7 +253,7 @@ const Alerts = () => {
             id: a.id,
             title: a.is_pest
               ? `${translateDistrictName(a.district, language)} : ${a.risk_count} ${t("alertRisksSuffix")}`
-              : formatTitle(`${a.disaster_type} risk`),
+              : `${translateDisasterType(a.disaster_type, t)} ${t("alertRiskLabel")}`,
             description: `${t("alertStage")}: ${translateStageCategory(a.stage_name, t)} | ${t("alertHealth")}: ${translateHealthCategory(a.paddy_health, t)}`,
             status: a.status,
             field: a.district,
