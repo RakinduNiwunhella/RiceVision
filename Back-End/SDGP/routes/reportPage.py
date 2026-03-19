@@ -5,6 +5,8 @@ import pandas as pd
 import numpy as np
 from botocore.exceptions import BotoCoreError, ClientError
 from fastapi import APIRouter, HTTPException
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import ChatPromptTemplate
 
 router = APIRouter()
 BUCKET_NAME = "ricevision"
@@ -118,3 +120,34 @@ async def get_detailed_report(date: str, district: str, season: str):
         raise HTTPException(status_code=503, detail=f"S3 error: {str(e)}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+    
+    # Initialize LLM
+llm = ChatOpenAI(
+    model="gpt-4o-mini",
+    temperature=0
+)
+
+# Prompt template
+report_prompt = ChatPromptTemplate.from_template("""
+You are an agricultural analysis expert.
+
+Generate a professional report based on the following data:
+
+DATA:
+{data}
+
+Return the response in this format:
+
+Title:
+Summary:
+Key Insights:
+- point 1
+- point 2
+Recommendations:
+""")
+
+def generate_ai_report(data: dict) -> str:
+    chain = report_prompt | llm
+    response = chain.invoke({"data": data})
+    return response.content

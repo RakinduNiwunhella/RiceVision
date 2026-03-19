@@ -1,41 +1,111 @@
 import os
+from typing import List, Any, Optional
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from typing import Any
-import google.generativeai as genai
+
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.messages import HumanMessage, AIMessage
+from langchain_core.tools import tool
+from langgraph.prebuilt import create_react_agent
+
+from ..db import supabase
 
 router = APIRouter()
 
+# ─── TOOLS ────────────────────────────────────────────────────────────────────
+
+@tool
+def get_yield_summary(year: Optional[int] = None):
+    """
+    Returns an overview of districts including their predicted yield, 
+    risk scores, and climate stress levels.
+    """
+    try:
+        query = supabase.table("Final_Dataset_Yield").select("*")
+        if year:
+            query = query.eq("year", year)
+        response = query.execute()
+        return response.data
+    except Exception as e:
+        return f"Error fetching summary: {str(e)}"
+
+
+@tool
+def get_district_details(district_name: str, year: Optional[int] = None):
+    """
+    Returns specific agricultural data for a single district.
+    """
+    try:
+        query = (
+            supabase.table("Final_Dataset_Yield")
+            .select("*")
+            .ilike("districtname", district_name.strip())
+        )
+        if year:
+            query = query.eq("year", year)
+
+        response = query.execute()
+
+        return response.data if response.data else (
+            f"No data found for {district_name}" +
+            (f" in year {year}" if year else "")
+        )
+
+    except Exception as e:
+        return f"Error fetching details: {str(e)}"
+
+
+@tool
+def get_stress_analysis(year: Optional[int] = None):
+    """
+    Returns districts under severe stress.
+    """
+    try:
+        query = supabase.table("Final_Dataset_Yield").select("*")
+        if year:
+            query = query.eq("year", year)
+
+        response = query.execute()
+        data = response.data
+
+        high_stress = [
+            d for d in data
+            if d.get("severe_stress_pct", 0) > 30
+            or d.get("health_index_z", 0) < -1
+        ]
+
+        return high_stress
+
+    except Exception as e:
+        return f"Error analyzing stress: {str(e)}"
+
+
+tools = [
+    get_yield_summary,
+    get_district_details,
+    get_stress_analysis
+]
+
+# ─── SYSTEM PROMPT ────────────────────────────────────────────────────────────
+
 SYSTEM_PROMPT = """
-You are an expert agricultural data analyst assistant for a crop yield dashboard.
-You have access to real data from the table "Final_Dataset_Yield".
+You are an expert agricultural data analyst for a crop yield dashboard.
+
+CRITICAL INSTRUCTIONS:
+1. ALWAYS use tools to fetch data.
+2. If a user mentions a year, pass it into tool calls.
+3. Format answers as professional reports.
+4. If no data is found, say it clearly.
+5. NEVER hallucinate values.
 
 COLUMNS:
-- districtname         : Name of the district
-- predictedyield_kg_ha : Predicted crop yield in kg per hectare
-- historicalavg_kg_ha  : Historical average yield in kg per hectare
-- totalyield_kg        : Total yield in kg for the district
-- yieldgap_kg_ha       : Gap between historical average and predicted yield (kg/ha)
-- percent_change       : % change compared to historical average
-- health_index_z       : Crop health index (z-score; higher = healthier)
-- climate_stress_index : Climate stress level (higher = more stress)
-- total_pixels         : Number of satellite pixels analysed
-- severe_stress_pct    : Percentage of area under severe stress
-- pest_attack_count    : Number of recorded pest attack incidents
-- most_common_stage    : Most common crop growth stage in the district
-- risk_score           : Overall risk score for the district
-- est_harvest_date     : Estimated harvest date
-- season               : Crop season (e.g. Kharif, Rabi)
-
-RULES:
-- Only answer based on the data given. Never fabricate numbers.
-- Be concise, specific, and conversational.
-- When listing districts, rank them if it makes sense.
-- Format numbers to 2 decimal places where appropriate.
-- If the user asks something you can't derive from the data, say so honestly.
-- You can draw comparisons, spot trends, highlight risks, and suggest insights.
+- districtname
+- year
+- predictedyield_kg_ha
+- risk_score
 """
 
+# ─── REQUEST MODELS ───────────────────────────────────────────────────────────
 
 class ChatMessage(BaseModel):
     role: str
@@ -44,37 +114,64 @@ class ChatMessage(BaseModel):
 
 class ChatRequest(BaseModel):
     question: str
-    yieldData: list[Any]
-    chatHistory: list[ChatMessage]
+    yieldData: Optional[List[Any]] = None
+    chatHistory: List[ChatMessage]
 
 
-@router.post("/api/chat")
-def chat(req: ChatRequest):
+# ─── ROUTE ────────────────────────────────────────────────────────────────────
+
+@router.post("/chat")
+async def chat(req: ChatRequest):
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         raise HTTPException(status_code=500, detail="GEMINI_API_KEY not configured")
 
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel("gemini-2.0-flash-lite")
+    try:
+        # LLM
+        llm = ChatGoogleGenerativeAI(
+            model="gemini-1.5-flash",
+            google_api_key=api_key,
+            temperature=0
+        )
 
-    history = "\n".join(
-        f"{'User' if m.role == 'user' else 'Assistant'}: {m.content}"
-        for m in req.chatHistory
-    )
+        # Agent
+        agent = create_react_agent(
+            llm,
+            tools,
+            state_modifier=SYSTEM_PROMPT
+        )
 
-    import json
-    prompt = f"""{SYSTEM_PROMPT}
+        # Convert chat history
+        history_msgs = []
+        for m in req.chatHistory:
+            if m.role == "user":
+                history_msgs.append(HumanMessage(content=m.content))
+            else:
+                history_msgs.append(AIMessage(content=m.content))
 
---- LIVE DATA ({len(req.yieldData)} districts) ---
-{json.dumps(req.yieldData, indent=2)}
+        # Run agent
+        result = agent.invoke({
+            "messages": history_msgs + [HumanMessage(content=req.question)]
+        })
 
---- CONVERSATION HISTORY ---
-{history or "None yet."}
+        # Extract intermediate steps (tool usage)
+        intermediate_steps = []
+        for msg in result["messages"]:
+            if hasattr(msg, "tool_calls") and msg.tool_calls:
+                for tc in msg.tool_calls:
+                    intermediate_steps.append({
+                        "tool": tc["name"],
+                        "input": tc["args"]
+                    })
 
---- NEW QUESTION ---
-User: {req.question}
+        # Final response
+        final_message = result["messages"][-1]
 
-Answer:"""
+        return {
+            "reply": final_message.content,
+            "intermediate_steps": intermediate_steps
+        }
 
-    response = model.generate_content(prompt)
-    return {"reply": response.text}
+    except Exception as e:
+        print(f"Agent Error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Agent Error: {str(e)}")

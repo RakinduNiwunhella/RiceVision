@@ -1,5 +1,4 @@
 import os
-
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from .auth import get_current_user
@@ -26,6 +25,7 @@ def _get_cors_origins() -> list[str]:
 
     return [
         "http://localhost:5173",
+        "http://localhost:5174",
         "https://app.ricevisionlanka.com",
         "https://ricevision-cakt.onrender.com",
     ]
@@ -50,7 +50,7 @@ app.include_router(profile_router, dependencies=[Depends(get_current_user)])
 app.include_router(map_router, dependencies=[Depends(get_current_user)])
 app.include_router(alerts_router, prefix="/api", dependencies=[Depends(get_current_user)])
 app.include_router(notifications_router, dependencies=[Depends(get_current_user)])
-app.include_router(chat_router, dependencies=[Depends(get_current_user)])
+app.include_router(chat_router, prefix="/api")
 
 # PUBLIC ROUTES
 app.include_router(signin_router)
@@ -59,4 +59,3 @@ app.include_router(signup_router)
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
-
