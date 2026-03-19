@@ -9,10 +9,11 @@ import React, { useState, useEffect, useCallback } from "react";
 import FieldDrawMap from "../FieldSetup/FieldDrawMap";
 import { PRICE_PER_ACRE_LKR } from "../FieldSetup/fieldConstants";
 import { useLanguage } from "../../context/LanguageContext";
-import { fetchUserField, removeUserField, saveUserField } from "../../api/api";
+import { translateDistrictName } from "../../utils/locationTranslations";
 
 export default function MyFieldTab() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const [user,          setUser]          = useState(null);
   const [existing,      setExisting]      = useState(null);   // row from user_fields
   const [loading,       setLoading]       = useState(true);
   const [editMode,      setEditMode]      = useState(false);
@@ -103,7 +104,7 @@ export default function MyFieldTab() {
     setEditMode(false);
     setDrawnFeature(null);
     setFieldName("");
-    setStatus({ type: "success", message: "Field registration removed." });
+    setStatus({ type: "success", message: t('fieldRegistrationRemoved') });
   };
 
   if (loading) {
@@ -121,6 +122,13 @@ export default function MyFieldTab() {
   const price = drawnFeature
     ? Math.ceil(acres * PRICE_PER_ACRE_LKR)
     : (existing?.price_lkr || 0);
+
+  const localizedExistingDistrict = existing?.district
+    ? translateDistrictName(existing.district, language)
+    : "—";
+  const localizedSelectedDistrict = district
+    ? translateDistrictName(district, language)
+    : "";
 
   return (
     <div className="space-y-6 relative">
@@ -182,8 +190,8 @@ export default function MyFieldTab() {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
             {[
               { icon: "badge",        label: t('fieldNameStat'),  value: existing.field_name || "—"                                },
-              { icon: "location_on",  label: t('districtStat') || t('district'),   value: existing.district || "—"                                 },
-              { icon: "straighten",   label: t('areaStat'),       value: `${parseFloat(existing.area_acres).toFixed(3)} ac`        },
+              { icon: "location_on",  label: t('districtStat'),   value: localizedExistingDistrict                                   },
+              { icon: "straighten",   label: t('areaStat'),       value: `${parseFloat(existing.area_acres).toFixed(3)} ${t('unitAcres')}` },
               { icon: "crop_square",  label: t('areaSqmLabel'),   value: `${(existing.area_acres * 4046.86).toFixed(0)} m²`        },
               { icon: "paid",         label: t('annualFeeStat'),  value: `Rs. ${existing.price_lkr.toLocaleString()}`              },
             ].map(({ icon, label, value }) => (
@@ -245,12 +253,12 @@ export default function MyFieldTab() {
                   {district && (
                     <div>
                       <span className="text-white/85 block text-xs mb-0.5">{t('district')}</span>
-                      <span className="font-bold text-white">{district}</span>
+                      <span className="font-bold text-white">{localizedSelectedDistrict}</span>
                     </div>
                   )}
                   <div>
                     <span className="text-white/85 block text-xs mb-0.5">{t('areaStat')}</span>
-                    <span className="font-bold text-white">{acres.toFixed(4)} acres</span>
+                    <span className="font-bold text-white">{acres.toFixed(4)} {t('unitAcres')}</span>
                   </div>
                   <div>
                     <span className="text-white/85 block text-xs mb-0.5">{t('areaSqmLabel')}</span>
@@ -259,9 +267,9 @@ export default function MyFieldTab() {
                 </div>
               </div>
               <div className="flex flex-col items-center justify-center gap-1 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30">
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400/70">{t('annualCostLabel')}</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-300">{t('annualCostLabel')}</span>
                 <span className="text-3xl font-black text-emerald-400">Rs. {price.toLocaleString()}</span>
-                <span className="text-[10px] text-white/85">Rs. {PRICE_PER_ACRE_LKR.toLocaleString()} / acre</span>
+                <span className="text-[10px] text-white/85">Rs. {PRICE_PER_ACRE_LKR.toLocaleString()} {t('mapPerAcreSuffix')}</span>
               </div>
             </div>
           )}

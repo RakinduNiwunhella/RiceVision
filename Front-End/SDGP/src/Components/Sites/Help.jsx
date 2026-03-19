@@ -1,18 +1,74 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   QuestionMarkCircleIcon,
   PhoneIcon,
   EnvelopeIcon,
   ExclamationTriangleIcon,
   ChevronDownIcon,
-  PlayCircleIcon,
 } from "@heroicons/react/24/outline";
 import { fetchFaqs, submitComplaint } from "../../api/api";
 import { useLanguage } from "../../context/LanguageContext";
 
+const FAQ_TRANSLATION_KEYS = {
+  "how does ricevision monitor paddy fields": {
+    question: "helpFaqMonitorFieldsQ",
+    answer: "helpFaqMonitorFieldsA",
+  },
+  "how often is satellite data updated": {
+    question: "helpFaqSatelliteUpdateQ",
+    answer: "helpFaqSatelliteUpdateA",
+  },
+  "do farmers need special equipment": {
+    question: "helpFaqSpecialEquipmentQ",
+    answer: "helpFaqSpecialEquipmentA",
+  },
+  "how accurate are the crop health insights": {
+    question: "helpFaqAccuracyQ",
+    answer: "helpFaqAccuracyA",
+  },
+  "who can access ricevision": {
+    question: "helpFaqWhoCanAccessQ",
+    answer: "helpFaqWhoCanAccessA",
+  },
+  "what is ricevision": {
+    question: "helpFaqWhatIsQ",
+    answer: "helpFaqWhatIsA",
+  },
+  "who can use ricevision": {
+    question: "helpFaqWhoCanUseQ",
+    answer: "helpFaqWhoCanUseA",
+  },
+};
+
+const normalizeFaqLookup = (value) =>
+  String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+const HIDDEN_FAQ_QUESTIONS = new Set([
+  normalizeFaqLookup("How often is data updated?"),
+]);
+
+const shouldHideFaq = (faq) => {
+  const candidates = [
+    faq?.question,
+    faq?.question_en,
+    faq?.question_si,
+    faq?.question_ta,
+    faq?.translations?.en?.question,
+    faq?.translations?.si?.question,
+    faq?.translations?.ta?.question,
+  ];
+
+  return candidates.some((candidate) =>
+    HIDDEN_FAQ_QUESTIONS.has(normalizeFaqLookup(candidate))
+  );
+};
+
 const Help = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [form, setForm] = useState({
     full_name: "",
     position: "",
@@ -27,21 +83,18 @@ const Help = () => {
   const [faqs, setFaqs] = useState([]);
   const [faqLoading, setFaqLoading] = useState(true);
   const [openFaq, setOpenFaq] = useState(null);
-  const navigate = useNavigate();
   const supportPhone = "+94 74 291 2929";
   const supportEmail = "ricevisionlanka@gmail.com";
-
-  const handleReplayTutorial = () => {
-    localStorage.setItem('ricevision_force_tutorial_replay', 'true');
-    navigate('/dashboard');
-  };
   /* ---------------- FETCH FAQS ---------------- */
 
   useEffect(() => {
     const loadFaqs = async () => {
       try {
         const data = await fetchFaqs();
-        setFaqs(data);
+        const filteredFaqs = Array.isArray(data)
+          ? data.filter((faq) => !shouldHideFaq(faq))
+          : [];
+        setFaqs(filteredFaqs);
       } catch (err) {
         console.error("Failed to load FAQs:", err);
       } finally {
@@ -60,7 +113,7 @@ const Help = () => {
 
   const handleSubmit = async () => {
     if (!form.full_name || !form.message) {
-      alert("Full name and complaint message are required");
+      alert(t("complaintValidationRequired"));
       return;
     }
 
@@ -69,7 +122,7 @@ const Help = () => {
     try {
       await submitComplaint(form);
 
-      alert("Complaint submitted successfully");
+      alert(t("complaintSubmittedSuccess"));
 
       setForm({
         full_name: "",
@@ -81,7 +134,7 @@ const Help = () => {
       });
     } catch (err) {
       console.error(err);
-      alert("Failed to submit complaint");
+      alert(t("complaintSubmitFailed"));
     }
 
     setLoading(false);
@@ -89,6 +142,32 @@ const Help = () => {
 
   const inputClass =
     "w-full rounded-xl border border-white/10 bg-white/5 text-white px-4 py-2.5 focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all duration-300 placeholder:text-white/85 font-medium";
+
+  const getFaqFallbackText = (faq, kind) => {
+    const englishQuestion =
+      faq?.translations?.en?.question || faq?.question_en || faq?.question || "";
+    const entry = FAQ_TRANSLATION_KEYS[normalizeFaqLookup(englishQuestion)];
+    if (!entry?.[kind]) return "";
+
+    const translated = t(entry[kind]);
+    return translated && translated !== entry[kind] ? translated : "";
+  };
+
+  const getFaqText = (faq, kind) => {
+    const lang = language === "si" || language === "ta" ? language : "en";
+    const fallbackLocalized = getFaqFallbackText(faq, kind);
+    const fallbacks = [
+      faq?.translations?.[lang]?.[kind],
+      faq?.translations?.en?.[kind],
+      faq?.[`${kind}_${lang}`],
+      faq?.[`${kind}_${lang.toUpperCase()}`],
+      fallbackLocalized,
+      faq?.[kind],
+    ];
+
+    const value = fallbacks.find((candidate) => typeof candidate === "string" && candidate.trim());
+    return value || "";
+  };
 
   return (
     <div className="min-h-full p-4 sm:p-6 lg:p-10 text-white font-sans">
@@ -105,13 +184,6 @@ const Help = () => {
               {/* Optional subtitle text */}
             </p>
           </div>
-          <button 
-            onClick={handleReplayTutorial}
-            className="flex items-center gap-2 glass px-4 py-2 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 rounded-xl uppercase tracking-widest text-[10px] font-black transition-all active:scale-95"
-          >
-            <PlayCircleIcon className="w-5 h-5" />
-            Replay Tutorials
-          </button>
         </div>
 
         {/* Quick Contact Grid */}
@@ -119,17 +191,17 @@ const Help = () => {
           {[
             {
               icon: <PhoneIcon className="w-5 h-5 text-emerald-400" />,
-              title: "Quick phone support",
-              desc: "Call our support team for urgent help with your dashboard, field setup, or report issues.",
-              action: `Call ${supportPhone}`,
+              title: t("quickPhoneSupportTitle"),
+              desc: t("quickPhoneSupportDesc"),
+              action: `${t("call")}: ${supportPhone}`,
               href: `tel:${supportPhone.replace(/\s+/g, "")}`,
               color: "emerald",
             },
             {
               icon: <EnvelopeIcon className="w-5 h-5 text-cyan-400" />,
-              title: "Email support",
-              desc: "Send your issue details by email and our team will respond with a solution.",
-              action: `Email ${supportEmail}`,
+              title: t("emailSupportTitle"),
+              desc: t("emailSupportDesc"),
+              action: `${t("email")}: ${supportEmail}`,
               href: `mailto:${supportEmail}?subject=RiceVision%20Support%20Request`,
               color: "cyan",
             },
@@ -170,18 +242,18 @@ const Help = () => {
             <div className="glass p-4 sm:p-6 md:p-8 lg:p-10 rounded-xl sm:rounded-2xl md:rounded-[2.5rem] border border-white/10 shadow-2xl space-y-6 sm:space-y-8">
               <div className="flex items-center gap-3 border-b border-white/10 pb-6">
                 <ExclamationTriangleIcon className="w-6 h-6 text-amber-400" />
-                <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/85">Submit a complaint</h2>
+                <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/85">{t('submitComplaintTitle')}</h2>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <div>
                     <label className="block text-[10px] font-black uppercase tracking-widest text-white/85 mb-2 ml-1">{t('fullOperatorName')}</label>
-                    <input name="full_name" value={form.full_name} onChange={handleChange} className={inputClass} placeholder="John Doe" />
+                    <input name="full_name" value={form.full_name} onChange={handleChange} className={inputClass} placeholder={t('fullNameExample')} />
                   </div>
                   <div>
                     <label className="block text-[10px] font-black uppercase tracking-widest text-white/85 mb-2 ml-1">{t('assignedPosition')}</label>
-                    <input name="position" value={form.position} onChange={handleChange} className={inputClass} placeholder="Field Supervisor" />
+                    <input name="position" value={form.position} onChange={handleChange} className={inputClass} placeholder={t('assignedPositionExample')} />
                   </div>
                 </div>
 
@@ -204,11 +276,11 @@ const Help = () => {
                       onChange={handleChange}
                       className={inputClass + " appearance-none cursor-pointer"}
                     >
-                      <option value="" className="bg-slate-900">Select issue type</option>
-                      <option className="bg-slate-900">Technical issue</option>
-                      <option className="bg-slate-900">Data mismatch</option>
-                      <option className="bg-slate-900">Account or access issue</option>
-                      <option className="bg-slate-900">Other</option>
+                      <option value="" className="bg-slate-900">{t('selectIssueType')}</option>
+                      <option className="bg-slate-900">{t('issueTechnical')}</option>
+                      <option className="bg-slate-900">{t('issueDataMismatch')}</option>
+                      <option className="bg-slate-900">{t('issueAccountAccess')}</option>
+                      <option className="bg-slate-900">{t('issueOther')}</option>
                     </select>
                   </div>
                 </div>
@@ -247,7 +319,7 @@ const Help = () => {
               {faqLoading && (
                 <div className="flex items-center gap-3 py-10 justify-center">
                   <div className="w-4 h-4 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin" />
-                  <span className="text-xs font-black uppercase text-white/85">Loading FAQs...</span>
+                  <span className="text-xs font-black uppercase text-white/85">{t('decryptingFaqs')}</span>
                 </div>
               )}
 
@@ -262,7 +334,7 @@ const Help = () => {
                       onClick={() => setOpenFaq(openFaq === faq.id ? null : faq.id)}
                       className="w-full flex justify-between items-center px-5 py-4 text-left font-bold text-xs md:text-sm text-white/90 group"
                     >
-                      <span className="group-hover:text-white transition-colors">{faq.question}</span>
+                      <span className="group-hover:text-white transition-colors">{getFaqText(faq, "question")}</span>
                       <ChevronDownIcon
                         className={`w-4 h-4 text-white/85 transition-transform duration-500 ${openFaq === faq.id ? "rotate-180 text-emerald-400" : ""
                           }`}
@@ -271,12 +343,17 @@ const Help = () => {
 
                     {openFaq === faq.id && (
                       <div className="px-5 pb-5 text-xs text-white/85 leading-relaxed font-medium animate-in fade-in slide-in-from-top-2 duration-300">
-                        {faq.answer}
+                        {getFaqText(faq, "answer")}
                       </div>
                     )}
                   </div>
                 ))}
               </div>
+            </div>
+
+            {/* Support Tag */}
+            <div className="glass p-6 rounded-3xl border border-white/10 text-center">
+              <p className="text-[10px] font-black uppercase text-white/85 tracking-tighter">{t('systemVersionTag')}</p>
             </div>
           </div>
         </div>

@@ -11,21 +11,21 @@ export default function Profile() {
   // Tutorial setup
   const tutorialSteps = useMemo(() => [
     {
-      title: "Your Profile",
-      action: "Manage your identity information and paddy field details",
-      outcome: "Two tabs: Identity Profile for personal info, My Paddy Field for field details",
+      title: t("profileTitle"),
+      action: t("profileAction"),
+      outcome: t("profileOutcome"),
     },
     {
-      title: "Identity Profile",
-      action: "Click the Identity Profile tab to update your account information",
-      outcome: "Edit your name, email, contact details, and other personal information",
+      title: t("identityProfile"),
+      action: t("profileAction"),
+      outcome: t("profileDesc"),
     },
     {
-      title: "My Paddy Field",
-      action: "Click My Paddy Field tab to view and manage your field data",
-      outcome: "See your registered paddy field size, location, and other field-related details",
+      title: t("myPaddyField"),
+      action: t("fieldRegistry"),
+      outcome: t("paddyFieldDesc"),
     },
-  ], [])
+  ], [t])
 
   const { currentStep, showTutorial, currentTutorialStep, nextStep, prevStep, closeTutorial } =
     usePageTutorial("profile", tutorialSteps)
@@ -35,8 +35,8 @@ export default function Profile() {
   const contentRef = useRef(null)
 
   const TABS = [
-    { id: "identity", label: "Profile Details", icon: "verified_user" },
-    { id: "field", label: "My Paddy Field", icon: "landscape" },
+    { id: "identity", label: t("identityProfile"), icon: "verified_user" },
+    { id: "field", label: t("myPaddyField"), icon: "landscape" },
   ];
   const [activeTab, setActiveTab] = useState("identity");
   const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
@@ -79,17 +79,17 @@ export default function Profile() {
         <div ref={headerRef} className="mb-8 relative">
           <p className="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-400 mb-3 flex items-center gap-2">
             <span className="material-symbols-outlined text-sm">verified_user</span>
-            Profile settings
+            {t("operatorAuth")}
           </p>
 
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tighter uppercase mb-3 sm:mb-4">
-            {activeTab === "identity" ? "Profile Details" : "My Paddy Field"}
+            {activeTab === "identity" ? t("identityProfile") : t("myPaddyField")}
           </h1>
 
           <p className="text-white/85 text-sm font-medium max-w-xl leading-relaxed">
             {activeTab === "identity"
-              ? "Update your name, phone number, email address, and profile photo."
-              : "View and manage your registered paddy field information."}
+              ? t("profileDesc")
+              : t("paddyFieldDesc")}
           </p>
         </div>
 

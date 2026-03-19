@@ -19,6 +19,9 @@ import { useLanguage } from "../../context/LanguageContext";
 import { Bug } from "lucide-react";
 import TutorialOverlay from "../TutorialOverlay";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
+import { useNavigate } from "react-router-dom";
+import { translateDistrictName } from "../../utils/locationTranslations";
+import { translateDisasterType, translateStageCategory } from "../../utils/agriTranslations";
 
 import {
   fetchHealthSummary,
@@ -40,7 +43,7 @@ const StatWidget = ({ title, value, subtitle, icon }) => (
     </div>
     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/85 mb-2 sm:mb-3">{title}</p>
     <p className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tighter drop-shadow-2xl">{value}</p>
-    {subtitle && <p className="text-[10px] font-bold text-emerald-400/60 mt-2 sm:mt-3 uppercase tracking-widest">{subtitle}</p>}
+    {subtitle && <p className="text-[10px] font-bold text-emerald-300 mt-2 sm:mt-3 uppercase tracking-widest">{subtitle}</p>}
   </div>
 );
 
@@ -70,7 +73,7 @@ const ProgressWidget = ({ label, value, color }) => {
 /* ------------------ MAIN ------------------ */
 
 const MyDashboard = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [healthSummary, setHealthSummary] = useState(null);
   const [yieldForecast, setYieldForecast] = useState(null);
   const [bestYieldDistricts, setBestYieldDistricts] = useState([]);
@@ -95,52 +98,75 @@ const MyDashboard = () => {
     const steps = [
       {
         ref: headerRef,
-        title: "Welcome! This is your field control center overview.",
+        title: t("dashboardTutorialWelcome"),
       },
       {
         ref: syncBadgeRef,
-        title: "Check this icon to ensure your data is freshly synced.",
+        title: t("dashboardTutorialSync"),
       },
       {
         ref: healthCardRef,
-        title: "See crop health as a pie chart. Green means optimal.",
+        title: t("dashboardTutorialHealth"),
       },
       {
         ref: yieldCardRef,
-        title: "View your expected total harvest here in metric tons.",
+        title: t("dashboardTutorialYield"),
       },
       {
         ref: supplyCardRef,
-        title: "Track expected shortfalls and national demand saturation risks quickly.",
+        title: t("dashboardTutorialSupply"),
       },
       {
-        ref: yieldInsightsRef,
-        title: "Review district-level yield rankings and season momentum.",
+        ref: threatsCardRef,
+        title: t("dashboardTutorialThreats"),
       },
     ]
+
+    if (outbreaks.length > 0) {
+      steps.push({
+        ref: threatDetailsBtnRef,
+        title: t("dashboardTutorialThreatDetails"),
+      })
+    }
+
+    if (outbreaks.length > 5) {
+      steps.push({
+        ref: outbreaksToggleBtnRef,
+        title: t("dashboardTutorialThreatToggle"),
+      })
+    }
 
     steps.push(
       {
         ref: stageChartRef,
-        title: "Check what percentage of your crops are in each growth stage.",
+        title: t("dashboardTutorialStageChart"),
       },
       {
         ref: districtTableRef,
-        title: "Compare health metrics across all your districts in one table.",
+        title: t("dashboardTutorialDistrictTable"),
       },
       {
         ref: districtToggleBtnRef,
-        title: "Use this button to expand the full district list.",
+        title: t("dashboardTutorialDistrictToggle"),
       },
     )
 
     return steps
-  }, [bestYieldDistricts.length])
+  }, [outbreaks.length, t])
 
   const { currentStep, showTutorial, nextStep, prevStep, closeTutorial } =
     usePageTutorial("dashboard", tutorialSteps);
 
   const stageColors = ["#10b981", "#06b6d4", "#8b5cf6", "#f59e0b", "#ef4444", "#f97316"];
+
+  const translatedStageDistribution = useMemo(
+    () =>
+      stageDistribution.map((stage) => ({
+        ...stage,
+        stageLabel: translateStageCategory(stage.stage_name, t),
+      })),
+    [stageDistribution, t]
+  );
 
   const pieColors = ["#10b981", "#f59e0b", "#ef4444"]; // Emerald-500, Amber-500, Red-500
 
@@ -165,8 +191,7 @@ const MyDashboard = () => {
       { name: t('mildStress'), value: healthSummary.mild_stress_pct },
       { name: t('severeStress'), value: healthSummary.severe_stress_pct },
     ]
-    : [];
-
+    : []
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -285,10 +310,10 @@ const MyDashboard = () => {
         <div ref={currentStep === 0 ? headerRef : undefined} className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
             <h1 className="text-xl sm:text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
-            Welcome to RiceVision
+            {t('welcomeTitle')}
             </h1>
-            <p className="text-white/40 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em]">
-              {t('Satellite-driven insights for national food security')}
+            <p className="text-white/85 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em]">
+              {t('welcomeSubtitle')}
             </p>
           </div>
 
@@ -303,7 +328,7 @@ const MyDashboard = () => {
 
           {/* Field Health Distribution */}
           <div ref={healthCardRef} className="glass glass-hover p-4 sm:p-6 md:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col items-center">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-8 self-start flex items-center gap-2">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/85 mb-8 self-start flex items-center gap-2">
               <span className="material-symbols-outlined text-emerald-400 text-sm">radiology</span>
               {t('cropHealthDist')}
             </p>
@@ -358,7 +383,7 @@ const MyDashboard = () => {
 
           {/* Yield Forecast */}
           <div ref={yieldCardRef} className="glass glass-hover p-4 sm:p-6 md:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-6 flex items-center gap-2">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/85 mb-6 flex items-center gap-2">
               <span className="material-symbols-outlined text-cyan-400 text-sm">trending_up</span>
               {t('outputProjection')}
             </p>
@@ -379,7 +404,7 @@ const MyDashboard = () => {
                   <div key={i} className="flex justify-between items-center group/item hover:translate-x-1 transition-transform">
                     <div className="flex items-center gap-3">
                       <span className="text-[10px] font-black text-white/85 w-4">{i + 1}</span>
-                      <span className="text-xs font-black text-white uppercase tracking-tight group-hover/item:text-cyan-400 transition-colors">{d.District}</span>
+                      <span className="text-xs font-black text-white uppercase tracking-tight group-hover/item:text-cyan-400 transition-colors">{translateDistrictName(d.District, language)}</span>
                     </div>
                     <span className="text-xs font-black text-white/90 tabular-nums">{formatDistrictMT(Number(d.total_yield_kg_ha || 0) / 1000)} <span className="text-[10px] text-white/85">MT</span></span>
                   </div>
@@ -540,14 +565,14 @@ const MyDashboard = () => {
 
           {/* Stage Distribution */}
           <div ref={stageChartRef} className="glass glass-hover p-4 sm:p-6 md:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-2 flex items-center gap-2">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/85 mb-2 flex items-center gap-2">
               <span className="material-symbols-outlined text-purple-400 text-sm">bar_chart</span>
               {t('growthAnalysis')}
             </p>
             <h3 className="text-xl font-black text-white tracking-tight uppercase mb-6">{t('cropStageDistribution')}</h3>
 
-            {stageDistribution.length > 0 ? (() => {
-              const total = stageDistribution.reduce((sum, d) => sum + d.stage_count, 0);
+            {translatedStageDistribution.length > 0 ? (() => {
+              const total = translatedStageDistribution.reduce((sum, d) => sum + d.stage_count, 0);
               return (
                 <>
                   {/* Total pill */}
@@ -559,10 +584,10 @@ const MyDashboard = () => {
                   {/* Bar chart */}
                   <div className="flex-1">
                     <ResponsiveContainer width="100%" height={320}>
-                      <BarChart data={stageDistribution} margin={{ top: 5, right: 5, left: -10, bottom: 40 }}>
+                      <BarChart data={translatedStageDistribution} margin={{ top: 5, right: 5, left: -10, bottom: 40 }}>
                         <XAxis
-                          dataKey="stage_name"
-                          tick={{ fill: "rgba(255,255,255,0.45)", fontSize: 9, fontWeight: 900 }}
+                          dataKey="stageLabel"
+                          tick={{ fill: "rgba(255,255,255,0.90)", fontSize: 9, fontWeight: 900 }}
                           axisLine={{ stroke: "rgba(255,255,255,0.05)" }}
                           tickLine={false}
                           angle={-35}
@@ -571,7 +596,7 @@ const MyDashboard = () => {
                           height={55}
                         />
                         <YAxis
-                          tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 9, fontWeight: 900 }}
+                          tick={{ fill: "rgba(255,255,255,0.90)", fontSize: 9, fontWeight: 900 }}
                           axisLine={false}
                           tickLine={false}
                           width={40}
@@ -582,10 +607,10 @@ const MyDashboard = () => {
                           labelStyle={{ color: "#fff", fontSize: "10px", fontWeight: "900", textTransform: "uppercase", letterSpacing: "0.15em" }}
                           itemStyle={{ color: "#a78bfa", fontSize: "11px", fontWeight: "bold" }}
                           cursor={{ fill: "rgba(255,255,255,0.02)" }}
-                          formatter={(value) => [`${value.toLocaleString()} fields`, "Count"]}
+                          formatter={(value) => [`${value.toLocaleString()} ${t('fieldsLabel')}`, t('countLabel')]}
                         />
                         <Bar dataKey="stage_count" radius={[8, 8, 0, 0]} maxBarSize={56}>
-                          {stageDistribution.map((_, i) => (
+                          {translatedStageDistribution.map((_, i) => (
                             <Cell
                               key={i}
                               fill={stageColors[i % stageColors.length]}
@@ -599,13 +624,13 @@ const MyDashboard = () => {
 
                   {/* Per-stage breakdown */}
                   <div className="mt-4 pt-5 border-t border-white/5 flex flex-col gap-2">
-                    {stageDistribution.map((d, i) => {
+                    {translatedStageDistribution.map((d, i) => {
                       const pct = total > 0 ? Math.round((d.stage_count / total) * 100) : 0;
                       const color = stageColors[i % stageColors.length];
                       return (
                         <div key={i} className="flex items-center gap-3 group">
                           <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: color, boxShadow: `0 0 6px ${color}` }} />
-                          <span className="text-[10px] font-black text-white/85 uppercase tracking-tight flex-1 group-hover:text-white/90 transition-colors truncate">{d.stage_name}</span>
+                          <span className="text-[10px] font-black text-white/85 uppercase tracking-tight flex-1 group-hover:text-white/90 transition-colors truncate">{d.stageLabel}</span>
                           <div className="w-24 h-1.5 bg-white/5 rounded-full overflow-hidden">
                             <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${pct}%`, background: color }} />
                           </div>
@@ -618,7 +643,7 @@ const MyDashboard = () => {
               );
             })() : (
               <div className="flex-1 min-h-75 flex items-center justify-center text-white/85 animate-pulse text-xs font-black uppercase tracking-widest">
-                Loading Stage Data...
+                {t('loadingStageData')}
               </div>
             )}
           </div>
