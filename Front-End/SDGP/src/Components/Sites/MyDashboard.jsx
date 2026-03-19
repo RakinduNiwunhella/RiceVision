@@ -89,9 +89,6 @@ const MyDashboard = () => {
   const healthCardRef = useRef(null);
   const yieldCardRef = useRef(null);
   const supplyCardRef = useRef(null);
-  const threatsCardRef = useRef(null);
-  const threatDetailsBtnRef = useRef(null);
-  const outbreaksToggleBtnRef = useRef(null);
   const yieldInsightsRef = useRef(null);
   const stageChartRef = useRef(null);
   const districtTableRef = useRef(null);
