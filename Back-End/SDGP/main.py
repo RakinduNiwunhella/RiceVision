@@ -34,7 +34,7 @@ def _get_cors_origins() -> list[str]:
     ]
 
 
-# Configure CORS middleware with proper settings
+# ── CORS CONFIG ─────────────────────────────────────────────
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_get_cors_origins(),
@@ -43,12 +43,15 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
     expose_headers=["*"],
-    max_age=600,  # Cache preflight requests for 10 minutes
+    max_age=600,
 )
 
-# PUBLIC ROUTES (no authentication required)
+# ── PUBLIC ROUTES ───────────────────────────────────────────
 app.include_router(signin_router)
 app.include_router(signup_router)
+
+# ✅ Make MAP routes PUBLIC (FIXED)
+app.include_router(map_router)
 
 
 @app.get("/health")
@@ -57,16 +60,14 @@ def health_check():
     return {"status": "ok", "api": "RiceVision API"}
 
 
-# PROTECTED ROUTES (authentication required)
+# ── PROTECTED ROUTES (require authentication) ───────────────
 app.include_router(yield_router, dependencies=[Depends(get_current_user)])
 app.include_router(field_data_router, dependencies=[Depends(get_current_user)])
 app.include_router(report_router, prefix="/api", dependencies=[Depends(get_current_user)])
 app.include_router(weather_router, dependencies=[Depends(get_current_user)])
 app.include_router(help_router, prefix="/api", dependencies=[Depends(get_current_user)])
 app.include_router(profile_router, dependencies=[Depends(get_current_user)])
-app.include_router(map_router, dependencies=[Depends(get_current_user)])
 app.include_router(user_field_router, dependencies=[Depends(get_current_user)])
 app.include_router(alerts_router, prefix="/api", dependencies=[Depends(get_current_user)])
 app.include_router(notifications_router, dependencies=[Depends(get_current_user)])
 app.include_router(chat_router, dependencies=[Depends(get_current_user)])
-
