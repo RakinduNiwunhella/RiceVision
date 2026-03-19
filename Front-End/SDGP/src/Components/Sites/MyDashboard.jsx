@@ -492,7 +492,7 @@ const MyDashboard = () => {
                     </ResponsiveContainer>
                   </div>
 
-                  <div className="flex-1 overflow-x-auto pb-2">
+                  <div className="flex-1 overflow-x-auto pb-2 custom-scrollbar">
                     <div style={{ width: `${Math.max(900, districtYieldRows.length * 72)}px`, height: "320px" }}>
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart data={districtYieldRows} margin={{ top: 8, right: 14, left: 0, bottom: 56 }}>
@@ -706,7 +706,7 @@ const MyDashboard = () => {
                   <span className="col-span-2 text-right">Status</span>
                 </div>
 
-                <div className="mt-3 flex-1 no-scrollbar overflow-y-auto max-h-[420px] pr-1 space-y-2">
+                <div className="mt-3 flex-1 custom-scrollbar overflow-y-auto max-h-[420px] pr-1 space-y-2">
                   {visibleDistricts.map((district, i) => {
                     const healthPct = Math.max(0, Math.min(100, Math.round(Number(district.normal_pct || 0))));
                     const pestRiskPct = 100 - healthPct;
