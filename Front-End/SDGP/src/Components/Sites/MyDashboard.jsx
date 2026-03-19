@@ -3,6 +3,7 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import {
   LineChart,
   Line,
+  CartesianGrid,
   XAxis,
   YAxis,
   Tooltip,
@@ -15,7 +16,7 @@ import {
   Bar,
 } from "recharts";
 import { useLanguage } from "../../context/LanguageContext";
-import { AlertTriangle, CloudRain, Bug } from "lucide-react";
+import { Bug } from "lucide-react";
 import TutorialOverlay from "../TutorialOverlay";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
 import { useNavigate } from "react-router-dom";
@@ -26,7 +27,7 @@ import {
   fetchHealthSummary,
   fetchYield,
   fetchBestDistricts,
-  fetchOutbreaks,
+  fetchDistrictYields,
   fetchDistrictHealth,
   fetchStageDistribution,
 } from "../../api/api";
@@ -76,12 +77,10 @@ const MyDashboard = () => {
   const [healthSummary, setHealthSummary] = useState(null);
   const [yieldForecast, setYieldForecast] = useState(null);
   const [bestYieldDistricts, setBestYieldDistricts] = useState([]);
-  const [outbreaks, setOutbreaks] = useState([]);
-  const [showAllOutbreaks, setShowAllOutbreaks] = useState(false);
+  const [districtYieldData, setDistrictYieldData] = useState([]);
   const [districtHealth, setDistrictHealth] = useState([]);
   const [showAllDistricts, setShowAllDistricts] = useState(false);
   const [stageDistribution, setStageDistribution] = useState([]);
-  const navigate = useNavigate();
 
   // Refs for tutorial tooltips
   const headerRef = useRef(null);
@@ -89,9 +88,7 @@ const MyDashboard = () => {
   const healthCardRef = useRef(null);
   const yieldCardRef = useRef(null);
   const supplyCardRef = useRef(null);
-  const threatsCardRef = useRef(null);
-  const threatDetailsBtnRef = useRef(null);
-  const outbreaksToggleBtnRef = useRef(null);
+  const yieldInsightsRef = useRef(null);
   const stageChartRef = useRef(null);
   const districtTableRef = useRef(null);
   const districtToggleBtnRef = useRef(null);
@@ -157,7 +154,7 @@ const MyDashboard = () => {
     return steps
   }, [outbreaks.length, t])
 
-  const { currentStep, showTutorial, currentTutorialStep, hasMoreSteps, nextStep, prevStep, closeTutorial } =
+  const { currentStep, showTutorial, nextStep, prevStep, closeTutorial } =
     usePageTutorial("dashboard", tutorialSteps);
 
   const stageColors = ["#10b981", "#06b6d4", "#8b5cf6", "#f59e0b", "#ef4444", "#f97316"];
@@ -173,6 +170,21 @@ const MyDashboard = () => {
 
   const pieColors = ["#10b981", "#f59e0b", "#ef4444"]; // Emerald-500, Amber-500, Red-500
 
+  const currentSeason = (yieldForecast?.season || "").toLowerCase() === "yala" ? "Yala" : "Maha";
+  const seasonalTargetMT = currentSeason === "Maha" ? 2_600_000 : 1_300_000;
+  const seasonalTargetKgs = seasonalTargetMT * 1000;
+  const actualYieldKgs = Number(yieldForecast?.total_yield_kgs || 0);
+  const expectedShortfallMT = Math.max(0, Math.round((seasonalTargetKgs - actualYieldKgs) / 1000));
+  const demandSaturationPct = Math.max(0, Math.min(100, (actualYieldKgs / seasonalTargetKgs) * 100));
+
+  const topYieldDistricts = useMemo(() => {
+    return [...bestYieldDistricts]
+      .sort(
+      (a, b) => Number(b?.total_yield_kg_ha ?? 0) - Number(a?.total_yield_kg_ha ?? 0),
+      )
+      .slice(0, 5);
+  }, [bestYieldDistricts]);
+
   const healthPieData = healthSummary
     ? [
       { name: t('optimal'), value: healthSummary.normal_pct },
@@ -183,18 +195,18 @@ const MyDashboard = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [health, yld, best, out, dist, stages] = await Promise.all([
+        const [health, yld, best, districtYields, dist, stages] = await Promise.all([
           fetchHealthSummary(),
           fetchYield(),
           fetchBestDistricts(),
-          fetchOutbreaks(),
+          fetchDistrictYields(),
           fetchDistrictHealth(),
           fetchStageDistribution()
         ]);
         setHealthSummary(health);
         setYieldForecast(yld);
         setBestYieldDistricts(best);
-        setOutbreaks(out);
+        setDistrictYieldData(districtYields);
         setDistrictHealth(dist);
         setStageDistribution(stages);
       } catch (err) {
@@ -213,13 +225,79 @@ const MyDashboard = () => {
     return value.toLocaleString();
   };
 
-  const getOutbreakIcon = (title) => {
-    const t = title.toLowerCase();
-    if (t.includes("flood") || t.includes("rain") || t.includes("storm"))
-      return <CloudRain size={18} className="text-blue-400" />;
-    if (t.includes("pest") || t.includes("insect"))
-      return <Bug size={18} className="text-rose-400" />;
-    return <AlertTriangle size={18} className="text-amber-400" />;
+  const formatDistrictMT = (value) => {
+    const numeric = Number(value || 0);
+    if (!Number.isFinite(numeric)) return "-";
+    return numeric.toLocaleString(undefined, {
+      minimumFractionDigits: numeric < 100 ? 1 : 0,
+      maximumFractionDigits: 1,
+    });
+  };
+
+  const districtYieldRows = useMemo(() => {
+    const sortedRows = [...districtYieldData].sort(
+      (a, b) => Number(b?.totalyield_kg ?? 0) - Number(a?.totalyield_kg ?? 0),
+    );
+
+    return sortedRows.map((district, index) => {
+      const yieldMT = Number(district?.totalyield_kg ?? 0) / 1000;
+
+      return {
+        rank: index + 1,
+        district: district.districtname,
+        yieldMT,
+        predictedYieldKgHa: Number(district?.predictedyield_kg_ha ?? 0),
+      };
+    });
+  }, [districtYieldData]);
+
+  const yieldAxisDomain = useMemo(() => {
+    if (districtYieldRows.length === 0) return [0, 100];
+
+    const values = districtYieldRows.map((row) => Number(row?.yieldMT ?? 0));
+    const maxValue = Math.max(...values);
+    const minValue = Math.min(...values);
+    const spread = Math.max(1, maxValue - minValue);
+    const padding = spread * 0.12;
+
+    return [Math.max(0, minValue - padding), maxValue + padding];
+  }, [districtYieldRows]);
+
+  const sortedDistrictHealth = useMemo(() => {
+    return [...districtHealth].sort((a, b) => {
+      const aPestRisk = 100 - Number(a?.normal_pct ?? 0);
+      const bPestRisk = 100 - Number(b?.normal_pct ?? 0);
+      return bPestRisk - aPestRisk;
+    });
+  }, [districtHealth]);
+
+  const districtOverview = useMemo(() => {
+    if (sortedDistrictHealth.length === 0) {
+      return { avgHealth: 0, avgPestRisk: 0, highRiskCount: 0 };
+    }
+
+    const totalHealth = sortedDistrictHealth.reduce(
+      (sum, district) => sum + Number(district?.normal_pct ?? 0),
+      0,
+    );
+
+    const avgHealth = Math.round(totalHealth / sortedDistrictHealth.length);
+    const avgPestRisk = Math.max(0, 100 - avgHealth);
+    const highRiskCount = sortedDistrictHealth.filter(
+      (district) => 100 - Number(district?.normal_pct ?? 0) > 70,
+    ).length;
+
+    return { avgHealth, avgPestRisk, highRiskCount };
+  }, [sortedDistrictHealth]);
+
+  const visibleDistricts = showAllDistricts
+    ? sortedDistrictHealth
+    : sortedDistrictHealth.slice(0, 12);
+
+  const getRiskMeta = (pestRiskPct) => {
+    if (pestRiskPct <= 30) return { label: "Low", color: "#10b981" };
+    if (pestRiskPct <= 70) return { label: "Medium", color: "#f59e0b" };
+    return { label: "High", color: "#ef4444" };
   };
 
   /* ------------------ RENDER ------------------ */
@@ -321,14 +399,14 @@ const MyDashboard = () => {
 
             <div className="mt-8 pt-8 border-t border-white/10">
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/85 mb-4 ml-1">{t('highPerformance')}</p>
-              <div className="space-y-4">
-                {bestYieldDistricts.map((d, i) => (
+              <div className="space-y-4 max-h-[320px] overflow-y-auto pr-1">
+                {topYieldDistricts.map((d, i) => (
                   <div key={i} className="flex justify-between items-center group/item hover:translate-x-1 transition-transform">
                     <div className="flex items-center gap-3">
                       <span className="text-[10px] font-black text-white/85 w-4">{i + 1}</span>
                       <span className="text-xs font-black text-white uppercase tracking-tight group-hover/item:text-cyan-400 transition-colors">{translateDistrictName(d.District, language)}</span>
                     </div>
-                    <span className="text-xs font-black text-white/90 tabular-nums">{formatMT(d.total_yield_kg_ha)} <span className="text-[10px] text-white/85">t</span></span>
+                    <span className="text-xs font-black text-white/90 tabular-nums">{formatDistrictMT(Number(d.total_yield_kg_ha || 0) / 1000)} <span className="text-[10px] text-white/85">MT</span></span>
                   </div>
                 ))}
               </div>
@@ -343,7 +421,9 @@ const MyDashboard = () => {
                 {t('supplyStability')}
               </p>
               <div className="py-2">
-                <p className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tighter mb-1" style={{ textShadow: "0 10px 40px rgba(0,0,0,0.5)" }}>220K</p>
+                <p className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tighter mb-1" style={{ textShadow: "0 10px 40px rgba(0,0,0,0.5)" }}>
+                  {yieldForecast ? formatMT(expectedShortfallMT) : "---"}
+                </p>
                 <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest">{t('expectedShortfall')}</p>
               </div>
             </div>
@@ -351,78 +431,133 @@ const MyDashboard = () => {
             <div className="space-y-4 mt-8">
               <div className="flex justify-between items-end text-[10px] font-black uppercase tracking-widest text-white/85">
                 <span>{t('nationalDemand')}</span>
-                <span className="text-white">92.7%</span>
+                <span className="text-white">{demandSaturationPct.toFixed(1)}%</span>
               </div>
               <div className="w-full h-3 bg-white/5 rounded-full overflow-hidden border border-white/5 p-[1px]">
                 <div
                   className="h-full bg-gradient-to-r from-amber-500 to-emerald-500 rounded-full shadow-[0_0_15px_rgba(245,158,11,0.2)]"
-                  style={{ width: "92.7%", transition: "width 2s cubic-bezier(0.34, 1.56, 0.64, 1)" }}
+                  style={{ width: `${demandSaturationPct}%`, transition: "width 2s cubic-bezier(0.34, 1.56, 0.64, 1)" }}
                 />
               </div>
-              <p className="text-[10px] font-bold text-white/85 uppercase tracking-[0.2em] italic text-center">{t('referenceThreshold')}</p>
+              <p className="text-[10px] font-bold text-white/85 uppercase tracking-[0.2em] italic text-center">
+                {`${t('referenceThreshold')} ${currentSeason} ${formatMT(seasonalTargetMT)} MT`}
+              </p>
             </div>
           </div>
         </div>
 
-        {/* ── Active Threats Section (Wider) ── */}
-        <div ref={threatsCardRef} className="glass p-2 sm:p-1 rounded-[1.5rem] sm:rounded-[3rem] border border-white/10 shadow-2xl overflow-hidden">
+        {/* ── National Yield Section (District Cards) ── */}
+        <div ref={yieldInsightsRef} className="glass p-2 sm:p-1 rounded-[1.5rem] sm:rounded-[3rem] border border-white/10 shadow-2xl overflow-hidden">
           <div className="p-4 sm:p-8 border-b border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/85 flex items-center gap-3">
-              <span className="material-symbols-outlined text-rose-500">sensors</span>
-              {t('diseaseOutbreak')}
+              <span className="material-symbols-outlined text-cyan-400">monitoring</span>
+              National Yield
             </h2>
-            <div className="flex items-center gap-4">
-              <span className="text-[10px] font-black text-white/85 uppercase tracking-widest animate-pulse">{t('checkingFields')}</span>
+            <div className="flex items-center gap-2 flex-wrap">
               <div className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase text-white/85">
-                {outbreaks.length} {t('alertsDetected')}
+                {currentSeason} Season
+              </div>
+              <div className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase text-white/85">
+                {districtYieldRows.length} District Yields
               </div>
             </div>
           </div>
 
-          <div className="p-4 space-y-3">
-            {(showAllOutbreaks ? outbreaks : outbreaks.slice(0, 5)).map((o, i) => (
-              <div
-                key={o.id}
-                className="group flex flex-col sm:flex-row justify-between items-start sm:items-center px-4 sm:px-6 py-3 sm:py-4 rounded-2xl bg-white/5 hover:bg-white/10 transition-all border border-white/5 hover:border-white/20 gap-3"
-              >
-                <div className="flex items-center gap-5">
-                  <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    {getOutbreakIcon(o.title)}
+          <div className="p-4 sm:p-6 grid grid-cols-1 xl:grid-cols-5 gap-4">
+            <div className="xl:col-span-3 rounded-2xl border border-white/10 bg-black/20 p-3 sm:p-4">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-[10px] font-black uppercase tracking-[0.15em] text-white/70">Total Yield by District (MT)</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.12em] text-white/45">Scrollable</p>
+              </div>
+
+              {districtYieldRows.length > 0 ? (
+                <div className="flex gap-0 h-[320px]">
+                  <div className="w-12 shrink-0 border-r border-white/10 bg-transparent pr-1">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={districtYieldRows} margin={{ top: 8, right: 0, left: 0, bottom: 56 }}>
+                        <YAxis
+                          domain={yieldAxisDomain}
+                          tick={{ fill: "rgba(255,255,255,0.55)", fontSize: 10, fontWeight: 800 }}
+                          axisLine={false}
+                          tickLine={false}
+                          width={56}
+                          tickFormatter={(value) => `${Number(value).toFixed(0)}`}
+                        />
+                        <Line dataKey="yieldMT" stroke="transparent" dot={false} isAnimationActive={false} />
+                      </LineChart>
+                    </ResponsiveContainer>
                   </div>
-                  <div>
-                    <p className="font-black text-white text-sm uppercase tracking-tight">
-                      {translateDisasterType(o.title, t)} — {translateDistrictName(o.district, language)}
-                    </p>
-                    <div className="flex items-center gap-3 mt-1 text-[10px] font-black text-white/85 uppercase tracking-widest">
-                      <span>{o.event_date}</span>
-                      <div className="w-1 h-1 rounded-full bg-white/10" />
-                      <span className="text-emerald-400 group-hover:animate-pulse">{t('active')}</span>
+
+                  <div className="flex-1 overflow-x-auto pb-2">
+                    <div style={{ width: `${Math.max(900, districtYieldRows.length * 72)}px`, height: "320px" }}>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={districtYieldRows} margin={{ top: 8, right: 14, left: 0, bottom: 56 }}>
+                          <CartesianGrid stroke="rgba(255,255,255,0.08)" strokeDasharray="3 3" vertical={false} />
+                          <XAxis
+                            dataKey="district"
+                            tick={{ fill: "rgba(255,255,255,0.62)", fontSize: 10, fontWeight: 800 }}
+                            axisLine={{ stroke: "rgba(255,255,255,0.15)" }}
+                            tickLine={false}
+                            interval={0}
+                            angle={-32}
+                            textAnchor="end"
+                            height={60}
+                          />
+                          <YAxis hide domain={yieldAxisDomain} />
+                          <Tooltip
+                            contentStyle={{ background: "rgba(8,13,22,0.96)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px" }}
+                            labelStyle={{ color: "#fff", fontSize: "11px", fontWeight: "700" }}
+                            itemStyle={{ color: "#9be7d0", fontSize: "11px", fontWeight: "700" }}
+                            labelFormatter={(value, payload) => {
+                              const rank = payload?.[0]?.payload?.rank;
+                              return rank ? `#${rank} ${value}` : value;
+                            }}
+                            formatter={(value) => [`${formatDistrictMT(value)} MT`, "Total yield"]}
+                          />
+                          <Line
+                            type="monotone"
+                            dataKey="yieldMT"
+                            stroke="#34d399"
+                            strokeWidth={2.5}
+                            dot={{ r: 2.5, fill: "#34d399", stroke: "#34d399" }}
+                            activeDot={{ r: 5 }}
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
                     </div>
                   </div>
                 </div>
-                <button
-                  ref={i === 0 ? threatDetailsBtnRef : undefined}
-                  onClick={() => navigate("/alerts")}
-                  className="text-[10px] font-black uppercase tracking-[0.2em] rounded-xl px-6 py-2.5 border border-white/10 text-white/85 hover:text-white hover:border-white/40 hover:bg-white/5 transition-all active:scale-95"
-                >
-                  {t('viewDetails')}
-                </button>
-              </div>
-            ))}
-          </div>
-
-          {outbreaks.length > 5 && (
-            <div className="px-8 py-6 bg-white/2 flex justify-center border-t border-white/5">
-              <button
-                ref={outbreaksToggleBtnRef}
-                onClick={() => setShowAllOutbreaks(!showAllOutbreaks)}
-                className="text-[10px] font-black uppercase tracking-[0.4em] text-white/85 hover:text-white transition-colors flex items-center gap-2"
-              >
-                {showAllOutbreaks ? t('showLess') : `${t('showAll')} (${outbreaks.length})`}
-                <span className="material-symbols-outlined text-sm">{showAllOutbreaks ? 'keyboard_double_arrow_up' : 'keyboard_double_arrow_down'}</span>
-              </button>
+              ) : (
+                <div className="min-h-[220px] flex items-center justify-center text-xs font-black uppercase tracking-[0.15em] text-white/55">
+                  Loading District Yields...
+                </div>
+              )}
             </div>
-          )}
+
+            <div className="xl:col-span-2 rounded-2xl border border-white/10 bg-black/20 p-3 sm:p-4">
+              <p className="text-[10px] font-black uppercase tracking-[0.15em] text-white/70 mb-3">District Yield Table</p>
+              <div className="max-h-[380px] overflow-y-auto rounded-xl border border-white/10">
+                <table className="w-full border-collapse">
+                  <thead className="sticky top-0 bg-[#0a1320]">
+                    <tr className="text-[10px] uppercase tracking-[0.14em] text-white/65">
+                      <th className="px-3 py-2.5 text-left font-black">District</th>
+                      <th className="px-3 py-2.5 text-right font-black">MT</th>
+                      <th className="px-3 py-2.5 text-right font-black">kg/ha</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {districtYieldRows.map((row) => (
+                      <tr key={`table-${row.district}-${row.rank}`} className="border-t border-white/5 odd:bg-white/[0.02] even:bg-transparent">
+                        <td className="px-3 py-2.5 text-xs font-black text-white/90 uppercase tracking-[0.03em]">{row.district}</td>
+                        <td className="px-3 py-2.5 text-xs font-black text-right tabular-nums text-emerald-300">{formatDistrictMT(row.yieldMT)}</td>
+                        <td className="px-3 py-2.5 text-xs font-black text-right tabular-nums text-cyan-200">{Number(row.predictedYieldKgHa || 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* ── Analytical Depth Row ── */}
@@ -514,75 +649,158 @@ const MyDashboard = () => {
           </div>
 
           {/* Regional Health / Pest Overview */}
-<div ref={districtTableRef} className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
-  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/85 mb-2 flex items-center gap-2">
-    <Bug className="text-rose-400 text-sm" />
-    {t('districtOverview')}
-  </p>
+          <div ref={districtTableRef} className="glass glass-hover p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
+            <div className="flex flex-col gap-5 mb-6">
+              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-white/85">
+                <Bug className="text-rose-400" size={14} />
+                District Overview
+              </div>
 
-  <h3 className="text-xl font-black text-white tracking-tight uppercase mb-8">
-    {t('districtPestHealthStatus')}
-  </h3>
+              <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+                <h3 className="text-xl font-black text-white tracking-tight uppercase">
+                  District Pest & Health Status
+                </h3>
 
-  <div className="flex-1 space-y-2 no-scrollbar overflow-y-auto max-h-[420px] pr-2">
-    {(showAllDistricts ? districtHealth : districtHealth.slice(0, 12)).map((d, i) => {
-      const healthPct = Math.round(d.normal_pct);
-      const pestPct = Math.round(100 - d.normal_pct);
+                <div className="grid grid-cols-3 gap-2 w-full lg:w-auto lg:min-w-[340px]">
+                  <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-center">
+                    <p className="text-[9px] font-black uppercase tracking-[0.12em] text-white/50">Avg Pest Risk</p>
+                    <p className="text-sm font-black tabular-nums text-amber-400 mt-1">{districtOverview.avgPestRisk}%</p>
+                  </div>
+                  <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-center">
+                    <p className="text-[9px] font-black uppercase tracking-[0.12em] text-white/50">Avg Health</p>
+                    <p className="text-sm font-black tabular-nums text-emerald-400 mt-1">{districtOverview.avgHealth}%</p>
+                  </div>
+                  <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-center">
+                    <p className="text-[9px] font-black uppercase tracking-[0.12em] text-white/50">High Risk</p>
+                    <p className="text-sm font-black tabular-nums text-rose-400 mt-1">{districtOverview.highRiskCount}</p>
+                  </div>
+                </div>
+              </div>
 
-      const healthColor = healthPct >= 75 ? "#10b981" : healthPct >= 50 ? "#f59e0b" : "#ef4444";
-      const pestColor = pestPct <= 30 ? "#10b981" : pestPct <= 70 ? "#f59e0b" : "#ef4444";
-      const statusIcon = pestPct <= 30 ? "🟢" : pestPct <= 70 ? "🟡" : "🔴";
-
-      return (
-        <div
-          key={i}
-          className="flex justify-between items-center p-3 rounded-2xl bg-white/5 hover:bg-white/10 transition-all group"
-        >
-          <div className="flex items-center gap-3">
-            <Bug size={14} className="text-rose-400" />
-            <span className="text-xs font-black text-white/85 uppercase tracking-tight group-hover:text-white transition-colors">
-              {translateDistrictName(d.district, language)}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <div className="w-20 h-1.5 bg-white/5 rounded-full overflow-hidden p-[1px]">
-              <div
-                className="h-full rounded-full transition-all duration-1000"
-                style={{ width: `${pestPct}%`, background: pestColor }}
-              />
+              <div className="flex items-center gap-4 text-[9px] font-black uppercase tracking-[0.14em] text-white/60">
+                <span className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                  Low: 0-30%
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-amber-500" />
+                  Medium: 31-70%
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-rose-500" />
+                  High: 71-100%
+                </span>
+              </div>
             </div>
 
-            <span className="text-[10px] font-black tabular-nums text-right" style={{ color: pestColor }}>
-              {pestPct}% {statusIcon}
-            </span>
+            {districtHealth.length > 0 ? (
+              <>
+                <div className="hidden md:grid grid-cols-12 gap-4 px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-[10px] font-black uppercase tracking-[0.14em] text-white/55">
+                  <span className="col-span-4">District</span>
+                  <span className="col-span-3 text-center">Pest Risk</span>
+                  <span className="col-span-3 text-center">Health</span>
+                  <span className="col-span-2 text-right">Status</span>
+                </div>
 
-            <div className="w-20 h-1.5 bg-white/5 rounded-full overflow-hidden p-[1px]">
-              <div
-                className="h-full rounded-full transition-all duration-1000"
-                style={{ width: `${healthPct}%`, background: healthColor }}
-              />
+                <div className="mt-3 flex-1 no-scrollbar overflow-y-auto max-h-[420px] pr-1 space-y-2">
+                  {visibleDistricts.map((district, i) => {
+                    const healthPct = Math.max(0, Math.min(100, Math.round(Number(district.normal_pct || 0))));
+                    const pestRiskPct = 100 - healthPct;
+                    const healthColor = healthPct >= 75 ? "#10b981" : healthPct >= 50 ? "#f59e0b" : "#ef4444";
+                    const riskMeta = getRiskMeta(pestRiskPct);
+
+                    return (
+                      <div
+                        key={`${district.district}-${i}`}
+                        className="grid grid-cols-1 md:grid-cols-12 items-center gap-3 md:gap-4 p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/20 transition-all"
+                      >
+                        <div className="md:col-span-4 flex items-center justify-between md:justify-start gap-3 min-w-0">
+                          <div className="w-6 h-6 rounded-lg border border-white/10 bg-white/5 text-[10px] font-black text-white/70 flex items-center justify-center shrink-0">
+                            {i + 1}
+                          </div>
+                          <span className="text-xs font-black text-white/90 uppercase tracking-tight truncate">
+                            {district.district}
+                          </span>
+                          <span
+                            className="md:hidden text-[9px] font-black uppercase tracking-[0.12em] px-2 py-1 rounded-full border"
+                            style={{
+                              color: riskMeta.color,
+                              borderColor: `${riskMeta.color}55`,
+                              backgroundColor: `${riskMeta.color}1a`,
+                            }}
+                          >
+                            {riskMeta.label} Risk
+                          </span>
+                        </div>
+
+                        <div className="md:col-span-3">
+                          <div className="flex items-center justify-between mb-1.5">
+                            <span className="md:hidden text-[9px] font-black uppercase tracking-[0.12em] text-white/55">Pest Risk</span>
+                            <span className="text-[10px] font-black tabular-nums" style={{ color: riskMeta.color }}>
+                              {pestRiskPct}%
+                            </span>
+                          </div>
+                          <div className="w-full h-2 rounded-full bg-white/5 border border-white/10 overflow-hidden">
+                            <div
+                              className="h-full rounded-full transition-all duration-1000"
+                              style={{ width: `${pestRiskPct}%`, background: riskMeta.color }}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="md:col-span-3">
+                          <div className="flex items-center justify-between mb-1.5">
+                            <span className="md:hidden text-[9px] font-black uppercase tracking-[0.12em] text-white/55">Health</span>
+                            <span className="text-[10px] font-black tabular-nums" style={{ color: healthColor }}>
+                              {healthPct}%
+                            </span>
+                          </div>
+                          <div className="w-full h-2 rounded-full bg-white/5 border border-white/10 overflow-hidden">
+                            <div
+                              className="h-full rounded-full transition-all duration-1000"
+                              style={{ width: `${healthPct}%`, background: healthColor }}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="hidden md:flex md:col-span-2 justify-end">
+                          <span
+                            className="text-[10px] font-black uppercase tracking-[0.12em] px-2.5 py-1 rounded-full border"
+                            style={{
+                              color: riskMeta.color,
+                              borderColor: `${riskMeta.color}55`,
+                              backgroundColor: `${riskMeta.color}1a`,
+                            }}
+                          >
+                            {riskMeta.label}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            ) : (
+              <div className="flex-1 min-h-48 flex items-center justify-center text-white/70 animate-pulse text-xs font-black uppercase tracking-widest">
+                Loading District Data...
+              </div>
+            )}
+
+            <div className="mt-8 pt-6 border-t border-white/5 text-center">
+              <button
+                ref={districtToggleBtnRef}
+                onClick={() => districtHealth.length > 12 && setShowAllDistricts(!showAllDistricts)}
+                disabled={districtHealth.length <= 12}
+                className={`text-[10px] font-black uppercase tracking-[0.4em] transition-colors ${districtHealth.length > 12 ? "text-white/85 hover:text-white" : "text-white/35 cursor-not-allowed"}`}
+              >
+                {districtHealth.length <= 12
+                  ? `Showing ${districtHealth.length} Districts`
+                  : showAllDistricts
+                    ? "Show Top 12"
+                    : `Show All (${districtHealth.length} Districts)`}
+              </button>
             </div>
-
-            <span className="text-[10px] font-black tabular-nums text-right" style={{ color: healthColor }}>
-              {healthPct}%
-            </span>
           </div>
-        </div>
-      );
-    })}
-  </div>
-
-  <div className="mt-8 pt-6 border-t border-white/5 text-center">
-    <button
-      ref={districtToggleBtnRef}
-      onClick={() => setShowAllDistricts(!showAllDistricts)}
-      className="text-[10px] font-black uppercase tracking-[0.4em] text-white/85 hover:text-white transition-colors"
-    >
-      {showAllDistricts ? t('showLess') : `${t('showAll')} (${districtHealth.length})`}
-    </button>
-  </div>
-</div>
 
         </div>
 

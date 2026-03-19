@@ -10,6 +10,7 @@ from .routes.weather import router as weather_router
 from .routes.help import router as help_router
 from .routes.profile import router as profile_router
 from .routes.mapPage import router as map_router
+from .routes.userField import router as user_field_router
 from .routes.alerts import router as alerts_router
 from .routes.notifications import router as notifications_router
 from .routes.chat import router as chat_router
@@ -64,6 +65,7 @@ app.include_router(weather_router, dependencies=[Depends(get_current_user)])
 app.include_router(help_router, prefix="/api", dependencies=[Depends(get_current_user)])
 app.include_router(profile_router, dependencies=[Depends(get_current_user)])
 app.include_router(map_router, dependencies=[Depends(get_current_user)])
+app.include_router(user_field_router, dependencies=[Depends(get_current_user)])
 app.include_router(alerts_router, prefix="/api", dependencies=[Depends(get_current_user)])
 app.include_router(notifications_router, dependencies=[Depends(get_current_user)])
 app.include_router(chat_router, dependencies=[Depends(get_current_user)])

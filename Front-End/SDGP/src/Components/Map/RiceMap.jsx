@@ -322,6 +322,7 @@ export default function RiceMap({ filters, layers, flyTo }) {
   const [eviTileUrl, setEviTileUrl] = useState(null);
   const [vvTileUrl, setVvTileUrl] = useState(null);
   const [vhTileUrl, setVhTileUrl] = useState(null);
+  const [satelliteTileFailed, setSatelliteTileFailed] = useState(false);
 
   const mapRef = useRef(null);
 
@@ -329,6 +330,10 @@ export default function RiceMap({ filters, layers, flyTo }) {
   const selectedHealth = filters.health;
 
   const overlayOpacity = layers.overlayOpacity ?? 0.75;
+
+  useEffect(() => {
+    setSatelliteTileFailed(false);
+  }, [layers.showSatellite, selectedDistrict]);
 
   /* ---------- LOAD PADDY EXTENT ---------- */
 
@@ -460,7 +465,7 @@ export default function RiceMap({ filters, layers, flyTo }) {
       maxBounds={!selectedDistrict ? SRI_LANKA_BOUNDS : undefined}
       maxBoundsViscosity={1.0}
       preferCanvas={true}
-      className="h-[100dvh] w-screen md:h-full md:w-full rounded-none md:rounded-3xl"
+      className="h-screen min-h-screen w-full md:h-full md:min-h-0 rounded-none md:rounded-3xl"
     >
       <FlyToController flyTo={flyTo} />
       <AlertMarker flyTo={flyTo} />
@@ -495,10 +500,22 @@ export default function RiceMap({ filters, layers, flyTo }) {
 
       {layers.showSatellite && (
         <>
-          <TileLayer
-            attribution="© Esri"
-            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-          />
+          {!satelliteTileFailed ? (
+            <TileLayer
+              attribution="© Esri"
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+              eventHandlers={{
+                tileerror: () => {
+                  if (!satelliteTileFailed) setSatelliteTileFailed(true);
+                },
+              }}
+            />
+          ) : (
+            <TileLayer
+              attribution="© OpenStreetMap contributors"
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+          )}
 
           {layers.showRoadOverlay && (
             <>

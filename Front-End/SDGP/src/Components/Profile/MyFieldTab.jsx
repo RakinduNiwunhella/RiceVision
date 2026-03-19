@@ -6,7 +6,6 @@
  */
 
 import React, { useState, useEffect, useCallback } from "react";
-import { supabase } from "../../supabaseClient";
 import FieldDrawMap from "../FieldSetup/FieldDrawMap";
 import { PRICE_PER_ACRE_LKR } from "../FieldSetup/fieldConstants";
 import { useLanguage } from "../../context/LanguageContext";
@@ -35,19 +34,18 @@ export default function MyFieldTab() {
   /* load user + existing field on mount */
   useEffect(() => {
     (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-      if (!user) { setLoading(false); return; }
-
-      const { data, error } = await supabase
-        .from("user_fields")
-        .select("*")
-        .eq("user_id", user.id)
-        .maybeSingle();
-
-      if (!error && data) {
-        setExisting(data);
-        if (data.field_name) setFieldName(data.field_name);
+      try {
+        const result = await fetchUserField();
+        const data = result?.data || null;
+        if (data) {
+          setExisting(data);
+          if (data.field_name) setFieldName(data.field_name);
+        }
+        // If data is null, it means user has no saved field yet — that's okay
+      } catch (error) {
+        console.error("Error fetching field:", error);
+        // Only show error if it's not a "no field" case
+        setStatus({ type: "error", message: `Unable to load field data. Please refresh the page.` });
       }
       setLoading(false);
     })();
@@ -66,53 +64,42 @@ export default function MyFieldTab() {
   }, []);
 
   const saveField = async () => {
-    if (!drawnFeature || !user) return;
+    if (!drawnFeature) return;
     setSaving(true);
 
     const price_lkr = Math.ceil(acres * PRICE_PER_ACRE_LKR);
-    const { data, error } = await supabase
-      .from("user_fields")
-      .upsert(
-        {
-          user_id:    user.id,
-          field_name: fieldName || null,
-          geojson:    drawnFeature,
-          area_acres: acres,
-          price_lkr,
-          district:   district || null,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "user_id" }
-      )
-      .select()
-      .maybeSingle();
+    try {
+      const result = await saveUserField({
+        field_name: fieldName || null,
+        geojson: drawnFeature,
+        area_acres: acres,
+        price_lkr,
+        district: district || null,
+      });
 
-    setSaving(false);
-
-    if (error) {
-      setStatus({ type: "error", message: `${t('saveFailedPrefix')}: ${error.message}` });
+      setSaving(false);
+      setExisting(result?.data || null);
+      setEditMode(false);
+      setDrawnFeature(null);
+      setStatus({ type: "success", message: "Field boundary saved to registry." });
+    } catch (error) {
+      setSaving(false);
+      setStatus({ type: "error", message: `Save failed: ${error.message}` });
       return;
     }
-
-    setExisting(data);
-    setEditMode(false);
-    setDrawnFeature(null);
-    setStatus({ type: "success", message: t('fieldBoundarySaved') });
   };
 
   const deleteField = async () => {
-    if (!existing || !user) return;
-    if (!window.confirm(t('confirmRemoveFieldRegistration'))) return;
+    if (!existing) return;
+    if (!window.confirm("Are you sure you want to remove your field registration? This cannot be undone.")) return;
 
-    const { error } = await supabase
-      .from("user_fields")
-      .delete()
-      .eq("user_id", user.id);
-
-    if (error) {
-      setStatus({ type: "error", message: `${t('deleteFailedPrefix')}: ${error.message}` });
+    try {
+      await removeUserField();
+    } catch (error) {
+      setStatus({ type: "error", message: `Delete failed: ${error.message}` });
       return;
     }
+
     setExisting(null);
     setEditMode(false);
     setDrawnFeature(null);
@@ -131,9 +118,10 @@ export default function MyFieldTab() {
     );
   }
 
-  const price = existing
-    ? existing.price_lkr
-    : Math.ceil(acres * PRICE_PER_ACRE_LKR);
+  // When drawing a new polygon, calculate price dynamically. Otherwise use existing price.
+  const price = drawnFeature
+    ? Math.ceil(acres * PRICE_PER_ACRE_LKR)
+    : (existing?.price_lkr || 0);
 
   const localizedExistingDistrict = existing?.district
     ? translateDistrictName(existing.district, language)
@@ -225,7 +213,7 @@ export default function MyFieldTab() {
             <FieldDrawMap
               initialFeature={existing.geojson}
               readOnly
-              height="400px"
+              height="600px"
             />
           </div>
         </div>
@@ -247,7 +235,7 @@ export default function MyFieldTab() {
             fieldName={fieldName}
             onFieldNameChange={setFieldName}
             initialFeature={editMode ? existing?.geojson : null}
-            height="440px"
+            height="600px"
           />
 
           {/* Summary + price */}
