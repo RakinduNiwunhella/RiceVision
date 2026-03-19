@@ -96,6 +96,9 @@ const MyDashboard = () => {
   const stageChartRef = useRef(null);
   const districtTableRef = useRef(null);
   const districtToggleBtnRef = useRef(null);
+  const threatsCardRef = useRef(null);
+  const threatDetailsBtnRef = useRef(null);
+  const outbreaksToggleBtnRef = useRef(null);
 
   // Tutorial setup - cards, icons, and key actions on dashboard
   const tutorialSteps = useMemo(() => {
@@ -492,7 +495,7 @@ const MyDashboard = () => {
                     </ResponsiveContainer>
                   </div>
 
-                  <div className="flex-1 overflow-x-auto pb-2">
+                  <div className="flex-1 overflow-x-auto pb-2 custom-scrollbar">
                     <div style={{ width: `${Math.max(900, districtYieldRows.length * 72)}px`, height: "320px" }}>
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart data={districtYieldRows} margin={{ top: 8, right: 14, left: 0, bottom: 56 }}>
@@ -540,7 +543,7 @@ const MyDashboard = () => {
 
             <div className="xl:col-span-2 rounded-2xl border border-white/10 bg-black/20 p-3 sm:p-4">
               <p className="text-[10px] font-black uppercase tracking-[0.15em] text-white/70 mb-3">District Yield Table</p>
-              <div className="max-h-[380px] overflow-y-auto rounded-xl border border-white/10">
+              <div className="max-h-[380px] overflow-y-auto rounded-xl border border-white/10 custom-scrollbar">
                 <table className="w-full border-collapse">
                   <thead className="sticky top-0 bg-[#0a1320]">
                     <tr className="text-[10px] uppercase tracking-[0.14em] text-white/65">
@@ -706,7 +709,7 @@ const MyDashboard = () => {
                   <span className="col-span-2 text-right">Status</span>
                 </div>
 
-                <div className="mt-3 flex-1 no-scrollbar overflow-y-auto max-h-[420px] pr-1 space-y-2">
+                <div className="mt-3 flex-1 custom-scrollbar overflow-y-auto max-h-[420px] pr-1 space-y-2">
                   {visibleDistricts.map((district, i) => {
                     const healthPct = Math.max(0, Math.min(100, Math.round(Number(district.normal_pct || 0))));
                     const pestRiskPct = 100 - healthPct;
