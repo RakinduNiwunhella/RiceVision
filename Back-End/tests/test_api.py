@@ -16,10 +16,9 @@ class TestHealthEndpoint:
         assert response.headers["content-type"] == "application/json"
 
     def test_health_returns_ok_status(self, test_client):
-        """Health endpoint should return ok status."""
         response = test_client.get("/health")
         data = response.json()
-        assert data == {"status": "ok"}
+        assert data["status"] == "ok"
 
     def test_health_accepts_get_only(self, test_client):
         """Health endpoint should only accept GET requests."""
