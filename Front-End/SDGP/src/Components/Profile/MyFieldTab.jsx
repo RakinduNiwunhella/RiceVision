@@ -213,6 +213,7 @@ export default function MyFieldTab() {
           <div className="rounded-2xl overflow-hidden border border-white/10">
             <FieldDrawMap
               initialFeature={existing.geojson}
+              initialDistrict={existing?.district}
               readOnly
               height="600px"
             />
@@ -236,6 +237,7 @@ export default function MyFieldTab() {
             fieldName={fieldName}
             onFieldNameChange={setFieldName}
             initialFeature={editMode ? existing?.geojson : null}
+            initialDistrict={editMode ? existing?.district : null}
             height="600px"
           />
 
