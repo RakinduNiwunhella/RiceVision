@@ -19,7 +19,7 @@
 
 :root, body, #root {
         /* Scale everything to 80% */
-        zoom: 0.8;
+        /* zoom: 0.8; */
 }
 
 /* DARK MODE VALUES */
