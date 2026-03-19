@@ -540,7 +540,7 @@ const MyDashboard = () => {
 
             <div className="xl:col-span-2 rounded-2xl border border-white/10 bg-black/20 p-3 sm:p-4">
               <p className="text-[10px] font-black uppercase tracking-[0.15em] text-white/70 mb-3">District Yield Table</p>
-              <div className="max-h-[380px] overflow-y-auto rounded-xl border border-white/10">
+              <div className="max-h-[380px] overflow-y-auto rounded-xl border border-white/10 custom-scrollbar">
                 <table className="w-full border-collapse">
                   <thead className="sticky top-0 bg-[#0a1320]">
                     <tr className="text-[10px] uppercase tracking-[0.14em] text-white/65">
