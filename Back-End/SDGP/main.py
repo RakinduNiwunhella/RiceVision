@@ -1,3 +1,5 @@
+this is main.py
+
 import os
 
 from fastapi import FastAPI, Depends
@@ -34,7 +36,7 @@ def _get_cors_origins() -> list[str]:
     ]
 
 
-# ── CORS CONFIG ─────────────────────────────────────────────
+# Configure CORS middleware with proper settings
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_get_cors_origins(),
@@ -43,15 +45,12 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
     expose_headers=["*"],
-    max_age=600,
+    max_age=600,  # Cache preflight requests for 10 minutes
 )
 
-# ── PUBLIC ROUTES ───────────────────────────────────────────
+# PUBLIC ROUTES (no authentication required)
 app.include_router(signin_router)
 app.include_router(signup_router)
-
-# ✅ Make MAP routes PUBLIC (FIXED)
-app.include_router(map_router)
 
 
 @app.get("/health")
@@ -60,13 +59,14 @@ def health_check():
     return {"status": "ok", "api": "RiceVision API"}
 
 
-# ── PROTECTED ROUTES (require authentication) ───────────────
+# PROTECTED ROUTES (authentication required)
 app.include_router(yield_router, dependencies=[Depends(get_current_user)])
 app.include_router(field_data_router, dependencies=[Depends(get_current_user)])
 app.include_router(report_router, prefix="/api", dependencies=[Depends(get_current_user)])
 app.include_router(weather_router, dependencies=[Depends(get_current_user)])
 app.include_router(help_router, prefix="/api", dependencies=[Depends(get_current_user)])
 app.include_router(profile_router, dependencies=[Depends(get_current_user)])
+app.include_router(map_router, dependencies=[Depends(get_current_user)])
 app.include_router(user_field_router, dependencies=[Depends(get_current_user)])
 app.include_router(alerts_router, prefix="/api", dependencies=[Depends(get_current_user)])
 app.include_router(notifications_router, dependencies=[Depends(get_current_user)])
