@@ -192,3 +192,25 @@ export const removeUserField = async () => {
 
   return res.json();
 };
+
+/* ------------------ NOTIFICATIONS ------------------ */
+export const fetchNotifications = () => get("/notifications");
+
+export const fetchNotificationUnreadCount = () => get("/notifications/unread_count");
+
+export const markNotificationAsRead = async (notificationId) => {
+  const res = await apiFetch(`/notifications/${notificationId}/read`, {
+    method: "PUT",
+  });
+
+  if (!res.ok) {
+    let message = "Failed to mark notification as read";
+    try {
+      const data = await res.json();
+      message = data.detail || message;
+    } catch (_) {}
+    throw new Error(message);
+  }
+
+  return res.json();
+};
