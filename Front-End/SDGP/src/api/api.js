@@ -19,7 +19,16 @@ async function get(path) {
 }
 
 // endpoints
-export const fetchNotificationUnreadCount = () => get("/notifications/unread-count");
+export const fetchNotificationUnreadCount = () => get("/notifications/unread_count");
+export const fetchNotifications = () => get("/notifications");
+
+export const markNotificationRead = async (notificationId) => {
+  const res = await apiFetch(`/notifications/${notificationId}/read`, {
+    method: "PUT",
+  });
+  if (!res.ok) throw new Error("Failed to mark notification as read");
+  return res.json();
+};
 export const fetchHealthSummary = () => get("/health-summary");
 export const fetchYield = () => get("/yield");
 export const fetchBestDistricts = () => get("/best-districts");
