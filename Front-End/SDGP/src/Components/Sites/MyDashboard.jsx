@@ -83,6 +83,7 @@ const MyDashboard = () => {
   const [showAllDistricts, setShowAllDistricts] = useState(false);
   const [stageDistribution, setStageDistribution] = useState([]);
   const [outbreaks, setOutbreaks] = useState([]);
+  const [replayTour, setReplayTour] = useState(false);
 
   // Refs for tutorial tooltips
   const headerRef = useRef(null);
@@ -253,6 +254,19 @@ const MyDashboard = () => {
       }
     };
     loadData();
+  }, []);
+
+  // Listen for tour replay events from Help page
+  useEffect(() => {
+    const handleReplayTour = () => {
+      setReplayTour(true);
+    };
+
+    window.addEventListener('replay-onboarding-tour', handleReplayTour);
+
+    return () => {
+      window.removeEventListener('replay-onboarding-tour', handleReplayTour);
+    };
   }, []);
 
 
@@ -858,8 +872,15 @@ const MyDashboard = () => {
         <OnboardingTour
           steps={onboardingSteps}
           storageKey="riceVisionOnboardingComplete"
-          onComplete={() => console.log('Onboarding completed')}
-          onSkip={() => console.log('Onboarding skipped')}
+          forceRun={replayTour}
+          onComplete={() => {
+            console.log('Onboarding completed');
+            setReplayTour(false);
+          }}
+          onSkip={() => {
+            console.log('Onboarding skipped');
+            setReplayTour(false);
+          }}
         />
       </div>
     </div>

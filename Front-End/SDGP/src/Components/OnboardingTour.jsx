@@ -12,19 +12,28 @@ const OnboardingTour = ({
   onComplete,
   onSkip,
   storageKey = "hasSeenTour",
+  forceRun = false,
 }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [spotlightRect, setSpotlightRect] = useState(null);
 
-  // Check if tour should be shown
+  // Check if tour should be shown (initial load or forced replay)
   useEffect(() => {
     const hasSeenTour = localStorage.getItem(storageKey);
-    if (!hasSeenTour && steps.length > 0) {
+    if ((!hasSeenTour || forceRun) && steps.length > 0) {
       // Small delay for DOM to be ready
       setTimeout(() => setIsVisible(true), 800);
     }
-  }, [storageKey, steps.length]);
+  }, [storageKey, steps.length, forceRun]);
+
+  // Handle replay: reset state when forceRun becomes true
+  useEffect(() => {
+    if (forceRun && steps.length > 0) {
+      setCurrentStep(0);
+      setIsVisible(true);
+    }
+  }, [forceRun, steps.length]);
 
   // Update spotlight position when step changes
   useEffect(() => {
@@ -43,21 +52,29 @@ const OnboardingTour = ({
       }
     };
 
-    // Scroll element into view on step change
+    // Check if element is fixed position
     const element = document.querySelector(steps[currentStep].target);
     const container = document.getElementById("app-scroll-container");
 
-    if (element && container) {
-      const elementTop = element.offsetTop;
+    if (element) {
+      const isFixed =
+        window.getComputedStyle(element).position === "fixed" ||
+        element.closest('[style*="position: fixed"]') !== null ||
+        element.closest(".fixed") !== null;
 
-      container.scrollTo({
-        top: elementTop - container.clientHeight / 2 + element.clientHeight / 2,
-        behavior: "smooth",
-      });
+      if (isFixed) {
+        // Fixed elements: update immediately (no scroll needed)
+        updateSpotlight();
+      } else if (container) {
+        // Scrollable elements: scroll first, then update
+        const elementTop = element.offsetTop;
+        container.scrollTo({
+          top: elementTop - container.clientHeight / 2 + element.clientHeight / 2,
+          behavior: "smooth",
+        });
+        setTimeout(updateSpotlight, 150);
+      }
     }
-
-    // Initial update with slight delay for scroll
-    setTimeout(updateSpotlight, 150);
 
     // Keep updating during resize/scroll
     window.addEventListener("resize", updateSpotlight);
@@ -159,7 +176,7 @@ const OnboardingTour = ({
   return (
     <>
       {/* Dark overlay with spotlight cutout */}
-      <div className="fixed inset-0 z-[9998] pointer-events-none">
+      <div className="fixed inset-0 z-[99999] pointer-events-none">
         {/* Animated spotlight border */}
         {spotlightRect && (
           <div
@@ -177,7 +194,7 @@ const OnboardingTour = ({
 
       {/* Tooltip card */}
       <div
-        className="fixed z-[9999] pointer-events-auto transition-all duration-500 ease-out"
+        className="fixed z-[99999] pointer-events-auto transition-all duration-500 ease-out"
         style={getTooltipPosition()}
       >
         <div className="glass border border-white/20 rounded-3xl shadow-2xl backdrop-blur-xl p-6 max-w-[380px] animate-fade-in">

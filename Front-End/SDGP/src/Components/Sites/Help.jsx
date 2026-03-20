@@ -8,6 +8,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { fetchFaqs, submitComplaint } from "../../api/api";
 import { useLanguage } from "../../context/LanguageContext";
+import { useNavigate } from "react-router-dom";
 
 const FAQ_TRANSLATION_KEYS = {
   "how does ricevision monitor paddy fields": {
@@ -63,12 +64,13 @@ const shouldHideFaq = (faq) => {
   ];
 
   return candidates.some((candidate) =>
-    HIDDEN_FAQ_QUESTIONS.has(normalizeFaqLookup(candidate))
+    HIDDEN_FAQ_QUESTIONS.has(normalizeFaqLookup(candidate)),
   );
 };
 
 const Help = () => {
   const { t, language } = useLanguage();
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     full_name: "",
     position: "",
@@ -145,7 +147,10 @@ const Help = () => {
 
   const getFaqFallbackText = (faq, kind) => {
     const englishQuestion =
-      faq?.translations?.en?.question || faq?.question_en || faq?.question || "";
+      faq?.translations?.en?.question ||
+      faq?.question_en ||
+      faq?.question ||
+      "";
     const entry = FAQ_TRANSLATION_KEYS[normalizeFaqLookup(englishQuestion)];
     if (!entry?.[kind]) return "";
 
@@ -165,20 +170,24 @@ const Help = () => {
       faq?.[kind],
     ];
 
-    const value = fallbacks.find((candidate) => typeof candidate === "string" && candidate.trim());
+    const value = fallbacks.find(
+      (candidate) => typeof candidate === "string" && candidate.trim(),
+    );
     return value || "";
   };
 
   return (
     <div className="min-h-full p-4 sm:p-6 lg:p-10 text-white font-sans">
       <div className="max-w-7xl mx-auto space-y-10 pb-20">
-
         {/* Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
-            <h1 className="flex items-center gap-2 sm:gap-3 text-xl sm:text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
+            <h1
+              className="flex items-center gap-2 sm:gap-3 text-xl sm:text-3xl md:text-5xl font-black text-white tracking-tight"
+              style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}
+            >
               <QuestionMarkCircleIcon className="w-6 h-6 sm:w-8 sm:h-8 md:w-12 md:h-12 text-emerald-400" />
-              {t('helpSupport')}
+              {t("helpSupport")}
             </h1>
             <p className="text-white/85 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em] max-w-2xl">
               {/* Optional subtitle text */}
@@ -211,7 +220,9 @@ const Help = () => {
               className="glass glass-hover p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl md:rounded-[2rem] border border-white/10 shadow-xl group transition-all duration-500"
             >
               <div className="flex items-center gap-4 mb-4">
-                <div className={`p-3 rounded-2xl bg-white/5 border border-white/10 group-hover:scale-110 transition-transform`}>
+                <div
+                  className={`p-3 rounded-2xl bg-white/5 border border-white/10 group-hover:scale-110 transition-transform`}
+                >
                   {card.icon}
                 </div>
                 <h3 className="font-black text-xl text-white tracking-tight">
@@ -223,10 +234,11 @@ const Help = () => {
               </p>
               <a
                 href={card.href}
-                className={`inline-flex items-center justify-center text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-lg border transition-all duration-300 ${idx === 0
+                className={`inline-flex items-center justify-center text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-lg border transition-all duration-300 ${
+                  idx === 0
                     ? "border-emerald-500/70 bg-emerald-400/35 text-emerald-950 hover:bg-emerald-400/45"
                     : "border-cyan-500/70 bg-cyan-400/35 text-cyan-950 hover:bg-cyan-400/45"
-                  }`}
+                }`}
               >
                 {card.action}
               </a>
@@ -236,65 +248,110 @@ const Help = () => {
 
         {/* Main Interface: Form & FAQs */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-10">
-
           {/* Complaint Console */}
           <div className="lg:col-span-3">
             <div className="glass p-4 sm:p-6 md:p-8 lg:p-10 rounded-xl sm:rounded-2xl md:rounded-[2.5rem] border border-white/10 shadow-2xl space-y-6 sm:space-y-8">
               <div className="flex items-center gap-3 border-b border-white/10 pb-6">
                 <ExclamationTriangleIcon className="w-6 h-6 text-amber-400" />
-                <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/85">{t('submitComplaintTitle')}</h2>
+                <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/85">
+                  {t("submitComplaintTitle")}
+                </h2>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-[10px] font-black uppercase tracking-widest text-white/85 mb-2 ml-1">{t('fullOperatorName')}</label>
-                    <input name="full_name" value={form.full_name} onChange={handleChange} className={inputClass} placeholder={t('fullNameExample')} />
+                    <label className="block text-[10px] font-black uppercase tracking-widest text-white/85 mb-2 ml-1">
+                      {t("fullOperatorName")}
+                    </label>
+                    <input
+                      name="full_name"
+                      value={form.full_name}
+                      onChange={handleChange}
+                      className={inputClass}
+                      placeholder={t("fullNameExample")}
+                    />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-black uppercase tracking-widest text-white/85 mb-2 ml-1">{t('assignedPosition')}</label>
-                    <input name="position" value={form.position} onChange={handleChange} className={inputClass} placeholder={t('assignedPositionExample')} />
+                    <label className="block text-[10px] font-black uppercase tracking-widest text-white/85 mb-2 ml-1">
+                      {t("assignedPosition")}
+                    </label>
+                    <input
+                      name="position"
+                      value={form.position}
+                      onChange={handleChange}
+                      className={inputClass}
+                      placeholder={t("assignedPositionExample")}
+                    />
                   </div>
                 </div>
 
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[10px] font-black uppercase tracking-widest text-white/85 mb-2 ml-1">{t('province')}</label>
-                      <input name="province" value={form.province} onChange={handleChange} className={inputClass} />
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-white/85 mb-2 ml-1">
+                        {t("province")}
+                      </label>
+                      <input
+                        name="province"
+                        value={form.province}
+                        onChange={handleChange}
+                        className={inputClass}
+                      />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-black uppercase tracking-widest text-white/85 mb-2 ml-1">{t('district')}</label>
-                      <input name="district" value={form.district} onChange={handleChange} className={inputClass} />
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-white/85 mb-2 ml-1">
+                        {t("district")}
+                      </label>
+                      <input
+                        name="district"
+                        value={form.district}
+                        onChange={handleChange}
+                        className={inputClass}
+                      />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-[10px] font-black uppercase tracking-widest text-white/85 mb-2 ml-1">{t('anomalyType')}</label>
+                    <label className="block text-[10px] font-black uppercase tracking-widest text-white/85 mb-2 ml-1">
+                      {t("anomalyType")}
+                    </label>
                     <select
                       name="complaint_type"
                       value={form.complaint_type}
                       onChange={handleChange}
                       className={inputClass + " appearance-none cursor-pointer"}
                     >
-                      <option value="" className="bg-slate-900">{t('selectIssueType')}</option>
-                      <option className="bg-slate-900">{t('issueTechnical')}</option>
-                      <option className="bg-slate-900">{t('issueDataMismatch')}</option>
-                      <option className="bg-slate-900">{t('issueAccountAccess')}</option>
-                      <option className="bg-slate-900">{t('issueOther')}</option>
+                      <option value="" className="bg-slate-900">
+                        {t("selectIssueType")}
+                      </option>
+                      <option className="bg-slate-900">
+                        {t("issueTechnical")}
+                      </option>
+                      <option className="bg-slate-900">
+                        {t("issueDataMismatch")}
+                      </option>
+                      <option className="bg-slate-900">
+                        {t("issueAccountAccess")}
+                      </option>
+                      <option className="bg-slate-900">
+                        {t("issueOther")}
+                      </option>
                     </select>
                   </div>
                 </div>
               </div>
 
               <div className="space-y-4">
-                <label className="block text-[10px] font-black uppercase tracking-widest text-white/85 mb-2 ml-1">{t('detailedMessage')}</label>
+                <label className="block text-[10px] font-black uppercase tracking-widest text-white/85 mb-2 ml-1">
+                  {t("detailedMessage")}
+                </label>
                 <textarea
                   name="message"
                   value={form.message}
                   onChange={handleChange}
                   rows="6"
                   className={inputClass + " resize-none"}
-                  placeholder={t('describeIssue')}
+                  placeholder={t("describeIssue")}
                 />
               </div>
 
@@ -303,7 +360,7 @@ const Help = () => {
                 disabled={loading}
                 className="w-full glass bg-emerald-400/35 hover:bg-emerald-400/45 text-emerald-950 py-4 rounded-2xl font-black uppercase tracking-widest transition-all active:scale-[0.98] border border-emerald-500/60 shadow-xl shadow-emerald-500/10 disabled:opacity-50"
               >
-                {loading ? t('transmitting') : t('submitReport')}
+                {loading ? t("transmitting") : t("submitReport")}
               </button>
             </div>
           </div>
@@ -311,15 +368,35 @@ const Help = () => {
           {/* Dynamic Knowledge Base (FAQs) */}
           <div className="lg:col-span-2 space-y-6">
             <div className="glass p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl md:rounded-[2.5rem] border border-white/10 shadow-xl h-fit">
-                <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/85 mb-8 flex items-center gap-2">
+              <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/85 mb-8 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-                {t('quickHelp')}
+                {t("quickHelp")}
               </h2>
+
+              {/* Take a Quick Tour Button */}
+              <button
+                onClick={() => {
+                  // Navigate to dashboard
+                  navigate("/dashboard");
+                  // Dispatch custom event to trigger tour replay after navigation
+                  setTimeout(() => {
+                    window.dispatchEvent(
+                      new CustomEvent("replay-onboarding-tour"),
+                    );
+                  }, 500);
+                }}
+                className="w-full mb-6 glass bg-cyan-400/35 hover:bg-cyan-400/45 text-cyan-950 py-3 px-4 rounded-xl font-black uppercase tracking-widest text-[10px] transition-all active:scale-[0.98] border border-cyan-500/60 shadow-lg shadow-cyan-500/10 flex items-center justify-center gap-2"
+              >
+                <QuestionMarkCircleIcon className="w-4 h-4" />
+                Take a Quick Tour
+              </button>
 
               {faqLoading && (
                 <div className="flex items-center gap-3 py-10 justify-center">
                   <div className="w-4 h-4 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin" />
-                  <span className="text-xs font-black uppercase text-white/85">{t('decryptingFaqs')}</span>
+                  <span className="text-xs font-black uppercase text-white/85">
+                    {t("decryptingFaqs")}
+                  </span>
                 </div>
               )}
 
@@ -327,17 +404,27 @@ const Help = () => {
                 {faqs.map((faq) => (
                   <div
                     key={faq.id}
-                    className={`glass rounded-2xl border transition-all duration-300 ${openFaq === faq.id ? "bg-white/10 border-white/20" : "bg-white/5 border-white/5 hover:border-white/10"
-                      }`}
+                    className={`glass rounded-2xl border transition-all duration-300 ${
+                      openFaq === faq.id
+                        ? "bg-white/10 border-white/20"
+                        : "bg-white/5 border-white/5 hover:border-white/10"
+                    }`}
                   >
                     <button
-                      onClick={() => setOpenFaq(openFaq === faq.id ? null : faq.id)}
+                      onClick={() =>
+                        setOpenFaq(openFaq === faq.id ? null : faq.id)
+                      }
                       className="w-full flex justify-between items-center px-5 py-4 text-left font-bold text-xs md:text-sm text-white/90 group"
                     >
-                      <span className="group-hover:text-white transition-colors">{getFaqText(faq, "question")}</span>
+                      <span className="group-hover:text-white transition-colors">
+                        {getFaqText(faq, "question")}
+                      </span>
                       <ChevronDownIcon
-                        className={`w-4 h-4 text-white/85 transition-transform duration-500 ${openFaq === faq.id ? "rotate-180 text-emerald-400" : ""
-                          }`}
+                        className={`w-4 h-4 text-white/85 transition-transform duration-500 ${
+                          openFaq === faq.id
+                            ? "rotate-180 text-emerald-400"
+                            : ""
+                        }`}
                       />
                     </button>
 
@@ -353,12 +440,12 @@ const Help = () => {
 
             {/* Support Tag */}
             <div className="glass p-6 rounded-3xl border border-white/10 text-center">
-              <p className="text-[10px] font-black uppercase text-white/85 tracking-tighter">{t('systemVersionTag')}</p>
+              <p className="text-[10px] font-black uppercase text-white/85 tracking-tighter">
+                {t("systemVersionTag")}
+              </p>
             </div>
           </div>
         </div>
-
-
       </div>
     </div>
   );
