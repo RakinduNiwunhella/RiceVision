@@ -80,6 +80,10 @@ const Notifications = ({ onRead, onUnreadCountChange, style }) => {
                 key={note.id}
                 onClick={(e) => {
                   e.stopPropagation();
+                  // Mark as read when user clicks the notification
+                  if (!note.is_read) {
+                    handleMarkAsRead(note.id);
+                  }
                   setSelectedNotification((prev) =>
                     prev && prev.id === note.id ? null : note
                   );
