@@ -21,29 +21,33 @@ const TutorialTooltip = ({
 
   // Apply highlight class to target element
   useEffect(() => {
-    if (!visible || !elementRef?.current) return
+    // 🧹 Clean ALL highlights first
+    document
+      .querySelectorAll('.tutorial-highlight')
+      .forEach(el => el.classList.remove('tutorial-highlight'))
 
-    console.log("🔥 Tutorial step triggered", { step, visible })
+    let element = elementRef?.current
 
-    const element = elementRef.current
-    const rect = element.getBoundingClientRect()
+    // 🔥 Fallback for step 0 (navbar)
+    if (!element && step === 0) {
+      element = document.querySelector('[data-tour="navbar"]')
+      console.log("🔍 Fallback navbar selector:", element)
+    }
 
-    console.log("📦 Element:", element)
-    console.log("📐 Rect:", rect)
-
-    if (rect.width === 0 || rect.height === 0) {
-      console.log("⚠️ Invalid rect size, skipping", { width: rect.width, height: rect.height })
+    if (!element) {
+      console.log("❌ No element found for highlight", { step })
       return
     }
 
-    // Add highlight class to element
-    element.classList.add('tutorial-highlight')
+    // ✅ Apply ONLY when visible
+    if (visible) {
+      element.classList.add('tutorial-highlight')
+    }
 
     return () => {
-      // Remove highlight class on cleanup
       element.classList.remove('tutorial-highlight')
     }
-  }, [visible, elementRef, step])
+  }, [visible, step, elementRef])
 
   // Calculate tooltip position
   useEffect(() => {

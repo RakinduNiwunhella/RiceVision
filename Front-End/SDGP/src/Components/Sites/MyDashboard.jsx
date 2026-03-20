@@ -166,7 +166,7 @@ const MyDashboard = () => {
   // First-time user onboarding tour (6 core steps)
   const onboardingSteps = [
     {
-      target: '[data-tour="navigation-bar"]',
+      target: '[data-tour="navbar"]',
       title: 'Navigation Bar',
       description: 'Access maps, alerts, weather, and reports',
     },

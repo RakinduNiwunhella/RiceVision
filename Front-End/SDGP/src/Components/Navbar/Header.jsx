@@ -316,10 +316,10 @@ const Header = () => {
 
   let filteredResults = searchQuery.trim()
     ? searchIndex.filter(
-        (item) =>
-          item.label.toLowerCase().includes(query) ||
-          item.description.toLowerCase().includes(query),
-      )
+      (item) =>
+        item.label.toLowerCase().includes(query) ||
+        item.description.toLowerCase().includes(query),
+    )
     : [];
 
   // Add district results dynamically
@@ -427,6 +427,7 @@ const Header = () => {
     <>
       <nav
         ref={navbarRef}
+        data-tour="navbar"
         className="fixed top-2 sm:top-4 left-1/2 -translate-x-1/2 w-[calc(100%-1rem)] sm:w-[calc(100%-3rem)] max-w-7xl z-[9995] glass h-12 sm:h-14 rounded-2xl shadow-2xl border-white/20 overflow-visible"
       >
         <div className="max-w-7xl mx-auto px-3 sm:px-4 h-full">
@@ -456,11 +457,10 @@ const Header = () => {
                     <div key={item.label} ref={item.ref}>
                       <Link
                         to={item.path}
-                        className={`flex items-center gap-1 lg:gap-1.5 px-2 lg:px-3 py-1.5 rounded-lg text-[10px] lg:text-[11px] font-semibold tracking-wide whitespace-nowrap transition-all duration-300 ${
-                          isActive
-                            ? "bg-white/15 text-white shadow-xl shadow-black/5 border border-white/20"
-                            : "text-white/85 hover:text-white hover:bg-white/10"
-                        }`}
+                        className={`flex items-center gap-1 lg:gap-1.5 px-2 lg:px-3 py-1.5 rounded-lg text-[10px] lg:text-[11px] font-semibold tracking-wide whitespace-nowrap transition-all duration-300 ${isActive
+                          ? "bg-white/15 text-white shadow-xl shadow-black/5 border border-white/20"
+                          : "text-white/85 hover:text-white hover:bg-white/10"
+                          }`}
                       >
                         <span className="material-symbols-outlined text-[15px] lg:text-[16px]">
                           {item.icon}
@@ -602,11 +602,10 @@ const Header = () => {
                               setLanguage(lang.code);
                               setLangOpen(false);
                             }}
-                            className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition hover:bg-white/10 ${
-                              language === lang.code
-                                ? "bg-emerald-500/20 text-white"
-                                : "text-white/85"
-                            }`}
+                            className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition hover:bg-white/10 ${language === lang.code
+                              ? "bg-emerald-500/20 text-white"
+                              : "text-white/85"
+                              }`}
                           >
                             <span className="text-xs font-semibold">
                               {lang.short}
@@ -768,11 +767,10 @@ const Header = () => {
                   <Link
                     to={item.path}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${
-                      isActive
-                        ? "bg-white/15 text-white border border-white/20"
-                        : "text-white/85 hover:text-white hover:bg-white/10"
-                    }`}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${isActive
+                      ? "bg-white/15 text-white border border-white/20"
+                      : "text-white/85 hover:text-white hover:bg-white/10"
+                      }`}
                   >
                     <span className="material-symbols-outlined text-[18px]">
                       {item.icon}
