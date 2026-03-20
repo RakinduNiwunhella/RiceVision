@@ -607,6 +607,9 @@ const Report = () => {
     const MUTED = [148, 163, 184];
     const LGRAY = [241, 245, 249];
     const BORDER = [226, 232, 240];
+    const TEAL_BG = [236, 253, 245];
+    const BLUE = [37, 99, 235];
+    const PURPLE = [124, 58, 237];
 
     doc.setFillColor(...WHITE);
     doc.rect(0, 0, PW, PH, "F");
@@ -639,6 +642,14 @@ const Report = () => {
     doc.setFillColor(...WHITE);
     doc.rect(0, 0, PW, 40, "F");
 
+    doc.setFillColor(...TEAL_BG);
+    doc.roundedRect(PW - M - 56, 7, 56, 8, 2, 2, "F");
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(7);
+    doc.setTextColor(...GREEN);
+    doc.text("COMPARATIVE INTELLIGENCE", PW - M - 2, 12, { align: "right" });
+
     doc.setFillColor(0, 100, 50);
     doc.rect(0, 40, PW, 2, "F");
 
@@ -648,9 +659,9 @@ const Report = () => {
       doc.addImage(logoDataUrl, "PNG", M, logoY, logoW, logoH);
     }
 
-    doc.setFont("helvetica", "bold");
+    doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
-    doc.setTextColor(...INK);
+    doc.setTextColor(...SUBTEXT);
 
     doc.setFontSize(9);
 
@@ -670,7 +681,7 @@ const Report = () => {
 
     /* ---------------- DISTRICT TITLE ROW ---------------- */
 
-    doc.setFillColor(...OFFWH);
+    doc.setFillColor(...TEAL_BG);
     doc.rect(0, 42, PW, 20, "F");
 
     doc.setDrawColor(...BORDER);
@@ -689,6 +700,13 @@ const Report = () => {
 
     doc.text("Sri Lanka · Comparative Yield Analytics", M, 59);
 
+    doc.setFillColor(...GREEN);
+    doc.roundedRect(PW - M - 34, 48, 34, 7, 1.5, 1.5, "F");
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(6.5);
+    doc.setTextColor(...WHITE);
+    doc.text("REPORT SNAPSHOT", PW - M - 17, 52.6, { align: "center" });
+
     /* ---------------- SUMMARY CARDS ---------------- */
 
     let y = 72;
@@ -701,24 +719,32 @@ const Report = () => {
       doc.setFillColor(...OFFWH);
       doc.roundedRect(x, y, cardW, cardH, 3, 3, "F");
 
+      doc.setDrawColor(...BORDER);
+      doc.setLineWidth(0.2);
+      doc.roundedRect(x, y, cardW, cardH, 3, 3, "S");
+
       doc.setFillColor(...GREEN);
       doc.roundedRect(x, y, 3, cardH, 2, 2, "F");
 
+      doc.setDrawColor(203, 213, 225);
+      doc.line(x + cardW / 2, y + 10, x + cardW / 2, y + cardH - 4);
+
       doc.setFontSize(6.5);
-      doc.setTextColor(...MUTED);
+      doc.setTextColor(...SUBTEXT);
       doc.text(label, x + 7, y + 7);
 
+      doc.setFontSize(5.5);
+      doc.setTextColor(...MUTED);
+      doc.text(districtADisplay.toUpperCase(), x + 7, y + 11);
+      doc.text(districtBDisplay.toUpperCase(), x + cardW / 2 + 7, y + 11);
+
       doc.setFontSize(11);
-      doc.setTextColor(...INK);
+      doc.setTextColor(...BLUE);
 
-      doc.text(`${valA}`, x + 7, y + 15);
-      doc.text(`${valB}`, x + cardW / 2 + 7, y + 15);
+      doc.text(`${valA}`, x + 7, y + 17);
 
-      doc.setFontSize(6);
-      doc.setTextColor(...SUBTEXT);
-
-      doc.text(districtADisplay, x + 7, y + 21);
-      doc.text(districtBDisplay, x + cardW / 2 + 7, y + 21);
+      doc.setTextColor(...PURPLE);
+      doc.text(`${valB}`, x + cardW / 2 + 7, y + 17);
 
     };
 
@@ -765,6 +791,10 @@ const Report = () => {
     doc.setDrawColor(...GREEN);
     doc.line(M, y + 1.5, PW - M, y + 1.5);
 
+    doc.setFontSize(6.5);
+    doc.setTextColor(...SUBTEXT);
+    doc.text("Yield, stress and risk metrics side-by-side", PW - M, y, { align: "right" });
+
     y += 6;
 
     autoTable(doc, {
@@ -810,11 +840,14 @@ const Report = () => {
         fillColor: GREEN,
         textColor: WHITE,
         fontSize: 7.5,
-        fontStyle: "bold"
+        fontStyle: "bold",
+        lineColor: [15, 23, 42],
+        lineWidth: 0
       },
       styles: {
         fontSize: 7.5,
-        cellPadding: 3
+        cellPadding: 3,
+        textColor: DARK
       },
       alternateRowStyles: { fillColor: LGRAY },
       tableLineColor: BORDER,
@@ -837,17 +870,29 @@ const Report = () => {
 
     y += 8;
 
+    const winner =
+      diff > 0 ? districtADisplay : districtBDisplay;
+
+    const insightText = `${winner} shows higher predicted yield by ${Math.abs(Math.round(diff))} kg/ha.`;
+    const insightLines = doc.splitTextToSize(insightText, PW - M * 2 - 10);
+
+    doc.setFillColor(...TEAL_BG);
+    doc.roundedRect(M, y - 5, PW - M * 2, 12, 2.5, 2.5, "F");
+    doc.setDrawColor(167, 243, 208);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(M, y - 5, PW - M * 2, 12, 2.5, 2.5, "S");
+
+    doc.setFillColor(...GREEN);
+    doc.circle(M + 4.5, y + 1, 1.2, "F");
+
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
     doc.setTextColor(...INK);
 
-    const winner =
-      diff > 0 ? districtADisplay : districtBDisplay;
-
     doc.text(
-      `${winner} shows higher predicted yield by ${Math.abs(Math.round(diff))} kg/ha.`,
-      M,
-      y
+      insightLines,
+      M + 8,
+      y + 2
     );
 
     /* ---------------- FOOTER ---------------- */
