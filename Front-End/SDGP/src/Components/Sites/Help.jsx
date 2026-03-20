@@ -22,11 +22,11 @@ const LAST_UPDATED = "19 March 2026";
 function PolicySection({ title, children }) {
   return (
     <section>
-      <h2 className="text-lg font-black text-white mb-3 flex items-center gap-2">
+      <h2 className="text-lg font-black text-slate-900 dark:text-white mb-3 flex items-center gap-2">
         <span className="w-1 h-5 rounded-full bg-emerald-500 inline-block" />
         {title}
       </h2>
-      <div className="text-white/70 text-sm leading-relaxed space-y-3 pl-3 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1.5 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:space-y-1.5 [&_a]:text-emerald-400 [&_strong]:text-white">
+      <div className="text-slate-700 dark:text-white/70 text-sm leading-relaxed space-y-3 pl-3 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1.5 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:space-y-1.5 [&_a]:text-emerald-700 dark:[&_a]:text-emerald-400 [&_strong]:text-slate-900 dark:[&_strong]:text-white">
         {children}
       </div>
     </section>
@@ -696,19 +696,17 @@ const Help = () => {
         {/* ── Policy Overlay Modal ── */}
         {activePolicy && (
           <div
-            className="fixed inset-x-0 bottom-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6"
-            style={{ top: "60px", background: "rgba(0,0,0,0.65)", backdropFilter: "blur(6px)" }}
+            className="fixed inset-x-0 top-15 bottom-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6 bg-slate-950/35 dark:bg-black/65 backdrop-blur-[6px]"
             onClick={(e) => { if (e.target === e.currentTarget) setActivePolicy(null); }}
           >
             <div
-              className="relative w-full sm:max-w-2xl max-h-[78dvh] flex flex-col rounded-t-3xl sm:rounded-3xl border border-white/20 shadow-2xl backdrop-blur-2xl"
-              style={{ background: "rgba(10,20,38,0.45)" }}
+              className="relative w-full sm:max-w-2xl max-h-[78dvh] flex flex-col rounded-t-3xl sm:rounded-3xl border border-slate-300/75 dark:border-white/20 shadow-[0_20px_60px_rgba(15,23,42,0.22)] dark:shadow-2xl backdrop-blur-2xl bg-white/80 dark:bg-[rgba(10,20,38,0.45)]"
             >
               {/* Modal header */}
-              <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-white/10 shrink-0">
+              <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-slate-300/80 dark:border-white/10 shrink-0">
                 <div className="flex items-center gap-3">
                   <DocumentTextIcon className="w-5 h-5 text-emerald-400" />
-                  <h2 className="text-base font-black tracking-tight text-white">
+                  <h2 className="text-base font-black tracking-tight text-slate-900 dark:text-white">
                     {POLICIES[activePolicy].title}
                   </h2>
                 </div>
@@ -716,13 +714,13 @@ const Help = () => {
                   type="button"
                   onClick={() => setActivePolicy(null)}
                   aria-label="Close"
-                  className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white/60 hover:text-white transition-all"
+                  className="p-2 rounded-xl bg-slate-900/5 hover:bg-slate-900/10 dark:bg-white/5 dark:hover:bg-white/10 border border-slate-400/30 dark:border-white/10 hover:border-slate-500/40 dark:hover:border-white/20 text-slate-600 hover:text-slate-900 dark:text-white/60 dark:hover:text-white transition-all"
                 >
                   <XMarkIcon className="w-5 h-5" />
                 </button>
               </div>
               {/* Updated line */}
-              <p className="px-6 py-2 text-[10px] text-white/30 shrink-0">
+              <p className="px-6 py-2 text-[10px] text-slate-500 dark:text-white/30 shrink-0">
                 Last updated: {LAST_UPDATED} · {WEBSITE}
               </p>
               {/* Scrollable content */}
