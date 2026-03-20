@@ -19,6 +19,7 @@ async function get(path) {
 }
 
 // endpoints
+export const fetchNotificationUnreadCount = () => get("/notifications/unread-count");
 export const fetchHealthSummary = () => get("/health-summary");
 export const fetchYield = () => get("/yield");
 export const fetchBestDistricts = () => get("/best-districts");
