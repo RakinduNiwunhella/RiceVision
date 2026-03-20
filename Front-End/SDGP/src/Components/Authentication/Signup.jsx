@@ -90,7 +90,7 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="flex transition-colors duration-500 ...">
+    <div className="min-h-screen flex flex-col md:flex-row transition-colors duration-500 bg-white dark:bg-neutral-900 text-black dark:text-white">
       {/* Theme Toggle */}
       <button
         type="button"
@@ -105,7 +105,7 @@ export default function SignupPage() {
       </button>
 
       {/* Left Side: Form Container */}
-      <div className="flex flex-col w-full px-5 sm:px-8 pt-3 pb-6 md:w-3/4 lg:w-1/2 md:px-12 lg:px-20 z-10 mx-auto md:mx-0">
+      <div className="flex-1 flex flex-col justify-center px-5 sm:px-8 py-8 md:py-12 md:w-1/2 lg:px-20 z-10 w-full mx-auto md:mx-0 order-2 md:order-1">
         <div className="w-full max-w-md mx-auto">
           {/* Logo */}
           <div className="flex items-center mb-0 space-x-3">
@@ -121,7 +121,7 @@ export default function SignupPage() {
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold mb-3 tracking-tight">
             {t('createAccount')}
           </h2>
-          <p className="text-slate-500 dark:text-slate-400 mb-6">
+          <p className="text-gray-500 dark:text-gray-400 mb-6">
             {t('createAccountSubtitle')}
           </p>
 
@@ -135,7 +135,7 @@ export default function SignupPage() {
                 type="text"
                 required
                 placeholder="John Doe"
-                className="w-full px-4 py-2.5 sm:py-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                className="w-full rounded-xl px-4 py-3 transition-all duration-200 bg-gray-100 text-gray-900 border border-gray-300 placeholder-gray-500 dark:bg-neutral-800/80 dark:text-white dark:border-neutral-600 dark:placeholder-gray-400 hover:border-gray-400 dark:hover:border-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 backdrop-blur-sm"
                 onChange={(e) => setFullName(e.target.value)}
               />
             </div>
@@ -149,9 +149,9 @@ export default function SignupPage() {
                 type="email"
                 required
                 placeholder="name@company.com"
-                className={`w-full px-4 py-2.5 sm:py-3.5 rounded-xl border bg-slate-50 dark:bg-slate-900/50 outline-none transition-all focus:ring-2 ${emailError
+                className={`w-full rounded-xl px-4 py-3 transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border outline-none backdrop-blur-sm focus:ring-2 ${emailError
                   ? "border-red-500 focus:ring-red-500/20"
-                  : "border-slate-200 dark:border-slate-800 focus:ring-indigo-500"
+                  : "bg-gray-100 dark:bg-neutral-800/80 border-gray-300 dark:border-neutral-600 hover:border-gray-400 dark:hover:border-neutral-500 focus:ring-indigo-500 dark:focus:ring-indigo-400"
                   }`}
                 onChange={(e) => {
                   setEmail(e.target.value);
@@ -173,9 +173,9 @@ export default function SignupPage() {
                   type="password"
                   required
                   placeholder="••••••••"
-                  className={`w-full px-4 py-2.5 sm:py-3.5 rounded-xl border bg-slate-50 dark:bg-slate-900/50 outline-none transition-all focus:ring-2 ${passwordLengthError
+                  className={`w-full rounded-xl px-4 py-3 transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border outline-none backdrop-blur-sm focus:ring-2 ${passwordLengthError
                     ? "border-red-500 focus:ring-red-500/20"
-                    : "border-slate-200 dark:border-slate-800 focus:ring-indigo-500"
+                    : "bg-gray-100 dark:bg-neutral-800/80 border-gray-300 dark:border-neutral-600 hover:border-gray-400 dark:hover:border-neutral-500 focus:ring-indigo-500 dark:focus:ring-indigo-400"
                     }`}
                   onChange={(e) => {
                     setPassword(e.target.value);
@@ -197,9 +197,9 @@ export default function SignupPage() {
                   type="password"
                   required
                   placeholder="••••••••"
-                  className={`w-full px-4 py-2.5 sm:py-3.5 rounded-xl border bg-slate-50 dark:bg-slate-900/50 outline-none transition-all focus:ring-2 ${passwordError
+                  className={`w-full rounded-xl px-4 py-3 transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border outline-none backdrop-blur-sm focus:ring-2 ${passwordError
                     ? "border-red-500 focus:ring-red-500/20"
-                    : "border-slate-200 dark:border-slate-800 focus:ring-indigo-500"
+                    : "bg-gray-100 dark:bg-neutral-800/80 border-gray-300 dark:border-neutral-600 hover:border-gray-400 dark:hover:border-neutral-500 focus:ring-indigo-500 dark:focus:ring-indigo-400"
                     }`}
                   onChange={(e) => {
                     setConfirmPassword(e.target.value);
@@ -256,13 +256,27 @@ export default function SignupPage() {
       </div>
 
       {/* Right Side */}
-      <div className="hidden md:block md:w-1/4 lg:w-1/2 relative">
+      <div className="w-full h-[40vh] md:h-auto md:w-1/2 relative bg-neutral-900 order-1 md:order-2">
+        {/* Day */}
         <img
-          src="/paddy_signup.png"
-          alt="Rice Field"
-          className="absolute inset-0 w-full h-full object-cover"
+          src="/images/rice-day-2.webp"
+          alt="Rice Field Day"
+          fetchPriority="high"
+          loading="eager"
+          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 opacity-100 dark:opacity-0"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+        
+        {/* Night */}
+        <img
+          src="/images/dark image 2.jpeg"
+          alt="Rice Field Night"
+          fetchPriority="high"
+          loading="eager"
+          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 opacity-0 dark:opacity-100"
+        />
+
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none"></div>
+        <div className="absolute inset-0 bg-transparent dark:bg-black/30 transition-colors duration-700 pointer-events-none"></div>
       </div>
     </div>
   );
