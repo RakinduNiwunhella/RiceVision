@@ -15,6 +15,32 @@ import {
   BarChart,
   Bar,
 } from "recharts";
+
+// Custom tooltip for district name popup
+const DistrictTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div style={{
+        background: "rgba(8,13,22,0.96)",
+        border: "1px solid rgba(255,255,255,0.08)",
+        borderRadius: 12,
+        padding: 10,
+        color: "#fff",
+        fontWeight: 700,
+        fontSize: 12,
+        textAlign: "center",
+        marginBottom: 8,
+        boxShadow: "0 2px 12px rgba(0,0,0,0.18)"
+      }}>
+        <div style={{ fontSize: 13, fontWeight: 900, marginBottom: 2 }}>{label}</div>
+        <div style={{ color: "#9be7d0", fontWeight: 700 }}>
+          {payload[0].value.toLocaleString(undefined, { maximumFractionDigits: 1 })} MT
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
 import { useLanguage } from "../../context/LanguageContext";
 import { Bug } from "lucide-react";
 import TutorialOverlay from "../TutorialOverlay";
@@ -524,60 +550,40 @@ const MyDashboard = () => {
               </div>
 
               {districtYieldRows.length > 0 ? (
-                <div className="flex gap-0 h-[320px]">
-                  <div className="w-12 shrink-0 border-r border-white/10 bg-transparent pr-1">
+                <div className="h-[320px] w-full overflow-x-auto pb-2 custom-scrollbar">
+                  <div style={{ width: `${Math.max(900, districtYieldRows.length * 72)}px`, height: "320px" }}>
                     <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={districtYieldRows} margin={{ top: 8, right: 0, left: 0, bottom: 56 }}>
-                        <YAxis
+                      <LineChart data={districtYieldRows} margin={{ top: 8, right: 14, left: 32, bottom: 56 }}>
+                        <CartesianGrid stroke="rgba(255,255,255,0.08)" strokeDasharray="3 3" vertical={false} />
+                        <XAxis
+                          dataKey="district"
+                          tick={{ fill: "rgba(255,255,255,0.62)", fontSize: 10, fontWeight: 800 }}
+                          axisLine={{ stroke: "rgba(255,255,255,0.15)" }}
+                          tickLine={false}
+                          interval={0}
+                          angle={-32}
+                          textAnchor="end"
+                          height={60}
+                        />
+                        <YAxis 
                           domain={yieldAxisDomain}
-                          tick={{ fill: "rgba(255,255,255,0.55)", fontSize: 10, fontWeight: 800 }}
+                          tick={{ fill: "rgba(255,255,255,0.85)", fontSize: 11, fontWeight: 900 }}
                           axisLine={false}
                           tickLine={false}
-                          width={56}
-                          tickFormatter={(value) => `${Number(value).toFixed(0)}`}
+                          width={60}
+                          tickFormatter={formatDistrictMT}
                         />
-                        <Line dataKey="yieldMT" stroke="transparent" dot={false} isAnimationActive={false} />
+                        <Tooltip content={<DistrictTooltip />} />
+                        <Line
+                          type="monotone"
+                          dataKey="yieldMT"
+                          stroke="#34d399"
+                          strokeWidth={2.5}
+                          dot={{ r: 2.5, fill: "#34d399", stroke: "#34d399" }}
+                          activeDot={{ r: 5 }}
+                        />
                       </LineChart>
                     </ResponsiveContainer>
-                  </div>
-
-                  <div className="flex-1 overflow-x-auto pb-2 custom-scrollbar">
-                    <div style={{ width: `${Math.max(900, districtYieldRows.length * 72)}px`, height: "320px" }}>
-                      <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={districtYieldRows} margin={{ top: 8, right: 14, left: 0, bottom: 56 }}>
-                          <CartesianGrid stroke="rgba(255,255,255,0.08)" strokeDasharray="3 3" vertical={false} />
-                          <XAxis
-                            dataKey="district"
-                            tick={{ fill: "rgba(255,255,255,0.62)", fontSize: 10, fontWeight: 800 }}
-                            axisLine={{ stroke: "rgba(255,255,255,0.15)" }}
-                            tickLine={false}
-                            interval={0}
-                            angle={-32}
-                            textAnchor="end"
-                            height={60}
-                          />
-                          <YAxis hide domain={yieldAxisDomain} />
-                          <Tooltip
-                            contentStyle={{ background: "rgba(8,13,22,0.96)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px" }}
-                            labelStyle={{ color: "#fff", fontSize: "11px", fontWeight: "700" }}
-                            itemStyle={{ color: "#9be7d0", fontSize: "11px", fontWeight: "700" }}
-                            labelFormatter={(value, payload) => {
-                              const rank = payload?.[0]?.payload?.rank;
-                              return rank ? `#${rank} ${value}` : value;
-                            }}
-                            formatter={(value) => [`${formatDistrictMT(value)} MT`, "Total yield"]}
-                          />
-                          <Line
-                            type="monotone"
-                            dataKey="yieldMT"
-                            stroke="#34d399"
-                            strokeWidth={2.5}
-                            dot={{ r: 2.5, fill: "#34d399", stroke: "#34d399" }}
-                            activeDot={{ r: 5 }}
-                          />
-                        </LineChart>
-                      </ResponsiveContainer>
-                    </div>
                   </div>
                 </div>
               ) : (

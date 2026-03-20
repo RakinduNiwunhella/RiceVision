@@ -347,12 +347,12 @@ export default function RiceVisionWeather() {
     : "";
 
   return (
-    <div className="min-h-screen -mx-6 -mt-6 p-4 sm:p-6 lg:p-10 font-sans text-white">
+    <div className="min-h-screen px-4 pt-6 pb-10 sm:px-6 lg:px-10 font-sans text-white">
       <div className="max-w-7xl mx-auto space-y-8">
 
         {/* ─── HEADER ─── */}
         <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 flex-wrap">
-          <div className="mb-6">
+          <div className="mb-4">
 
             {/* System label */}
             <p className="text-[10px] font-black uppercase tracking-[0.45em] text-emerald-400 mb-2 flex items-center gap-2">
@@ -377,7 +377,7 @@ export default function RiceVisionWeather() {
 
           </div>
 
-          <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-3 flex-wrap mt-4">
             <button
               onClick={() => {
                 if (!navigator.geolocation) return;

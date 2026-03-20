@@ -19,6 +19,16 @@ async function get(path) {
 }
 
 // endpoints
+export const fetchNotificationUnreadCount = () => get("/notifications/unread_count");
+export const fetchNotifications = () => get("/notifications");
+
+export const markNotificationRead = async (notificationId) => {
+  const res = await apiFetch(`/notifications/${notificationId}/read`, {
+    method: "PUT",
+  });
+  if (!res.ok) throw new Error("Failed to mark notification as read");
+  return res.json();
+};
 export const fetchHealthSummary = () => get("/health-summary");
 export const fetchYield = () => get("/yield");
 export const fetchBestDistricts = () => get("/best-districts");
@@ -191,4 +201,31 @@ export const removeUserField = async () => {
   }
 
   return res.json();
+};
+
+/* ------------------ PAYMENT ------------------ */
+
+/**
+ * Fetch a secure PayHere MD5 hash from the backend.
+ * The merchant secret never leaves the server.
+ * @param {string} orderId   e.g. "rv-<user_id>"
+ * @param {string} amount    e.g. "1000.00"
+ * @param {string} currency  e.g. "LKR"
+ */
+export const fetchPaymentHash = async (orderId, amount, currency = "LKR") => {
+  const res = await apiFetch("/payment/hash", {
+    method: "POST",
+    body: JSON.stringify({ order_id: orderId, amount, currency }),
+  });
+
+  if (!res.ok) {
+    let message = "Failed to generate payment hash";
+    try {
+      const data = await res.json();
+      message = data.detail || message;
+    } catch (_) {}
+    throw new Error(message);
+  }
+
+  return res.json(); // { status, merchant_id, hash, order_id, amount, currency }
 };

@@ -13,6 +13,9 @@ import Signup from "./Components/Authentication/Signup";
 import ForgotPassword from "./Components/Authentication/ForgotPassword";
 import ResetPassword from "./Components/Authentication/ResetPassword";
 import FieldSetupPage from "./Components/FieldSetup/FieldSetupPage";
+import ReturnPolicy from "./Components/Sites/ReturnPolicy";
+import PrivacyPolicy from "./Components/Sites/PrivacyPolicy";
+import TermsAndConditions from "./Components/Sites/TermsAndConditions";
 import { supabase } from "./supabaseClient";
 
 const isValidLocalToken = (token) => {
@@ -84,6 +87,19 @@ const router = createBrowserRouter([
     path: "/field-setup",
     loader: requireAuthLoader,
     element: <FieldSetupPage />,
+  },
+  /* ── Public legal pages (no auth required) ── */
+  {
+    path: "/return-policy",
+    element: <ReturnPolicy />,
+  },
+  {
+    path: "/privacy-policy",
+    element: <PrivacyPolicy />,
+  },
+  {
+    path: "/terms",
+    element: <TermsAndConditions />,
   },
   {
     // 2. Dashboard Layout starts here (No "/app" prefix)
