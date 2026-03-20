@@ -611,6 +611,29 @@ const Report = () => {
     doc.setFillColor(...WHITE);
     doc.rect(0, 0, PW, PH, "F");
 
+    // Load logo (maintain aspect ratio)
+    let logoDataUrl = null;
+    let logoW = 0, logoH = 0;
+    try {
+      const imgEl = await new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = logoImg;
+      });
+      const maxH = 16;
+      const ratio = imgEl.naturalWidth / imgEl.naturalHeight;
+      logoH = maxH;
+      logoW = maxH * ratio;
+      const canvas = document.createElement("canvas");
+      canvas.width = imgEl.naturalWidth;
+      canvas.height = imgEl.naturalHeight;
+      canvas.getContext("2d").drawImage(imgEl, 0, 0);
+      logoDataUrl = canvas.toDataURL("image/png");
+    } catch (_) {
+      // Logo is optional.
+    }
+
     /* ---------------- HEADER ---------------- */
 
     doc.setFillColor(...WHITE);
@@ -619,26 +642,30 @@ const Report = () => {
     doc.setFillColor(0, 100, 50);
     doc.rect(0, 40, PW, 2, "F");
 
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(13);
-    doc.setTextColor(...INK);
+    // Logo - vertically centered in header.
+    const logoY = (39 - logoH) / 2;
+    if (logoDataUrl) {
+      doc.addImage(logoDataUrl, "PNG", M, logoY, logoW, logoH);
+    }
 
-    doc.text("DISTRICT YIELD COMPARISON REPORT", PW / 2, 16, { align: "center" });
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.setTextColor(...INK);
 
     doc.setFontSize(9);
 
     doc.text(
       `Generated ${new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" })}`,
-      PW / 2,
+      PW - M,
       26,
-      { align: "center" }
+      { align: "right" }
     );
 
     doc.text(
       `Satellite Data ${configA.date}`,
-      PW / 2,
+      PW - M,
       36,
-      { align: "center" }
+      { align: "right" }
     );
 
     /* ---------------- DISTRICT TITLE ROW ---------------- */
@@ -655,7 +682,7 @@ const Report = () => {
     const districtADisplay = translateDistrictName(configA.district, language);
     const districtBDisplay = translateDistrictName(configB.district, language);
 
-    doc.text(`${districtADisplay}  vs  ${districtBDisplay}`, M, 53);
+    doc.text(`Comparison between ${districtADisplay} and ${districtBDisplay}`, M, 53);
 
     doc.setFontSize(7);
     doc.setTextColor(...SUBTEXT);
