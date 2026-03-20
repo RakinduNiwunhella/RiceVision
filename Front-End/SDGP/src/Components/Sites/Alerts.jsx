@@ -3,27 +3,28 @@ import { useNavigate } from "react-router-dom";
 import { updateAlertStatus } from "../../api/api";
 import { apiFetch } from "../../api/apiFetch";
 import { useLanguage } from "../../context/LanguageContext";
-import TutorialTooltip from "../../components/TutorialTooltip";
+import {
+  translateDisasterType,
+  translateHealthCategory,
+  translateStageCategory,
+} from "../../utils/agriTranslations";
+import { translateDistrictName } from "../../utils/locationTranslations";
+import TutorialTooltip from "../../Components/TutorialTooltip";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
 
-
-
-const TAB_KEYS = ["Disasters", "Pest Risks", "Past Alerts"];
-
-const formatTitle = (text) =>
-  text.replace(/\b\w/g, (char) => char.toUpperCase());
+const TAB_KEYS = ["Pest Risks", "Disasters", "Past Alerts"];
 
 // Renders a pest title like "Kurunegala • 32 RISKS" with the number in red.
 // Returns a plain string for disaster titles.
 const renderTitle = (title, isPest, isPast) => {
   if (!isPest) return title;
-  // Match: "District : NUMBER RISKS"
-  const match = title.match(/^(.+?:\s*)(\d+)(\s*RISKS)$/);
+  // Match: "District : NUMBER <suffix>"
+  const match = title.match(/^(.+?:\s*)(\d+)(\s*.+)$/);
   if (!match) return title;
   return (
     <span>
       {match[1]}
-      <span className={`risk-count ${isPast ? "!text-white/40" : ""}`}>
+      <span className={`risk-count ${isPast ? "!text-white/85" : ""}`}>
         {match[2]}
         {match[3]}
       </span>
@@ -50,7 +51,7 @@ const groupPestAlertsByDistrict = (rows) => {
 /* ─────────────────────────────────────────
    RESOLVE MODAL
 ───────────────────────────────────────── */
-const ResolveModal = ({ onConfirm, onCancel }) => {
+const ResolveModal = ({ onConfirm, onCancel, t }) => {
   const [note, setNote] = useState("");
 
   return (
@@ -59,19 +60,21 @@ const ResolveModal = ({ onConfirm, onCancel }) => {
       style={{ background: "rgba(0,0,0,0.6)" }}
     >
       <div className="glass rounded-3xl border border-white/20 p-8 w-full max-w-md mx-4 flex flex-col gap-5">
-        <h3 className="text-lg font-black text-white">Resolve Alert</h3>
+        <h3 className="text-lg font-black text-white">
+          {t("resolveAlertTitle")}
+        </h3>
 
         <div className="flex flex-col gap-2">
-          <label className="text-xs font-bold uppercase text-white/40">
-            Resolution Note (optional)
+          <label className="text-xs font-bold uppercase text-white/85">
+            {t("resolutionNoteOptional")}
           </label>
           <textarea
             autoFocus
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder="Describe how this was resolved…"
+            placeholder={t("resolutionNotePlaceholder")}
             rows={4}
-            className="bg-white/5 border border-white/10 rounded-2xl py-3 px-4 text-sm text-white placeholder:text-white/20 resize-none focus:outline-none focus:border-white/30"
+            className="bg-white/5 border border-white/10 rounded-2xl py-3 px-4 text-sm text-white placeholder:text-white/85 resize-none focus:outline-none focus:border-white/30"
           />
         </div>
 
@@ -80,13 +83,13 @@ const ResolveModal = ({ onConfirm, onCancel }) => {
             onClick={onCancel}
             className="glass-btn text-[10px] px-4 py-2 tracking-widest bg-white/10 hover:bg-white/20"
           >
-            Cancel
+            {t("cancelBtn")}
           </button>
           <button
             onClick={() => onConfirm(note.trim() || null)}
             className="px-6 py-2 bg-emerald-500/30 text-emerald-300 rounded-xl text-xs font-bold hover:bg-emerald-500/50 transition-colors"
           >
-            Confirm
+            {t("confirmBtn")}
           </button>
         </div>
       </div>
@@ -98,40 +101,50 @@ const ResolveModal = ({ onConfirm, onCancel }) => {
    MAIN COMPONENT
 ───────────────────────────────────────── */
 const Alerts = () => {
-  const { t } = useLanguage();
-  const tabLabels = [t("disasters"), t("pestRisks"), t("pastAlerts")];
+  const { t, language } = useLanguage();
+  const tabLabels = [t("pestRisks"), t("disasters"), t("pastAlerts")];
 
   // Tutorial setup - create once and memoize
-  const tutorialSteps = useMemo(() => [
-    {
-      title: "Alert Tabs",
-      action: "Click on different tabs to view different types of alerts",
-      outcome: "You'll see disasters, pest risks, or past resolved alerts",
-    },
-    {
-      title: "Search Alerts",
-      action: "Type in the search box to find specific alerts",
-      outcome: "The alert list filters to show only matching results",
-    },
-    {
-      title: "Resolve Alert",
-      action: "Click the 'Resolve' button on any active alert",
-      outcome: "A modal opens where you can add a resolution note",
-    },
-    {
-      title: "Ignore Alert",
-      action: "Click 'Ignore' to dismiss an alert without resolving",
-      outcome: "The alert moves to 'Past Alerts' tab",
-    },
-    {
-      title: "View on Map",
-      action: "Click 'View Map' to see the alert location",
-      outcome: "You're taken to the Field Map showing the affected area",
-    },
-  ], [])
+  const tutorialSteps = useMemo(
+    () => [
+      {
+        title: t("alertsTutorialTabsTitle"),
+        action: t("alertsTutorialTabsAction"),
+        outcome: t("alertsTutorialTabsOutcome"),
+      },
+      {
+        title: t("alertsTutorialSearchTitle"),
+        action: t("alertsTutorialSearchAction"),
+        outcome: t("alertsTutorialSearchOutcome"),
+      },
+      {
+        title: t("alertsTutorialResolveTitle"),
+        action: t("alertsTutorialResolveAction"),
+        outcome: t("alertsTutorialResolveOutcome"),
+      },
+      {
+        title: t("alertsTutorialIgnoreTitle"),
+        action: t("alertsTutorialIgnoreAction"),
+        outcome: t("alertsTutorialIgnoreOutcome"),
+      },
+      {
+        title: t("alertsTutorialMapTitle"),
+        action: t("alertsTutorialMapAction"),
+        outcome: t("alertsTutorialMapOutcome"),
+      },
+    ],
+    [t],
+  );
 
-  const { currentStep, showTutorial, currentTutorialStep, hasMoreSteps, nextStep, prevStep, closeTutorial } =
-    usePageTutorial("alerts", tutorialSteps);
+  const {
+    currentStep,
+    showTutorial,
+    currentTutorialStep,
+    hasMoreSteps,
+    nextStep,
+    prevStep,
+    closeTutorial,
+  } = usePageTutorial("alerts", tutorialSteps);
 
   const [alerts, setAlerts] = useState([]);
   const [globalAlerts, setGlobalAlerts] = useState([]);
@@ -212,8 +225,8 @@ const Alerts = () => {
         if (activeTab === "Disasters") {
           const mappedAlerts = (Array.isArray(data) ? data : []).map((a) => ({
             id: a.id,
-            title: formatTitle(`${a.disaster_type} risk`),
-            description: `Stage: ${a.stage} | Health: ${a.health}`,
+            title: `${translateDisasterType(a.disaster_type, t)} ${t("alertRiskLabel")}`,
+            description: `${t("alertStage")}: ${translateStageCategory(a.stage, t)} | ${t("alertHealth")}: ${translateHealthCategory(a.health, t)}`,
             status: a.status || "Open",
             priority: "High",
             field: a.district,
@@ -230,8 +243,8 @@ const Alerts = () => {
             .filter((a) => a.risky_pixels > 0)
             .map((a) => ({
               id: a.district,
-              title: `${a.district} : ${a.risky_pixels} RISKS`,
-              description: "Multiple pest risks detected in this district.",
+              title: `${translateDistrictName(a.district, language)} : ${a.risky_pixels} ${t("alertRisksSuffix")}`,
+              description: t("alertMultiplePestRisks"),
               status: a.status || "Open",
               priority: "High",
               field: a.district,
@@ -249,9 +262,9 @@ const Alerts = () => {
           const mappedAlerts = (Array.isArray(data) ? data : []).map((a) => ({
             id: a.id,
             title: a.is_pest
-              ? `${a.district} : ${a.risk_count} RISKS`
-              : formatTitle(`${a.disaster_type} risk`),
-            description: `Stage: ${a.stage_name} | Health: ${a.paddy_health}`,
+              ? `${translateDistrictName(a.district, language)} : ${a.risk_count} ${t("alertRisksSuffix")}`
+              : `${translateDisasterType(a.disaster_type, t)} ${t("alertRiskLabel")}`,
+            description: `${t("alertStage")}: ${translateStageCategory(a.stage_name, t)} | ${t("alertHealth")}: ${translateHealthCategory(a.paddy_health, t)}`,
             status: a.status,
             field: a.district,
             health: a.paddy_health,
@@ -270,7 +283,7 @@ const Alerts = () => {
     };
 
     loadAlerts();
-  }, [activeTab]);
+  }, [activeTab, language, t]);
 
   /* ---------------- LOAD GLOBAL ALERT COUNTS ---------------- */
 
@@ -399,6 +412,7 @@ const Alerts = () => {
         <ResolveModal
           onConfirm={handleModalConfirm}
           onCancel={handleModalCancel}
+          t={t}
         />
       )}
 
@@ -409,14 +423,14 @@ const Alerts = () => {
             <h1 className="text-3xl md:text-5xl font-black text-white">
               {t("fieldRiskAlerts")}
             </h1>
-            <p className="text-white/40 text-xs mt-1 font-bold uppercase tracking-[0.2em]">
-              Real-time Field Health intelligence
+            <p className="text-white/85 text-xs mt-1 font-bold uppercase tracking-[0.2em]">
+              {t("alertsRealtimeSubtitle")}
             </p>
           </div>
 
           <div className="flex gap-3">
             <div className="glass px-4 py-2 rounded-xl border-white/10">
-              <span className="text-[10px] font-black uppercase text-white/30 block">
+              <span className="text-[10px] font-black uppercase text-white/85 block">
                 {t("active")}
               </span>
               <span className="text-lg font-black text-red-400">
@@ -425,7 +439,7 @@ const Alerts = () => {
             </div>
 
             <div className="glass px-4 py-2 rounded-xl border-white/10">
-              <span className="text-[10px] font-black uppercase text-white/30 block">
+              <span className="text-[10px] font-black uppercase text-white/85 block">
                 {t("resolved")}
               </span>
               <span className="text-lg font-black text-emerald-400">
@@ -438,7 +452,10 @@ const Alerts = () => {
         {/* Tabs */}
         <div className="glass p-6 rounded-[2rem] border-white/20">
           <div className="flex flex-col lg:flex-row gap-6 justify-between">
-            <div className="flex p-1 rounded-2xl bg-white/5 border border-white/10 w-full sm:w-fit overflow-x-auto no-scrollbar" ref={tabsRef}>
+            <div
+              className="flex p-1 rounded-2xl bg-white/5 border border-white/10 w-full sm:w-fit overflow-x-auto no-scrollbar"
+              ref={tabsRef}
+            >
               {TAB_KEYS.map((key, idx) => (
                 <button
                   key={key}
@@ -446,10 +463,11 @@ const Alerts = () => {
                     setActiveTab(key);
                     localStorage.setItem("alerts_tab", key);
                   }}
-                  className={`px-5 py-2 rounded-xl text-xs font-bold transition-all ${activeTab === key
-                    ? "bg-white/15 text-white"
-                    : "text-white/40 hover:text-white/70"
-                    }`}
+                  className={`px-5 py-2 rounded-xl text-xs font-bold transition-all ${
+                    activeTab === key
+                      ? "bg-white/15 text-white"
+                      : "text-white/85 hover:text-white/90"
+                  }`}
                 >
                   {tabLabels[idx]}
                 </button>
@@ -462,7 +480,7 @@ const Alerts = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               ref={searchRef}
-              className="bg-white/5 border border-white/10 rounded-2xl py-3 px-6 text-sm text-white placeholder:text-white/20"
+              className="bg-white/5 border border-white/10 rounded-2xl py-3 px-6 text-sm text-white placeholder:text-white/85"
             />
           </div>
         </div>
@@ -472,8 +490,8 @@ const Alerts = () => {
         <div className="space-y-6">
           {filteredAlerts.length === 0 && (
             <div className="glass p-8 sm:p-12 md:p-20 rounded-2xl sm:rounded-[2rem] text-center">
-              <p className="text-white/30 font-bold uppercase">
-                No Past threats detected
+              <p className="text-white/85 font-bold uppercase">
+                {t("noPastThreats")}
               </p>
             </div>
           )}
@@ -486,7 +504,7 @@ const Alerts = () => {
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                   <h2
-                    className={`text-xl font-black ${activeTab === "Past Alerts" ? "text-white/40" : "text-emerald-400"}`}
+                    className={`text-xl font-black ${activeTab === "Past Alerts" ? "text-white/85" : "text-emerald-400"}`}
                   >
                     {renderTitle(
                       alert.title,
@@ -495,17 +513,17 @@ const Alerts = () => {
                     )}
                   </h2>
 
-                  <p className="text-white/60 text-sm mt-1">
+                  <p className="text-white/85 text-sm mt-1">
                     {alert.description}
                   </p>
 
-                  <span className="text-xs text-white/40">
+                  <span className="text-xs text-white/85">
                     {formatTimestamp(alert.timestamp)}
                   </span>
 
                   {activeTab === "Past Alerts" && alert.note && (
-                    <p className="text-white/40 text-xs mt-1">
-                      Note: {alert.note}
+                    <p className="text-white/85 text-xs mt-1">
+                      {t("noteLabel")}: {alert.note}
                     </p>
                   )}
                 </div>
@@ -513,7 +531,7 @@ const Alerts = () => {
                 {alert.status === "Open" && activeTab !== "Past Alerts" && (
                   <div className="flex gap-3">
                     <button
-                      ref={currentStep === 2 && resolveRef || undefined}
+                      ref={(currentStep === 2 && resolveRef) || undefined}
                       onClick={() => handleResolve(alert.id)}
                       className="px-4 sm:px-6 py-2 bg-emerald-500/30 text-emerald-300 rounded-xl text-xs font-bold"
                     >
@@ -521,19 +539,19 @@ const Alerts = () => {
                     </button>
 
                     <button
-                      ref={currentStep === 3 && ignoreRef || undefined}
+                      ref={(currentStep === 3 && ignoreRef) || undefined}
                       onClick={() => handleIgnore(alert.id)}
                       className="btn-ignore glass-btn text-[10px] px-3 py-1 tracking-widest bg-white/10 hover:bg-white/20"
                     >
-                      Ignore
+                      {t("ignoreBtn")}
                     </button>
 
                     <button
-                      ref={currentStep === 4 && mapRef || undefined}
+                      ref={(currentStep === 4 && mapRef) || undefined}
                       onClick={() => handleViewInMap(alert)}
                       className="glass-btn text-[10px] px-3 py-1 tracking-widest bg-white/10 hover:bg-white/20"
                     >
-                      View Map
+                      {t("viewInMap")}
                     </button>
                   </div>
                 )}

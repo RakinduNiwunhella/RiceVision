@@ -11,14 +11,7 @@ import {
 } from "react-icons/fa";
 import { useTheme } from "../../context/ThemeContext";
 import { useLanguage } from "../../context/LanguageContext";
-
-
-//PRODUCTION
-const API_BASE = "https://ricevision-cakt.onrender.com";
-
-//LOCAL
-//const API_BASE = "http://localhost:8000";
-
+import { API_BASE } from "../../config/apiBase";
 
 export default function LoginPage() {
   const { isDark, toggleTheme } = useTheme();
@@ -54,7 +47,7 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.detail || "Login failed");
+        throw new Error(data.detail || t('loginFailed'));
       }
 
       console.log("Login success:", data);
@@ -96,7 +89,7 @@ export default function LoginPage() {
     e.preventDefault();
 
     if (!email) {
-      setResetError("Please enter your email.");
+      setResetError(t('pleaseEnterEmail'));
       return;
     }
 
@@ -113,12 +106,12 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setResetError(data.detail || "Failed to send reset email.");
+        setResetError(data.detail || t('failedToSendResetEmail'));
       } else {
         setResetSuccess(true);
       }
     } catch (err) {
-      setResetError("Network error. Please try again.");
+      setResetError(t('networkErrorTryAgain'));
     }
 
     setResetLoading(false);

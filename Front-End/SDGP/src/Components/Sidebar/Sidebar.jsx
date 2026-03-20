@@ -1,7 +1,7 @@
 import React, { useRef, useMemo } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useLanguage } from '../../context/LanguageContext'
-import TutorialTooltip from '../../components/TutorialTooltip'
+import TutorialTooltip from '../../Components/TutorialTooltip'
 import { usePageTutorial } from '../../hooks/usePageTutorial'
 
 const Sidebar = () => {
@@ -10,21 +10,21 @@ const Sidebar = () => {
   // Tutorial setup
   const tutorialSteps = useMemo(() => [
     {
-      title: "Sidebar Navigation",
-      action: "Use the left sidebar to navigate between main pages",
-      outcome: "You can access Dashboard, Field Map, Alerts, Weather, Reports, and more from here",
+      title: t('sidebarTutorialNavTitle'),
+      action: t('sidebarTutorialNavAction'),
+      outcome: t('sidebarTutorialNavOutcome'),
     },
     {
-      title: "Top Navigation Links",
-      action: "Click Dashboard, Field Map, or other items to navigate",
-      outcome: "The highlighted item shows your current page. Active links have a green gradient background",
+      title: t('sidebarTutorialTopTitle'),
+      action: t('sidebarTutorialTopAction'),
+      outcome: t('sidebarTutorialTopOutcome'),
     },
     {
-      title: "Bottom Options",
-      action: "Profile: View your account settings. Help: Get support. Logout: Sign out",
-      outcome: "Quick access to user settings and account management from any page",
+      title: t('sidebarTutorialBottomTitle'),
+      action: t('sidebarTutorialBottomAction'),
+      outcome: t('sidebarTutorialBottomOutcome'),
     },
-  ], [])
+  ], [t])
 
   const { currentStep, showTutorial, currentTutorialStep, nextStep, prevStep, closeTutorial } =
     usePageTutorial("sidebar", tutorialSteps)

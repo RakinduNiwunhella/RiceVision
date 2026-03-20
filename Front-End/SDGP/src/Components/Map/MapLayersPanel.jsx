@@ -1,7 +1,9 @@
 import React from "react";
+import { useLanguage } from "../../context/LanguageContext";
 const OVERLAY_KEYS = ["ndvi", "evi", "vv", "vh"];
 
 export default function MapLayersPanel({ layers, setLayers, districtSelected }) {
+  const { t } = useLanguage();
   const [open, setOpen] = React.useState(false);
 
   const toggleLayer = (layer) => {
@@ -31,9 +33,9 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
   };
 
   const layerList = [
-    { key: "paddyExtent", label: "Paddy Extent" },
-    { key: "showCircles", label: "Show Circles" },
-    { key: "showSatellite", label: "Satellite View" },
+    { key: "paddyExtent", label: t("mapLayerPaddyExtent") },
+    { key: "showCircles", label: t("mapLayerShowCircles") },
+    { key: "showSatellite", label: t("mapLayerSatelliteView") },
     { key: "ndvi", label: "NDVI", tag: "S2" },
     { key: "evi", label: "EVI", tag: "S2" },
     { key: "vv", label: "VV", tag: "S1" },
@@ -91,8 +93,8 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
 
       <div className={`${!districtSelected ? "blur-sm opacity-40 pointer-events-none" : ""}`}>
 
-        <h2 className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/40 mb-6">
-          Map Layers
+        <h2 className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/85 mb-6">
+          {t("mapLayersTitle")}
         </h2>
 
         <div className="space-y-2">
@@ -109,7 +111,7 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
                   <span className="text-sm text-white/90">{label}</span>
 
                   {tag && (
-                    <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-white/10 text-white/40 tracking-wider">
+                    <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-white/10 text-white/85 tracking-wider">
                       {tag}
                     </span>
                   )}
@@ -139,7 +141,7 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
                     className="flex items-center justify-between text-sm cursor-pointer"
                   >
 
-                    <span className="text-white/70">Road Overlay</span>
+                    <span className="text-white/85">Road Overlay</span>
 
                     <div
                       className={`relative w-8 h-4 rounded-full ${
@@ -187,7 +189,7 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
 
             <div>
 
-              <div className="flex justify-between text-[10px] text-white/40 font-bold uppercase tracking-widest mb-2">
+              <div className="flex justify-between text-[10px] text-white/85 font-bold uppercase tracking-widest mb-2">
                 <span>Overlay Opacity</span>
                 <span>{Math.round((layers.overlayOpacity ?? 0.75) * 100)}%</span>
               </div>
@@ -213,7 +215,7 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
 
               <div key={l.key}>
 
-                <p className="text-[10px] font-bold uppercase tracking-widest text-white/50 mb-1.5">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-white/85 mb-1.5">
                   {l.label}
                 </p>
 
@@ -222,7 +224,7 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
                   style={{ background: l.gradient }}
                 />
 
-                <div className="flex justify-between text-[9px] text-white/30 mt-1">
+                <div className="flex justify-between text-[9px] text-white/85 mt-1">
                   <span>{l.min}</span>
                   <span>{l.max}</span>
                 </div>
@@ -236,15 +238,22 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
         )}
 
         <div className="mt-8 pt-6 border-t border-white/10">
-          <p className="text-[10px] text-white/40 italic">
-            Select layers to overlay specialized agricultural satellite telemetry.
+          <p className="text-[10px] text-white/85 italic">
+            {t("mapLayersHintIntro")}
           </p>
-          <p className="text-[9px] text-white/25 mt-1">
-            S2 = Sentinel-2 optical · S1 = Sentinel-1 SAR
+          <p className="text-[9px] text-white/85 mt-1">
+            {t("mapLayersHintSensors")}
           </p>
+          <div className="mt-3 space-y-1">
+            <p className="text-[9px] text-white/85">{t("mapLayersHintNDVI")}</p>
+            <p className="text-[9px] text-white/85">{t("mapLayersHintEVI")}</p>
+            <p className="text-[9px] text-white/85">{t("mapLayersHintVV")}</p>
+            <p className="text-[9px] text-white/85">{t("mapLayersHintVH")}</p>
+          </div>
         </div>
 
       </div>
+      
 
       {/* CENTER LOCK MESSAGE */}
 
@@ -259,7 +268,7 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
             </span>
 
             <p className="text-sm text-white font-medium px-6">
-              Please select a district to unlock the filters
+              {t("mapLayersSelectDistrict")}
             </p>
 
           </div>

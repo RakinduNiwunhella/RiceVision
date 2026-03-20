@@ -11,7 +11,10 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ThemeProvider>
       <LanguageProvider>
-        <RouterProvider router={router}/>
+        <RouterProvider
+          router={router}
+          future={{ v7_startTransition: true }}
+        />
       </LanguageProvider>
     </ThemeProvider>
   </StrictMode>,

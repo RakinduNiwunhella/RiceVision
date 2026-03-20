@@ -3,39 +3,39 @@ import React from "react";
 
 const goals = [
   {
-    id: "95% Accuracy Data",
-    title: "Achieve 95% accuracy in rice crop health detection",
-    desc: "Using satellite indices like NDVI, NDWI, LSWI, and red-edge bands, our system delivers highly accurate health classification to help farmers make informed decisions.",
-    icon: "eco",
-  },
-  {
-    id: "Paddy Monitoring",
-    title: "Detect crop stress up to 3 weeks earlier",
-    desc: "Identify water stress, disease, nutrient deficiency, and pest threats long before they become visible, reducing preventable yield losses.",
-    icon: "visibility",
-  },
-  {
-    id: "Predict Harvest Yield",
-    title: "Predict harvest yield with 80%+ reliability",
-    desc: "Our machine learning model estimates expected yield with high accuracy, helping farmers and government agencies plan for production and imports.",
-    icon: "analytics",
-  },
-  {
-    id: "Continuous Satellite Monitoring",
-    title: "Provide automated 24/7 satellite monitoring",
-    desc: "Leveraging Sentinel-2 data, we offer continuous, cloud-filtered monitoring of rice fields, without requiring manual field visits.",
+    id: "Satellite Data Collection",
+    title: "Sentinel-1 & Sentinel-2 imagery via Google Earth Engine",
+    desc: "Multispectral satellite images capture detailed information about vegetation, moisture levels, and soil conditions across rice-growing regions.",
     icon: "satellite_alt",
   },
   {
-    id: "Reduce Human Efforts",
-    title: "Reduce manual inspection efforts by 30%",
-    desc: "By automating field health assessments, the system cuts down time, travel, and labor required for physical inspections.",
+    id: "Vegetation Index Analysis",
+    title: "NDVI, EVI, NDWI & LSWI crop health indices",
+    desc: "Vegetation indices measure plant greenness, biomass, water content, and soil moisture to determine crop health, growth stages, and stress factors.",
+    icon: "eco",
+  },
+  {
+    id: "ML-Based Yield Prediction",
+    title: "Machine learning models forecast rice production",
+    desc: "Trained models analyze processed satellite data and historical trends to estimate crop productivity and identify risks before harvest.",
+    icon: "analytics",
+  },
+  {
+    id: "Early Risk Detection",
+    title: "Detect drought, floods & nutrient deficiency early",
+    desc: "The system identifies anomalies such as flooding, drought, or crop stress at early stages, enabling timely interventions to reduce yield losses.",
+    icon: "visibility",
+  },
+  {
+    id: "Automated Monitoring",
+    title: "Replace costly manual inspections with satellite analysis",
+    desc: "Cloud-filtered satellite imagery is processed automatically, eliminating the need for time-consuming and geographically limited field visits.",
     icon: "assignment_turned_in",
   },
   {
-    id: "Impact 1 Million Farmers",
-    title: "Impact 1 million Sri Lankan farmers",
-    desc: "Our platform aims to become a nationwide digital tool that empowers farmers with real-time insights, boosting food security and climate resilience.",
+    id: "Food Security Support",
+    title: "Data-driven decisions for farmers and policymakers",
+    desc: "Accurate production estimates help farmers plan irrigation and fertilizer usage, while governments can better plan imports, exports, and agricultural policies.",
     icon: "group",
   },
 ];
@@ -46,12 +46,11 @@ export default function Goals() {
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
 
         <h2 className="text-5xl font-extrabold text-gray-900 leading-tight dark:text-white">
-          Our Goals for <span className="block text-green-800 dark:text-green-400">2030</span>
+          How <span className="block text-green-800 dark:text-green-400">RiceVision Works</span>
         </h2>
 
         <p className="mt-6 text-lg text-gray-600 max-w-2xl dark:text-gray-200">
-          Our mission is to transform Sri Lanka's rice farming with accurate, satellite-powered insights. 
-          By combining remote sensing and machine learning, we help farmers make smarter, faster, and more resilient decisions.
+          RiceVision integrates satellite remote sensing, geospatial analysis, and machine learning to analyze crop conditions, predict yields, and support data-driven agricultural decision-making.
         </p>
 
 

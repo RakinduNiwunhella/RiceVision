@@ -4,14 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { FaSun, FaMoon } from "react-icons/fa";
 import { useTheme } from "../../context/ThemeContext";
 import { useLanguage } from "../../context/LanguageContext";
-
-
-//PRODUCTION
-const API_BASE = "https://ricevision-cakt.onrender.com";
-
-//LOCAL
-//const API_BASE = "http://localhost:8000";
-
+import { API_BASE } from "../../config/apiBase";
 
 export default function SignupPage() {
   const { isDark, toggleTheme } = useTheme();
@@ -31,7 +24,7 @@ export default function SignupPage() {
   const validateEmail = (value) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (value && !regex.test(value)) {
-      setEmailError("Please enter a valid email address");
+      setEmailError(t('validEmailAddressError'));
     } else {
       setEmailError("");
     }
@@ -39,13 +32,13 @@ export default function SignupPage() {
 
   const validatePasswords = (pass, confirm) => {
     if (pass.length > 0 && pass.length < 6) {
-      setPasswordLengthError("Password must be at least 6 characters");
+      setPasswordLengthError(t('passwordMinLengthError'));
     } else {
       setPasswordLengthError("");
     }
 
     if (confirm && pass !== confirm) {
-      setPasswordError("Passwords do not match");
+      setPasswordError(t('passwordsNoMatchError'));
     } else {
       setPasswordError("");
     }
@@ -66,14 +59,14 @@ export default function SignupPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        alert(data.detail || "Signup failed");
+        alert(data.detail || t('signupFailed'));
       } else {
         // Reset tutorials on signup - set to empty object instead of removing
         localStorage.setItem('ricevision_tutorial_pages', JSON.stringify({}));
         navigate("/field-setup", { state: { fromSignup: true } });
       }
     } catch (err) {
-      alert("Network error. Please try again.");
+      alert(t('networkErrorTryAgain'));
     }
     setLoading(false);
   };
@@ -129,7 +122,7 @@ export default function SignupPage() {
             {t('createAccount')}
           </h2>
           <p className="text-slate-500 dark:text-slate-400 mb-6">
-            {t('registerPaddySubtitle')}
+            {t('createAccountSubtitle')}
           </p>
 
           <form onSubmit={handleSignup} className="space-y-4">
@@ -231,7 +224,7 @@ export default function SignupPage() {
             {/* Divider */}
             <div className="flex items-center">
               <div className="flex-grow h-px bg-slate-300 dark:bg-slate-700"></div>
-              <span className="px-4 text-sm text-slate-500">OR</span>
+              <span className="px-4 text-sm text-slate-500">{t('orDivider')}</span>
               <div className="flex-grow h-px bg-slate-300 dark:bg-slate-700"></div>
             </div>
 

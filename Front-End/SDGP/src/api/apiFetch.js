@@ -1,10 +1,5 @@
 import { supabase } from "../supabaseClient";
-
-// PRODUCTION
-const API_BASE = "https://ricevision-cakt.onrender.com";
-
-// DEVELOPMENT
-// const API_BASE = "http://localhost:8000";
+import { API_BASE } from "../config/apiBase";
 
 export async function apiFetch(url, options = {}) {
   const { data: { session } } = await supabase.auth.getSession();
@@ -17,5 +12,9 @@ export async function apiFetch(url, options = {}) {
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
 
-  return fetch(`${API_BASE}${url}`, { ...options, headers });
+  return fetch(`${API_BASE}${url}`, {
+    ...options,
+    headers,
+    credentials: 'include', // Allow cookies and auth headers for CORS requests
+  });
 }
