@@ -200,12 +200,6 @@ export default function MyFieldTab() {
       </div>
 
       {/* ── READ-ONLY view of existing field ── */}
-      {/* Debug output for troubleshooting payment panel visibility */}
-      <div style={{ background: '#222', color: '#fff', padding: '8px', borderRadius: '8px', marginBottom: '12px', fontSize: '12px' }}>
-        <strong>DEBUG:</strong> user: {user ? JSON.stringify(user) : 'null'}<br />
-        existing: {existing ? JSON.stringify(existing) : 'null'}<br />
-        editMode: {String(editMode)}
-      </div>
 
       {existing && !editMode && (
         <div className="space-y-4">
