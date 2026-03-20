@@ -48,6 +48,7 @@ import { usePageTutorial } from "../../hooks/usePageTutorial";
 import { useNavigate } from "react-router-dom";
 import { translateDistrictName } from "../../utils/locationTranslations";
 import { translateDisasterType, translateStageCategory } from "../../utils/agriTranslations";
+import OnboardingTour from "../OnboardingTour";
 
 import {
   fetchHealthSummary,
@@ -108,6 +109,7 @@ const MyDashboard = () => {
   const [showAllDistricts, setShowAllDistricts] = useState(false);
   const [stageDistribution, setStageDistribution] = useState([]);
   const [outbreaks, setOutbreaks] = useState([]);
+  const [replayTour, setReplayTour] = useState(false);
 
   // Refs for tutorial tooltips
   const headerRef = useRef(null);
@@ -187,6 +189,40 @@ const MyDashboard = () => {
   const { currentStep, showTutorial, nextStep, prevStep, closeTutorial } =
     usePageTutorial("dashboard", tutorialSteps);
 
+  // First-time user onboarding tour (6 core steps)
+  const onboardingSteps = [
+    {
+      target: '[data-tour="navbar"]',
+      title: 'Navigation Bar',
+      description: 'Access maps, alerts, weather, and reports',
+    },
+    {
+      target: '[data-tour="crop-health"]',
+      title: 'Crop Health Distribution',
+      description: 'Monitor overall crop condition across regions',
+    },
+    {
+      target: '[data-tour="output-projection"]',
+      title: 'Output Projection',
+      description: 'See estimated rice production levels',
+    },
+    {
+      target: '[data-tour="supply-stability"]',
+      title: 'Supply Stability',
+      description: 'Identify shortages and demand gaps',
+    },
+    {
+      target: '[data-tour="bottom-section"]',
+      title: 'Detailed Insights',
+      description: 'Explore district-level data and analytics',
+    },
+    {
+      target: '[data-tour="chatbot"]',
+      title: 'AI Assistant',
+      description: 'Ask questions and get farming insights instantly',
+    },
+  ];
+
   const stageColors = ["#10b981", "#06b6d4", "#8b5cf6", "#f59e0b", "#ef4444", "#f97316"];
 
   const translatedStageDistribution = useMemo(
@@ -210,7 +246,7 @@ const MyDashboard = () => {
   const topYieldDistricts = useMemo(() => {
     return [...bestYieldDistricts]
       .sort(
-      (a, b) => Number(b?.total_yield_kg_ha ?? 0) - Number(a?.total_yield_kg_ha ?? 0),
+        (a, b) => Number(b?.total_yield_kg_ha ?? 0) - Number(a?.total_yield_kg_ha ?? 0),
       )
       .slice(0, 5);
   }, [bestYieldDistricts]);
@@ -244,6 +280,19 @@ const MyDashboard = () => {
       }
     };
     loadData();
+  }, []);
+
+  // Listen for tour replay events from Help page
+  useEffect(() => {
+    const handleReplayTour = () => {
+      setReplayTour(true);
+    };
+
+    window.addEventListener('replay-onboarding-tour', handleReplayTour);
+
+    return () => {
+      window.removeEventListener('replay-onboarding-tour', handleReplayTour);
+    };
   }, []);
 
 
@@ -333,14 +382,14 @@ const MyDashboard = () => {
   /* ------------------ RENDER ------------------ */
 
   return (
-    <div className="min-h-full px-3 py-4 sm:px-6 sm:py-6 lg:p-10 text-white font-sans transition-all duration-500">
+    <div className="min-h-full px-3 pt-0 pb-4 sm:px-6 sm:pt-0 sm:pb-6 lg:px-10 lg:pt-4 lg:pb-10 text-white font-sans transition-all duration-500">
       <div className="max-w-7xl mx-auto space-y-6 sm:space-y-10 lg:space-y-12 pb-16 sm:pb-20">
 
         {/* ── Page Header ── */}
         <div ref={currentStep === 0 ? headerRef : undefined} className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
             <h1 className="text-xl sm:text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
-            {t('welcomeTitle')}
+              {t('welcomeTitle')}
             </h1>
             <p className="text-white/85 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em]">
               {t('welcomeSubtitle')}
@@ -357,7 +406,7 @@ const MyDashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-6 sm:mt-10">
 
           {/* Field Health Distribution */}
-          <div ref={healthCardRef} className="glass glass-hover p-4 sm:p-6 md:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col items-center">
+          <div ref={healthCardRef} data-tour="crop-health" className="glass glass-hover p-4 sm:p-6 md:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col items-center">
             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/85 mb-8 self-start flex items-center gap-2">
               <span className="material-symbols-outlined text-emerald-400 text-sm">radiology</span>
               {t('cropHealthDist')}
@@ -412,7 +461,7 @@ const MyDashboard = () => {
           </div>
 
           {/* Yield Forecast */}
-          <div ref={yieldCardRef} className="glass glass-hover p-4 sm:p-6 md:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
+          <div ref={yieldCardRef} data-tour="output-projection" className="glass glass-hover p-4 sm:p-6 md:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/85 mb-6 flex items-center gap-2">
               <span className="material-symbols-outlined text-cyan-400 text-sm">trending_up</span>
               {t('outputProjection')}
@@ -444,7 +493,7 @@ const MyDashboard = () => {
           </div>
 
           {/* Expected Shortfall */}
-          <div ref={supplyCardRef} className="glass glass-hover p-4 sm:p-6 md:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col justify-between md:col-span-2 lg:col-span-1">
+          <div ref={supplyCardRef} data-tour="supply-stability" className="glass glass-hover p-4 sm:p-6 md:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col justify-between md:col-span-2 lg:col-span-1">
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/85 mb-6 flex items-center gap-2">
                 <span className="material-symbols-outlined text-amber-500 text-sm">error</span>
@@ -516,7 +565,7 @@ const MyDashboard = () => {
                           textAnchor="end"
                           height={60}
                         />
-                        <YAxis 
+                        <YAxis
                           domain={yieldAxisDomain}
                           tick={{ fill: "rgba(255,255,255,0.85)", fontSize: 11, fontWeight: 900 }}
                           axisLine={false}
@@ -571,7 +620,7 @@ const MyDashboard = () => {
         </div>
 
         {/* ── Analytical Depth Row ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 pb-10 sm:pb-12">
+        <div data-tour="bottom-section" className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 pb-10 sm:pb-12">
 
           {/* Stage Distribution */}
           <div ref={stageChartRef} className="glass glass-hover p-4 sm:p-6 md:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
@@ -823,6 +872,21 @@ const MyDashboard = () => {
           onBack={prevStep}
           onSkip={closeTutorial}
           onFinish={closeTutorial}
+        />
+
+        {/* First-time Onboarding Tour */}
+        <OnboardingTour
+          steps={onboardingSteps}
+          storageKey="riceVisionOnboardingComplete"
+          forceRun={replayTour}
+          onComplete={() => {
+            console.log('Onboarding completed');
+            setReplayTour(false);
+          }}
+          onSkip={() => {
+            console.log('Onboarding skipped');
+            setReplayTour(false);
+          }}
         />
       </div>
     </div>
