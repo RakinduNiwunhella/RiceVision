@@ -5,70 +5,69 @@ from ..db import supabase
 
 router = APIRouter()
 
+TABLE_NOTIFICATIONS = "notificationpanel"
+TABLE_READS = "notification_reads"
+
 
 def _fetch_notifications_with_read_state(user_id: str):
+    """Fetch all notifications and attach per-user read state."""
     notifications_response = (
         supabase
-        .table("notificationpanel")
+        .table(TABLE_NOTIFICATIONS)
         .select("id, title, message, description, created_at")
         .order("created_at", desc=True)
         .execute()
     )
 
     notifications = notifications_response.data or []
-    notification_ids = [item["id"] for item in notifications]
+    notification_ids = [n["id"] for n in notifications]
 
     if not notification_ids:
         return []
 
-    user_notifications_response = (
+    # Get which notifications this user has read
+    reads_response = (
         supabase
-        .table("user_notifications")
-        .select("notification_id, is_read")
+        .table(TABLE_READS)
+        .select("notification_id")
         .eq("user_id", user_id)
         .in_("notification_id", notification_ids)
         .execute()
     )
 
-    read_map = {
-        row["notification_id"]: bool(row.get("is_read"))
-        for row in (user_notifications_response.data or [])
-    }
+    read_ids = {row["notification_id"] for row in (reads_response.data or [])}
 
     return [
-        {
-            **notification,
-            "is_read": read_map.get(notification["id"], False),
-        }
-        for notification in notifications
+        {**n, "is_read": n["id"] in read_ids}
+        for n in notifications
     ]
 
 
 def _get_unread_count_for_user(user_id: str) -> int:
+    """Count how many notifications this user has NOT read."""
     notifications_response = (
         supabase
-        .table("notificationpanel")
+        .table(TABLE_NOTIFICATIONS)
         .select("id")
         .execute()
     )
 
-    notifications = notifications_response.data or []
-    notification_ids = [item["id"] for item in notifications]
+    all_ids = [n["id"] for n in (notifications_response.data or [])]
 
-    if not notification_ids:
+    if not all_ids:
         return 0
 
-    read_response = (
+    reads_response = (
         supabase
-        .table("user_notifications")
+        .table(TABLE_READS)
         .select("notification_id")
         .eq("user_id", user_id)
-        .eq("is_read", True)
-        .in_("notification_id", notification_ids)
+        .in_("notification_id", all_ids)
         .execute()
     )
 
-    return max(len(notification_ids) - len(read_response.data or []), 0)
+    read_count = len(reads_response.data or [])
+    return max(len(all_ids) - read_count, 0)
 
 
 @router.get("/notifications")
@@ -78,9 +77,10 @@ def get_notifications(current_user=Depends(get_current_user)):
 
 @router.put("/notifications/{notification_id}/read")
 def mark_notification_read(notification_id: str, current_user=Depends(get_current_user)):
+    # Verify notification exists
     notification_response = (
         supabase
-        .table("notificationpanel")
+        .table(TABLE_NOTIFICATIONS)
         .select("id")
         .eq("id", notification_id)
         .execute()
@@ -89,28 +89,29 @@ def mark_notification_read(notification_id: str, current_user=Depends(get_curren
     if not notification_response.data:
         raise HTTPException(status_code=404, detail="Notification not found")
 
-    write_response = (
+    user_id = current_user["user_id"]
+
+    # Check if already marked as read
+    existing = (
         supabase
-        .table("user_notifications")
-        .upsert(
-            {
-                "user_id": current_user["user_id"],
-                "notification_id": notification_id,
-                "is_read": True,
-            },
-            on_conflict="user_id,notification_id",
-        )
+        .table(TABLE_READS)
         .select("id")
+        .eq("user_id", user_id)
+        .eq("notification_id", notification_id)
         .execute()
     )
 
-    if getattr(write_response, "data", None) is None:
-        raise HTTPException(status_code=500, detail="Failed to store notification read status")
+    if not (existing.data):
+        # Insert a new read record
+        supabase.table(TABLE_READS).insert({
+            "user_id": user_id,
+            "notification_id": notification_id,
+        }).execute()
 
     return {
         "message": "Notification marked as read",
         "notification_id": notification_id,
-        "unread_count": _get_unread_count_for_user(current_user["user_id"]),
+        "unread_count": _get_unread_count_for_user(user_id),
     }
 
 
