@@ -132,30 +132,120 @@ export default function YieldChatbot() {
         backdrop: isDark ? "blur(40px) saturate(180%)" : "blur(20px)",
     };
 
-    // Helper to render basic markdown links [text](url)
+    // Helper to render basic markdown links and suggestion chips
     const RenderMessage = ({ content, role }) => {
-        const parts = content.split(/(\[.*?\]\(.*?\))/g);
-        return parts.map((part, i) => {
-            const match = part.match(/\[(.*?)\]\((.*?)\)/);
-            if (match) {
-                return (
-                    <a
-                        key={i}
-                        href={match[2]}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                            color: role === "user" ? "#fff" : theme.emerald,
-                            textDecoration: "underline",
-                            fontWeight: "600"
-                        }}
-                    >
-                        {match[1]}
-                    </a>
-                );
-            }
-            return part;
+        // Extract suggestions: [SUGGEST: Text]
+        const suggestions = [];
+        const cleanContent = content.replace(/\[SUGGEST:\s*(.*?)\]/g, (match, p1) => {
+            suggestions.push(p1);
+            return ""; // Remove from text bubble
         });
+
+        const parts = cleanContent.split(/(\[.*?\]\(.*?\))/g);
+
+        return (
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                <div>
+                    {parts.map((part, i) => {
+                        const match = part.match(/\[(.*?)\]\((.*?)\)/);
+                        if (match) {
+                            const isReportLink = match[1].toLowerCase().includes("report") || match[1].toLowerCase().includes("pdf");
+
+                            if (isReportLink && role === "assistant") {
+                                return (
+                                    <a
+                                        key={i}
+                                        href={match[2]}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style={{
+                                            display: "inline-flex",
+                                            alignItems: "center",
+                                            gap: "8px",
+                                            margin: "8px 0",
+                                            padding: "10px 16px",
+                                            background: "rgba(16, 185, 129, 0.1)",
+                                            border: "1px solid rgba(16, 185, 129, 0.3)",
+                                            borderRadius: "12px",
+                                            color: theme.emerald,
+                                            textDecoration: "none",
+                                            fontWeight: "700",
+                                            fontSize: "12px",
+                                            transition: "all 0.2s",
+                                            cursor: "pointer",
+                                            textTransform: "uppercase",
+                                            letterSpacing: "0.05em"
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.background = "rgba(16, 185, 129, 0.2)";
+                                            e.currentTarget.style.transform = "translateY(-1px)";
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.background = "rgba(16, 185, 129, 0.1)";
+                                            e.currentTarget.style.transform = "translateY(0)";
+                                        }}
+                                    >
+                                        <span className="material-symbols-outlined" style={{ fontSize: "16px" }}>auto_awesome</span>
+                                        {match[1]}
+                                    </a>
+                                );
+                            }
+
+                            return (
+                                <a
+                                    key={i}
+                                    href={match[2]}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{
+                                        color: role === "user" ? "#fff" : theme.emerald,
+                                        textDecoration: "underline",
+                                        fontWeight: "600"
+                                    }}
+                                >
+                                    {match[1]}
+                                </a>
+                            );
+                        }
+                        return part;
+                    })}
+                </div>
+
+                {/* Render extracted suggestions as buttons */}
+                {suggestions.length > 0 && (
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginTop: "4px" }}>
+                        {suggestions.map((suggestion, idx) => (
+                            <button
+                                key={idx}
+                                onClick={() => {
+                                    setInput(suggestion);
+                                    // Trigger send logic (manually since send depends on state)
+                                    // We'll set the input and let the user click enter, 
+                                    // or better, we can invoke the send logic if we refactor slightly.
+                                    // For now, setting input is safe.
+                                }}
+                                style={{
+                                    ...dynamicStyles.chip,
+                                    background: theme.emerald + "15",
+                                    borderColor: theme.emerald + "44",
+                                    color: theme.emerald,
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = theme.emerald + "25";
+                                    e.currentTarget.style.transform = "translateY(-1px)";
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = theme.emerald + "15";
+                                    e.currentTarget.style.transform = "translateY(0)";
+                                }}
+                            >
+                                {suggestion}
+                            </button>
+                        ))}
+                    </div>
+                )}
+            </div>
+        );
     };
 
     const downloadMessageAsPDF = (content) => {
