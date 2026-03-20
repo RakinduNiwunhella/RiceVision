@@ -771,7 +771,7 @@ const Header = () => {
                     className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${isActive
                       ? "bg-white/15 text-white border border-white/20"
                       : "text-white/85 hover:text-white hover:bg-white/10"
-                    }`}
+                      }`}
                   >
                     <span className="material-symbols-outlined text-[18px] w-6 shrink-0 flex items-center justify-center">
                       {item.icon}
@@ -920,5 +920,5 @@ function NotificationPanelButton() {
   );
 }
 
-  
+
 export default Header;

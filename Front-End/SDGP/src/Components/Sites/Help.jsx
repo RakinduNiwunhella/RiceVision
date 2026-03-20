@@ -204,7 +204,7 @@ const Help = () => {
         </div>
 
         {/* Quick Contact Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-10 items-stretch">
           {[
             {
               icon: <PhoneIcon className="w-5 h-5 text-emerald-400" />,
@@ -225,7 +225,9 @@ const Help = () => {
           ].map((card, idx) => (
             <div
               key={idx}
-              className="glass glass-hover h-full flex flex-col justify-between p-6 rounded-2xl border border-white/10 shadow-xl group transition-all duration-500"
+              className={`glass glass-hover h-full flex flex-col justify-between p-6 sm:p-8 lg:p-10 rounded-2xl md:rounded-[2.5rem] border border-white/10 shadow-xl group transition-all duration-500 ${
+                idx === 0 ? "lg:col-span-3" : "lg:col-span-2"
+              }`}
             >
               <div>
                 <div className="flex items-center gap-3 mb-4">
@@ -244,11 +246,10 @@ const Help = () => {
               </div>
               <a
                 href={card.href}
-                className={`mt-auto flex items-center justify-center gap-2 text-[10px] sm:text-xs font-black uppercase tracking-widest px-6 py-3 rounded-xl border transition-all duration-300 ${
-                  idx === 0
-                    ? "border-emerald-500/70 bg-emerald-400/35 text-emerald-950 hover:bg-emerald-400/45"
-                    : "border-cyan-500/70 bg-cyan-400/35 text-cyan-950 hover:bg-cyan-400/45"
-                }`}
+                className={`mt-auto flex items-center justify-center gap-2 text-[10px] sm:text-xs font-black uppercase tracking-widest px-6 py-3 rounded-xl border transition-all duration-300 ${idx === 0
+                  ? "border-emerald-500/70 bg-emerald-400/35 text-emerald-950 hover:bg-emerald-400/45"
+                  : "border-cyan-500/70 bg-cyan-400/35 text-cyan-950 hover:bg-cyan-400/45"
+                  }`}
               >
                 {card.action}
               </a>
@@ -257,10 +258,10 @@ const Help = () => {
         </div>
 
         {/* Main Interface: Form & FAQs */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-10">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-10 items-start">
           {/* Complaint Console */}
-          <div className="lg:col-span-3">
-            <div className="glass p-4 sm:p-6 md:p-8 lg:p-10 rounded-xl sm:rounded-2xl md:rounded-[2.5rem] border border-white/10 shadow-2xl space-y-6 sm:space-y-8">
+          <div className="lg:col-span-3 h-full">
+            <div className="glass p-6 md:p-8 lg:p-10 rounded-xl sm:rounded-2xl md:rounded-[2.5rem] border border-white/10 shadow-2xl h-full flex flex-col space-y-6 sm:space-y-8">
               <div className="flex items-center gap-3 border-b border-white/10 pb-6">
                 <ExclamationTriangleIcon className="w-6 h-6 text-amber-400" />
                 <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/85">
@@ -368,7 +369,7 @@ const Help = () => {
               <button
                 onClick={handleSubmit}
                 disabled={loading}
-                className="w-full glass bg-emerald-400/35 hover:bg-emerald-400/45 text-emerald-950 py-4 rounded-2xl font-black uppercase tracking-widest transition-all active:scale-[0.98] border border-emerald-500/60 shadow-xl shadow-emerald-500/10 disabled:opacity-50"
+                className="mt-auto w-full glass bg-emerald-400/35 hover:bg-emerald-400/45 text-emerald-950 py-4 rounded-2xl font-black uppercase tracking-widest transition-all active:scale-[0.98] border border-emerald-500/60 shadow-xl shadow-emerald-500/10 disabled:opacity-50"
               >
                 {loading ? t("transmitting") : t("submitReport")}
               </button>
@@ -376,8 +377,8 @@ const Help = () => {
           </div>
 
           {/* Dynamic Knowledge Base (FAQs) */}
-          <div className="lg:col-span-2 space-y-6">
-            <div className="glass p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl md:rounded-[2.5rem] border border-white/10 shadow-xl h-fit">
+          <div className="lg:col-span-2 h-full flex flex-col gap-6">
+            <div className="glass p-6 md:p-8 lg:p-10 rounded-xl sm:rounded-2xl md:rounded-[2.5rem] border border-white/10 shadow-xl h-full flex flex-col">
               <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/85 mb-8 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
                 {t("quickHelp")}
@@ -410,15 +411,14 @@ const Help = () => {
                 </div>
               )}
 
-              <div className="space-y-3">
+              <div className="space-y-3 flex-1">
                 {faqs.map((faq) => (
                   <div
                     key={faq.id}
-                    className={`glass rounded-2xl border transition-all duration-300 ${
-                      openFaq === faq.id
-                        ? "bg-white/10 border-white/20"
-                        : "bg-white/5 border-white/5 hover:border-white/10"
-                    }`}
+                    className={`glass rounded-2xl border transition-all duration-300 ${openFaq === faq.id
+                      ? "bg-white/10 border-white/20"
+                      : "bg-white/5 border-white/5 hover:border-white/10"
+                      }`}
                   >
                     <button
                       onClick={() =>
@@ -430,11 +430,10 @@ const Help = () => {
                         {getFaqText(faq, "question")}
                       </span>
                       <ChevronDownIcon
-                        className={`w-4 h-4 text-white/85 transition-transform duration-500 ${
-                          openFaq === faq.id
-                            ? "rotate-180 text-emerald-400"
-                            : ""
-                        }`}
+                        className={`w-4 h-4 text-white/85 transition-transform duration-500 ${openFaq === faq.id
+                          ? "rotate-180 text-emerald-400"
+                          : ""
+                          }`}
                       />
                     </button>
                     {openFaq === faq.id && (
@@ -444,11 +443,11 @@ const Help = () => {
                     )}
                   </div>
                 ))}
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Close the main grid grid-cols-1 lg:grid-cols-5 */}
+          {/* Close the main grid grid-cols-1 lg:grid-cols-5 */}
         </div>
 
         {/* ── Legal & Policies — full-width footer bar ── */}
@@ -468,9 +467,9 @@ const Help = () => {
             {/* Buttons — Route navigation */}
             <div className="flex flex-wrap gap-4 flex-1">
               {[
-                { label: "Privacy Policy",     key: "privacy", icon: "privacy_tip"       },
-                { label: "Terms & Conditions", key: "terms",   icon: "gavel"             },
-                { label: "Return Policy",      key: "returns",  icon: "assignment_return" },
+                { label: "Privacy Policy", key: "privacy", icon: "privacy_tip" },
+                { label: "Terms & Conditions", key: "terms", icon: "gavel" },
+                { label: "Return Policy", key: "returns", icon: "assignment_return" },
               ].map(({ label, key, icon }) => (
                 <button
                   type="button"
