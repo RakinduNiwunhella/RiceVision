@@ -63,7 +63,7 @@ export default function FiltersPanel({ filters, setFilters }) {
       >
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-sm font-bold uppercase tracking-widest text-white/85">
-          {t("mapFiltersTitle")}
+          {t("Filters")}
         </h2>
 
         {filters.districts.length > 0 && (

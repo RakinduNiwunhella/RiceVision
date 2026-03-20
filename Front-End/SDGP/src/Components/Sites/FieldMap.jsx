@@ -128,57 +128,86 @@ export default function FieldMap() {
   }, [districtFromURL, navigate]);
 
   const [showMobilePanel, setShowMobilePanel] = useState(false);
+  const [mobilePanelTab, setMobilePanelTab] = useState("filters");
 
   return (
-    <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 min-h-[calc(100vh-4rem)] p-3 sm:p-6">
-
-      {/* ── Mobile: single filter/layers toggle button ── */}
-      <button
-        onClick={() => setShowMobilePanel((p) => !p)}
-        className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[1001] bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-2 text-sm font-bold transition-all active:scale-95"
-      >
-        <span className="material-symbols-outlined text-[20px]">
-          {showMobilePanel ? "close" : "tune"}
-        </span>
-        {showMobilePanel ? "Close" : "Filters & Layers"}
-      </button>
-
-      {/* ── Mobile: combined slide-up panel ── */}
-      {showMobilePanel && (
-        <div className="lg:hidden fixed inset-0 z-[1000]">
-          <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            onClick={() => setShowMobilePanel(false)}
-          />
-          <div className="absolute bottom-0 left-0 right-0 max-h-[75vh] overflow-y-auto rounded-t-3xl glass border-t border-white/10 shadow-2xl p-4 space-y-4">
-            <div className="flex justify-center mb-2">
-              <div className="w-10 h-1 rounded-full bg-white/30" />
-            </div>
-            {/* Filters inline */}
-            <div>
-              <FiltersPanel filters={filters} setFilters={setFilters} />
-            </div>
-            {/* Layers inline */}
-            <div>
-              <MapLayersPanel
-                layers={layers}
-                setLayers={setLayers}
-                districtSelected={filters.districts.length > 0}
-              />
-            </div>
-          </div>
-        </div>
-      )}
+    <div className="flex flex-col lg:flex-row gap-3 sm:gap-6 p-3 sm:p-6">
 
       {/* ── Desktop: Filters Panel (left) ── */}
       <div ref={currentStep === 1 ? filtersPanelRef : undefined} className="hidden lg:flex flex-col gap-4 sm:gap-6 w-full lg:w-auto">
         <FiltersPanel filters={filters} setFilters={setFilters} />
       </div>
 
-      {/* Map */}
-      <div ref={currentStep === 0 ? mapContainerRef : undefined} className="flex-1 rounded-2xl sm:rounded-3xl overflow-hidden glass border-white/20 shadow-2xl h-[calc(100vh-8rem)] sm:h-[60vh] md:h-[65vh] lg:h-[80vh]">
-        <RiceMap filters={filters} layers={layers} flyTo={flyTo} />
+      {/* ── Mobile + map column ── */}
+      <div className="flex-1 flex flex-col gap-3">
+
+        {/* Toggle button — mobile only, sits above map inline */}
+        <button
+          onClick={() => setShowMobilePanel((p) => !p)}
+          className="lg:hidden w-full flex items-center justify-between glass border border-white/10 rounded-2xl px-4 py-3 text-sm font-semibold text-white/90 hover:bg-white/10 active:scale-[0.98] transition-all"
+        >
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-emerald-400 text-[20px]">tune</span>
+            <span>Filters &amp; Layers</span>
+            {filters.districts.length > 0 && (
+              <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                {filters.districts[0]}
+              </span>
+            )}
+          </div>
+          <span className="material-symbols-outlined text-white/50 text-[18px]">
+            {showMobilePanel ? "expand_less" : "expand_more"}
+          </span>
+        </button>
+
+        {/* Inline expandable panel — pushes map down */}
+        {showMobilePanel && (
+          <div className="lg:hidden glass border border-white/10 rounded-2xl overflow-hidden">
+            {/* Tab bar */}
+            <div className="flex gap-1 p-2 border-b border-white/10">
+              {[
+                { id: "filters", label: "Filters", icon: "filter_list" },
+                { id: "layers",  label: "Layers",  icon: "layers" },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setMobilePanelTab(tab.id)}
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
+                    mobilePanelTab === tab.id
+                      ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                      : "text-white/60 hover:text-white/80 hover:bg-white/5"
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-[15px]">{tab.icon}</span>
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Scrollable content — max height so map below is still visible */}
+            <div className="overflow-y-auto overscroll-contain max-h-[40vh] p-1">
+              {mobilePanelTab === "filters" ? (
+                <FiltersPanel filters={filters} setFilters={setFilters} />
+              ) : (
+                <MapLayersPanel
+                  layers={layers}
+                  setLayers={setLayers}
+                  districtSelected={filters.districts.length > 0}
+                />
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Map — fixed height, always fully visible below filter panel */}
+        <div
+          ref={currentStep === 0 ? mapContainerRef : undefined}
+          className="rounded-2xl sm:rounded-3xl overflow-hidden glass border-white/20 shadow-2xl h-[60vh] lg:h-[80vh]"
+        >
+          <RiceMap filters={filters} layers={layers} flyTo={flyTo} />
+        </div>
       </div>
+
 
       {/* ── Desktop: Map Layers (right) ── */}
       <div ref={currentStep === 2 ? layersPanelRef : undefined} className="hidden lg:flex flex-col gap-4 sm:gap-6 w-full lg:w-auto">
