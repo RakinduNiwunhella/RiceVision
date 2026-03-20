@@ -90,11 +90,11 @@ const router = createBrowserRouter([
   },
   /* ── Public legal pages (no auth required) ── */
   {
-    path: "/return-policy",
+    path: "/returns",
     element: <ReturnPolicy />,
   },
   {
-    path: "/privacy-policy",
+    path: "/privacy",
     element: <PrivacyPolicy />,
   },
   {

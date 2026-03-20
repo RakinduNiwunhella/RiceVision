@@ -15,6 +15,32 @@ import {
   BarChart,
   Bar,
 } from "recharts";
+
+// Custom tooltip for district name popup
+const DistrictTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div style={{
+        background: "rgba(8,13,22,0.96)",
+        border: "1px solid rgba(255,255,255,0.08)",
+        borderRadius: 12,
+        padding: 10,
+        color: "#fff",
+        fontWeight: 700,
+        fontSize: 12,
+        textAlign: "center",
+        marginBottom: 8,
+        boxShadow: "0 2px 12px rgba(0,0,0,0.18)"
+      }}>
+        <div style={{ fontSize: 13, fontWeight: 900, marginBottom: 2 }}>{label}</div>
+        <div style={{ color: "#9be7d0", fontWeight: 700 }}>
+          {payload[0].value.toLocaleString(undefined, { maximumFractionDigits: 1 })} MT
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
 import { useLanguage } from "../../context/LanguageContext";
 import { Bug } from "lucide-react";
 import TutorialOverlay from "../TutorialOverlay";
@@ -22,6 +48,7 @@ import { usePageTutorial } from "../../hooks/usePageTutorial";
 import { useNavigate } from "react-router-dom";
 import { translateDistrictName } from "../../utils/locationTranslations";
 import { translateDisasterType, translateStageCategory } from "../../utils/agriTranslations";
+import OnboardingTour from "../OnboardingTour";
 
 import {
   fetchHealthSummary,
@@ -82,6 +109,7 @@ const MyDashboard = () => {
   const [showAllDistricts, setShowAllDistricts] = useState(false);
   const [stageDistribution, setStageDistribution] = useState([]);
   const [outbreaks, setOutbreaks] = useState([]);
+  const [replayTour, setReplayTour] = useState(false);
 
   // Refs for tutorial tooltips
   const headerRef = useRef(null);
@@ -161,6 +189,40 @@ const MyDashboard = () => {
   const { currentStep, showTutorial, nextStep, prevStep, closeTutorial } =
     usePageTutorial("dashboard", tutorialSteps);
 
+  // First-time user onboarding tour (6 core steps)
+  const onboardingSteps = [
+    {
+      target: '[data-tour="navbar"]',
+      title: 'Navigation Bar',
+      description: 'Access maps, alerts, weather, and reports',
+    },
+    {
+      target: '[data-tour="crop-health"]',
+      title: 'Crop Health Distribution',
+      description: 'Monitor overall crop condition across regions',
+    },
+    {
+      target: '[data-tour="output-projection"]',
+      title: 'Output Projection',
+      description: 'See estimated rice production levels',
+    },
+    {
+      target: '[data-tour="supply-stability"]',
+      title: 'Supply Stability',
+      description: 'Identify shortages and demand gaps',
+    },
+    {
+      target: '[data-tour="bottom-section"]',
+      title: 'Detailed Insights',
+      description: 'Explore district-level data and analytics',
+    },
+    {
+      target: '[data-tour="chatbot"]',
+      title: 'AI Assistant',
+      description: 'Ask questions and get farming insights instantly',
+    },
+  ];
+
   const stageColors = ["#10b981", "#06b6d4", "#8b5cf6", "#f59e0b", "#ef4444", "#f97316"];
 
   const translatedStageDistribution = useMemo(
@@ -218,6 +280,19 @@ const MyDashboard = () => {
       }
     };
     loadData();
+  }, []);
+
+  // Listen for tour replay events from Help page
+  useEffect(() => {
+    const handleReplayTour = () => {
+      setReplayTour(true);
+    };
+
+    window.addEventListener('replay-onboarding-tour', handleReplayTour);
+
+    return () => {
+      window.removeEventListener('replay-onboarding-tour', handleReplayTour);
+    };
   }, []);
 
 
@@ -331,7 +406,7 @@ const MyDashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-6 sm:mt-10">
 
           {/* Field Health Distribution */}
-          <div ref={healthCardRef} className="glass glass-hover p-4 sm:p-6 md:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col items-center">
+          <div ref={healthCardRef} data-tour="crop-health" className="glass glass-hover p-4 sm:p-6 md:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col items-center">
             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/85 mb-8 self-start flex items-center gap-2">
               <span className="material-symbols-outlined text-emerald-400 text-sm">radiology</span>
               {t('cropHealthDist')}
@@ -386,7 +461,7 @@ const MyDashboard = () => {
           </div>
 
           {/* Yield Forecast */}
-          <div ref={yieldCardRef} className="glass glass-hover p-4 sm:p-6 md:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
+          <div ref={yieldCardRef} data-tour="output-projection" className="glass glass-hover p-4 sm:p-6 md:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/85 mb-6 flex items-center gap-2">
               <span className="material-symbols-outlined text-cyan-400 text-sm">trending_up</span>
               {t('outputProjection')}
@@ -418,7 +493,7 @@ const MyDashboard = () => {
           </div>
 
           {/* Expected Shortfall */}
-          <div ref={supplyCardRef} className="glass glass-hover p-4 sm:p-6 md:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col justify-between md:col-span-2 lg:col-span-1">
+          <div ref={supplyCardRef} data-tour="supply-stability" className="glass glass-hover p-4 sm:p-6 md:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col justify-between md:col-span-2 lg:col-span-1">
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/85 mb-6 flex items-center gap-2">
                 <span className="material-symbols-outlined text-amber-500 text-sm">error</span>
@@ -475,60 +550,40 @@ const MyDashboard = () => {
               </div>
 
               {districtYieldRows.length > 0 ? (
-                <div className="flex gap-0 h-[320px]">
-                  <div className="w-12 shrink-0 border-r border-white/10 bg-transparent pr-1">
+                <div className="h-[320px] w-full overflow-x-auto pb-2 custom-scrollbar">
+                  <div style={{ width: `${Math.max(900, districtYieldRows.length * 72)}px`, height: "320px" }}>
                     <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={districtYieldRows} margin={{ top: 8, right: 0, left: 0, bottom: 56 }}>
-                        <YAxis
+                      <LineChart data={districtYieldRows} margin={{ top: 8, right: 14, left: 32, bottom: 56 }}>
+                        <CartesianGrid stroke="rgba(255,255,255,0.08)" strokeDasharray="3 3" vertical={false} />
+                        <XAxis
+                          dataKey="district"
+                          tick={{ fill: "rgba(255,255,255,0.62)", fontSize: 10, fontWeight: 800 }}
+                          axisLine={{ stroke: "rgba(255,255,255,0.15)" }}
+                          tickLine={false}
+                          interval={0}
+                          angle={-32}
+                          textAnchor="end"
+                          height={60}
+                        />
+                        <YAxis 
                           domain={yieldAxisDomain}
-                          tick={{ fill: "rgba(255,255,255,0.55)", fontSize: 10, fontWeight: 800 }}
+                          tick={{ fill: "rgba(255,255,255,0.85)", fontSize: 11, fontWeight: 900 }}
                           axisLine={false}
                           tickLine={false}
-                          width={56}
-                          tickFormatter={(value) => `${Number(value).toFixed(0)}`}
+                          width={60}
+                          tickFormatter={formatDistrictMT}
                         />
-                        <Line dataKey="yieldMT" stroke="transparent" dot={false} isAnimationActive={false} />
+                        <Tooltip content={<DistrictTooltip />} />
+                        <Line
+                          type="monotone"
+                          dataKey="yieldMT"
+                          stroke="#34d399"
+                          strokeWidth={2.5}
+                          dot={{ r: 2.5, fill: "#34d399", stroke: "#34d399" }}
+                          activeDot={{ r: 5 }}
+                        />
                       </LineChart>
                     </ResponsiveContainer>
-                  </div>
-
-                  <div className="flex-1 overflow-x-auto pb-2 custom-scrollbar">
-                    <div style={{ width: `${Math.max(900, districtYieldRows.length * 72)}px`, height: "320px" }}>
-                      <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={districtYieldRows} margin={{ top: 8, right: 14, left: 0, bottom: 56 }}>
-                          <CartesianGrid stroke="rgba(255,255,255,0.08)" strokeDasharray="3 3" vertical={false} />
-                          <XAxis
-                            dataKey="district"
-                            tick={{ fill: "rgba(255,255,255,0.62)", fontSize: 10, fontWeight: 800 }}
-                            axisLine={{ stroke: "rgba(255,255,255,0.15)" }}
-                            tickLine={false}
-                            interval={0}
-                            angle={-32}
-                            textAnchor="end"
-                            height={60}
-                          />
-                          <YAxis hide domain={yieldAxisDomain} />
-                          <Tooltip
-                            contentStyle={{ background: "rgba(8,13,22,0.96)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px" }}
-                            labelStyle={{ color: "#fff", fontSize: "11px", fontWeight: "700" }}
-                            itemStyle={{ color: "#9be7d0", fontSize: "11px", fontWeight: "700" }}
-                            labelFormatter={(value, payload) => {
-                              const rank = payload?.[0]?.payload?.rank;
-                              return rank ? `#${rank} ${value}` : value;
-                            }}
-                            formatter={(value) => [`${formatDistrictMT(value)} MT`, "Total yield"]}
-                          />
-                          <Line
-                            type="monotone"
-                            dataKey="yieldMT"
-                            stroke="#34d399"
-                            strokeWidth={2.5}
-                            dot={{ r: 2.5, fill: "#34d399", stroke: "#34d399" }}
-                            activeDot={{ r: 5 }}
-                          />
-                        </LineChart>
-                      </ResponsiveContainer>
-                    </div>
                   </div>
                 </div>
               ) : (
@@ -565,7 +620,7 @@ const MyDashboard = () => {
         </div>
 
         {/* ── Analytical Depth Row ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 pb-10 sm:pb-12">
+        <div data-tour="bottom-section" className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 pb-10 sm:pb-12">
 
           {/* Stage Distribution */}
           <div ref={stageChartRef} className="glass glass-hover p-4 sm:p-6 md:p-8 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl flex flex-col">
@@ -817,6 +872,21 @@ const MyDashboard = () => {
           onBack={prevStep}
           onSkip={closeTutorial}
           onFinish={closeTutorial}
+        />
+
+        {/* First-time Onboarding Tour */}
+        <OnboardingTour
+          steps={onboardingSteps}
+          storageKey="riceVisionOnboardingComplete"
+          forceRun={replayTour}
+          onComplete={() => {
+            console.log('Onboarding completed');
+            setReplayTour(false);
+          }}
+          onSkip={() => {
+            console.log('Onboarding skipped');
+            setReplayTour(false);
+          }}
         />
       </div>
     </div>

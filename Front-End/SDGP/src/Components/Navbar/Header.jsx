@@ -8,6 +8,7 @@ import Notifications from "../Notifications/Notifications";
 import { supabase } from "../../supabaseClient";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
 import TutorialTooltip from "../../Components/TutorialTooltip";
+import { fetchNotificationUnreadCount } from "../../api/api";
 
 const searchIndex = [
   {
@@ -116,6 +117,9 @@ const Header = () => {
   const reportBtnRef = useRef(null);
   const helpBtnRef = useRef(null);
 
+  // Optional navbar ref for highlighting the whole navbar as fallback
+  const navbarRef = useRef(null);
+
   // Tutorial refs for header action buttons
   const searchInputRef = useRef(null);
   const languageBtnRef = useRef(null);
@@ -125,108 +129,155 @@ const Header = () => {
 
   // Navigation items with their tutorial refs
   const navItems = [
-    { label: t("dashboard"), icon: "apps", path: "/dashboard", ref: dashboardBtnRef },
-    { label: t("fieldData"), icon: "table_chart", path: "/field-data", ref: fieldDataBtnRef },
+    {
+      label: t("dashboard"),
+      icon: "apps",
+      path: "/dashboard",
+      ref: dashboardBtnRef,
+    },
+    {
+      label: t("fieldData"),
+      icon: "table_chart",
+      path: "/field-data",
+      ref: fieldDataBtnRef,
+    },
     { label: t("map"), icon: "map", path: "/field-map", ref: mapBtnRef },
-    { label: t("weather"), icon: "cloud", path: "/weather", ref: weatherBtnRef },
-    { label: t("alerts"), icon: "notification_important", path: "/alerts", ref: alertsBtnRef },
-    { label: t("report"), icon: "bar_chart", path: "/report", ref: reportBtnRef },
+    {
+      label: t("weather"),
+      icon: "cloud",
+      path: "/weather",
+      ref: weatherBtnRef,
+    },
+    {
+      label: t("alerts"),
+      icon: "notification_important",
+      path: "/alerts",
+      ref: alertsBtnRef,
+    },
+    {
+      label: t("report"),
+      icon: "bar_chart",
+      path: "/report",
+      ref: reportBtnRef,
+    },
     { label: t("help"), icon: "help", path: "/help", ref: helpBtnRef },
   ];
 
-  // Tutorial setup - navbar first, then header action controls
-  const tutorialSteps = useMemo(() => [
-    {
-      ref: dashboardBtnRef,
-      title: t("dashboardTutTitle"),
-      action: t("dashboardTutAction"),
-      outcome: t("dashboardTutOutcome"),
-      position: "bottom",
-    },
-    {
-      ref: fieldDataBtnRef,
-      title: t("fieldDataTutTitle"),
-      action: t("fieldDataTutAction"),
-      outcome: t("fieldDataTutOutcome"),
-      position: "bottom",
-    },
-    {
-      ref: mapBtnRef,
-      title: t("mapTutTitle"),
-      action: t("mapTutAction"),
-      outcome: t("mapTutOutcome"),
-      position: "bottom",
-    },
-    {
-      ref: weatherBtnRef,
-      title: t("weatherTutTitle"),
-      action: t("weatherTutAction"),
-      outcome: t("weatherTutOutcome"),
-      position: "bottom",
-    },
-    {
-      ref: alertsBtnRef,
-      title: t("alertsTutTitle"),
-      action: t("alertsTutAction"),
-      outcome: t("alertsTutOutcome"),
-      position: "bottom",
-    },
-    {
-      ref: reportBtnRef,
-      title: t("reportTutTitle"),
-      action: t("reportTutAction"),
-      outcome: t("reportTutOutcome"),
-      position: "bottom",
-    },
-    {
-      ref: helpBtnRef,
-      title: t("helpTutTitle"),
-      action: t("helpTutAction"),
-      outcome: t("helpTutOutcome"),
-      position: "bottom",
-    },
-    {
-      ref: searchInputRef,
-      title: t("searchHeaderTitle"),
-      action: t("searchHeaderAction"),
-      outcome: t("searchHeaderOutcome"),
-      position: "bottom",
-    },
-    {
-      ref: languageBtnRef,
-      title: t("languageTitle"),
-      action: t("languageAction"),
-      outcome: t("languageOutcome"),
-      position: "bottom",
-    },
-    {
-      ref: themeBtnRef,
-      title: t("themeTitle"),
-      action: t("themeAction"),
-      outcome: t("themeOutcome"),
-      position: "bottom",
-    },
-    {
-      ref: notificationBtnRef,
-      title: t("notificationsTitle"),
-      action: t("notificationsAction"),
-      outcome: t("notificationsOutcome"),
-      position: "bottom",
-    },
-    {
-      ref: profileBtnRef,
-      title: t("profileTitle"),
-      action: t("profileAction"),
-      outcome: t("profileOutcome"),
-      position: "bottom",
-    },
-  ], [t]);
+  // Tutorial setup - navbar first, then individual navigation buttons, then header action controls
+  const tutorialSteps = useMemo(
+    () => [
+      {
+        ref: navbarRef,
+        title: t("navbarTutTitle") || "Navigation Bar",
+        action: t("navbarTutAction") || "This is your main navigation bar",
+        outcome:
+          t("navbarTutOutcome") ||
+          "Use these buttons to navigate between different sections of RiceVision",
+        position: "bottom",
+      },
+      {
+        ref: dashboardBtnRef,
+        title: t("dashboardTutTitle"),
+        action: t("dashboardTutAction"),
+        outcome: t("dashboardTutOutcome"),
+        position: "bottom",
+      },
+      {
+        ref: fieldDataBtnRef,
+        title: t("fieldDataTutTitle"),
+        action: t("fieldDataTutAction"),
+        outcome: t("fieldDataTutOutcome"),
+        position: "bottom",
+      },
+      {
+        ref: mapBtnRef,
+        title: t("mapTutTitle"),
+        action: t("mapTutAction"),
+        outcome: t("mapTutOutcome"),
+        position: "bottom",
+      },
+      {
+        ref: weatherBtnRef,
+        title: t("weatherTutTitle"),
+        action: t("weatherTutAction"),
+        outcome: t("weatherTutOutcome"),
+        position: "bottom",
+      },
+      {
+        ref: alertsBtnRef,
+        title: t("alertsTutTitle"),
+        action: t("alertsTutAction"),
+        outcome: t("alertsTutOutcome"),
+        position: "bottom",
+      },
+      {
+        ref: reportBtnRef,
+        title: t("reportTutTitle"),
+        action: t("reportTutAction"),
+        outcome: t("reportTutOutcome"),
+        position: "bottom",
+      },
+      {
+        ref: helpBtnRef,
+        title: t("helpTutTitle"),
+        action: t("helpTutAction"),
+        outcome: t("helpTutOutcome"),
+        position: "bottom",
+      },
+      {
+        ref: searchInputRef,
+        title: t("searchHeaderTitle"),
+        action: t("searchHeaderAction"),
+        outcome: t("searchHeaderOutcome"),
+        position: "bottom",
+      },
+      {
+        ref: languageBtnRef,
+        title: t("languageTitle"),
+        action: t("languageAction"),
+        outcome: t("languageOutcome"),
+        position: "bottom",
+      },
+      {
+        ref: themeBtnRef,
+        title: t("themeTitle"),
+        action: t("themeAction"),
+        outcome: t("themeOutcome"),
+        position: "bottom",
+      },
+      {
+        ref: notificationBtnRef,
+        title: t("notificationsTitle"),
+        action: t("notificationsAction"),
+        outcome: t("notificationsOutcome"),
+        position: "bottom",
+      },
+      {
+        ref: profileBtnRef,
+        title: t("profileTitle"),
+        action: t("profileAction"),
+        outcome: t("profileOutcome"),
+        position: "bottom",
+      },
+    ],
+    [t],
+  );
 
-  const { currentStep, showTutorial, currentTutorialStep, nextStep, prevStep, closeTutorial } = usePageTutorial("Header", tutorialSteps);
+  const {
+    currentStep,
+    showTutorial,
+    currentTutorialStep,
+    nextStep,
+    prevStep,
+    closeTutorial,
+  } = usePageTutorial("Header", tutorialSteps);
 
   // Publish the current Header tutorial version so other pages wait for this exact version.
   useEffect(() => {
-    localStorage.setItem("ricevision_header_required_steps", String(tutorialSteps.length));
+    localStorage.setItem(
+      "ricevision_header_required_steps",
+      String(tutorialSteps.length),
+    );
     window.dispatchEvent(new Event("ricevision:tutorial-pages-updated"));
   }, [tutorialSteps.length]);
 
@@ -239,13 +290,14 @@ const Header = () => {
 
     const timer = setTimeout(() => {
       if (!step.ref?.current) {
+        console.log(`⚠️ Step ${currentStep} ref missing, auto-skipping`);
         if (currentStep < tutorialSteps.length - 1) {
           nextStep();
         } else {
           closeTutorial();
         }
       }
-    }, 180);
+    }, 200);
 
     return () => clearTimeout(timer);
   }, [showTutorial, currentStep, tutorialSteps, nextStep, closeTutorial]);
@@ -308,7 +360,8 @@ const Header = () => {
   useEffect(() => {
     const getInitials = (fullName, email) => {
       const parts = (fullName || "").trim().split(/\s+/).filter(Boolean);
-      if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+      if (parts.length >= 2)
+        return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
       if (parts.length === 1) return parts[0][0].toUpperCase();
       if (email) return email[0].toUpperCase();
       return "U";
@@ -373,7 +426,11 @@ const Header = () => {
 
   return (
     <>
-      <nav className="fixed top-2 sm:top-4 left-1/2 -translate-x-1/2 w-[calc(100%-1rem)] sm:w-[calc(100%-3rem)] max-w-7xl z-[9995] glass h-12 sm:h-14 rounded-2xl shadow-2xl border-white/20 overflow-visible">
+      <nav
+        ref={navbarRef}
+        data-tour="navbar"
+        className="fixed top-2 sm:top-4 left-1/2 -translate-x-1/2 w-[calc(100%-1rem)] sm:w-[calc(100%-3rem)] max-w-7xl z-[9995] glass h-12 sm:h-14 rounded-2xl shadow-2xl border-white/20 overflow-visible"
+      >
         <div className="max-w-7xl mx-auto px-3 sm:px-4 h-full">
           <div className="flex justify-between items-center h-full gap-2 sm:gap-4">
             {/* Logo Section */}
@@ -398,20 +455,20 @@ const Header = () => {
                     location.pathname === item.path ||
                     (item.path === "/dashboard" && location.pathname === "/");
                   return (
-                    <Link
-                      key={item.label}
-                      ref={item.ref}
-                      to={item.path}
-                      className={`flex items-center gap-1 lg:gap-1.5 px-2 lg:px-3 py-1.5 rounded-lg text-[10px] lg:text-[11px] font-semibold tracking-wide whitespace-nowrap transition-all duration-300 ${isActive
+                    <div key={item.label} ref={item.ref}>
+                      <Link
+                        to={item.path}
+                        className={`flex items-center gap-1 lg:gap-1.5 px-2 lg:px-3 py-1.5 rounded-lg text-[10px] lg:text-[11px] font-semibold tracking-wide whitespace-nowrap transition-all duration-300 ${isActive
                           ? "bg-white/15 text-white shadow-xl shadow-black/5 border border-white/20"
                           : "text-white/85 hover:text-white hover:bg-white/10"
-                        }`}
-                    >
-                      <span className="material-symbols-outlined text-[15px] lg:text-[16px]">
-                        {item.icon}
-                      </span>
-                      {item.label}
-                    </Link>
+                          }`}
+                      >
+                        <span className="material-symbols-outlined text-[15px] lg:text-[16px]">
+                          {item.icon}
+                        </span>
+                        {item.label}
+                      </Link>
+                    </div>
                   );
                 })}
               </div>
@@ -547,8 +604,8 @@ const Header = () => {
                               setLangOpen(false);
                             }}
                             className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition hover:bg-white/10 ${language === lang.code
-                                ? "bg-emerald-500/20 text-white"
-                                : "text-white/85"
+                              ? "bg-emerald-500/20 text-white"
+                              : "text-white/85"
                               }`}
                           >
                             <span className="text-xs font-semibold">
@@ -609,7 +666,9 @@ const Header = () => {
                   className="w-9 h-9 rounded-lg flex items-center justify-center text-white/85 hover:text-white hover:bg-white/10 transition"
                   title="Change Language"
                 >
-                  <span className="material-symbols-outlined text-[20px]">language</span>
+                  <span className="material-symbols-outlined text-[20px]">
+                    language
+                  </span>
                 </button>
 
                 <button
@@ -705,21 +764,21 @@ const Header = () => {
                 location.pathname === item.path ||
                 (item.path === "/dashboard" && location.pathname === "/");
               return (
-                <Link
-                  key={item.label}
-                  ref={item.ref}
-                  to={item.path}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${isActive
+                <div key={item.label} ref={item.ref}>
+                  <Link
+                    to={item.path}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${isActive
                       ? "bg-white/15 text-white border border-white/20"
                       : "text-white/85 hover:text-white hover:bg-white/10"
-                    }`}
-                >
-                  <span className="material-symbols-outlined text-[18px]">
-                    {item.icon}
-                  </span>
-                  {item.label}
-                </Link>
+                      }`}
+                  >
+                    <span className="material-symbols-outlined text-[18px] w-6 shrink-0 flex items-center justify-center">
+                      {item.icon}
+                    </span>
+                    {item.label}
+                  </Link>
+                </div>
               );
             })}
           </div>
@@ -727,12 +786,12 @@ const Header = () => {
       )}
 
       {/* Tutorial Tooltips */}
-      {showTutorial && currentTutorialStep && tutorialSteps[currentStep] && (
+      {showTutorial && tutorialSteps[currentStep]?.ref?.current && (
         <TutorialTooltip
           visible={true}
-          title={currentTutorialStep.title}
-          action={currentTutorialStep.action}
-          outcome={currentTutorialStep.outcome}
+          title={tutorialSteps[currentStep].title}
+          action={tutorialSteps[currentStep].action}
+          outcome={tutorialSteps[currentStep].outcome}
           elementRef={tutorialSteps[currentStep].ref}
           position={tutorialSteps[currentStep].position || "bottom"}
           step={currentStep}
@@ -755,16 +814,12 @@ function NotificationPanelButton() {
 
   const buttonRef = useRef(null);
   const wrapperRef = useRef(null);
+  const panelRef = useRef(null);
 
   const fetchCount = async () => {
     try {
-      const { count, error } = await supabase
-        .from("notificationpanel")
-        .select("*", { count: "exact", head: true })
-        .eq("is_read", false);
-
-      if (error) throw error;
-      setUnread(count || 0);
+      const { unread_count: unreadCount } = await fetchNotificationUnreadCount();
+      setUnread(unreadCount || 0);
     } catch (e) {
       console.error("failed to get notifications count", e);
     }
@@ -774,13 +829,30 @@ function NotificationPanelButton() {
     fetchCount();
   }, [show]);
 
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(() => {
+      fetchCount();
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
   const handleRead = () => {
     fetchCount();
   };
 
   useEffect(() => {
     function handleClick(e) {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(e.target) &&
+        panelRef.current &&
+        !panelRef.current.contains(e.target)
+      ) {
         setShow(false);
       }
     }
@@ -793,29 +865,35 @@ function NotificationPanelButton() {
     if (show && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
       const top = rect.bottom + 8;
+      const isMobile = window.innerWidth < 640;
 
       setCoords({
         top,
-        right: window.innerWidth - rect.right,
+        right: isMobile ? 8 : window.innerWidth - rect.right,
       });
 
       setMaxHeight(window.innerHeight - top - 16);
     }
   }, [show]);
 
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 640;
+
   const panel = (
-    <Notifications
-      onRead={handleRead}
-      style={{
-        position: "fixed",
-        top: coords.top,
-        right: coords.right,
-        zIndex: 9999,
-        width: "20rem",
-        maxHeight: maxHeight > 0 ? maxHeight : "24rem",
-        overflowY: "auto",
-      }}
-    />
+    <div ref={panelRef}>
+      <Notifications
+        onRead={handleRead}
+        onUnreadCountChange={setUnread}
+        style={{
+          position: "fixed",
+          top: coords.top,
+          right: coords.right,
+          zIndex: 9999,
+          width: isMobile ? "calc(100vw - 16px)" : "20rem",
+          maxHeight: maxHeight > 0 ? maxHeight : "24rem",
+          overflowY: "auto",
+        }}
+      />
+    </div>
   );
 
   return (
@@ -841,5 +919,6 @@ function NotificationPanelButton() {
     </div>
   );
 }
+
 
 export default Header;
