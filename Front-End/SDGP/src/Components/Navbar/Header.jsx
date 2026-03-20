@@ -8,6 +8,7 @@ import Notifications from "../Notifications/Notifications";
 import { supabase } from "../../supabaseClient";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
 import TutorialTooltip from "../../Components/TutorialTooltip";
+import { fetchNotificationUnreadCount } from "../../api/api";
 
 const searchIndex = [
   {
@@ -755,16 +756,12 @@ function NotificationPanelButton() {
 
   const buttonRef = useRef(null);
   const wrapperRef = useRef(null);
+  const panelRef = useRef(null);
 
   const fetchCount = async () => {
     try {
-      const { count, error } = await supabase
-        .from("notificationpanel")
-        .select("*", { count: "exact", head: true })
-        .eq("is_read", false);
-
-      if (error) throw error;
-      setUnread(count || 0);
+      const { unread_count: unreadCount } = await fetchNotificationUnreadCount();
+      setUnread(unreadCount || 0);
     } catch (e) {
       console.error("failed to get notifications count", e);
     }
@@ -774,13 +771,30 @@ function NotificationPanelButton() {
     fetchCount();
   }, [show]);
 
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(() => {
+      fetchCount();
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
   const handleRead = () => {
     fetchCount();
   };
 
   useEffect(() => {
     function handleClick(e) {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(e.target) &&
+        panelRef.current &&
+        !panelRef.current.contains(e.target)
+      ) {
         setShow(false);
       }
     }
@@ -804,18 +818,21 @@ function NotificationPanelButton() {
   }, [show]);
 
   const panel = (
-    <Notifications
-      onRead={handleRead}
-      style={{
-        position: "fixed",
-        top: coords.top,
-        right: coords.right,
-        zIndex: 9999,
-        width: "20rem",
-        maxHeight: maxHeight > 0 ? maxHeight : "24rem",
-        overflowY: "auto",
-      }}
-    />
+    <div ref={panelRef}>
+      <Notifications
+        onRead={handleRead}
+        onUnreadCountChange={setUnread}
+        style={{
+          position: "fixed",
+          top: coords.top,
+          right: coords.right,
+          zIndex: 9999,
+          width: "20rem",
+          maxHeight: maxHeight > 0 ? maxHeight : "24rem",
+          overflowY: "auto",
+        }}
+      />
+    </div>
   );
 
   return (
@@ -842,4 +859,5 @@ function NotificationPanelButton() {
   );
 }
 
+  
 export default Header;
