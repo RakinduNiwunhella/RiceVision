@@ -597,8 +597,8 @@ const MyDashboard = () => {
               <p className="text-[10px] font-black uppercase tracking-[0.15em] text-white/70 mb-3">District Yield Table</p>
               <div className="max-h-[380px] overflow-y-auto rounded-xl border border-white/10 custom-scrollbar">
                 <table className="w-full border-collapse">
-                  <thead className="sticky top-0 bg-[#0a1320]">
-                    <tr className="text-[10px] uppercase tracking-[0.14em] text-white/65">
+                  <thead className="sticky top-0 bg-white/90 dark:bg-[#0a1320]/95 backdrop-blur-md border-b border-black/10 dark:border-white/10">
+                    <tr className="text-[10px] uppercase tracking-[0.14em] text-slate-700 dark:text-white/65">
                       <th className="px-3 py-2.5 text-left font-black">District</th>
                       <th className="px-3 py-2.5 text-right font-black">MT</th>
                       <th className="px-3 py-2.5 text-right font-black">kg/ha</th>
