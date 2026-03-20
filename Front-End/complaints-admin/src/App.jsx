@@ -4,6 +4,7 @@ import ComplaintsTable from "./components/admin/ComplaintsTable";
 import useComplaints from "./hooks/useComplaints";
 import Dashboard from "./components/admin/Dashboard";
 import AnalyticsPage from "./components/pages/AnalyticsPage";
+import NotificationsPage from "./components/pages/NotificationsPage";
 import SettingsPage from "./components/pages/SettingsPage";
 import LoginPage from "./components/pages/LoginPage";
 import AdminRoute from "./components/auth/AdminRoute";
@@ -41,6 +42,7 @@ export default function App() {
       >
         <Route index element={<Dashboard />} />
         <Route path="complaints" element={<ComplaintsPage />} />
+        <Route path="notifications" element={<NotificationsPage />} />
         <Route path="analytics" element={<AnalyticsPage />} />
         <Route path="settings" element={<SettingsPage />} />
       </Route>
