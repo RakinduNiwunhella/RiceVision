@@ -1,63 +1,81 @@
-import React, { useRef, useMemo } from 'react'
-import { NavLink } from 'react-router-dom'
-import { useLanguage } from '../../context/LanguageContext'
-import TutorialTooltip from '../../Components/TutorialTooltip'
-import { usePageTutorial } from '../../hooks/usePageTutorial'
+import React, { useRef, useMemo } from "react";
+import { NavLink } from "react-router-dom";
+import { useLanguage } from "../../context/LanguageContext";
+import TutorialTooltip from "../../Components/TutorialTooltip";
+import { usePageTutorial } from "../../hooks/usePageTutorial";
 
 const Sidebar = () => {
-  const { t } = useLanguage()
+  const { t } = useLanguage();
 
   // Tutorial setup
-  const tutorialSteps = useMemo(() => [
-    {
-      title: t('sidebarTutorialNavTitle'),
-      action: t('sidebarTutorialNavAction'),
-      outcome: t('sidebarTutorialNavOutcome'),
-    },
-    {
-      title: t('sidebarTutorialTopTitle'),
-      action: t('sidebarTutorialTopAction'),
-      outcome: t('sidebarTutorialTopOutcome'),
-    },
-    {
-      title: t('sidebarTutorialBottomTitle'),
-      action: t('sidebarTutorialBottomAction'),
-      outcome: t('sidebarTutorialBottomOutcome'),
-    },
-  ], [t])
+  const tutorialSteps = useMemo(
+    () => [
+      {
+        title: t("sidebarTutorialNavTitle"),
+        action: t("sidebarTutorialNavAction"),
+        outcome: t("sidebarTutorialNavOutcome"),
+      },
+      {
+        title: t("sidebarTutorialTopTitle"),
+        action: t("sidebarTutorialTopAction"),
+        outcome: t("sidebarTutorialTopOutcome"),
+      },
+      {
+        title: t("sidebarTutorialBottomTitle"),
+        action: t("sidebarTutorialBottomAction"),
+        outcome: t("sidebarTutorialBottomOutcome"),
+      },
+    ],
+    [t],
+  );
 
-  const { currentStep, showTutorial, currentTutorialStep, nextStep, prevStep, closeTutorial } =
-    usePageTutorial("sidebar", tutorialSteps)
+  const {
+    currentStep,
+    showTutorial,
+    currentTutorialStep,
+    nextStep,
+    prevStep,
+    closeTutorial,
+  } = usePageTutorial("sidebar", tutorialSteps);
 
-  const sidebarRef = useRef(null)
-  const navItemsRef = useRef(null)
-  const bottomItemsRef = useRef(null)
+  const sidebarRef = useRef(null);
+  const navItemsRef = useRef(null);
+  const bottomItemsRef = useRef(null);
 
   const navItems = [
-    { id: 'dashboard', labelKey: 'myDashboard', icon: 'apps' },
-    { id: 'field-map', labelKey: 'fieldMap',    icon: 'map' },
-    { id: 'field-data', labelKey: 'fieldData',  icon: 'agriculture' },
-    { id: 'alerts',    labelKey: 'alerts',      icon: 'notification_important' },
-    { id: 'weather',   labelKey: 'weather',     icon: 'cloud' },
-    { id: 'report',    labelKey: 'report',      icon: 'bar_chart' },
-  ]
+    { id: "dashboard", labelKey: "myDashboard", icon: "apps" },
+    { id: "field-map", labelKey: "fieldMap", icon: "map" },
+    { id: "field-data", labelKey: "fieldData", icon: "agriculture" },
+    { id: "alerts", labelKey: "alerts", icon: "notification_important" },
+    { id: "weather", labelKey: "weather", icon: "cloud" },
+    { id: "report", labelKey: "report", icon: "bar_chart" },
+  ];
 
   const bottomItems = [
-    { id: 'profile',  labelKey: 'myProfile', icon: 'person' },
-    { id: 'help',     labelKey: 'helpFAQ',   icon: 'help_outline' },
-    { id: '#',        labelKey: 'logout',    icon: 'logout' },
-  ]
+    { id: "profile", labelKey: "myProfile", icon: "person" },
+    { id: "help", labelKey: "helpFAQ", icon: "help_outline" },
+    { id: "#", labelKey: "logout", icon: "logout" },
+  ];
   const isActive = (isActiveRoute, itemId) =>
-    isActiveRoute || (location.pathname === '/' && itemId === 'dashboard')
+    isActiveRoute || (location.pathname === "/" && itemId === "dashboard");
 
-  const linkBase = 'flex items-center gap-3 py-2.5 px-3 rounded-xl transition-all duration-200 group'
-  const linkActive = 'text-white bg-gradient-to-r from-emerald-600/80 to-cyan-600/60 shadow-lg shadow-emerald-900/20 border border-emerald-500/20'
-  const linkInactive = 'text-slate-400 hover:text-white hover:bg-white/[0.05]'
+  const linkBase =
+    "flex items-center gap-3 py-2.5 px-3 rounded-xl transition-all duration-200 group";
+  const linkActive =
+    "text-white bg-gradient-to-r from-emerald-600/80 to-cyan-600/60 shadow-lg shadow-emerald-900/20 border border-emerald-500/20";
+  const linkInactive = "text-slate-400 hover:text-white hover:bg-white/[0.05]";
 
   return (
-    <aside ref={sidebarRef} className="h-full w-60 bg-slate-900/60 backdrop-blur-xl px-4 py-5 flex flex-col justify-between border-r border-white/[0.06] relative">
+    <aside
+      ref={sidebarRef}
+      className="h-full w-60 bg-slate-900/60 backdrop-blur-xl px-4 py-5 flex flex-col justify-between border-r border-white/[0.06] relative"
+    >
       {/* Top nav */}
-      <nav ref={navItemsRef} className="flex flex-col gap-0.5">
+      <nav
+        ref={navItemsRef}
+        data-tour="navigation-bar"
+        className="flex flex-col gap-0.5"
+      >
         {navItems.map((item) => (
           <NavLink
             key={item.id}
@@ -68,7 +86,7 @@ const Sidebar = () => {
           >
             <span
               className="w-8 shrink-0 flex items-center justify-center material-symbols-outlined transition-transform duration-200 group-hover:scale-110"
-              style={{ fontSize: '20px' }}
+              style={{ fontSize: "20px" }}
             >
               {item.icon}
             </span>
@@ -90,7 +108,7 @@ const Sidebar = () => {
           >
             <span
               className="w-8 shrink-0 flex items-center justify-center material-symbols-outlined"
-              style={{ fontSize: '20px' }}
+              style={{ fontSize: "20px" }}
             >
               {item.icon}
             </span>
@@ -150,7 +168,7 @@ const Sidebar = () => {
         </>
       )}
     </aside>
-  )
-}
+  );
+};
 
-export default Sidebar
+export default Sidebar;
