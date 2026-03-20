@@ -701,8 +701,8 @@ const Help = () => {
             onClick={(e) => { if (e.target === e.currentTarget) setActivePolicy(null); }}
           >
             <div
-              className="relative w-full sm:max-w-2xl max-h-[78dvh] flex flex-col rounded-t-3xl sm:rounded-3xl border border-white/10 shadow-2xl"
-              style={{ background: "rgba(15,23,42,0.97)" }}
+              className="relative w-full sm:max-w-2xl max-h-[78dvh] flex flex-col rounded-t-3xl sm:rounded-3xl border border-white/20 shadow-2xl backdrop-blur-2xl"
+              style={{ background: "rgba(10,20,38,0.45)" }}
             >
               {/* Modal header */}
               <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-white/10 shrink-0">
