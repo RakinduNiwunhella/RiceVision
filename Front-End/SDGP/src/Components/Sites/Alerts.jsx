@@ -12,9 +12,7 @@ import { translateDistrictName } from "../../utils/locationTranslations";
 import TutorialTooltip from "../../Components/TutorialTooltip";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
 
-
-
-const TAB_KEYS = ["Disasters", "Pest Risks", "Past Alerts"];
+const TAB_KEYS = ["Pest Risks", "Disasters", "Past Alerts"];
 
 // Renders a pest title like "Kurunegala • 32 RISKS" with the number in red.
 // Returns a plain string for disaster titles.
@@ -62,17 +60,19 @@ const ResolveModal = ({ onConfirm, onCancel, t }) => {
       style={{ background: "rgba(0,0,0,0.6)" }}
     >
       <div className="glass rounded-3xl border border-white/20 p-8 w-full max-w-md mx-4 flex flex-col gap-5">
-        <h3 className="text-lg font-black text-white">{t('resolveAlertTitle')}</h3>
+        <h3 className="text-lg font-black text-white">
+          {t("resolveAlertTitle")}
+        </h3>
 
         <div className="flex flex-col gap-2">
           <label className="text-xs font-bold uppercase text-white/85">
-            {t('resolutionNoteOptional')}
+            {t("resolutionNoteOptional")}
           </label>
           <textarea
             autoFocus
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder={t('resolutionNotePlaceholder')}
+            placeholder={t("resolutionNotePlaceholder")}
             rows={4}
             className="bg-white/5 border border-white/10 rounded-2xl py-3 px-4 text-sm text-white placeholder:text-white/85 resize-none focus:outline-none focus:border-white/30"
           />
@@ -83,13 +83,13 @@ const ResolveModal = ({ onConfirm, onCancel, t }) => {
             onClick={onCancel}
             className="glass-btn text-[10px] px-4 py-2 tracking-widest bg-white/10 hover:bg-white/20"
           >
-            {t('cancelBtn')}
+            {t("cancelBtn")}
           </button>
           <button
             onClick={() => onConfirm(note.trim() || null)}
             className="px-6 py-2 bg-emerald-500/30 text-emerald-300 rounded-xl text-xs font-bold hover:bg-emerald-500/50 transition-colors"
           >
-            {t('confirmBtn')}
+            {t("confirmBtn")}
           </button>
         </div>
       </div>
@@ -102,39 +102,49 @@ const ResolveModal = ({ onConfirm, onCancel, t }) => {
 ───────────────────────────────────────── */
 const Alerts = () => {
   const { t, language } = useLanguage();
-  const tabLabels = [t("disasters"), t("pestRisks"), t("pastAlerts")];
+  const tabLabels = [t("pestRisks"), t("disasters"), t("pastAlerts")];
 
   // Tutorial setup - create once and memoize
-  const tutorialSteps = useMemo(() => [
-    {
-      title: t('alertsTutorialTabsTitle'),
-      action: t('alertsTutorialTabsAction'),
-      outcome: t('alertsTutorialTabsOutcome'),
-    },
-    {
-      title: t('alertsTutorialSearchTitle'),
-      action: t('alertsTutorialSearchAction'),
-      outcome: t('alertsTutorialSearchOutcome'),
-    },
-    {
-      title: t('alertsTutorialResolveTitle'),
-      action: t('alertsTutorialResolveAction'),
-      outcome: t('alertsTutorialResolveOutcome'),
-    },
-    {
-      title: t('alertsTutorialIgnoreTitle'),
-      action: t('alertsTutorialIgnoreAction'),
-      outcome: t('alertsTutorialIgnoreOutcome'),
-    },
-    {
-      title: t('alertsTutorialMapTitle'),
-      action: t('alertsTutorialMapAction'),
-      outcome: t('alertsTutorialMapOutcome'),
-    },
-  ], [t])
+  const tutorialSteps = useMemo(
+    () => [
+      {
+        title: t("alertsTutorialTabsTitle"),
+        action: t("alertsTutorialTabsAction"),
+        outcome: t("alertsTutorialTabsOutcome"),
+      },
+      {
+        title: t("alertsTutorialSearchTitle"),
+        action: t("alertsTutorialSearchAction"),
+        outcome: t("alertsTutorialSearchOutcome"),
+      },
+      {
+        title: t("alertsTutorialResolveTitle"),
+        action: t("alertsTutorialResolveAction"),
+        outcome: t("alertsTutorialResolveOutcome"),
+      },
+      {
+        title: t("alertsTutorialIgnoreTitle"),
+        action: t("alertsTutorialIgnoreAction"),
+        outcome: t("alertsTutorialIgnoreOutcome"),
+      },
+      {
+        title: t("alertsTutorialMapTitle"),
+        action: t("alertsTutorialMapAction"),
+        outcome: t("alertsTutorialMapOutcome"),
+      },
+    ],
+    [t],
+  );
 
-  const { currentStep, showTutorial, currentTutorialStep, hasMoreSteps, nextStep, prevStep, closeTutorial } =
-    usePageTutorial("alerts", tutorialSteps);
+  const {
+    currentStep,
+    showTutorial,
+    currentTutorialStep,
+    hasMoreSteps,
+    nextStep,
+    prevStep,
+    closeTutorial,
+  } = usePageTutorial("alerts", tutorialSteps);
 
   const [alerts, setAlerts] = useState([]);
   const [globalAlerts, setGlobalAlerts] = useState([]);
@@ -414,7 +424,7 @@ const Alerts = () => {
               {t("fieldRiskAlerts")}
             </h1>
             <p className="text-white/85 text-xs mt-1 font-bold uppercase tracking-[0.2em]">
-              {t('alertsRealtimeSubtitle')}
+              {t("alertsRealtimeSubtitle")}
             </p>
           </div>
 
@@ -442,7 +452,10 @@ const Alerts = () => {
         {/* Tabs */}
         <div className="glass p-6 rounded-[2rem] border-white/20">
           <div className="flex flex-col lg:flex-row gap-6 justify-between">
-            <div className="flex p-1 rounded-2xl bg-white/5 border border-white/10 w-full sm:w-fit overflow-x-auto no-scrollbar" ref={tabsRef}>
+            <div
+              className="flex p-1 rounded-2xl bg-white/5 border border-white/10 w-full sm:w-fit overflow-x-auto no-scrollbar"
+              ref={tabsRef}
+            >
               {TAB_KEYS.map((key, idx) => (
                 <button
                   key={key}
@@ -450,10 +463,11 @@ const Alerts = () => {
                     setActiveTab(key);
                     localStorage.setItem("alerts_tab", key);
                   }}
-                  className={`px-5 py-2 rounded-xl text-xs font-bold transition-all ${activeTab === key
-                    ? "bg-white/15 text-white"
-                    : "text-white/85 hover:text-white/90"
-                    }`}
+                  className={`px-5 py-2 rounded-xl text-xs font-bold transition-all ${
+                    activeTab === key
+                      ? "bg-white/15 text-white"
+                      : "text-white/85 hover:text-white/90"
+                  }`}
                 >
                   {tabLabels[idx]}
                 </button>
@@ -477,7 +491,7 @@ const Alerts = () => {
           {filteredAlerts.length === 0 && (
             <div className="glass p-8 sm:p-12 md:p-20 rounded-2xl sm:rounded-[2rem] text-center">
               <p className="text-white/85 font-bold uppercase">
-                {t('noPastThreats')}
+                {t("noPastThreats")}
               </p>
             </div>
           )}
@@ -509,7 +523,7 @@ const Alerts = () => {
 
                   {activeTab === "Past Alerts" && alert.note && (
                     <p className="text-white/85 text-xs mt-1">
-                      {t('noteLabel')}: {alert.note}
+                      {t("noteLabel")}: {alert.note}
                     </p>
                   )}
                 </div>
@@ -517,7 +531,7 @@ const Alerts = () => {
                 {alert.status === "Open" && activeTab !== "Past Alerts" && (
                   <div className="flex gap-3">
                     <button
-                      ref={currentStep === 2 && resolveRef || undefined}
+                      ref={(currentStep === 2 && resolveRef) || undefined}
                       onClick={() => handleResolve(alert.id)}
                       className="px-4 sm:px-6 py-2 bg-emerald-500/30 text-emerald-300 rounded-xl text-xs font-bold"
                     >
@@ -525,19 +539,19 @@ const Alerts = () => {
                     </button>
 
                     <button
-                      ref={currentStep === 3 && ignoreRef || undefined}
+                      ref={(currentStep === 3 && ignoreRef) || undefined}
                       onClick={() => handleIgnore(alert.id)}
                       className="btn-ignore glass-btn text-[10px] px-3 py-1 tracking-widest bg-white/10 hover:bg-white/20"
                     >
-                      {t('ignoreBtn')}
+                      {t("ignoreBtn")}
                     </button>
 
                     <button
-                      ref={currentStep === 4 && mapRef || undefined}
+                      ref={(currentStep === 4 && mapRef) || undefined}
                       onClick={() => handleViewInMap(alert)}
                       className="glass-btn text-[10px] px-3 py-1 tracking-widest bg-white/10 hover:bg-white/20"
                     >
-                      {t('viewInMap')}
+                      {t("viewInMap")}
                     </button>
                   </div>
                 )}

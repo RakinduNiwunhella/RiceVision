@@ -6,6 +6,7 @@ import { useLanguage } from "../../context/LanguageContext";
 import { supabase } from "../../supabaseClient";
 import { saveUserField } from "../../api/api";
 import FieldDrawMap from "./FieldDrawMap";
+import PayHereCheckout from "./PayHereCheckout";
 import TutorialTooltip from "../../Components/TutorialTooltip";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
 import { PRICE_PER_ACRE_LKR } from "./fieldConstants";
@@ -31,7 +32,6 @@ export default function FieldSetupPage() {
   const [acres,          setAcres]          = useState(0);
   const [district,       setDistrict]       = useState("");
   const [saving,         setSaving]         = useState(false);
-  const [payClicked,     setPayClicked]     = useState(false);
   const [fieldName,      setFieldName]      = useState("");
 
   // Tutorial refs
@@ -373,93 +373,35 @@ export default function FieldSetupPage() {
                 )}
               </div>
 
-              {/* ── Payment gateway mock ── */}
-              <div className="p-6 rounded-2xl bg-white/5 border border-white/10 space-y-5">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-[11px] font-black uppercase tracking-[0.35em] text-white/85">
-                    {t('securePaymentTitle')}
-                  </h3>
-                  <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30 uppercase tracking-widest">
-                    {t('previewOnlyBadge')}
-                  </span>
-                </div>
-
-                {/* Order line */}
-                <div className="flex items-center justify-between px-4 py-3 rounded-xl bg-white/5 border border-white/10">
-                  <div>
-                    <p className="text-xs font-bold text-white/85">{t("fieldMonitoringTitle")}</p>
-                    <p className="text-[10px] text-white/85">{district || t("sriLanka")} · {acres.toFixed(3)} acres</p>
-                  </div>
-                  <span className="font-black text-emerald-400">Rs. {price.toLocaleString()}</span>
-                </div>
-
-                {/* Mock card fields */}
-                <div className="space-y-3 opacity-50 pointer-events-none select-none">
-                  <div>
-                    <label className="block text-[10px] text-white/85 uppercase tracking-wider mb-1.5">
-                      {t('cardNumberLabel')}
-                    </label>
-                    <input
-                      disabled
-                      value="•••• •••• •••• ••••"
-                      className="w-full px-4 py-3 text-sm rounded-xl bg-white/5 border border-white/10 text-white font-mono cursor-not-allowed"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-[10px] text-white/85 uppercase tracking-wider mb-1.5">{t('expiryLabel')}</label>
-                      <input disabled value="MM / YY" className="w-full px-4 py-3 text-sm rounded-xl bg-white/5 border border-white/10 text-white cursor-not-allowed" />
-                    </div>
-                    <div>
-                      <label className="block text-[10px] text-white/85 uppercase tracking-wider mb-1.5">{t('cvvLabel')}</label>
-                      <input disabled value="•••" className="w-full px-4 py-3 text-sm rounded-xl bg-white/5 border border-white/10 text-white font-mono cursor-not-allowed" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Pay button (mock) */}
-                <button
-                  onClick={() => setPayClicked(true)}
-                  className="w-full py-3.5 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-400 font-black text-sm hover:bg-amber-500/25 transition-all tracking-wide"
-                >
-                  Pay Rs. {price.toLocaleString()} / month
-                </button>
-
-                {payClicked && (
-                  <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs">
-                    <span className="material-symbols-outlined text-base">construction</span>
-                    <span>{t('paymentComingSoon')}</span>
-                  </div>
-                )}
-
-                {/* Security note */}
-                <div className="flex items-center gap-2 text-white/85 text-[10px]">
-                  <span className="material-symbols-outlined text-base">lock</span>
-                  <span>{t('securedSSL')}</span>
-                </div>
-              </div>
+              {/* ── PayHere payment panel ── */}
+              <PayHereCheckout
+                price={price}
+                acres={acres}
+                district={district}
+                fieldName={fieldName}
+                drawnFeature={drawnFeature}
+                user={user}
+                onPaymentSuccess={saveAndFinish}
+              />
             </div>
 
             {/* Action row */}
-            <div className="flex justify-between gap-3 pt-1">
+            <div className="flex justify-between items-center gap-3 pt-1">
               <button onClick={() => setStep(2)} className={btnSecondary}>
                 {t('backToMapBtn')}
               </button>
               <button
                 onClick={saveAndFinish}
                 disabled={saving || !drawnFeature}
-                className={btnPrimary}
+                className="text-white/40 hover:text-white/60 text-xs transition-colors underline underline-offset-2 disabled:cursor-not-allowed"
               >
                 {saving ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <div className="w-3 h-3 border border-white/30 border-t-white rounded-full animate-spin inline-block mr-1" />
                     {t('savingField')}
                   </>
                 ) : (
-                  <>
-                    <span className="material-symbols-outlined text-[18px]">check_circle</span>
-                    {t('completeRegistrationBtn')}
-                  </>
+                  "Skip payment for now →"
                 )}
               </button>
             </div>

@@ -30,6 +30,7 @@ def get_current_user(credentials=Depends(security)) -> dict:
             "user_id": user.id,
             "email": user.email,
             "user": user,
+            "token": token,
         }
     except HTTPException:
         raise
