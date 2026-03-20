@@ -382,7 +382,7 @@ const MyDashboard = () => {
   /* ------------------ RENDER ------------------ */
 
   return (
-    <div className="min-h-full px-3 py-4 sm:px-6 sm:py-6 lg:p-10 text-white font-sans transition-all duration-500">
+    <div className="min-h-full px-3 pt-0 pb-4 sm:px-6 sm:pt-2 sm:pb-6 lg:px-10 lg:pt-4 lg:pb-10 text-white font-sans transition-all duration-500">
       <div className="max-w-7xl mx-auto space-y-6 sm:space-y-10 lg:space-y-12 pb-16 sm:pb-20">
 
         {/* ── Page Header ── */}

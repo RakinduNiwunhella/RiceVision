@@ -219,3 +219,19 @@
   z-index: 99999 !important;
   pointer-events: none !important;
 }
+
+/* ── Browser Autofill Dark Mode Fix ── */
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus,
+.dark textarea:-webkit-autofill,
+.dark textarea:-webkit-autofill:hover,
+.dark textarea:-webkit-autofill:focus,
+.dark select:-webkit-autofill,
+.dark select:-webkit-autofill:hover,
+.dark select:-webkit-autofill:focus {
+  -webkit-text-fill-color: white !important;
+  -webkit-box-shadow: 0 0 0px 1000px #262626 inset !important; /* Neutral-800 */
+  transition: background-color 5000000s ease-in-out 0s;
+}
+

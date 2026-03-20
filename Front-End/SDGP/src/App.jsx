@@ -37,7 +37,7 @@ const App = () => {
       {/* Main content (scrolls) */}
       <main
         id="app-scroll-container"
-        className="relative z-10 pt-16 sm:pt-[72px] px-3 sm:px-6 pb-6 overflow-y-auto h-screen text-white transition-colors duration-500 text-sm"
+        className="relative z-10 pt-16 sm:pt-20 px-3 sm:px-6 pb-6 overflow-y-auto h-screen text-white transition-colors duration-500 text-sm"
       >
         <Outlet />
       </main>
