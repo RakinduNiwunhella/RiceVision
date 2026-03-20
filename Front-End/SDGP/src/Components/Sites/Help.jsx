@@ -726,7 +726,7 @@ const Help = () => {
                 Last updated: {LAST_UPDATED} · {WEBSITE}
               </p>
               {/* Scrollable content */}
-              <div className="overflow-y-auto px-6 pb-8 flex-1">
+              <div className="custom-scrollbar overflow-y-auto px-6 pb-8 flex-1">
                 {POLICIES[activePolicy].content}
               </div>
             </div>
