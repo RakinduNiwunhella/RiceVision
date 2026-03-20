@@ -11,7 +11,6 @@ def _fetch_notifications_with_read_state(user_id: str):
         supabase
         .table("notificationpanel")
         .select("id, title, message, description, created_at")
-        .eq("user_id", user_id)
         .order("created_at", desc=True)
         .execute()
     )
@@ -50,7 +49,6 @@ def _get_unread_count_for_user(user_id: str) -> int:
         supabase
         .table("notificationpanel")
         .select("id")
-        .eq("user_id", user_id)
         .execute()
     )
 
@@ -85,7 +83,6 @@ def mark_notification_read(notification_id: str, current_user=Depends(get_curren
         .table("notificationpanel")
         .select("id")
         .eq("id", notification_id)
-        .eq("user_id", current_user["user_id"])
         .execute()
     )
 
