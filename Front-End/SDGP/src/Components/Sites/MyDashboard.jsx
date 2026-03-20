@@ -641,7 +641,7 @@ const MyDashboard = () => {
                   </div>
 
                   {/* Bar chart */}
-                  <div className="flex-1">
+                  <div className="mt-6">
                     <ResponsiveContainer width="100%" height={320}>
                       <BarChart data={translatedStageDistribution} margin={{ top: 5, right: 5, left: -10, bottom: 40 }}>
                         <XAxis
@@ -658,7 +658,7 @@ const MyDashboard = () => {
                           tick={{ fill: "rgba(255,255,255,0.90)", fontSize: 9, fontWeight: 900 }}
                           axisLine={false}
                           tickLine={false}
-                          width={40}
+                          width={45}
                           allowDecimals={false}
                         />
                         <Tooltip
