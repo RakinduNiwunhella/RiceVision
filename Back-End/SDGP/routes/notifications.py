@@ -77,7 +77,7 @@ def get_notifications(current_user=Depends(get_current_user)):
 
 
 @router.put("/notifications/{notification_id}/read")
-def mark_notification_read(notification_id: int, current_user=Depends(get_current_user)):
+def mark_notification_read(notification_id: str, current_user=Depends(get_current_user)):
     notification_response = (
         supabase
         .table("notificationpanel")
