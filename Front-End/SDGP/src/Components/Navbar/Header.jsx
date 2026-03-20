@@ -807,15 +807,18 @@ function NotificationPanelButton() {
     if (show && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
       const top = rect.bottom + 8;
+      const isMobile = window.innerWidth < 640;
 
       setCoords({
         top,
-        right: window.innerWidth - rect.right,
+        right: isMobile ? 8 : window.innerWidth - rect.right,
       });
 
       setMaxHeight(window.innerHeight - top - 16);
     }
   }, [show]);
+
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 640;
 
   const panel = (
     <div ref={panelRef}>
@@ -827,7 +830,7 @@ function NotificationPanelButton() {
           top: coords.top,
           right: coords.right,
           zIndex: 9999,
-          width: "20rem",
+          width: isMobile ? "calc(100vw - 16px)" : "20rem",
           maxHeight: maxHeight > 0 ? maxHeight : "24rem",
           overflowY: "auto",
         }}

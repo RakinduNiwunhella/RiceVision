@@ -77,16 +77,8 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
 
   return (
     <>
-      {/* Mobile Toggle Button */}
-      <button
-        onClick={() => setOpen(!open)}
-        className="md:hidden fixed top-20 right-4 z-[1000] bg-emerald-500 text-white p-3 rounded-full shadow-lg"
-      >
-        <span className="material-symbols-outlined">layers</span>
-      </button>
-
       <div
-        className={`${open ? "block" : "hidden"} md:block fixed md:relative top-0 right-0 h-full md:h-auto w-72 glass p-4 sm:p-6 shadow-xl transition-transform duration-300 z-[999] md:translate-x-0`}
+        className="w-full glass p-4 sm:p-6 shadow-xl rounded-2xl lg:w-72"
       >
 
       {/* BLURRED PANEL CONTENT */}
