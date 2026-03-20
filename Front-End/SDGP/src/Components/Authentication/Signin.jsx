@@ -118,7 +118,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex transition-colors duration-500 ...">
+    <div className="min-h-screen flex flex-col md:flex-row transition-colors duration-500 bg-white dark:bg-neutral-900 text-black dark:text-white">
       {/* Theme Toggle */}
       <button
         type="button"
@@ -133,7 +133,7 @@ export default function LoginPage() {
       </button>
 
       {/* Left Side: Form Container */}
-      <div className="flex flex-col w-full px-5 sm:px-8 pt-3 pb-6 md:w-3/4 lg:w-1/2 md:px-12 lg:px-20 z-10 mx-auto md:mx-0">
+      <div className="flex-1 flex flex-col justify-center px-5 sm:px-8 py-8 md:py-12 md:w-1/2 lg:px-20 z-10 w-full mx-auto md:mx-0 order-2 md:order-1">
         <div className="w-full max-w-md mx-auto">
           {/* Logo */}
           <div className="flex items-center mb-0 space-x-3">
@@ -149,7 +149,7 @@ export default function LoginPage() {
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold mb-3 tracking-tight">
             {t('welcomeBack')}
           </h2>
-          <p className="text-slate-500 dark:text-slate-400 mb-6">
+          <p className="text-gray-500 dark:text-gray-400 mb-6">
             {t('signInDetails')}
           </p>
 
@@ -164,7 +164,7 @@ export default function LoginPage() {
                 required
                 placeholder="name@company.com"
                 value={email}
-                className="w-full px-4 py-2.5 sm:py-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                className="w-full px-4 py-2.5 sm:py-3.5 rounded-xl border border-gray-300 dark:border-neutral-600 bg-gray-100 dark:bg-neutral-700 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                 onChange={(e) => {
                   setEmail(e.target.value);
                   if (errorMessage) setErrorMessage("");
@@ -184,7 +184,7 @@ export default function LoginPage() {
                   required
                   placeholder="••••••••"
                   value={password}
-                  className="w-full px-4 py-2.5 sm:py-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                  className="w-full px-4 py-2.5 sm:py-3.5 rounded-xl border border-gray-300 dark:border-neutral-600 bg-gray-100 dark:bg-neutral-700 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                   onChange={(e) => {
                     setPassword(e.target.value);
                     if (errorMessage) setErrorMessage("");
@@ -229,7 +229,7 @@ export default function LoginPage() {
               />
               <label
                 htmlFor="remember"
-                className="text-sm text-slate-500 dark:text-slate-400 cursor-pointer"
+                className="text-sm text-gray-500 dark:text-gray-400 cursor-pointer"
               >
                 {t('keepLoggedIn')}
               </label>
@@ -305,13 +305,14 @@ export default function LoginPage() {
       </div>
 
       {/* Right Side: Visuals */}
-      <div className="hidden md:block md:w-1/4 lg:w-1/2 relative">
+      <div className="w-full h-[40vh] md:h-auto md:w-1/2 relative bg-neutral-900 order-1 md:order-2">
         <img
           src="/paddy_signin.png"
           alt="Rice Field"
           className="absolute inset-0 w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+        <div className="absolute inset-0 bg-black/30 hidden dark:block"></div>
       </div>
 
       {showForgot && (
@@ -323,7 +324,7 @@ export default function LoginPage() {
           ></div>
 
           {/* Modal */}
-          <div className="relative z-10 w-full max-w-md p-8 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl">
+          <div className="relative z-10 w-full max-w-md p-8 bg-white dark:bg-neutral-800 rounded-2xl shadow-2xl">
             <h2 className="text-2xl font-bold mb-6">{t('resetPassword')}</h2>
 
             <form onSubmit={handleResetPassword} className="space-y-4">
@@ -333,7 +334,7 @@ export default function LoginPage() {
                 placeholder={t('emailAddress')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800"
+                className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-neutral-600 bg-gray-100 dark:bg-neutral-700 outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
               />
               <button
                 type="submit"
