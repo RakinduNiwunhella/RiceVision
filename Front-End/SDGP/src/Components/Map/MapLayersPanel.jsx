@@ -142,7 +142,7 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
         <div className="absolute inset-0 flex items-center justify-center text-center z-20">
           <div className="flex flex-col items-center">
             <span className="material-symbols-outlined text-white text-5xl mb-3 drop-shadow-[0_0_8px_rgba(255,255,255,0.6)]">lock</span>
-            <p className="text-sm text-white font-medium px-6">{t("mapLayersSelectDistrict")}</p>
+            <p className="text-sm text-white font-medium px-6">{t("Please Select a District to Unlock the Filters")}</p>
           </div>
         </div>
       )}

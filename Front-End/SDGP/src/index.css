@@ -44,89 +44,91 @@
   --glass-inset-bottom: rgba(0, 0, 0, 0.3);
 }
 
-/* ── Glass Surface (Base) ── */
-.glass {
-  background: rgba(255, 255, 255, 0.22);
-
-  /* Using var() so Lightning CSS cannot strip spaces or deduplicate these */
-  -webkit-backdrop-filter: var(--glass-backdrop) !important;
-  backdrop-filter: var(--glass-backdrop) !important;
-  filter: saturate(120%);
-  /* fallback saturation for browsers without backdrop-filter */
-
-  border: 1.5px solid rgba(255, 255, 255, 0.25);
-  border-top: 1.5px solid rgba(255, 255, 255, 0.35);
-  border-radius: 20px;
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.18),
-    0 2px 8px rgba(0, 0, 0, 0.08),
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.18),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.08);
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  position: relative;
-  overflow: hidden;
-}
-
-/* Dark mode glass override */
-.dark .glass {
-  background: rgba(10, 18, 35, 0.52);
-  border: 1.5px solid rgba(255, 255, 255, 0.08);
-  border-top: 1.5px solid rgba(255, 255, 255, 0.12);
-  box-shadow:
-    0 4px 20px rgba(0, 0, 0, 0.5),
-    0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-/* Fallback for low-spec browsers */
-@supports not (
-  (-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))
-) {
+@layer components {
+  /* ── Glass Surface (Base) ── */
   .glass {
-    background: rgba(255, 255, 255, 0.65);
+    background: rgba(255, 255, 255, 0.22);
+
+    /* Using var() so Lightning CSS cannot strip spaces or deduplicate these */
     -webkit-backdrop-filter: var(--glass-backdrop) !important;
     backdrop-filter: var(--glass-backdrop) !important;
+    filter: saturate(120%);
+    /* fallback saturation for browsers without backdrop-filter */
+
+    border: 1.5px solid rgba(255, 255, 255, 0.25);
+    border-top: 1.5px solid rgba(255, 255, 255, 0.35);
+    border-radius: 20px;
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.18),
+      0 2px 8px rgba(0, 0, 0, 0.08),
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.18),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.08);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: hidden;
   }
 
+  /* Dark mode glass override */
   .dark .glass {
-    background: rgba(10, 18, 35, 0.85);
-    -webkit-backdrop-filter: var(--glass-backdrop) !important;
-    backdrop-filter: var(--glass-backdrop) !important;
+    background: rgba(10, 18, 35, 0.52);
+    border: 1.5px solid rgba(255, 255, 255, 0.08);
+    border-top: 1.5px solid rgba(255, 255, 255, 0.12);
+    box-shadow:
+      0 4px 20px rgba(0, 0, 0, 0.5),
+      0 2px 8px rgba(0, 0, 0, 0.3);
   }
-}
 
-/* ── Iridescent shimmer overlay ── */
-.glass::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: var(--glass-shimmer);
-  pointer-events: none;
-  z-index: 0;
-}
+  /* Fallback for low-spec browsers */
+  @supports not (
+    (-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))
+  ) {
+    .glass {
+      background: rgba(255, 255, 255, 0.65);
+      -webkit-backdrop-filter: var(--glass-backdrop) !important;
+      backdrop-filter: var(--glass-backdrop) !important;
+    }
 
-.glass > * {
-  position: relative;
-  z-index: 1;
-}
+    .dark .glass {
+      background: rgba(10, 18, 35, 0.85);
+      -webkit-backdrop-filter: var(--glass-backdrop) !important;
+      backdrop-filter: var(--glass-backdrop) !important;
+    }
+  }
 
-/* ── Hover Effects ── */
-.glass-hover {
-  transition:
-    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
-    box-shadow 0.35s ease,
-    border-color 0.35s ease;
-}
+  /* ── Iridescent shimmer overlay ── */
+  .glass::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--glass-shimmer);
+    pointer-events: none;
+    z-index: 0;
+  }
 
-.glass-hover:hover {
-  transform: translateY(-4px) scale(1.008);
-  border-color: rgba(255, 255, 255, 0.4);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-}
+  .glass > * {
+    position: relative;
+    z-index: 1;
+  }
 
-.dark .glass-hover:hover {
-  border-color: rgba(255, 255, 255, 0.18);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
+  /* ── Hover Effects ── */
+  .glass-hover {
+    transition:
+      transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+      box-shadow 0.35s ease,
+      border-color 0.35s ease;
+  }
+
+  .glass-hover:hover {
+    transform: translateY(-4px) scale(1.008);
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  }
+
+  .dark .glass-hover:hover {
+    border-color: rgba(255, 255, 255, 0.18);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
+  }
 }
 
 /* ── Utilities ── */
@@ -219,3 +221,19 @@
   z-index: 99999 !important;
   pointer-events: none !important;
 }
+
+/* ── Browser Autofill Dark Mode Fix ── */
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus,
+.dark textarea:-webkit-autofill,
+.dark textarea:-webkit-autofill:hover,
+.dark textarea:-webkit-autofill:focus,
+.dark select:-webkit-autofill,
+.dark select:-webkit-autofill:hover,
+.dark select:-webkit-autofill:focus {
+  -webkit-text-fill-color: white !important;
+  -webkit-box-shadow: 0 0 0px 1000px #262626 inset !important; /* Neutral-800 */
+  transition: background-color 5000000s ease-in-out 0s;
+}
+

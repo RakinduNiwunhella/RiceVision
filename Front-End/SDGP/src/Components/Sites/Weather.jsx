@@ -460,7 +460,6 @@ export default function RiceVisionWeather() {
               </div>
             </div>
           </div>
-          <span className="absolute -right-7 -bottom-1 text-[6rem] sm:text-[8rem] md:text-[10rem] opacity-[0.5] pointer-events-none select-none">{cond.icon}</span>
         </div>
 
         {/* ─── TABS ─── */}
