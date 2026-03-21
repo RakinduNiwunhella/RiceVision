@@ -1,142 +1,100 @@
-import React, { useEffect, useState, useRef } from "react";
-import { apiFetch } from "../../api/apiFetch";
-import { useLanguage } from "../../context/LanguageContext";
-import { translateDistrictName } from "../../utils/locationTranslations";
-import { useNavigate } from "react-router-dom";
-import TutorialTooltip from "../../Components/TutorialTooltip";
-import { usePageTutorial } from "../../hooks/usePageTutorial";
+import React, { useEffect, useState } from "react";
+import { supabase } from "../../supabaseClient"; // adjust path if needed
 
 const healthColor = (health) => {
   switch (health) {
     case "Healthy":
-      return "text-emerald-400 bg-emerald-500/10 border-emerald-500/20";
+      return "text-green-600 bg-green-100";
     case "Moderate":
-      return "text-amber-400 bg-amber-500/10 border-amber-500/20";
+      return "text-yellow-600 bg-yellow-100";
     case "Critical":
-      return "text-red-400 bg-red-500/10 border-red-500/20";
+      return "text-red-600 bg-red-100";
     default:
-      return "text-white/85 bg-white/5 border-white/10";
+      return "text-gray-600 bg-gray-100";
   }
 };
 
 const FieldData = () => {
-  const navigate = useNavigate();
-  const { t, language } = useLanguage();
-
   const [stats, setStats] = useState([]);
   const [districtData, setDistrictData] = useState([]);
+
   const [loading, setLoading] = useState(true);
-
-  // Tutorial setup
-  const tutorialSteps = [
-    {
-      title: t('fieldDataOverviewTitle'),
-      action: t('fieldDataOverviewAction'),
-      outcome: t('fieldDataOverviewOutcome'),
-    },
-    {
-      title: t('fieldDataSummaryTitle'),
-      action: t('fieldDataSummaryAction'),
-      outcome: t('fieldDataSummaryOutcome'),
-    },
-    {
-      title: t('fieldDataDistrictTableTitle'),
-      action: t('fieldDataDistrictTableAction'),
-      outcome: t('fieldDataDistrictTableOutcome'),
-    },
-    {
-      title: t('fieldDataViewMapTitle'),
-      action: t('fieldDataViewMapAction'),
-      outcome: t('fieldDataViewMapOutcome'),
-    },
-  ];
-
-  const { currentStep, showTutorial, currentTutorialStep, hasMoreSteps, nextStep, prevStep, closeTutorial } =
-    usePageTutorial("field-data", tutorialSteps);
-
-  // Refs for tutorial
-  const headerRef = useRef(null);
-  const statsRef = useRef(null);
-  const tableRef = useRef(null);
-  const mapButtonRef = useRef(null);
-
-  const handleViewMap = (district) => {
-    // navigate to map page and filter/zoom to the selected district
-    navigate("/field-map", { state: { district } });
-  };
-
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        setLoading(true);
+      setLoading(true);
 
-        const summaryRes = await apiFetch("/field-data/summary");
-        const summary = await summaryRes.json();
+      // 1️⃣ Fetch summary stats
+      const { data: summary, error: summaryError } = await supabase
+        .from("field_summary_view")
+        .select("*")
+        .single();
 
-        setStats([
-          { label: t("colTotalFields"), value: summary.total_fields, icon: "analytics" },
-          { label: t("colHealthy"), value: summary.healthy_fields, icon: "check_circle", color: "text-emerald-400" },
-          { label: t("colStressed"), value: summary.stressed_fields, icon: "potted_plant", color: "text-amber-400" },
-          { label: t("colCritical"), value: summary.critical_alerts, icon: "warning", color: "text-red-400" },
-        ]);
-
-        const districtRes = await apiFetch("/field-data/districts");
-        const districts = await districtRes.json();
-
-        setDistrictData(districts);
-      } catch (err) {
-        console.error("Field data error:", err);
-      } finally {
+      if (summaryError) {
+        console.error("Summary error:", summaryError);
         setLoading(false);
+        return;
       }
+
+      setStats([
+        { label: "Total Fields", value: summary.total_fields },
+        { label: "Healthy Fields", value: summary.healthy_fields },
+        { label: "Stressed Fields", value: summary.stressed_fields },
+        { label: "Critical Alerts", value: summary.critical_alerts },
+      ]);
+
+      // 2️⃣ Fetch table data
+      const { data: districts, error: districtError } = await supabase
+        .from("district_health_summary")
+        .select("*")
+        .order("total_yield_tons", { ascending: false });
+
+      if (districtError) {
+        console.error("District error:", districtError);
+        setLoading(false);
+        return;
+      }
+
+      setDistrictData(districts);
+
+      setLoading(false);
     };
 
     fetchData();
   }, []);
-
   if (loading) {
     return (
-      <div className="min-h-full flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
-          <p className="text-white/85 font-black uppercase tracking-widest text-xs animate-pulse">{t('decryptingIntel')}</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-900">
+        <p className="text-slate-500 dark:text-slate-400">
+          Loading field data...
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-full p-4 sm:p-6 lg:p-10 text-white font-sans transition-all duration-500">
-      <div className="max-w-7xl mx-auto space-y-10 pb-20">
-
+    <div className="min-h-screen bg-white dark:bg-slate-900 p-6">
+      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6 space-y-6">
         {/* Page Header */}
-        <div ref={headerRef} className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-          <div>
-            <h1 className="text-xl sm:text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
-              {t('fieldData')}
-            </h1>
-            <p className="text-white/85 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em]">
-              {t('liveStream')}
-            </p>
-          </div>
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">
+            Field Data Overview
+          </h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            Aggregated satellite-derived insights on paddy field conditions
+          </p>
         </div>
 
         {/* Stats Cards */}
-        <div ref={currentStep === 1 ? statsRef : undefined} className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map((item) => (
             <div
               key={item.label}
-              className="glass glass-hover p-4 sm:p-6 rounded-[1.5rem] sm:rounded-[2.5rem] border border-white/10 shadow-xl group transition-all duration-500"
+              className="rounded-xl bg-white dark:bg-slate-800 shadow-sm p-4"
             >
-              <div className="flex justify-between items-start mb-4">
-                <span className={`material-symbols-outlined ${item.color || 'text-white/85'} text-3xl group-hover:scale-110 transition-transform duration-500`}>
-                  {item.icon}
-                </span>
-              </div>
-              <p className="text-xs font-bold text-white/85 uppercase tracking-widest mb-1">
+              <p className="text-sm text-slate-500 dark:text-slate-400">
                 {item.label}
               </p>
-              <p className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tighter">
+              <p className="text-2xl font-bold text-slate-900 dark:text-white">
                 {item.value}
               </p>
             </div>
@@ -144,90 +102,51 @@ const FieldData = () => {
         </div>
 
         {/* Table Section */}
-        <div ref={currentStep === 2 ? tableRef : undefined} className="glass p-1 rounded-[2rem] sm:rounded-[3rem] border border-white/10 shadow-2xl overflow-hidden group">
-          <div className="p-4 sm:p-8 border-b border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-            <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white/85 flex items-center gap-3">
-              <span className="material-symbols-outlined text-emerald-400">dataset</span>
-              {t('districtPerformance')}
+        <div className="rounded-xl bg-white dark:bg-slate-800 shadow-sm overflow-hidden">
+          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 className="text-lg font-medium text-slate-900 dark:text-white">
+              District-wise Paddy Health & Yield Summary
             </h2>
-            <div className="flex gap-2">
-              <div className="w-2 h-2 rounded-full bg-white/10" />
-              <div className="w-2 h-2 rounded-full bg-white/10" />
-              <div className="w-2 h-2 rounded-full bg-white/10" />
-            </div>
           </div>
 
-          <div className="overflow-x-auto no-scrollbar">
-            <table className="w-full text-xs border-collapse">
-              <thead>
-                <tr className="text-white/85 uppercase text-[10px] font-black tracking-widest border-b border-white/5 whitespace-nowrap">
-                  <th className="px-3 sm:px-6 md:px-8 py-3 sm:py-5 text-left font-black whitespace-nowrap">{t('colDistrict')}</th>
-                  <th className="px-3 sm:px-6 py-3 sm:py-5 text-left font-black whitespace-nowrap">{t('colTotalFields')}</th>
-                  <th className="px-3 sm:px-6 py-3 sm:py-5 text-left font-black whitespace-nowrap">{t('colHealthy')}</th>
-                  <th className="px-3 sm:px-6 py-3 sm:py-5 text-left font-black whitespace-nowrap">{t('colStressed')}</th>
-                  <th className="px-3 sm:px-6 py-3 sm:py-5 text-left font-black whitespace-nowrap">{t('colCritical')}</th>
-                  <th className="hidden sm:table-cell px-3 sm:px-6 py-3 sm:py-5 text-left font-black whitespace-nowrap">{t('colAvgYield')}</th>
-                  <th className="hidden sm:table-cell px-3 sm:px-6 md:px-8 py-3 sm:py-5 text-right font-black whitespace-nowrap">{t('colTotalYield')}</th>
-                  <th className="px-3 sm:px-6 py-3 sm:py-5 text-center font-black whitespace-nowrap">{t('actionLabel')}</th>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                <tr>
+                  <th className="px-4 py-3 text-left">District</th>
+                  <th className="px-4 py-3 text-left">Total Fields</th>
+                  <th className="px-4 py-3 text-left">Healthy</th>
+                  <th className="px-4 py-3 text-left">Stressed</th>
+                  <th className="px-4 py-3 text-left">Critical</th>
+                  <th className="px-4 py-3 text-left">Avg NDVI</th>
+                  <th className="px-4 py-3 text-left">Avg Yield (t/ha)</th>
+                  <th className="px-4 py-3 text-left">Total Yield (tons)</th>
                 </tr>
               </thead>
 
-              <tbody className="divide-y divide-white/5 font-medium">
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                 {districtData.map((d) => (
                   <tr
                     key={d.district}
-                    className="hover:bg-white/5 transition-all duration-300 group/row whitespace-nowrap"
+                    className="hover:bg-gray-50 dark:hover:bg-slate-700 transition"
                   >
-                    <td className="px-3 sm:px-6 md:px-8 py-3 sm:py-5">
-                      <div className="text-center flex items-center gap-3">
-                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/50 group-hover/row:bg-emerald-400 transition-colors" />
-                        <span className="font-black text-white group-hover/row:translate-x-1 transition-transform inline-block">
-                          {translateDistrictName(d.district, language)}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-5 text-center text-white/85 font-bold">{d.total_fields}</td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-5 text-center">
-                      <span className="px-3 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[11px] font-black uppercase">
-                        {d.healthy_fields}
-                      </span>
-                    </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-5 text-center">
-                      <span className="px-3 py-1 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[11px] font-black uppercase">
-                        {d.stressed_fields}
-                      </span>
-                    </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-5 text-center">
-                      <span className="px-3 py-1 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 text-[11px] font-black uppercase">
-                        {d.critical_fields}
-                      </span>
-                    </td>
-                    <td className="hidden sm:table-cell px-3 sm:px-6 py-3 sm:py-5 text-center">
-                      <div className="flex flex-col">
-                        <span className="text-white/85">{d.avg_yield_kg_ha}</span>
-                        <span className="text-[10px] text-white/85 uppercase font-black tracking-tighter">kg/Ha</span>
-                      </div>
-                    </td>
-                    <td className="hidden sm:table-cell px-3 sm:px-6 md:px-8 py-3 sm:py-5 text-center">
-                      <span className="font-black text-center text-white">{Number(d.total_yield_kg).toLocaleString()}</span>
-                      <span className="ml-1 text-[10px] text-white/85 uppercase font-black">kg</span>
-                    </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-5 text-center">
-                      <div ref={mapButtonRef} className="flex items-center justify-center gap-2">
-                        <button
-                          onClick={() => handleViewMap(d.district)}
-                          className="glass-btn text-[10px] px-3 py-1 tracking-widest bg-white/10 hover:bg-white/20"
-                        >
-                          {t('viewInMap')}
-                        </button>
+                    <td className="px-4 py-3 font-medium">{d.district}</td>
+                    <td className="px-4 py-3">{d.total_fields}</td>
 
-                        <button
-                          onClick={() => navigate("/report", { state: { district: d.district } })}
-                          className="glass-btn text-[10px] px-3 py-1 tracking-widest bg-white/10 hover:bg-white/20"
-                        >
-                          {t('viewReportBtn')}
-                        </button>
-                      </div>
+                    <td className="px-4 py-3 text-green-600">
+                      {d.healthy_fields}
+                    </td>
+                    <td className="px-4 py-3 text-yellow-600">
+                      {d.stressed_fields}
+                    </td>
+                    <td className="px-4 py-3 text-red-600">
+                      {d.critical_fields}
+                    </td>
+
+                    <td className="px-4 py-3">{d.avg_ndvi}</td>
+                    <td className="px-4 py-3">{d.avg_yield_ton_ha}</td>
+                    <td className="px-4 py-3 font-medium">
+                      {d.total_yield_tons}
                     </td>
                   </tr>
                 ))}
@@ -235,75 +154,10 @@ const FieldData = () => {
             </table>
           </div>
         </div>
-
-        {/* Tutorial Tooltips */}
-        {showTutorial && currentTutorialStep && (
-          <>
-            {currentStep === 0 && (
-              <TutorialTooltip
-                visible={true}
-                position="bottom"
-                title={currentTutorialStep.title}
-                action={currentTutorialStep.action}
-                outcome={currentTutorialStep.outcome}
-                elementRef={headerRef}
-                step={currentStep}
-                totalSteps={tutorialSteps.length}
-                onNext={nextStep}
-                onPrevious={prevStep}
-                onDismiss={closeTutorial}
-              />
-            )}
-            {currentStep === 1 && (
-              <TutorialTooltip
-                visible={true}
-                position="bottom"
-                title={currentTutorialStep.title}
-                action={currentTutorialStep.action}
-                outcome={currentTutorialStep.outcome}
-                elementRef={statsRef}
-                step={currentStep}
-                totalSteps={tutorialSteps.length}
-                onNext={nextStep}
-                onPrevious={prevStep}
-                onDismiss={closeTutorial}
-              />
-            )}
-            {currentStep === 2 && (
-              <TutorialTooltip
-                visible={true}
-                position="bottom"
-                title={currentTutorialStep.title}
-                action={currentTutorialStep.action}
-                outcome={currentTutorialStep.outcome}
-                elementRef={tableRef}
-                step={currentStep}
-                totalSteps={tutorialSteps.length}
-                onNext={nextStep}
-                onPrevious={prevStep}
-                onDismiss={closeTutorial}
-              />
-            )}
-            {currentStep === 3 && (
-              <TutorialTooltip
-                visible={true}
-                position="top"
-                title={currentTutorialStep.title}
-                action={currentTutorialStep.action}
-                outcome={currentTutorialStep.outcome}
-                elementRef={mapButtonRef}
-                step={currentStep}
-                totalSteps={tutorialSteps.length}
-                onNext={nextStep}
-                onPrevious={prevStep}
-                onDismiss={closeTutorial}
-              />
-            )}
-          </>
-        )}
       </div>
     </div>
   );
 };
 
 export default FieldData;
+
