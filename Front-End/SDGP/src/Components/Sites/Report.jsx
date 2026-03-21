@@ -987,15 +987,8 @@ const Report = () => {
               {t('downloadPdf')}
             </button>
 
-            <a
-              href={`https://ricevision-cakt.onrender.com/api/download-pdf?date=${config.date}&district=${config.district}&season=${config.season}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 text-[10px] font-black px-4 py-1.5 rounded-xl border border-blue-400/70 bg-blue-500/10 transition-all duration-300 hover:bg-blue-500/20 hover:border-blue-300 hover:scale-[1.02] cursor-pointer uppercase tracking-widest no-underline"
-            >
-              <span className="material-symbols-outlined text-xs">auto_awesome</span>
-              Official AI Report
-            </a>
+            
+
           </div>
           <div ref={districtSelectorRef}>
             <CustomSelect
@@ -1121,10 +1114,7 @@ const Report = () => {
                 {t('compare')}
               </button>
             </div>
-            <div className="glass px-4 py-2 rounded-xl border-white/10 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-white/85">{t('liveData')}</span>
-            </div>
+
             {mode === "compare" && dataA && dataB && (
               <button
                 onClick={() => generateComparisonPDF()}
