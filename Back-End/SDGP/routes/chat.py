@@ -131,15 +131,14 @@ def generate_agricultural_report(district: str, season: str = "", date: str = ""
         # Call reportPage.py logic directly — no HTTP round-trip
         pdf_bytes = generate_report_for_district(date=date, district=district, season=season)
 
-        # Encode PDF as base64 and embed a detectable marker for the chat route
-        b64 = base64.b64encode(pdf_bytes).decode("utf-8")
         filename = f"RiceVision_{district.title()}_{season}_{date}.pdf"
+        filepath = f"/tmp/{filename}"
+        with open(filepath, "wb") as f:
+            f.write(pdf_bytes)
 
         return (
-            f"PDF_PAYLOAD:{b64}:{filename}\n\n"
-            f"Your RiceVision Agricultural Intelligence Report for **{district.title()}** "
-            f"({season} season, data as of {date}) is ready. "
-            f"The PDF has been attached below."
+            f"SUCCESS_PDF:{filepath}:{filename}\n\n"
+            f"Report generated successfully. Please check the PDF."
         )
     except ValueError as e:
         return f"Could not generate report: {str(e)}"
@@ -309,13 +308,18 @@ async def chat(req: ChatRequest):
                         "tool": tc["name"],
                         "input": tc["args"]
                     })
-            # Detect PDF payload embedded by the generate_agricultural_report tool
+            # Detect PDF file path embedded by the generate_agricultural_report tool
             if hasattr(msg, "content") and isinstance(msg.content, str):
-                if msg.content.startswith("PDF_PAYLOAD:"):
-                    parts = msg.content.split(":", 2)
+                if "SUCCESS_PDF:" in msg.content:
+                    idx = msg.content.find("SUCCESS_PDF:")
+                    parts = msg.content[idx:].split(":", 2)
                     if len(parts) >= 3:
-                        pdf_base64 = parts[1]
+                        filepath = parts[1]
                         pdf_filename = parts[2].split("\n")[0]
+                        if os.path.exists(filepath):
+                            with open(filepath, "rb") as f:
+                                pdf_base64 = base64.b64encode(f.read()).decode("utf-8")
+                            os.remove(filepath)
 
         # Final response
         final_message = result["messages"][-1]
@@ -327,8 +331,8 @@ async def chat(req: ChatRequest):
                 for t in reply_text
             ])
             
-        # Strip the PDF_PAYLOAD line from final reply if it leaked through
-        if isinstance(reply_text, str) and reply_text.startswith("PDF_PAYLOAD:"):
+        # Strip the SUCCESS_PDF line from final reply if it leaked through
+        if isinstance(reply_text, str) and "SUCCESS_PDF:" in reply_text:
             reply_text = reply_text.split("\n", 2)[-1].strip()
 
         response = {

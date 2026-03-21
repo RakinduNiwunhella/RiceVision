@@ -91,10 +91,11 @@ export default function YieldChatbot() {
         }
     };
 
-    const send = async () => {
-        if (!input.trim() || loading || dataLoading || !yieldData) return;
+    const handleSend = async (msgText) => {
+        const textToUse = typeof msgText === "string" ? msgText : input;
+        if (!textToUse.trim() || loading || dataLoading || !yieldData) return;
 
-        const userMsg = { role: "user", content: input.trim() };
+        const userMsg = { role: "user", content: textToUse.trim() };
         const updated = [...messages, userMsg];
         setMessages(updated);
         setInput("");
@@ -259,10 +260,7 @@ export default function YieldChatbot() {
                                 key={idx}
                                 onClick={() => {
                                     setInput(suggestion);
-                                    // Trigger send logic (manually since send depends on state)
-                                    // We'll set the input and let the user click enter, 
-                                    // or better, we can invoke the send logic if we refactor slightly.
-                                    // For now, setting input is safe.
+                                    setTimeout(() => handleSend(suggestion), 50);
                                 }}
                                 style={{
                                     ...dynamicStyles.chip,
@@ -657,7 +655,7 @@ export default function YieldChatbot() {
                                     style={dynamicStyles.chip}
                                     onClick={() => {
                                         setInput(q);
-                                        setTimeout(() => inputRef.current?.focus(), 50);
+                                        setTimeout(() => handleSend(q), 50);
                                     }}
                                 >
                                     {q}
@@ -674,7 +672,7 @@ export default function YieldChatbot() {
                             style={dynamicStyles.input}
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
-                            onKeyDown={(e) => e.key === "Enter" && send()}
+                            onKeyDown={(e) => e.key === "Enter" && handleSend()}
                             placeholder={
                                 dataLoading
                                     ? "Loading data…"
@@ -689,7 +687,7 @@ export default function YieldChatbot() {
                                 ...dynamicStyles.sendBtn,
                                 opacity: loading || dataLoading || !yieldData ? 0.45 : 1,
                             }}
-                            onClick={send}
+                            onClick={() => handleSend()}
                             disabled={loading || dataLoading || !yieldData}
                         >
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none">

@@ -265,8 +265,20 @@ def generate_report_for_district(date: str, district: str, season: str) -> bytes
     """
     client = _s3()
     df_yield = _get_csv_from_s3(client, f"SupabasePredictions/{date}/yieldPredictions.csv")
+    
     if df_yield is None:
-        raise ValueError(f"No prediction data found on S3 for date '{date}'.")
+        try:
+            resp = client.list_objects_v2(Bucket=BUCKET_NAME, Prefix="SupabasePredictions/", Delimiter="/")
+            folders = [p.get("Prefix").split("/")[-2] for p in resp.get("CommonPrefixes", [])]
+            if folders:
+                latest_date = sorted(folders)[-1]
+                df_yield = _get_csv_from_s3(client, f"SupabasePredictions/{latest_date}/yieldPredictions.csv")
+                date = latest_date
+        except Exception:
+            pass
+            
+    if df_yield is None:
+        raise ValueError(f"No prediction data found on S3 for date '{date}' or any fallback.")
 
     def norm(name):
         return str(name).strip().lower().replace("th", "t")
