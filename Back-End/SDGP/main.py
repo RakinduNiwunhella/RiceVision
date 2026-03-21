@@ -18,7 +18,7 @@ from .routes.chat import router as chat_router
 from .routes.signin import router as signin_router
 from .routes.signup import router as signup_router
 from .routes.payment import router as payment_router
-from pdf_report import router as pdf_router
+from .pdf_report import router as pdf_router
 
 app = FastAPI(title="RiceVision API", version="1.0.0") 
 
