@@ -73,3 +73,4 @@ matplotlib
 fpdf==1.7.2
 langchain-openai
 langchain-core
+langchain-google-genai
