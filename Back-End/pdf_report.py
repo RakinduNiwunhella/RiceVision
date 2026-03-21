@@ -15,7 +15,7 @@ from reportlab.platypus import (
     HRFlowable, KeepTogether
 )
 
-from db import supabase
+from SDGP.db import supabase
 
 router = APIRouter()
 
