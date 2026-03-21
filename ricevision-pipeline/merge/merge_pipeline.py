@@ -8,7 +8,7 @@ BASE_DIR = Path(__file__).resolve().parents[1]
 DISASTER_FOLDER = BASE_DIR / "data" / "disaster_csv"
 SAT_FOLDER = BASE_DIR / "data" / "sat_csv"
 OUTPUT_FOLDER = BASE_DIR / "data" / "merged"
-# ==========================================
+# ===========================================
 
 
 def merge_disasters(sat_df, disaster_df):

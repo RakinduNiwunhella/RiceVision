@@ -2,10 +2,11 @@ name: Deploy to EC2
 
 on:
   push:
-    paths:
-      - 'ricevision-pipeline/**'
     branches:
       - main
+    paths:
+      - 'ricevision-pipeline/**'
+      - '.github/workflows/deploy-ricevision-ec2.yml'  # optional (trigger on workflow edits)
 
 jobs:
   deploy:
@@ -19,5 +20,19 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd /home/ec2-user/app/RiceVision
+            set -e
+            set -x
+
+            echo "Connected to EC2"
+
+            cd /home/ec2-user/app/RiceVision || exit
+
+            echo "Current directory:"
+            pwd
+            ls -la
+
+            echo "Running deploy script..."
+            chmod +x deploy.sh
             ./deploy.sh
+
+            echo "Deployment finished"
