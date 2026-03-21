@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage, AIMessage
 from langchain_core.tools import tool
-from langgraph.prebuilt import create_react_agent
+
 
 from ..db import supabase
 from .reportPage import generate_report_for_district
@@ -255,6 +255,8 @@ async def chat(req: ChatRequest):
         raise HTTPException(status_code=500, detail="GEMINI_API_KEY not configured")
 
     try:
+        from langgraph.prebuilt import create_react_agent
+        
         # LLM
         llm = ChatGoogleGenerativeAI(
             model="gemini-2.0-flash",

@@ -8,8 +8,6 @@ from fpdf import FPDF
 from botocore.exceptions import BotoCoreError, ClientError
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_core.prompts import ChatPromptTemplate
 
 router = APIRouter()
 BUCKET_NAME = "ricevision"
@@ -49,14 +47,17 @@ def _get_csv_from_s3(client, key):
 
 
 # --- LLM for Summary ---
-report_prompt = ChatPromptTemplate.from_template("""
+def generate_ai_report(data: dict) -> str:
+    from langchain_google_genai import ChatGoogleGenerativeAI
+    from langchain_core.prompts import ChatPromptTemplate
+    
+    report_prompt = ChatPromptTemplate.from_template("""
 You are an agricultural analysis expert.
 Generate a professional report summary based on the following data:
 DATA: {data}
 Keep it concise and professional.
 """)
 
-def generate_ai_report(data: dict) -> str:
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         return "AI Summary unavailable (GEMINI_API_KEY is not configured)."
