@@ -94,7 +94,7 @@ export default function Profile() {
         </div>
 
         {/* Tab switcher */}
-        <div ref={tabSwitcherRef} className="flex gap-3 mt-10 sm:mt-12 mb-6 sm:mb-8 relative overflow-x-auto no-scrollbar">
+        <div ref={tabSwitcherRef} className="flex flex-wrap gap-3 mt-10 sm:mt-12 mb-6 sm:mb-8 relative">
           {TABS.map((tab) => (
             <button
               key={tab.id}

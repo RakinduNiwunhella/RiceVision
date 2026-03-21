@@ -1,5 +1,4 @@
 import os
-
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from .auth import get_current_user
@@ -17,10 +16,13 @@ from .routes.chat import router as chat_router
 from .routes.signin import router as signin_router
 from .routes.signup import router as signup_router
 from .routes.payment import router as payment_router
+from pdf_report import router as pdf_router
 
 app = FastAPI(title="RiceVision API", version="1.0.0")
 
 
+app = FastAPI()
+ 
 def _get_cors_origins() -> list[str]:
     """Get allowed origin URLs from environment or use defaults."""
     configured = os.getenv("CORS_ORIGINS", "")
@@ -72,5 +74,5 @@ app.include_router(map_router, dependencies=[Depends(get_current_user)])
 app.include_router(user_field_router, dependencies=[Depends(get_current_user)])
 app.include_router(alerts_router, prefix="/api", dependencies=[Depends(get_current_user)])
 app.include_router(notifications_router, dependencies=[Depends(get_current_user)])
-app.include_router(chat_router, dependencies=[Depends(get_current_user)])
-
+app.include_router(chat_router, prefix="/api")
+app.include_router(pdf_router, prefix="/api", dependencies=[Depends(get_current_user)])

@@ -246,7 +246,7 @@ const MyDashboard = () => {
   const topYieldDistricts = useMemo(() => {
     return [...bestYieldDistricts]
       .sort(
-      (a, b) => Number(b?.total_yield_kg_ha ?? 0) - Number(a?.total_yield_kg_ha ?? 0),
+        (a, b) => Number(b?.total_yield_kg_ha ?? 0) - Number(a?.total_yield_kg_ha ?? 0),
       )
       .slice(0, 5);
   }, [bestYieldDistricts]);
@@ -382,14 +382,14 @@ const MyDashboard = () => {
   /* ------------------ RENDER ------------------ */
 
   return (
-    <div className="min-h-full px-3 py-4 sm:px-6 sm:py-6 lg:p-10 text-white font-sans transition-all duration-500">
+    <div className="min-h-full px-3 pt-0 pb-4 sm:px-6 sm:pt-0 sm:pb-6 lg:px-10 lg:pt-4 lg:pb-10 text-white font-sans transition-all duration-500">
       <div className="max-w-7xl mx-auto space-y-6 sm:space-y-10 lg:space-y-12 pb-16 sm:pb-20">
 
         {/* ── Page Header ── */}
         <div ref={currentStep === 0 ? headerRef : undefined} className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
             <h1 className="text-xl sm:text-3xl md:text-5xl font-black text-white tracking-tight" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
-            {t('welcomeTitle')}
+              {t('welcomeTitle')}
             </h1>
             <p className="text-white/85 text-[10px] sm:text-xs md:text-sm mt-2 font-bold uppercase tracking-[0.2em]">
               {t('welcomeSubtitle')}
@@ -565,7 +565,7 @@ const MyDashboard = () => {
                           textAnchor="end"
                           height={60}
                         />
-                        <YAxis 
+                        <YAxis
                           domain={yieldAxisDomain}
                           tick={{ fill: "rgba(255,255,255,0.85)", fontSize: 11, fontWeight: 900 }}
                           axisLine={false}
@@ -597,8 +597,8 @@ const MyDashboard = () => {
               <p className="text-[10px] font-black uppercase tracking-[0.15em] text-white/70 mb-3">District Yield Table</p>
               <div className="max-h-[380px] overflow-y-auto rounded-xl border border-white/10 custom-scrollbar">
                 <table className="w-full border-collapse">
-                  <thead className="sticky top-0 bg-[#0a1320]">
-                    <tr className="text-[10px] uppercase tracking-[0.14em] text-white/65">
+                  <thead className="sticky top-0 bg-white/90 dark:bg-[#0a1320]/95 backdrop-blur-md border-b border-black/10 dark:border-white/10">
+                    <tr className="text-[10px] uppercase tracking-[0.14em] text-slate-700 dark:text-white/65">
                       <th className="px-3 py-2.5 text-left font-black">District</th>
                       <th className="px-3 py-2.5 text-right font-black">MT</th>
                       <th className="px-3 py-2.5 text-right font-black">kg/ha</th>
@@ -641,7 +641,7 @@ const MyDashboard = () => {
                   </div>
 
                   {/* Bar chart */}
-                  <div className="flex-1">
+                  <div className="mt-6">
                     <ResponsiveContainer width="100%" height={320}>
                       <BarChart data={translatedStageDistribution} margin={{ top: 5, right: 5, left: -10, bottom: 40 }}>
                         <XAxis
@@ -658,7 +658,7 @@ const MyDashboard = () => {
                           tick={{ fill: "rgba(255,255,255,0.90)", fontSize: 9, fontWeight: 900 }}
                           axisLine={false}
                           tickLine={false}
-                          width={40}
+                          width={45}
                           allowDecimals={false}
                         />
                         <Tooltip
