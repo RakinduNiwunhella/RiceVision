@@ -142,4 +142,4 @@ else:
 upload_in_batches("Final_Dataset_Points", final_df, "id")
 upload_in_batches("Final_Dataset_Yield", yield_selected, "districtname")
 
-print(f"Successfully uploaded {len(yield_selected)} rows for year {year_val}")
+print("All uploads completed successfully!")

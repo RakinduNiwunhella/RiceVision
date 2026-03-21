@@ -887,7 +887,7 @@ const Report = () => {
                 }`}
             >
               <span className="material-symbols-outlined text-xs">download</span>
-              Instant PDF
+            {t('downloadPdf')}
             </button>
 
             <a
