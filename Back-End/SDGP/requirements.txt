@@ -72,3 +72,4 @@ fpdf
 langchain-openai
 langchain-google-genai
 matplotlib
+langgraph
