@@ -3,11 +3,14 @@ import os
 import boto3
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 import time
 from fpdf import FPDF
 from botocore.exceptions import BotoCoreError, ClientError
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import ChatPromptTemplate
 
 router = APIRouter()
 BUCKET_NAME = "ricevision"
@@ -47,10 +50,7 @@ def _get_csv_from_s3(client, key):
 
 
 # --- LLM for Summary ---
-def generate_ai_report(data: dict) -> str:
-    from langchain_google_genai import ChatGoogleGenerativeAI
-    from langchain_core.prompts import ChatPromptTemplate
-    
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
     report_prompt = ChatPromptTemplate.from_template("""
 You are an agricultural analysis expert.
 Generate a professional report summary based on the following data:
@@ -58,15 +58,7 @@ DATA: {data}
 Keep it concise and professional.
 """)
 
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        return "AI Summary unavailable (GEMINI_API_KEY is not configured)."
-        
-    llm = ChatGoogleGenerativeAI(
-        model="gemini-2.0-flash",
-        google_api_key=api_key,
-        temperature=0
-    )
+def generate_ai_report(data: dict) -> str:
     chain = report_prompt | llm
     response = chain.invoke({"data": data})
     return response.content
@@ -113,7 +105,6 @@ class UnifiedPDF(FPDF):
         self.ln(2)
 
 def _create_chart(predicted, historical):
-    import matplotlib.pyplot as plt
     plt.figure(figsize=(4, 2.2))
     plt.style.use('default') # matching White background of PDF better or keeping brand dark? 
     # Frontend uses transparent on dark. Backend PDF is white. Let's use clean white chart.

@@ -1002,7 +1002,7 @@ const Report = () => {
               {t('downloadPdf')}
             </button>
 
-            
+
 
           </div>
           <div ref={districtSelectorRef}>
