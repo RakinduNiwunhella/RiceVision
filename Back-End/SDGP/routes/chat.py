@@ -267,12 +267,13 @@ async def chat(req: ChatRequest):
         # Agent
         agent = create_react_agent(
             llm,
-            tools=tools,
-            state_modifier=SYSTEM_PROMPT
+            tools=tools
         )
 
         # Convert chat history
-        history_msgs = []
+        from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
+        
+        history_msgs = [SystemMessage(content=SYSTEM_PROMPT)]
         for m in req.chatHistory:
             if m.role == "user":
                 history_msgs.append(HumanMessage(content=m.content))

@@ -74,3 +74,4 @@ langchain-google-genai
 matplotlib
 langgraph
 reportlab
+earthengine-api
