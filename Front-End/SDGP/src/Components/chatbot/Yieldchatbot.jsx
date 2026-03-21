@@ -68,6 +68,29 @@ export default function YieldChatbot() {
     if (isOpen) setTimeout(() => inputRef.current?.focus(), 100);
   }, [isOpen]);
 
+    // Helper: convert base64 PDF to a blob URL and trigger download
+    const downloadPdfFromBase64 = (base64Data, filename) => {
+        try {
+            const byteChars = atob(base64Data);
+            const byteNumbers = new Array(byteChars.length);
+            for (let i = 0; i < byteChars.length; i++) {
+                byteNumbers[i] = byteChars.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], { type: "application/pdf" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = filename || "RiceVision_Report.pdf";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 10000);
+        } catch (err) {
+            console.error("PDF download error:", err);
+        }
+    };
+
     const send = async () => {
         if (!input.trim() || loading || dataLoading || !yieldData) return;
 
@@ -78,103 +101,35 @@ export default function YieldChatbot() {
         setIntermediateSteps([]);
         setLoading(true);
 
-        // Helper: Try to extract district, season, and date from user's message or yieldData
-        function getReportParams() {
-            if (!yieldData || !yieldData.length) return null;
-
-            // Try to extract from user message
-            const msg = userMsg.content.toLowerCase();
-            // District: match any district in yieldData
-            let district = "";
-            let season = "";
-            let date = "";
-
-            // Build sets for matching
-            const allDistricts = Array.from(new Set(yieldData.map(r => (r.districtname || "").toLowerCase())));
-            const allSeasons = Array.from(new Set(yieldData.map(r => (r.season || "").toLowerCase())));
-            // Date: match yyyy-mm-dd or dd[th|st|nd|rd] month yyyy
-            const dateRegex1 = /(\d{4}-\d{2}-\d{2})/; // 2026-03-17
-            const dateRegex2 = /(\d{1,2})(?:st|nd|rd|th)?\s+([a-zA-Z]+)\s+(\d{4})/; // 17th March 2026
-
-            // District
-            for (const d of allDistricts) {
-                if (d && msg.includes(d)) { district = d; break; }
-            }
-            // Season
-            for (const s of allSeasons) {
-                if (s && msg.includes(s)) { season = s; break; }
-            }
-            // Date
-            let dateMatch = msg.match(dateRegex1);
-            if (dateMatch) {
-                date = dateMatch[1];
-            } else {
-                dateMatch = msg.match(dateRegex2);
-                if (dateMatch) {
-                    // Convert to yyyy-mm-dd
-                    const day = dateMatch[1].padStart(2, '0');
-                    const monthStr = dateMatch[2];
-                    const year = dateMatch[3];
-                    // Map month name to number
-                    const months = ["january","february","march","april","may","june","july","august","september","october","november","december"];
-                    const mIdx = months.findIndex(m => monthStr.toLowerCase().startsWith(m.slice(0,3)));
-                    if (mIdx >= 0) {
-                        const month = String(mIdx+1).padStart(2,'0');
-                        date = `${year}-${month}-${day}`;
-                    }
-                }
-            }
-
-            // Try to find a matching row in yieldData
-            let row = null;
-            for (const r of yieldData) {
-                const d = (r.districtname || "").toLowerCase();
-                const s = (r.season || "").toLowerCase();
-                const dt = r.date ? String(r.date).split(" ")[0] : "";
-                if ((district ? d === district : true) && (season ? s === season : true) && (date ? dt === date : true)) {
-                    row = r;
-                    break;
-                }
-            }
-            // Fallback: use first row
-            if (!row) row = yieldData[0];
-            return {
-                district: row.districtname || "",
-                season: row.season || "",
-                date: row.date ? String(row.date).split(" ")[0] : ""
-            };
-        }
-
-        // Detect if user is asking for a report
-        const reportRegex = /\b(report|pdf|summary)\b/i;
-        const isReportRequest = reportRegex.test(userMsg.content);
-
         try {
-            let reply = "";
-            let intermediate_steps = null;
-            if (isReportRequest) {
-                // Generate a PDF link using backend endpoint
-                const params = getReportParams();
-                if (params && params.district && params.season && params.date) {
-                    const pdfUrl = `/api/download-pdf?date=${encodeURIComponent(params.date)}&district=${encodeURIComponent(params.district)}&season=${encodeURIComponent(params.season)}`;
-                    reply = `Okay, here is your yield report. [Download Yield Report](${pdfUrl})`;
-                } else {
-                    reply = "Sorry, I couldn't determine the correct district, season, or date for the report.";
-                }
-            } else {
-                // Default: call the chat API as before
-                const res = await apiFetch(`/api/chat`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ question: userMsg.content, yieldData, chatHistory: messages }),
-                });
-                if (!res.ok) throw new Error(`Server error ${res.status}`);
-                const data = await res.json();
-                reply = data.reply;
-                intermediate_steps = data.intermediate_steps;
+            // All messages go through the AI agent — it decides when to
+            // generate a PDF report via the generate_agricultural_report tool.
+            const res = await apiFetch(`/api/chat`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ question: userMsg.content, yieldData, chatHistory: messages }),
+            });
+            if (!res.ok) throw new Error(`Server error ${res.status}`);
+            const data = await res.json();
+
+            let reply = data.reply;
+            const intermediate_steps = data.intermediate_steps;
+
+            // If the backend returned a PDF, auto-trigger the download
+            if (data.pdf_base64 && data.pdf_filename) {
+                downloadPdfFromBase64(data.pdf_base64, data.pdf_filename);
+                // Append a download-again link to the reply so the user can re-download
+                reply = reply + `\n\n📄 Your report has been downloaded. Click below to download again.`;
             }
+
             if (intermediate_steps) setIntermediateSteps(intermediate_steps);
-            setMessages([...updated, { role: "assistant", content: reply }]);
+            // Store pdf info on the message so we can show a download button
+            const assistantMsg = { role: "assistant", content: reply };
+            if (data.pdf_base64 && data.pdf_filename) {
+                assistantMsg._pdfBase64 = data.pdf_base64;
+                assistantMsg._pdfFilename = data.pdf_filename;
+            }
+            setMessages([...updated, assistantMsg]);
         } catch (e) {
             setMessages([
                 ...updated,
@@ -608,32 +563,41 @@ export default function YieldChatbot() {
                                     <div style={dynamicStyles.bubble(m.role)}>
                                         <RenderMessage content={m.content} role={m.role} />
                                     </div>
-                                    {m.role === "assistant" && /\[(.*?(report|pdf).*?)\]\((.*?)\)/i.test(m.content) && (
+                                    {m.role === "assistant" && m._pdfBase64 && m._pdfFilename && (
                                         <button
-                                            onClick={() => downloadMessageAsPDF(m.content)}
+                                            onClick={() => downloadPdfFromBase64(m._pdfBase64, m._pdfFilename)}
                                             style={{
-                                                background: 'none',
-                                                border: 'none',
-                                                color: theme.emerald,
-                                                fontSize: '11px',
-                                                cursor: 'pointer',
-                                                display: 'flex',
+                                                display: 'inline-flex',
                                                 alignItems: 'center',
-                                                gap: 4,
-                                                padding: '2px 6px',
-                                                borderRadius: '4px',
-                                                transition: 'background 0.2s',
-                                                fontWeight: '600',
+                                                gap: 8,
+                                                margin: '6px 0 0 0',
+                                                padding: '10px 16px',
+                                                background: 'rgba(16, 185, 129, 0.1)',
+                                                border: '1px solid rgba(16, 185, 129, 0.3)',
+                                                borderRadius: 12,
+                                                color: theme.emerald,
+                                                fontWeight: 700,
+                                                fontSize: 12,
+                                                cursor: 'pointer',
+                                                textTransform: 'uppercase',
+                                                letterSpacing: '0.05em',
+                                                transition: 'all 0.2s',
                                             }}
-                                            onMouseEnter={(e) => e.target.style.background = theme.headerBg}
-                                            onMouseLeave={(e) => e.target.style.background = 'none'}
+                                            onMouseEnter={(e) => {
+                                                e.currentTarget.style.background = 'rgba(16, 185, 129, 0.2)';
+                                                e.currentTarget.style.transform = 'translateY(-1px)';
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                e.currentTarget.style.background = 'rgba(16, 185, 129, 0.1)';
+                                                e.currentTarget.style.transform = 'translateY(0)';
+                                            }}
                                         >
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                                                 <polyline points="7 10 12 15 17 10" />
                                                 <line x1="12" y1="15" x2="12" y2="3" />
                                             </svg>
-                                            Download PDF
+                                            📄 Download Report PDF
                                         </button>
                                     )}
                                 </div>

@@ -1,12 +1,13 @@
 import os
 import base64
+import traceback
 from datetime import date as _date
 from typing import List, Any, Optional
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_core.messages import HumanMessage, AIMessage
+from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from langchain_core.tools import tool
 from langgraph.prebuilt import create_react_agent
 
@@ -263,12 +264,21 @@ async def chat(req: ChatRequest):
             temperature=0
         )
 
-        # Agent
-        agent = create_react_agent(
-            llm,
-            tools=tools,
-            state_modifier=SYSTEM_PROMPT
-        )
+        # Agent — try the newer `prompt` kwarg first; fall back to
+        # `state_modifier` for older langgraph versions.
+        try:
+            agent = create_react_agent(
+                llm,
+                tools=tools,
+                prompt=SYSTEM_PROMPT,
+            )
+        except TypeError:
+            # Older langgraph that still uses state_modifier
+            agent = create_react_agent(
+                llm,
+                tools=tools,
+                state_modifier=SYSTEM_PROMPT,
+            )
 
         # Convert chat history
         history_msgs = []
@@ -278,9 +288,12 @@ async def chat(req: ChatRequest):
             else:
                 history_msgs.append(AIMessage(content=m.content))
 
+        # Prepend the system message so it's always part of the conversation
+        all_msgs = [SystemMessage(content=SYSTEM_PROMPT)] + history_msgs + [HumanMessage(content=req.question)]
+
         # Run agent
         result = agent.invoke({
-            "messages": history_msgs + [HumanMessage(content=req.question)]
+            "messages": all_msgs
         })
 
         # Extract intermediate steps (tool usage) + detect PDF payload
@@ -323,5 +336,5 @@ async def chat(req: ChatRequest):
         return response
 
     except Exception as e:
-        print(f"Agent Error: {str(e)}")
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Agent Error: {str(e)}")
