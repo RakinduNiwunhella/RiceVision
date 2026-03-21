@@ -61,7 +61,7 @@ import {
 
 
 
-/* ------------------ Components ------------------ */
+
 
 const StatWidget = ({ title, value, subtitle, icon }) => (
   <div className="glass glass-hover p-4 sm:p-6 md:p-8 text-center relative overflow-hidden group">
