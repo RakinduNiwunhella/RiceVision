@@ -3,14 +3,36 @@ import { apiFetch } from "./apiFetch";
 // Authenticated helper for all backend GET requests
 async function get(path) {
   const res = await apiFetch(path);
-  if (!res.ok) throw new Error("API error");
+  if (!res.ok) {
+    let detail = "";
+    try {
+      const payload = await res.json();
+      detail = payload?.detail || payload?.message || "";
+    } catch {
+      // Ignore JSON parse errors and fall back to status text.
+    }
+
+    const suffix = detail || res.statusText || "Request failed";
+    throw new Error(`API error (${res.status}): ${suffix}`);
+  }
   return res.json();
 }
 
 // endpoints
+export const fetchNotificationUnreadCount = () => get("/notifications/unread_count");
+export const fetchNotifications = () => get("/notifications");
+
+export const markNotificationRead = async (notificationId) => {
+  const res = await apiFetch(`/notifications/${notificationId}/read`, {
+    method: "PUT",
+  });
+  if (!res.ok) throw new Error("Failed to mark notification as read");
+  return res.json();
+};
 export const fetchHealthSummary = () => get("/health-summary");
 export const fetchYield = () => get("/yield");
 export const fetchBestDistricts = () => get("/best-districts");
+export const fetchDistrictYields = () => get("/district-yields");
 export const fetchOutbreaks = () => get("/outbreaks");
 export const fetchNDVITrend = () => get("/ndvi-trend");
 export const fetchDistrictHealth = () => get("/district-health");
@@ -141,4 +163,69 @@ export const fetchGEETileUrl = async ({
     throw new Error(data.detail || "GEE tile fetch failed");
   }
   return res.json();
+};
+
+/* ------------------ USER FIELD ------------------ */
+export const fetchUserField = () => get("/user-field");
+
+export const saveUserField = async (payload) => {
+  const res = await apiFetch("/user-field", {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    let message = "Failed to save field";
+    try {
+      const data = await res.json();
+      message = data.detail || message;
+    } catch (_) {}
+    throw new Error(message);
+  }
+
+  return res.json();
+};
+
+export const removeUserField = async () => {
+  const res = await apiFetch("/user-field", {
+    method: "DELETE",
+  });
+
+  if (!res.ok) {
+    let message = "Failed to delete field";
+    try {
+      const data = await res.json();
+      message = data.detail || message;
+    } catch (_) {}
+    throw new Error(message);
+  }
+
+  return res.json();
+};
+
+/* ------------------ PAYMENT ------------------ */
+
+/**
+ * Fetch a secure PayHere MD5 hash from the backend.
+ * The merchant secret never leaves the server.
+ * @param {string} orderId   e.g. "rv-<user_id>"
+ * @param {string} amount    e.g. "1000.00"
+ * @param {string} currency  e.g. "LKR"
+ */
+export const fetchPaymentHash = async (orderId, amount, currency = "LKR") => {
+  const res = await apiFetch("/payment/hash", {
+    method: "POST",
+    body: JSON.stringify({ order_id: orderId, amount, currency }),
+  });
+
+  if (!res.ok) {
+    let message = "Failed to generate payment hash";
+    try {
+      const data = await res.json();
+      message = data.detail || message;
+    } catch (_) {}
+    throw new Error(message);
+  }
+
+  return res.json(); // { status, merchant_id, hash, order_id, amount, currency }
 };

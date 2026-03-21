@@ -47,7 +47,7 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.detail || "Login failed");
+        throw new Error(data.detail || t('loginFailed'));
       }
 
       console.log("Login success:", data);
@@ -89,7 +89,7 @@ export default function LoginPage() {
     e.preventDefault();
 
     if (!email) {
-      setResetError("Please enter your email.");
+      setResetError(t('pleaseEnterEmail'));
       return;
     }
 
@@ -106,19 +106,19 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setResetError(data.detail || "Failed to send reset email.");
+        setResetError(data.detail || t('failedToSendResetEmail'));
       } else {
         setResetSuccess(true);
       }
     } catch (err) {
-      setResetError("Network error. Please try again.");
+      setResetError(t('networkErrorTryAgain'));
     }
 
     setResetLoading(false);
   };
 
   return (
-    <div className="flex transition-colors duration-500 ...">
+    <div className="min-h-screen flex flex-col md:flex-row transition-colors duration-500 bg-white dark:bg-neutral-900 text-black dark:text-white">
       {/* Theme Toggle */}
       <button
         type="button"
@@ -133,7 +133,7 @@ export default function LoginPage() {
       </button>
 
       {/* Left Side: Form Container */}
-      <div className="flex flex-col w-full px-5 sm:px-8 pt-3 pb-6 md:w-3/4 lg:w-1/2 md:px-12 lg:px-20 z-10 mx-auto md:mx-0">
+      <div className="flex-1 flex flex-col justify-center px-5 sm:px-8 py-8 md:py-12 md:w-1/2 lg:px-20 z-10 w-full mx-auto md:mx-0 order-2 md:order-1">
         <div className="w-full max-w-md mx-auto">
           {/* Logo */}
           <div className="flex items-center mb-0 space-x-3">
@@ -149,7 +149,7 @@ export default function LoginPage() {
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold mb-3 tracking-tight">
             {t('welcomeBack')}
           </h2>
-          <p className="text-slate-500 dark:text-slate-400 mb-6">
+          <p className="text-gray-500 dark:text-gray-400 mb-6">
             {t('signInDetails')}
           </p>
 
@@ -164,7 +164,7 @@ export default function LoginPage() {
                 required
                 placeholder="name@company.com"
                 value={email}
-                className="w-full px-4 py-2.5 sm:py-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                className="w-full rounded-xl px-4 py-3 transition-all duration-200 bg-gray-100 text-gray-900 border border-gray-300 placeholder-gray-500 dark:bg-neutral-800/80 dark:text-white dark:border-neutral-600 dark:placeholder-gray-400 hover:border-gray-400 dark:hover:border-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 backdrop-blur-sm"
                 onChange={(e) => {
                   setEmail(e.target.value);
                   if (errorMessage) setErrorMessage("");
@@ -184,7 +184,7 @@ export default function LoginPage() {
                   required
                   placeholder="••••••••"
                   value={password}
-                  className="w-full px-4 py-2.5 sm:py-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                  className="w-full rounded-xl px-4 py-3 transition-all duration-200 bg-gray-100 text-gray-900 border border-gray-300 placeholder-gray-500 dark:bg-neutral-800/80 dark:text-white dark:border-neutral-600 dark:placeholder-gray-400 hover:border-gray-400 dark:hover:border-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 backdrop-blur-sm"
                   onChange={(e) => {
                     setPassword(e.target.value);
                     if (errorMessage) setErrorMessage("");
@@ -195,7 +195,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-4 flex items-center text-slate-500 dark:text-slate-400 hover:text-indigo-500 transition-colors"
+                  className="absolute inset-y-0 right-4 flex items-center text-gray-500 dark:text-gray-400 hover:text-indigo-500 transition-colors"
                 >
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </button>
@@ -225,11 +225,11 @@ export default function LoginPage() {
               <input
                 type="checkbox"
                 id="remember"
-                className="w-4 h-4 rounded border-slate-300 accent-indigo-600 cursor-pointer"
+                className="w-4 h-4 rounded bg-gray-100 border-gray-300 dark:bg-neutral-800 dark:border-neutral-600 focus:ring-indigo-500 dark:focus:ring-indigo-400 accent-indigo-600 cursor-pointer"
               />
               <label
                 htmlFor="remember"
-                className="text-sm text-slate-500 dark:text-slate-400 cursor-pointer"
+                className="text-sm text-gray-500 dark:text-gray-400 cursor-pointer"
               >
                 {t('keepLoggedIn')}
               </label>
@@ -305,13 +305,27 @@ export default function LoginPage() {
       </div>
 
       {/* Right Side: Visuals */}
-      <div className="hidden md:block md:w-1/4 lg:w-1/2 relative">
+      <div className="w-full h-[40vh] md:h-auto md:w-1/2 relative bg-neutral-900 order-1 md:order-2">
+        {/* Day */}
         <img
-          src="/paddy_signin.png"
-          alt="Rice Field"
-          className="absolute inset-0 w-full h-full object-cover"
+          src="/images/rice-day-1.webp"
+          alt="Rice Field Day"
+          fetchPriority="high"
+          loading="eager"
+          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 opacity-100 dark:opacity-0"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+        
+        {/* Night */}
+        <img
+          src="/images/dark image 1.jpeg"
+          alt="Rice Field Night"
+          fetchPriority="high"
+          loading="eager"
+          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 opacity-0 dark:opacity-100"
+        />
+
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none"></div>
+        <div className="absolute inset-0 bg-transparent dark:bg-black/30 transition-colors duration-700 pointer-events-none"></div>
       </div>
 
       {showForgot && (
@@ -323,7 +337,7 @@ export default function LoginPage() {
           ></div>
 
           {/* Modal */}
-          <div className="relative z-10 w-full max-w-md p-8 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl">
+          <div className="relative z-10 w-full max-w-md p-8 bg-white dark:bg-neutral-800 rounded-2xl shadow-2xl">
             <h2 className="text-2xl font-bold mb-6">{t('resetPassword')}</h2>
 
             <form onSubmit={handleResetPassword} className="space-y-4">
@@ -333,7 +347,7 @@ export default function LoginPage() {
                 placeholder={t('emailAddress')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800"
+                className="w-full rounded-xl px-4 py-3 transition-all duration-200 bg-gray-100 text-gray-900 border border-gray-300 placeholder-gray-500 dark:bg-neutral-800/80 dark:text-white dark:border-neutral-600 dark:placeholder-gray-400 hover:border-gray-400 dark:hover:border-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 backdrop-blur-sm"
               />
               <button
                 type="submit"

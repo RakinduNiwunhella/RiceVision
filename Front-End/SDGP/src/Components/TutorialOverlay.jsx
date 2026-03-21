@@ -190,7 +190,7 @@ const TutorialOverlay = ({
         {/* Step counter */}
         <div className="flex items-center gap-1.5 mb-3">
           <span className="text-emerald-400 text-sm leading-none">✦</span>
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400/80">
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-300">
             Step {currentStep + 1} of {steps.length}
           </span>
         </div>

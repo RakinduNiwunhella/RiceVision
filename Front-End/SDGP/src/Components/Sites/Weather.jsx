@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { getDSDivision } from "../../utils/geoUtils";
 import { useLanguage } from "../../context/LanguageContext";
+import { translateDistrictName, translatePlaceName } from "../../utils/locationTranslations";
 import TutorialTooltip from "../../Components/TutorialTooltip";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
 
@@ -60,18 +61,18 @@ function nearestDistrict(lat, lon) {
   return best;
 }
 
-function wmoLabel(code) {
-  if (code === 0) return { label: "Clear Sky", icon: "☀️", color: "text-amber-400" };
-  if (code <= 2) return { label: "Partly Cloudy", icon: "⛅", color: "text-yellow-300" };
-  if (code === 3) return { label: "Overcast", icon: "☁️", color: "text-slate-400" };
-  if (code <= 49) return { label: "Foggy / Haze", icon: "🌫️", color: "text-slate-300" };
-  if (code <= 57) return { label: "Drizzle", icon: "🌦️", color: "text-blue-300" };
-  if (code <= 67) return { label: "Rain", icon: "🌧️", color: "text-blue-400" };
-  if (code <= 77) return { label: "Snow / Ice", icon: "🌨️", color: "text-sky-200" };
-  if (code <= 82) return { label: "Rain Showers", icon: "🌩️", color: "text-blue-400" };
-  if (code <= 86) return { label: "Heavy Snow Showers", icon: "❄️", color: "text-sky-100" };
-  if (code <= 99) return { label: "Thunderstorm", icon: "⛈️", color: "text-red-400" };
-  return { label: "Unknown", icon: "🌡️", color: "text-white" };
+function wmoLabel(code, t) {
+  if (code === 0) return { label: t("wmoClearSky"), icon: "☀️", color: "text-amber-400" };
+  if (code <= 2) return { label: t("wmoPartlyCloudy"), icon: "⛅", color: "text-yellow-300" };
+  if (code === 3) return { label: t("wmoOvercast"), icon: "☁️", color: "text-slate-400" };
+  if (code <= 49) return { label: t("wmoFoggyHaze"), icon: "🌫️", color: "text-slate-300" };
+  if (code <= 57) return { label: t("wmoDrizzle"), icon: "🌦️", color: "text-blue-300" };
+  if (code <= 67) return { label: t("wmoRain"), icon: "🌧️", color: "text-blue-400" };
+  if (code <= 77) return { label: t("wmoSnowIce"), icon: "🌨️", color: "text-sky-200" };
+  if (code <= 82) return { label: t("wmoRainShowers"), icon: "🌩️", color: "text-blue-400" };
+  if (code <= 86) return { label: t("wmoHeavySnowShowers"), icon: "❄️", color: "text-sky-100" };
+  if (code <= 99) return { label: t("wmoThunderstorm"), icon: "⛈️", color: "text-red-400" };
+  return { label: t("wmoUnknown"), icon: "🌡️", color: "text-white" };
 }
 
 function windDir(deg) {
@@ -79,12 +80,12 @@ function windDir(deg) {
   return dirs[Math.round((deg % 360) / 45) % 8];
 }
 
-function fmtTime(iso) {
-  return new Date(iso).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
+function fmtTime(iso, locale = "en-US") {
+  return new Date(iso).toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit", hour12: true });
 }
 
-function fmtDay(iso, short = false) {
-  return new Date(iso).toLocaleDateString("en-US", short
+function fmtDay(iso, short = false, locale = "en-US") {
+  return new Date(iso).toLocaleDateString(locale, short
     ? { weekday: "short", day: "numeric" }
     : { weekday: "long", month: "short", day: "numeric" });
 }
@@ -153,7 +154,15 @@ function SectionHeading({ children }) {
 // Main Component
 // ─────────────────────────────────────────────
 export default function RiceVisionWeather() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const locale = language === "si" ? "si-LK" : language === "ta" ? "ta-LK" : "en-US";
+  const tf = (key, replacements = {}) => {
+    let template = t(key);
+    Object.entries(replacements).forEach(([k, v]) => {
+      template = template.replaceAll(`{${k}}`, String(v));
+    });
+    return template;
+  };
   const [district, setDistrict] = useState(null);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -167,28 +176,28 @@ export default function RiceVisionWeather() {
   const tutorialSteps = [
     {
       title: t("weatherTitle") || "Weather Information",
-      action: "Explore the current weather conditions, including temperature, precipitation, and wind data",
-      outcome: "You will see real-time weather measurements for your location"
+      action: t("weatherTutorialOverviewAction"),
+      outcome: t("weatherTutorialOverviewOutcome")
     },
     {
       title: t("hourlyForecast") || "Hourly Forecast",
-      action: "Click the 'Hourly Forecast' tab to view 24-hour weather progression",
-      outcome: "You will see temperature, precipitation, and wind patterns for the next 24 hours"
+      action: t("weatherTutorialHourlyAction"),
+      outcome: t("weatherTutorialHourlyOutcome")
     },
     {
       title: t("soilAgronomic") || "Soil & Agronomic Data",
-      action: "Click the 'Soil & Agronomic' tab to view soil conditions",
-      outcome: "You will see soil temperature at different depths (0, 6, 18 cm), soil moisture %, VPD, and evapotranspiration rates for irrigation planning"
+      action: t("weatherTutorialSoilAction"),
+      outcome: t("weatherTutorialSoilOutcome")
     },
     {
       title: t("forecast14Day") || "14-Day Forecast",
-      action: "Click the 'Forecast' tab to see extended weather outlook",
-      outcome: "You will see daily weather predictions for the next 14 days to help plan farming activities"
+      action: t("weatherTutorialForecastAction"),
+      outcome: t("weatherTutorialForecastOutcome")
     },
     {
       title: t("historyData") || "Historical Data",
-      action: "Click the 'History' tab to view past weather records",
-      outcome: "You will see historical weather patterns to analyze seasonal trends and inform future planning"
+      action: t("weatherTutorialHistoryAction"),
+      outcome: t("weatherTutorialHistoryOutcome")
     }
   ];
 
@@ -300,7 +309,7 @@ export default function RiceVisionWeather() {
   const c = data.current;
   const h = data.hourly;
   const d = data.daily;
-  const cond = wmoLabel(c.weather_code);
+  const cond = wmoLabel(c.weather_code, t);
 
   const nowISO = c.time;
   const nowIdx = h.time.findLastIndex((t) => t <= nowISO);
@@ -330,13 +339,20 @@ export default function RiceVisionWeather() {
     { id: "history", labelKey: "tabHistory" },
   ];
 
+  const placeDisplayName = district?.name
+    ? translatePlaceName(district.name, language)
+    : "";
+  const districtDisplayName = district
+    ? translateDistrictName(district.district || district.name, language)
+    : "";
+
   return (
-    <div className="min-h-screen -mx-6 -mt-6 p-4 sm:p-6 lg:p-10 font-sans text-white">
+    <div className="min-h-screen px-4 pt-6 pb-10 sm:px-6 lg:px-10 font-sans text-white">
       <div className="max-w-7xl mx-auto space-y-8">
 
         {/* ─── HEADER ─── */}
         <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 flex-wrap">
-          <div className="mb-6">
+          <div className="mb-4">
 
             {/* System label */}
             <p className="text-[10px] font-black uppercase tracking-[0.45em] text-emerald-400 mb-2 flex items-center gap-2">
@@ -346,22 +362,22 @@ export default function RiceVisionWeather() {
 
             {/* Main Location */}
             <h1 className="text-2xl sm:text-4xl md:text-6xl font-black text-white leading-tight tracking-tight">
-              {district?.name}
+              {placeDisplayName}
             </h1>
 
             {/* Admin hierarchy */}
             <p className="text-sm md:text-base text-white/85 font-semibold mt-1">
-              {district?.name} DS Division · {district?.district || "Colombo"} District
+              {placeDisplayName} {t('dsDivision')} · {districtDisplayName || t('colombo')} {t('district')}
             </p>
 
             {/* Meta info */}
             <p className="text-[10px] text-white/85 mt-2 font-bold uppercase tracking-widest">
-              {district?.lat.toFixed(4)}°N · {district?.lon.toFixed(4)}°E · Auto-detected
+              {district?.lat.toFixed(4)}°N · {district?.lon.toFixed(4)}°E · {t('autoDetected')}
             </p>
 
           </div>
 
-          <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-3 flex-wrap mt-4">
             <button
               onClick={() => {
                 if (!navigator.geolocation) return;
@@ -381,10 +397,10 @@ export default function RiceVisionWeather() {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setDropdownOpen((o) => !o)}
-                className="glass px-5 py-2.5 rounded-2xl border border-white/10 text-[10px] font-black uppercase tracking-widest text-white/80 hover:border-emerald-500/30 hover:text-emerald-400 transition-all flex items-center gap-3 min-w-44 justify-between"
+                className="glass px-5 py-2.5 rounded-2xl border border-white/10 text-[10px] font-black uppercase tracking-widest text-white/85 hover:border-emerald-500/30 hover:text-emerald-400 transition-all flex items-center gap-3 min-w-44 justify-between"
               >
                 <span className="material-symbols-outlined text-sm">location_on</span>
-                {district?.name}
+                {districtDisplayName || placeDisplayName}
                 <span className="material-symbols-outlined text-sm">{dropdownOpen ? "expand_less" : "expand_more"}</span>
               </button>
 
@@ -397,7 +413,7 @@ export default function RiceVisionWeather() {
                         onClick={() => { setDistrict(dst); setDropdownOpen(false); }}
                         className={`w-full text-left px-5 py-3 text-[10px] font-black uppercase tracking-widest transition-all hover:bg-emerald-500/10 hover:text-emerald-400 ${district?.name === dst.name ? "bg-emerald-500/15 text-emerald-400" : "text-white/85"}`}
                       >
-                        {dst.name}
+                        {translateDistrictName(dst.name, language)}
                       </button>
                     ))}
                   </div>
@@ -412,39 +428,38 @@ export default function RiceVisionWeather() {
           <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-8">
             <div>
               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/85 block mb-3">
-                {c.is_day ? "☀️ Daytime" : "🌙 Night"} · {new Date(c.time).toLocaleString("en-US", { weekday: "long", hour: "2-digit", minute: "2-digit" })}
+                {c.is_day ? `☀️ ${t('daytime')}` : `🌙 ${t('night')}`} · {new Date(c.time).toLocaleString(locale, { weekday: "long", hour: "2-digit", minute: "2-digit" })}
               </span>
               <div className="flex items-end gap-4">
                 <h2 className="text-4xl sm:text-6xl md:text-8xl lg:text-[10rem] font-black text-white leading-none">{Math.round(c.temperature_2m)}°</h2>
                 <div className="mb-4">
-                  <span className="text-base sm:text-2xl font-black text-white/80">{cond.icon} {cond.label}</span>
-                  <p className="text-white/85 text-sm mt-1">Feels like {Math.round(c.apparent_temperature)}°C</p>
+                  <span className="text-base sm:text-2xl font-black text-white/85">{cond.icon} {cond.label}</span>
+                  <p className="text-white/85 text-sm mt-1">{t('feelsLike')} {Math.round(c.apparent_temperature)}°C</p>
                 </div>
               </div>
               <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-4 sm:mt-6">
-                <span className="bg-white/10 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl text-[8px] sm:text-[9px] font-black border border-white/20 uppercase tracking-widest">💧 {c.relative_humidity_2m}% Humidity</span>
+                <span className="bg-white/10 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl text-[8px] sm:text-[9px] font-black border border-white/20 uppercase tracking-widest">💧 {c.relative_humidity_2m}% {t('humidity')}</span>
                 <span className="bg-white/10 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl text-[8px] sm:text-[9px] font-black border border-white/20 uppercase tracking-widest">💨 {c.wind_speed_10m} km/h {windDir(c.wind_direction_10m)}</span>
-                <span className="bg-blue-500/20 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl text-[8px] sm:text-[9px] font-black border border-blue-400/20 uppercase tracking-widest">🌧️ {d.precipitation_probability_max[todayI]}% Rain Today</span>
+                <span className="bg-blue-500/20 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl text-[8px] sm:text-[9px] font-black border border-blue-400/20 uppercase tracking-widest">🌧️ {d.precipitation_probability_max[todayI]}% {t('todayRain')}</span>
                 <span className="bg-amber-500/20 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl text-[8px] sm:text-[9px] font-black border border-amber-400/20 uppercase tracking-widest">☀️ UV {uvNow}</span>
-                <span className="bg-white/10 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl text-[8px] sm:text-[9px] font-black border border-white/20 uppercase tracking-widest">☁️ {c.cloud_cover}% Cloud</span>
+                <span className="bg-white/10 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl text-[8px] sm:text-[9px] font-black border border-white/20 uppercase tracking-widest">☁️ {c.cloud_cover}% {t('cloudCover')}</span>
               </div>
             </div>
             <div className="flex flex-col gap-2 sm:gap-3 min-w-0 sm:min-w-40">
               <div className="glass bg-black/20 p-4 rounded-2xl text-center">
-                <p className="text-[9px] text-white/85 font-black uppercase tracking-widest mb-1">Sunrise</p>
-                <p className="text-lg font-black text-amber-400">{fmtTime(d.sunrise[todayI])}</p>
+                <p className="text-[9px] text-white/85 font-black uppercase tracking-widest mb-1">{t('sunrise')}</p>
+                <p className="text-lg font-black text-amber-400">{fmtTime(d.sunrise[todayI], locale)}</p>
               </div>
               <div className="glass bg-black/20 p-4 rounded-2xl text-center">
-                <p className="text-[9px] text-white/85 font-black uppercase tracking-widest mb-1">Sunset</p>
-                <p className="text-lg font-black text-orange-400">{fmtTime(d.sunset[todayI])}</p>
+                <p className="text-[9px] text-white/85 font-black uppercase tracking-widest mb-1">{t('sunset')}</p>
+                <p className="text-lg font-black text-orange-400">{fmtTime(d.sunset[todayI], locale)}</p>
               </div>
               <div className="glass bg-black/20 p-4 rounded-2xl text-center">
-                <p className="text-[9px] text-white/85 font-black uppercase tracking-widest mb-1">Today Rain</p>
+                <p className="text-[9px] text-white/85 font-black uppercase tracking-widest mb-1">{t('todayRain')}</p>
                 <p className="text-lg font-black text-blue-400">{d.precipitation_sum[todayI]?.toFixed(1)} mm</p>
               </div>
             </div>
           </div>
-          <span className="absolute -right-7 -bottom-1 text-[6rem] sm:text-[8rem] md:text-[10rem] opacity-[0.5] pointer-events-none select-none">{cond.icon}</span>
         </div>
 
         {/* ─── TABS ─── */}
@@ -475,16 +490,16 @@ export default function RiceVisionWeather() {
           <div className="space-y-8">
             <SectionHeading>{t('atmospheric')}</SectionHeading>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-              <StatCard label={t('temperature')} value={`${Math.round(c.temperature_2m)}°C`} accent="amber" icon="🌡️" sub={`Feels ${Math.round(c.apparent_temperature)}°C`} />
-              <StatCard label={t('humidity')} value={`${c.relative_humidity_2m}%`} accent="blue" icon="💧" sub={c.relative_humidity_2m > 85 ? "⚠️ Fungal risk" : "Normal"} />
-              <StatCard label={t('dewpoint')} value={`${dewPoint}°C`} accent="cyan" icon="🌫️" sub="Moisture saturation threshold" />
-              <StatCard label={t('cloudCover')} value={`${c.cloud_cover}%`} accent="sky" icon="☁️" sub={c.cloud_cover > 70 ? "Poor sunlight" : "Good for crops"} />
-              <StatCard label={t('pressure')} value={c.pressure_msl?.toFixed(0)} unit="hPa" accent="violet" icon="🔵" sub="Mean sea level" />
-              <StatCard label={t('windSpeed')} value={c.wind_speed_10m} unit="km/h" accent="cyan" icon="💨" sub={`${windDir(c.wind_direction_10m)} · ${c.wind_speed_10m > 15 ? "⚠️ Avoid spraying" : "Safe for spraying"}`} />
-              <StatCard label={t('windGusts')} value={c.wind_gusts_10m} unit="km/h" accent="rose" icon="🌪️" sub={c.wind_gusts_10m > 25 ? "⚠️ High gusts" : "Safe"} />
-              <StatCard label={t('precipitation')} value={c.precipitation} unit="mm" accent="blue" icon="🌧️" sub="Current hour" />
-              <StatCard label={t('uvIndex')} value={uvNow} accent="amber" icon="☀️" sub={uvNow >= 8 ? "⚠️ Very high" : uvNow >= 5 ? "Moderate" : "Low"} />
-              <StatCard label={t('visibility')} value={visibility != null ? (visibility / 1000).toFixed(1) : "—"} unit="km" accent="sky" icon="👁️" sub={visibility < 1000 ? "⚠️ Poor" : "Good"} />
+              <StatCard label={t('temperature')} value={`${Math.round(c.temperature_2m)}°C`} accent="amber" icon="🌡️" sub={tf("weatherAdvisoryFeels", { temp: Math.round(c.apparent_temperature) })} />
+              <StatCard label={t('humidity')} value={`${c.relative_humidity_2m}%`} accent="blue" icon="💧" sub={c.relative_humidity_2m > 85 ? t("weatherAdvisoryFungalRisk") : t("weatherAdvisoryNormal")} />
+              <StatCard label={t('dewpoint')} value={`${dewPoint}°C`} accent="cyan" icon="🌫️" sub={t("weatherAdvisoryMoistureThreshold")} />
+              <StatCard label={t('cloudCover')} value={`${c.cloud_cover}%`} accent="sky" icon="☁️" sub={c.cloud_cover > 70 ? t("weatherAdvisoryPoorSunlight") : t("weatherAdvisoryGoodForCrops")} />
+              <StatCard label={t('pressure')} value={c.pressure_msl?.toFixed(0)} unit="hPa" accent="violet" icon="🔵" sub={t("weatherAdvisoryMeanSeaLevel")} />
+              <StatCard label={t('windSpeed')} value={c.wind_speed_10m} unit="km/h" accent="cyan" icon="💨" sub={`${windDir(c.wind_direction_10m)} · ${c.wind_speed_10m > 15 ? t("weatherAdvisoryAvoidSpraying") : t("weatherAdvisorySafeForSpraying")}`} />
+              <StatCard label={t('windGusts')} value={c.wind_gusts_10m} unit="km/h" accent="rose" icon="🌪️" sub={c.wind_gusts_10m > 25 ? t("weatherAdvisoryHighGusts") : t("weatherAdvisorySafe")} />
+              <StatCard label={t('precipitation')} value={c.precipitation} unit="mm" accent="blue" icon="🌧️" sub={t("weatherAdvisoryCurrentHour")} />
+              <StatCard label={t('uvIndex')} value={uvNow} accent="amber" icon="☀️" sub={uvNow >= 8 ? t("weatherAdvisoryUVVeryHigh") : uvNow >= 5 ? t("weatherAdvisoryUVModerate") : t("weatherAdvisoryUVLow")} />
+              <StatCard label={t('visibility')} value={visibility != null ? (visibility / 1000).toFixed(1) : "—"} unit="km" accent="sky" icon="👁️" sub={visibility < 1000 ? t("weatherAdvisoryPoorVisibility") : t("weatherAdvisoryGood")} />
             </div>
 
             <SectionHeading>{t('todayFieldSummary')}</SectionHeading>
@@ -492,13 +507,13 @@ export default function RiceVisionWeather() {
               <StatCard label={t('maxTemp')} value={`${Math.round(d.temperature_2m_max[todayI])}°C`} accent="amber" icon="🔥" />
               <StatCard label={t('minTemp')} value={`${Math.round(d.temperature_2m_min[todayI])}°C`} accent="sky" icon="❄️" />
               <StatCard label={t('uvIndexMax')} value={d.uv_index_max[todayI]} accent="amber" icon="🌞" />
-              <StatCard label={t('daylightRain')} value={`${d.precipitation_hours[todayI]}h`} accent="blue" icon="⏱️" sub="Hours with rain" />
-              <StatCard label={t('solarRadiation')} value={radToday} unit="MJ/m²" accent="orange" icon="⚡" sub="Today total" />
-              <StatCard label={t('evapotranspiration')} value={et0Today} unit="mm" accent="emerald" icon="🌿" sub="ET₀ — irrigation guide" />
-              <StatCard label={t('vapourPressureDef')} value={vpd} unit="kPa" accent="violet" icon="💨" sub={vpd > 2 ? "⚠️ Crop stress" : "Normal"} />
+              <StatCard label={t('daylightRain')} value={`${d.precipitation_hours[todayI]}h`} accent="blue" icon="⏱️" sub={t("weatherAdvisoryHoursWithRain")} />
+              <StatCard label={t('solarRadiation')} value={radToday} unit="MJ/m²" accent="orange" icon="⚡" sub={t("weatherAdvisoryTodayTotal")} />
+              <StatCard label={t('evapotranspiration')} value={et0Today} unit="mm" accent="emerald" icon="🌿" sub={t("weatherAdvisoryIrrigationGuide")} />
+              <StatCard label={t('vapourPressureDef')} value={vpd} unit="kPa" accent="violet" icon="💨" sub={vpd > 2 ? t("weatherAdvisoryCropStress") : t("weatherAdvisoryNormal")} />
               <StatCard label={t('windMaxToday')} value={d.wind_speed_10m_max[todayI]} unit="km/h" accent="cyan" icon="🌬️" />
-              <StatCard label={t('rainSum')} value={d.rain_sum[todayI]?.toFixed(1)} unit="mm" accent="blue" icon="🌧️" sub="Total rain today" />
-              <StatCard label={t('rainProbability')} value={`${d.precipitation_probability_max[todayI]}%`} accent="blue" icon="🎲" sub="Max chance today" />
+              <StatCard label={t('rainSum')} value={d.rain_sum[todayI]?.toFixed(1)} unit="mm" accent="blue" icon="🌧️" sub={t("weatherAdvisoryTotalRainToday")} />
+              <StatCard label={t('rainProbability')} value={`${d.precipitation_probability_max[todayI]}%`} accent="blue" icon="🎲" sub={t("weatherAdvisoryMaxChanceToday")} />
             </div>
           </div>
         )}
@@ -512,7 +527,7 @@ export default function RiceVisionWeather() {
             <div className="overflow-x-auto pb-2">
               <div className="flex gap-3 min-w-max">
                 {next24.map((idx, i) => {
-                  const info = wmoLabel(h.weather_code[idx]);
+                  const info = wmoLabel(h.weather_code[idx], t);
 
                   return (
                     <div
@@ -523,7 +538,7 @@ export default function RiceVisionWeather() {
                         }`}
                     >
                       <p className="text-[9px] font-black text-white/85 uppercase">
-                        {new Date(h.time[idx]).toLocaleTimeString("en-US", {
+                        {new Date(h.time[idx]).toLocaleTimeString(locale, {
                           hour: "2-digit",
                           hour12: true,
                         })}
@@ -555,7 +570,7 @@ export default function RiceVisionWeather() {
             </div>
 
             {/* ─── HOURLY TABLE PANEL ─── */}
-            <SectionHeading>Hourly Detail Table</SectionHeading>
+            <SectionHeading>{t('hourlyDetailTable')}</SectionHeading>
 
             <div className="glass bg-black/40 backdrop-blur-md border border-white/10 rounded-3xl p-6 shadow-xl">
 
@@ -566,17 +581,17 @@ export default function RiceVisionWeather() {
                   <thead>
                     <tr className="text-white/85 uppercase tracking-widest border-b border-white/10">
                       {[
-                        "Time",
-                        "Cond",
-                        "Temp",
-                        "Feels",
-                        "Humid",
-                        "Rain%",
-                        "Rain mm",
-                        "Wind",
-                        "UV",
-                        "ET₀",
-                        "Visibility",
+                        t("weatherTableColTime"),
+                        t("weatherTableColCondition"),
+                        t("weatherTableColTemp"),
+                        t("weatherTableColFeels"),
+                        t("weatherTableColHumidity"),
+                        t("weatherTableColRainPercent"),
+                        t("weatherTableColRainMm"),
+                        t("weatherTableColWind"),
+                        t("weatherTableColUV"),
+                        t("weatherTableColET0"),
+                        t("weatherTableColVisibility"),
                       ].map((col) => (
                         <th
                           key={col}
@@ -590,7 +605,7 @@ export default function RiceVisionWeather() {
 
                   <tbody>
                     {next24.map((idx, i) => {
-                      const info = wmoLabel(h.weather_code[idx]);
+                      const info = wmoLabel(h.weather_code[idx], t);
 
                       return (
                         <tr
@@ -598,8 +613,8 @@ export default function RiceVisionWeather() {
                           className={`border-b border-white/5 hover:bg-white/[0.05] transition-colors ${i === 0 ? "bg-emerald-500/10" : ""
                             }`}
                         >
-                          <td className="px-3 py-3 text-white/80 whitespace-nowrap">
-                            {new Date(h.time[idx]).toLocaleTimeString("en-US", {
+                          <td className="px-3 py-3 text-white/85 whitespace-nowrap">
+                            {new Date(h.time[idx]).toLocaleTimeString(locale, {
                               hour: "2-digit",
                               minute: "2-digit",
                               hour12: true,
@@ -663,12 +678,12 @@ export default function RiceVisionWeather() {
         {/* ════ SOIL & AGRO ════ */}
         {activeTab === "soil" && (
           <div className="space-y-8">
-            <SectionHeading>Soil Temperature Profiles</SectionHeading>
+            <SectionHeading>{t('soilTemperatureProfiles')}</SectionHeading>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {[
-                { label: "Surface (0 cm)", value: soilTemp0, depth: "Top layer — seed germination zone" },
-                { label: "Shallow (6 cm)", value: soilTemp6, depth: "Root zone for seedlings" },
-                { label: "Medium (18 cm)", value: soilTemp18, depth: "Active root zone — paddy growth" },
+                { label: t("soilTempSurfaceLabel"), value: soilTemp0, depth: t("soilTempSurfaceDesc") },
+                { label: t("soilTempShallowLabel"), value: soilTemp6, depth: t("soilTempShallowDesc") },
+                { label: t("soilTempMediumLabel"), value: soilTemp18, depth: t("soilTempMediumDesc") },
               ].map((s) => (
                 <div key={s.label} className="glass glass-hover p-6 rounded-3xl border border-white/10 hover:-translate-y-0.5 transition-all">
                   <p className="text-[9px] font-black text-white/85 uppercase tracking-[0.3em] mb-4">{s.label}</p>
@@ -679,76 +694,76 @@ export default function RiceVisionWeather() {
                   </div>
                   <div className="flex justify-between text-[8px] text-white/85 mt-1"><span>15°C</span><span>40°C</span></div>
                   <p className={`mt-3 text-[9px] font-black uppercase ${s.value < 18 ? "text-blue-400" : s.value > 35 ? "text-red-400" : "text-emerald-400"}`}>
-                    {s.value < 18 ? "⚠️ Too cold for germination" : s.value > 35 ? "⚠️ Heat stress risk" : "✓ Optimal for paddy"}
+                    {s.value < 18 ? t("soilAdvisoryTooCold") : s.value > 35 ? t("soilAdvisoryHeatStress") : t("soilAdvisoryOptimal")}
                   </p>
                 </div>
               ))}
             </div>
 
-            <SectionHeading>Soil Moisture Content</SectionHeading>
+            <SectionHeading>{t('soilMoistureContent')}</SectionHeading>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {[
-                { label: "0–1 cm", value: soilM0, note: "Topsoil — surface evaporation layer" },
-                { label: "1–3 cm", value: soilM1, note: "Seedling root zone" },
-                { label: "3–9 cm", value: soilM3, note: "Primary root absorption zone" },
+                { label: t("soilMoistureDepth0to1"), value: soilM0, note: t("soilMoistureDepth0to1Desc") },
+                { label: t("soilMoistureDepth1to3"), value: soilM1, note: t("soilMoistureDepth1to3Desc") },
+                { label: t("soilMoistureDepth3to9"), value: soilM3, note: t("soilMoistureDepth3to9Desc") },
               ].map((s) => (
                 <div key={s.label} className="glass glass-hover p-6 rounded-3xl border border-blue-500/20 hover:-translate-y-0.5 transition-all">
-                  <p className="text-[9px] font-black text-white/85 uppercase tracking-[0.3em] mb-4">Soil Moisture · {s.label}</p>
+                  <p className="text-[9px] font-black text-white/85 uppercase tracking-[0.3em] mb-4">{t("soilMoistureLabel")} · {s.label}</p>
                   <p className="text-5xl font-black text-blue-400 mb-2">{s.value}%</p>
                   <p className="text-[9px] text-white/85 font-medium mb-4">{s.note}</p>
                   <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
                     <div className="h-full bg-linear-to-r from-blue-500 to-cyan-400 rounded-full" style={{ width: `${Math.min(100, parseFloat(s.value))}%` }} />
                   </div>
                   <p className={`mt-3 text-[9px] font-black uppercase ${parseFloat(s.value) < 20 ? "text-amber-400" : parseFloat(s.value) > 80 ? "text-blue-400" : "text-emerald-400"}`}>
-                    {parseFloat(s.value) < 20 ? "⚠️ Low — Consider irrigation" : parseFloat(s.value) > 80 ? "💧 Saturated" : "✓ Good moisture level"}
+                    {parseFloat(s.value) < 20 ? t("soilMoistureLow") : parseFloat(s.value) > 80 ? t("soilMoistureSaturated") : t("soilMoistureGood")}
                   </p>
                 </div>
               ))}
             </div>
 
-            <SectionHeading>Agronomic Indicators</SectionHeading>
+            <SectionHeading>{t('agronomicIndicators')}</SectionHeading>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="glass glass-hover p-6 rounded-3xl border border-emerald-500/20 col-span-1 sm:col-span-2">
-                <p className="text-[9px] font-black text-white/85 uppercase tracking-[0.3em] mb-2">ET₀ Evapotranspiration Today</p>
+                <p className="text-[9px] font-black text-white/85 uppercase tracking-[0.3em] mb-2">{t("et0EvapotranspirationToday")}</p>
                 <p className="text-5xl font-black text-emerald-400 mb-1">{et0Today} <span className="text-xl text-white/85">mm</span></p>
-                <p className="text-[10px] text-white/85 mt-2 leading-relaxed">Reference evapotranspiration (FAO-56) — the amount of water the crop would use under optimal conditions. Use this to plan daily irrigation volumes.</p>
+                <p className="text-[10px] text-white/85 mt-2 leading-relaxed">{t("et0Description")}</p>
                 <div className={`mt-4 inline-block px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest ${parseFloat(et0Today) > 6 ? "bg-amber-500/20 text-amber-400 border border-amber-500/20" : parseFloat(et0Today) > 3 ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/20" : "bg-blue-500/10 text-blue-400 border border-blue-500/20"}`}>
-                  {parseFloat(et0Today) > 6 ? "High demand — increase irrigation" : parseFloat(et0Today) > 3 ? "Moderate — normal irrigation" : "Low demand — reduce irrigation"}
+                  {parseFloat(et0Today) > 6 ? t("et0HighDemand") : parseFloat(et0Today) > 3 ? t("et0ModerateDemand") : t("et0LowDemand")}
                 </div>
               </div>
               <div className="glass glass-hover p-6 rounded-3xl border border-violet-500/20">
-                <p className="text-[9px] font-black text-white/85 uppercase tracking-[0.3em] mb-2">Vapour Pressure Deficit</p>
+                <p className="text-[9px] font-black text-white/85 uppercase tracking-[0.3em] mb-2">{t("vapourPressureDeficit")}</p>
                 <p className="text-5xl font-black text-violet-400 mb-1">{vpd} <span className="text-xl text-white/85">kPa</span></p>
-                <p className="text-[9px] text-white/85 mt-2">VPD drives transpiration. High VPD → crop water stress.</p>
+                <p className="text-[9px] text-white/85 mt-2">{t("vpdDescription")}</p>
                 <p className={`mt-3 text-[9px] font-black uppercase ${parseFloat(vpd) > 2 ? "text-red-400" : parseFloat(vpd) > 1 ? "text-amber-400" : "text-emerald-400"}`}>
-                  {parseFloat(vpd) > 2 ? "⚠️ Severe stress" : parseFloat(vpd) > 1 ? "Moderate stress" : "✓ Good conditions"}
+                  {parseFloat(vpd) > 2 ? t("vpdSevereStress") : parseFloat(vpd) > 1 ? t("vpdModerateStress") : t("vpdGoodConditions")}
                 </p>
               </div>
               <div className="glass glass-hover p-6 rounded-3xl border border-orange-500/20">
-                <p className="text-[9px] font-black text-white/85 uppercase tracking-[0.3em] mb-2">Solar Radiation Today</p>
+                <p className="text-[9px] font-black text-white/85 uppercase tracking-[0.3em] mb-2">{t("solarRadiationToday")}</p>
                 <p className="text-5xl font-black text-orange-400 mb-1">{radToday} <span className="text-xl text-white/85">MJ/m²</span></p>
-                <p className="text-[9px] text-white/85 mt-2">Higher radiation drives more ET₀ and photosynthesis.</p>
+                <p className="text-[9px] text-white/85 mt-2">{t("solarRadiationDescription")}</p>
                 <p className={`mt-3 text-[9px] font-black uppercase ${parseFloat(radToday) > 20 ? "text-amber-400" : "text-emerald-400"}`}>
-                  {parseFloat(radToday) > 20 ? "High radiation day" : "Normal radiation"}
+                  {parseFloat(radToday) > 20 ? t("solarRadiationHigh") : t("solarRadiationNormal")}
                 </p>
               </div>
             </div>
 
-            <SectionHeading>Spray & Field Work Advisory</SectionHeading>
+            <SectionHeading>{t('sprayFieldAdvisory')}</SectionHeading>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {[
-                { title: "Pesticide / Herbicide Spraying", ok: c.wind_speed_10m <= 15 && c.precipitation === 0 && c.cloud_cover < 80, reason: c.wind_speed_10m > 15 ? `Wind ${c.wind_speed_10m} km/h — drift risk` : c.precipitation > 0 ? "Active rain — wash-off risk" : c.cloud_cover >= 80 ? "Heavy cloud — poor drying" : "All conditions met", icon: "🪣" },
-                { title: "Irrigation Recommended", ok: parseFloat(et0Today) > 4 && parseFloat(soilM0) < 40, reason: parseFloat(et0Today) <= 4 ? `ET₀ low (${et0Today} mm)` : parseFloat(soilM0) >= 40 ? "Soil moisture sufficient" : `ET₀ = ${et0Today} mm, moisture low`, icon: "💧" },
-                { title: "Fungal Disease Risk", ok: false, warn: c.relative_humidity_2m > 80, reason: c.relative_humidity_2m > 80 ? `⚠️ Humidity ${c.relative_humidity_2m}% — monitor for blast` : `Humidity ${c.relative_humidity_2m}% — low risk`, icon: "🍄" },
-                { title: "Field Machinery Work", ok: c.precipitation === 0 && parseFloat(soilM3) < 70, reason: c.precipitation > 0 ? "Rain present — soil waterlogged" : parseFloat(soilM3) >= 70 ? "Soil too wet for machinery" : "Conditions suitable", icon: "🚜" },
-                { title: "Harvest Conditions", ok: c.precipitation === 0 && c.relative_humidity_2m < 75 && c.wind_speed_10m < 20, reason: c.precipitation > 0 ? "Rain — avoid harvest" : c.relative_humidity_2m >= 75 ? "High humidity — grain moisture risk" : "Good harvest window", icon: "🌾" },
-                { title: "UV Exposure Risk", ok: uvNow < 6, reason: uvNow >= 8 ? `UV ${uvNow} — very high, use protection` : uvNow >= 6 ? `UV ${uvNow} — wear protective gear` : `UV ${uvNow} — safe`, icon: "🕶️" },
+                { title: t("advisorySprayingTitle"), ok: c.wind_speed_10m <= 15 && c.precipitation === 0 && c.cloud_cover < 80, reason: c.wind_speed_10m > 15 ? tf("advisoryWindDriftRisk", { speed: c.wind_speed_10m }) : c.precipitation > 0 ? t("advisoryRainWashOffRisk") : c.cloud_cover >= 80 ? t("advisoryHeavyCloudPoorDrying") : t("advisoryAllConditionsMet"), icon: "🪣" },
+                { title: t("advisoryIrrigationTitle"), ok: parseFloat(et0Today) > 4 && parseFloat(soilM0) < 40, reason: parseFloat(et0Today) <= 4 ? tf("advisoryEt0Low", { et0: et0Today }) : parseFloat(soilM0) >= 40 ? t("advisorySoilMoistureSufficient") : tf("advisoryEt0MoistureLow", { et0: et0Today }), icon: "💧" },
+                { title: t("advisoryFungalRiskTitle"), ok: false, warn: c.relative_humidity_2m > 80, reason: c.relative_humidity_2m > 80 ? tf("advisoryHumidityMonitorBlast", { humidity: c.relative_humidity_2m }) : tf("advisoryHumidityLowRisk", { humidity: c.relative_humidity_2m }), icon: "🍄" },
+                { title: t("advisoryFieldMachineryTitle"), ok: c.precipitation === 0 && parseFloat(soilM3) < 70, reason: c.precipitation > 0 ? t("advisoryRainSoilWaterlogged") : parseFloat(soilM3) >= 70 ? t("advisorySoilTooWetMachinery") : t("advisoryConditionsSuitable"), icon: "🚜" },
+                { title: t("advisoryHarvestTitle"), ok: c.precipitation === 0 && c.relative_humidity_2m < 75 && c.wind_speed_10m < 20, reason: c.precipitation > 0 ? t("advisoryRainAvoidHarvest") : c.relative_humidity_2m >= 75 ? t("advisoryHighHumidityGrainMoistureRisk") : t("advisoryGoodHarvestWindow"), icon: "🌾" },
+                { title: t("advisoryUvRiskTitle"), ok: uvNow < 6, reason: uvNow >= 8 ? tf("advisoryUvVeryHigh", { uv: uvNow }) : uvNow >= 6 ? tf("advisoryUvWearProtection", { uv: uvNow }) : tf("advisoryUvSafe", { uv: uvNow }), icon: "🕶️" },
               ].map((a) => (
                 <div key={a.title} className={`glass glass-hover p-5 rounded-3xl border transition-all hover:-translate-y-0.5 ${a.warn ? "border-amber-500/30 bg-amber-500/5" : a.ok ? "border-emerald-500/30 bg-emerald-500/5" : "border-red-500/20 bg-red-500/5"}`}>
                   <div className="flex items-start justify-between gap-2 mb-3">
                     <span className="text-2xl">{a.icon}</span>
                     <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-lg ${a.warn ? "bg-amber-500/20 text-amber-400" : a.ok ? "bg-emerald-500/20 text-emerald-400" : "bg-red-500/20 text-red-400"}`}>
-                      {a.warn ? "Monitor" : a.ok ? "Go" : "Hold"}
+                      {a.warn ? t("advisoryStatusMonitor") : a.ok ? t("advisoryStatusGo") : t("advisoryStatusHold")}
                     </span>
                   </div>
                   <p className="text-[11px] font-black text-white/90 mb-2">{a.title}</p>
@@ -763,16 +778,16 @@ export default function RiceVisionWeather() {
         {activeTab === "forecast" && (
           <div className="space-y-6">
 
-            <SectionHeading>14-Day Outlook</SectionHeading>
+            <SectionHeading>{t('outlook14Day')}</SectionHeading>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
               {forecastIdx.map((idx) => {
-                const info = wmoLabel(d.weather_code[idx]);
+                const info = wmoLabel(d.weather_code[idx], t);
 
                 return (
                   <div key={idx} className="glass glass-hover p-5 rounded-3xl border border-white/10 text-center hover:-translate-y-1 transition-all duration-300">
                     <p className="text-[9px] text-white/85 font-black mb-3 uppercase">
-                      {fmtDay(d.time[idx], true)}
+                      {fmtDay(d.time[idx], true, locale)}
                     </p>
 
                     <div className="text-4xl mb-3">{info.icon}</div>
@@ -791,7 +806,7 @@ export default function RiceVisionWeather() {
 
                     <div className="mt-4 space-y-1">
                       <p className="text-[9px] font-black text-blue-400">
-                        {d.precipitation_probability_max[idx]}% Rain
+                        {d.precipitation_probability_max[idx]}% {t("weatherRainShort")}
                       </p>
 
                       <p className="text-[8px] text-blue-300">
@@ -811,7 +826,7 @@ export default function RiceVisionWeather() {
               })}
             </div>
 
-            <SectionHeading>Weekly Agro Forecast Detail</SectionHeading>
+            <SectionHeading>{t('weeklyAgroForecastDetail')}</SectionHeading>
 
             <div className="glass bg-black/40 backdrop-blur-md border border-white/10 rounded-3xl p-6 shadow-xl">
               <div className="overflow-x-auto">
@@ -821,18 +836,18 @@ export default function RiceVisionWeather() {
                   <thead>
                     <tr className="text-white/85 uppercase tracking-widest border-b border-white/10">
                       {[
-                        "Date",
-                        "Cond",
-                        "Max°C",
-                        "Min°C",
-                        "Rain%",
-                        "Rain mm",
-                        "Wind Max",
-                        "UV Max",
-                        "ET₀",
-                        "Radiation",
-                        "Sunrise",
-                        "Sunset",
+                        t("weatherTableColDate"),
+                        t("weatherTableColCondition"),
+                        t("weatherTableColMaxTemp"),
+                        t("weatherTableColMinTemp"),
+                        t("weatherTableColRainPercent"),
+                        t("weatherTableColRainMm"),
+                        t("weatherTableColWindMax"),
+                        t("weatherTableColUvMax"),
+                        t("weatherTableColET0"),
+                        t("weatherTableColRadiation"),
+                        t("weatherTableColSunrise"),
+                        t("weatherTableColSunset"),
                       ].map((col) => (
                         <th key={col} className="px-3 py-3 text-left whitespace-nowrap">
                           {col}
@@ -843,13 +858,13 @@ export default function RiceVisionWeather() {
 
                   <tbody>
                     {forecastIdx.map((idx) => {
-                      const info = wmoLabel(d.weather_code[idx]);
+                      const info = wmoLabel(d.weather_code[idx], t);
 
                       return (
                         <tr key={idx} className="border-b border-white/5 hover:bg-white/[0.05] transition-colors">
 
-                          <td className="px-3 py-3 text-white/80 whitespace-nowrap">
-                            {fmtDay(d.time[idx], true)}
+                          <td className="px-3 py-3 text-white/85 whitespace-nowrap">
+                            {fmtDay(d.time[idx], true, locale)}
                           </td>
 
                           <td className="px-3 py-3 whitespace-nowrap">
@@ -889,11 +904,11 @@ export default function RiceVisionWeather() {
                           </td>
 
                           <td className="px-3 py-3 text-amber-300 whitespace-nowrap">
-                            {fmtTime(d.sunrise[idx])}
+                            {fmtTime(d.sunrise[idx], locale)}
                           </td>
 
                           <td className="px-3 py-3 text-orange-300 whitespace-nowrap">
-                            {fmtTime(d.sunset[idx])}
+                            {fmtTime(d.sunset[idx], locale)}
                           </td>
 
                         </tr>
@@ -912,22 +927,22 @@ export default function RiceVisionWeather() {
         {activeTab === "history" && (
           <div className="space-y-6">
 
-            <SectionHeading>Past 7 Days — Field History</SectionHeading>
+            <SectionHeading>{t('past7DaysFieldHistory')}</SectionHeading>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
               {pastIdx.map((date, idx) => {
-                const info = wmoLabel(d.weather_code[idx]);
+                const info = wmoLabel(d.weather_code[idx], t);
 
                 return (
                   <div key={idx} className="glass p-5 rounded-3xl border border-white/5 text-center opacity-80 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300">
 
                     <p className="text-[9px] text-white/85 font-bold mb-3 uppercase">
-                      {fmtDay(date, true)}
+                      {fmtDay(date, true, locale)}
                     </p>
 
                     <div className="text-3xl mb-3">{info.icon}</div>
 
-                    <p className="text-xl font-bold text-white/80">
+                    <p className="text-xl font-bold text-white/85">
                       {Math.round(d.temperature_2m_max[idx])}°
                     </p>
 
@@ -954,7 +969,7 @@ export default function RiceVisionWeather() {
               })}
             </div>
 
-            <SectionHeading>Historical Detail Table</SectionHeading>
+            <SectionHeading>{t('historicalDetailTable')}</SectionHeading>
 
             <div className="glass bg-black/40 backdrop-blur-md border border-white/10 rounded-3xl p-6 shadow-xl">
               <div className="overflow-x-auto">
@@ -964,16 +979,16 @@ export default function RiceVisionWeather() {
                   <thead>
                     <tr className="text-white/85 uppercase tracking-widest border-b border-white/10">
                       {[
-                        "Date",
-                        "Conditions",
-                        "Max°C",
-                        "Min°C",
-                        "Rain Sum",
-                        "Rain Hrs",
-                        "Wind Max",
-                        "UV Max",
-                        "ET₀",
-                        "Radiation",
+                        t("weatherTableColDate"),
+                        t("weatherTableColConditions"),
+                        t("weatherTableColMaxTemp"),
+                        t("weatherTableColMinTemp"),
+                        t("weatherTableColRainSum"),
+                        t("weatherTableColRainHours"),
+                        t("weatherTableColWindMax"),
+                        t("weatherTableColUvMax"),
+                        t("weatherTableColET0"),
+                        t("weatherTableColRadiation"),
                       ].map((col) => (
                         <th key={col} className="px-3 py-3 text-left whitespace-nowrap">
                           {col}
@@ -984,13 +999,13 @@ export default function RiceVisionWeather() {
 
                   <tbody>
                     {pastIdx.map((date, idx) => {
-                      const info = wmoLabel(d.weather_code[idx]);
+                      const info = wmoLabel(d.weather_code[idx], t);
 
                       return (
                         <tr key={idx} className="border-b border-white/5 hover:bg-white/[0.05] transition-colors">
 
-                          <td className="px-3 py-3 text-white/80 whitespace-nowrap">
-                            {fmtDay(date)}
+                          <td className="px-3 py-3 text-white/85 whitespace-nowrap">
+                            {fmtDay(date, false, locale)}
                           </td>
 
                           <td className="px-3 py-3 whitespace-nowrap">

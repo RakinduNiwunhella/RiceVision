@@ -47,3 +47,4 @@ AWS/Lambda/**/*.libs/
 AWS/Lambda/**/bin/
 AWS/Lambda/**/*.zip
 AWS/Lambda/**/gee_auth.json
+ricevision-pipeline/google-chrome-stable_current_x86_64.rpm

@@ -19,12 +19,12 @@ import { useTheme } from "../../context/ThemeContext";
 
 // ─── Fetch all rows from Final_Dataset_Yield ──────────────────────────────────
 async function fetchYieldData() {
-    const { data, error } = await supabase
-        .from("Final_Dataset_Yield")
-        .select("*");
+  const { data, error } = await supabase
+    .from("Final_Dataset_Yield")
+    .select("*");
 
-    if (error) throw new Error(error.message);
-    return data;
+  if (error) throw new Error(error.message);
+  return data;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -63,13 +63,13 @@ export default function YieldChatbot() {
         bottomRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages, loading, intermediateSteps]);
 
-    // Focus input when opened
-    useEffect(() => {
-        if (isOpen) setTimeout(() => inputRef.current?.focus(), 100);
-    }, [isOpen]);
+  // Focus input when opened
+  useEffect(() => {
+    if (isOpen) setTimeout(() => inputRef.current?.focus(), 100);
+  }, [isOpen]);
 
-    const send = async () => {
-        if (!input.trim() || loading || dataLoading || !yieldData) return;
+  const send = async () => {
+    if (!input.trim() || loading || dataLoading || !yieldData) return;
 
         const userMsg = { role: "user", content: input.trim() };
         const updated = [...messages, userMsg];
@@ -104,13 +104,13 @@ export default function YieldChatbot() {
         }
     };
 
-    const statusText = fetchError
-        ? "⚠️ Failed to load data"
-        : dataLoading
-            ? "Loading yield data…"
-            : yieldData
-                ? `✓ ${yieldData.length} districts loaded`
-                : "";
+  const statusText = fetchError
+    ? "⚠️ Failed to load data"
+    : dataLoading
+      ? "Loading yield data…"
+      : yieldData
+        ? `✓ ${yieldData.length} districts loaded`
+        : "";
 
     // ─── Theme Configuration ──────────────────────────────────────────────
     const theme = {
@@ -590,8 +590,8 @@ export default function YieldChatbot() {
                             </div>
                         )}
 
-                        <div ref={bottomRef} />
-                    </div>
+            <div ref={bottomRef} />
+          </div>
 
                     {/* Suggested questions (shown before first user message) */}
                     {messages.length === 1 && !dataLoading && yieldData && (

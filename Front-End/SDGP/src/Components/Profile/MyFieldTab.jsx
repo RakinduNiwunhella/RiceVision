@@ -10,9 +10,12 @@ import { supabase } from "../../supabaseClient";
 import FieldDrawMap from "../FieldSetup/FieldDrawMap";
 import { PRICE_PER_ACRE_LKR } from "../FieldSetup/fieldConstants";
 import { useLanguage } from "../../context/LanguageContext";
+import { translateDistrictName } from "../../utils/locationTranslations";
+import { fetchUserField, saveUserField, removeUserField } from "../../api/api";
+import PayHereCheckout from "../FieldSetup/PayHereCheckout";
 
 export default function MyFieldTab() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [user,          setUser]          = useState(null);
   const [existing,      setExisting]      = useState(null);   // row from user_fields
   const [loading,       setLoading]       = useState(true);
@@ -34,19 +37,23 @@ export default function MyFieldTab() {
   /* load user + existing field on mount */
   useEffect(() => {
     (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-      if (!user) { setLoading(false); return; }
+      try {
+        // Fetch Supabase user
+        const { data: { user: supaUser } } = await supabase.auth.getUser();
+        setUser(supaUser || null);
 
-      const { data, error } = await supabase
-        .from("user_fields")
-        .select("*")
-        .eq("user_id", user.id)
-        .maybeSingle();
-
-      if (!error && data) {
-        setExisting(data);
-        if (data.field_name) setFieldName(data.field_name);
+        // Fetch user field
+        const result = await fetchUserField();
+        const data = result?.data || null;
+        if (data) {
+          setExisting(data);
+          if (data.field_name) setFieldName(data.field_name);
+        }
+        // If data is null, it means user has no saved field yet — that's okay
+      } catch (error) {
+        console.error("Error fetching field:", error);
+        // Only show error if it's not a "no field" case
+        setStatus({ type: "error", message: `Unable to load field data. Please refresh the page.` });
       }
       setLoading(false);
     })();
@@ -65,58 +72,55 @@ export default function MyFieldTab() {
   }, []);
 
   const saveField = async () => {
-    if (!drawnFeature || !user) return;
+    if (!drawnFeature || !district) {
+      setStatus({ type: "error", message: "Please select a district and draw your field." });
+      return;
+    }
     setSaving(true);
 
     const price_lkr = Math.ceil(acres * PRICE_PER_ACRE_LKR);
-    const { data, error } = await supabase
-      .from("user_fields")
-      .upsert(
-        {
-          user_id:    user.id,
-          field_name: fieldName || null,
-          geojson:    drawnFeature,
-          area_acres: acres,
-          price_lkr,
-          district:   district || null,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "user_id" }
-      )
-      .select()
-      .maybeSingle();
+    try {
+      const result = await saveUserField({
+        field_name: fieldName || null,
+        geojson: drawnFeature,
+        area_acres: acres,
+        price_lkr,
+        district: district || null,
+      });
 
-    setSaving(false);
-
-    if (error) {
+      setSaving(false);
+      setExisting(result?.data || null);
+      setEditMode(false);
+      setDrawnFeature(null);
+      setStatus({ type: "success", message: "Field boundary saved to registry." });
+      // Reload user field after save to ensure UI is up to date
+      try {
+        const reload = await fetchUserField();
+        setExisting(reload?.data || null);
+      } catch {}
+    } catch (error) {
+      setSaving(false);
       setStatus({ type: "error", message: `Save failed: ${error.message}` });
       return;
     }
-
-    setExisting(data);
-    setEditMode(false);
-    setDrawnFeature(null);
-    setStatus({ type: "success", message: "Field boundary saved to registry." });
   };
 
   const deleteField = async () => {
-    if (!existing || !user) return;
+    if (!existing) return;
     if (!window.confirm("Are you sure you want to remove your field registration? This cannot be undone.")) return;
 
-    const { error } = await supabase
-      .from("user_fields")
-      .delete()
-      .eq("user_id", user.id);
-
-    if (error) {
+    try {
+      await removeUserField();
+    } catch (error) {
       setStatus({ type: "error", message: `Delete failed: ${error.message}` });
       return;
     }
+
     setExisting(null);
     setEditMode(false);
     setDrawnFeature(null);
     setFieldName("");
-    setStatus({ type: "success", message: "Field registration removed." });
+    setStatus({ type: "success", message: t('fieldRegistrationRemoved') });
   };
 
   if (loading) {
@@ -130,9 +134,17 @@ export default function MyFieldTab() {
     );
   }
 
-  const price = existing
-    ? existing.price_lkr
-    : Math.ceil(acres * PRICE_PER_ACRE_LKR);
+  // When drawing a new polygon, calculate price dynamically. Otherwise use existing price.
+  const price = drawnFeature
+    ? Math.ceil(acres * PRICE_PER_ACRE_LKR)
+    : (existing?.price_lkr || 0);
+
+  const localizedExistingDistrict = existing?.district
+    ? translateDistrictName(existing.district, language)
+    : "—";
+  const localizedSelectedDistrict = district
+    ? translateDistrictName(district, language)
+    : "";
 
   return (
     <div className="space-y-6 relative">
@@ -188,14 +200,15 @@ export default function MyFieldTab() {
       </div>
 
       {/* ── READ-ONLY view of existing field ── */}
+
       {existing && !editMode && (
         <div className="space-y-4">
           {/* Stats row */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
             {[
               { icon: "badge",        label: t('fieldNameStat'),  value: existing.field_name || "—"                                },
-              { icon: "location_on",  label: t('districtStat') || t('district'),   value: existing.district || "—"                                 },
-              { icon: "straighten",   label: t('areaStat'),       value: `${parseFloat(existing.area_acres).toFixed(3)} ac`        },
+              { icon: "location_on",  label: t('districtStat'),   value: localizedExistingDistrict                                   },
+              { icon: "straighten",   label: t('areaStat'),       value: `${parseFloat(existing.area_acres).toFixed(3)} ${t('unitAcres')}` },
               { icon: "crop_square",  label: t('areaSqmLabel'),   value: `${(existing.area_acres * 4046.86).toFixed(0)} m²`        },
               { icon: "paid",         label: t('annualFeeStat'),  value: `Rs. ${existing.price_lkr.toLocaleString()}`              },
             ].map(({ icon, label, value }) => (
@@ -216,10 +229,29 @@ export default function MyFieldTab() {
           <div className="rounded-2xl overflow-hidden border border-white/10">
             <FieldDrawMap
               initialFeature={existing.geojson}
+              initialDistrict={existing?.district}
               readOnly
-              height="400px"
+              height="600px"
             />
           </div>
+
+          {/* Payment option */}
+          {user && (
+            <PayHereCheckout
+              price={existing.price_lkr}
+              acres={existing.area_acres}
+              district={existing.district}
+              fieldName={existing.field_name}
+              drawnFeature={existing.geojson}
+              user={user}
+              onPaymentSuccess={async () => {
+                // Optionally refresh field or show a message
+                const reload = await fetchUserField();
+                setExisting(reload?.data || null);
+                setStatus({ type: "success", message: "Payment successful!" });
+              }}
+            />
+          )}
         </div>
       )}
 
@@ -239,7 +271,8 @@ export default function MyFieldTab() {
             fieldName={fieldName}
             onFieldNameChange={setFieldName}
             initialFeature={editMode ? existing?.geojson : null}
-            height="440px"
+            initialDistrict={editMode ? existing?.district : null}
+            height="600px"
           />
 
           {/* Summary + price */}
@@ -257,12 +290,12 @@ export default function MyFieldTab() {
                   {district && (
                     <div>
                       <span className="text-white/85 block text-xs mb-0.5">{t('district')}</span>
-                      <span className="font-bold text-white">{district}</span>
+                      <span className="font-bold text-white">{localizedSelectedDistrict}</span>
                     </div>
                   )}
                   <div>
                     <span className="text-white/85 block text-xs mb-0.5">{t('areaStat')}</span>
-                    <span className="font-bold text-white">{acres.toFixed(4)} acres</span>
+                    <span className="font-bold text-white">{acres.toFixed(4)} {t('unitAcres')}</span>
                   </div>
                   <div>
                     <span className="text-white/85 block text-xs mb-0.5">{t('areaSqmLabel')}</span>
@@ -271,9 +304,9 @@ export default function MyFieldTab() {
                 </div>
               </div>
               <div className="flex flex-col items-center justify-center gap-1 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30">
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400/70">{t('annualCostLabel')}</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-300">{t('annualCostLabel')}</span>
                 <span className="text-3xl font-black text-emerald-400">Rs. {price.toLocaleString()}</span>
-                <span className="text-[10px] text-white/85">Rs. {PRICE_PER_ACRE_LKR.toLocaleString()} / acre</span>
+                <span className="text-[10px] text-white/85">Rs. {PRICE_PER_ACRE_LKR.toLocaleString()} {t('mapPerAcreSuffix')}</span>
               </div>
             </div>
           )}
