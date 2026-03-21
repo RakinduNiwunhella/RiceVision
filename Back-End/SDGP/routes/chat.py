@@ -19,6 +19,10 @@ router = APIRouter()
 
 @tool
 def get_reports(crop: Optional[str] = None, ndvi_threshold: Optional[float] = None):
+    """
+    Fetches agricultural reports from the database, optionally filtered by crop type
+    and/or NDVI threshold.
+    """
     query = supabase.table("reports").select("*")
 
     if crop:

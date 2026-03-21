@@ -1,4 +1,7 @@
 import os
+import importlib
+import sys
+from pathlib import Path
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from .auth import get_current_user
@@ -16,12 +19,17 @@ from .routes.chat import router as chat_router
 from .routes.signin import router as signin_router
 from .routes.signup import router as signup_router
 from .routes.payment import router as payment_router
+
+# pdf_report.py lives one level up (Back-End/pdf_report.py), outside the SDGP
+# package.  Add its parent directory to sys.path so bare `import db` inside it
+# also resolves correctly on Render.
+_backend_dir = str(Path(__file__).resolve().parent.parent)
+if _backend_dir not in sys.path:
+    sys.path.insert(0, _backend_dir)
+
 from pdf_report import router as pdf_router
 
 app = FastAPI(title="RiceVision API", version="1.0.0")
-
-
-app = FastAPI()
  
 def _get_cors_origins() -> list[str]:
     """Get allowed origin URLs from environment or use defaults."""
