@@ -11,7 +11,6 @@ from langchain_core.tools import tool
 
 
 from ..db import supabase
-from .reportPage import generate_report_for_district
 
 router = APIRouter()
 
@@ -100,50 +99,6 @@ def get_stress_analysis(year: Optional[int] = None):
         return f"Error analyzing stress: {str(e)}"
 
 
-@tool
-def generate_agricultural_report(district: str, season: str = "", date: str = ""):
-    """
-    Generates a PDF report for a given Sri Lankan paddy district by calling
-    the reportPage download_pdf_report pipeline directly.
-
-    Use this tool whenever the user:
-    - Asks for a 'report', 'PDF', or 'summary' for any district
-    - Says things like 'give me the Galle report' or 'Ampara 2026 PDF'
-
-    Arguments:
-    - district: The district name (e.g., Ampara, Galle, Kurunegala). REQUIRED.
-    - season: 'Maha' or 'Yala'. Auto-derived from current month if not provided.
-              Maha = October–March. Yala = April–September.
-    - date: Data date in YYYY-MM-DD format. Defaults to today.
-    """
-    try:
-        # Auto-derive season from current month if not specified
-        if not season:
-            month = _date.today().month
-            season = "Maha" if month >= 10 or month <= 3 else "Yala"
-
-        # Default date to today if not specified
-        if not date:
-            date = _date.today().isoformat()
-
-        # Call reportPage.py logic directly — no HTTP round-trip
-        pdf_bytes = generate_report_for_district(date=date, district=district, season=season)
-
-        # Encode PDF as base64 and embed a detectable marker for the chat route
-        b64 = base64.b64encode(pdf_bytes).decode("utf-8")
-        filename = f"RiceVision_{district.title()}_{season}_{date}.pdf"
-
-        return (
-            f"PDF_PAYLOAD:{b64}:{filename}\n\n"
-            f"Your RiceVision Agricultural Intelligence Report for **{district.title()}** "
-            f"({season} season, data as of {date}) is ready. "
-            f"The PDF has been attached below."
-        )
-    except ValueError as e:
-        return f"Could not generate report: {str(e)}"
-    except Exception as e:
-        return f"Error generating report: {str(e)}"
-
 
 @tool
 def get_field_stats():
@@ -198,7 +153,6 @@ tools = [
     get_yield_summary,
     get_district_details,
     get_stress_analysis,
-    generate_agricultural_report,
     get_field_stats,
     get_alerts_and_risks,
     get_growth_stages,
@@ -209,18 +163,12 @@ tools = [
 # ─── SYSTEM PROMPT ────────────────────────────────────────────────────────────
 
 SYSTEM_PROMPT = """
-You are RiceVision's agricultural intelligence analyst for Sri Lanka. You have full access to the agricultural database and can generate downloadable PDF reports.
+You are RiceVision's agricultural intelligence analyst for Sri Lanka. You have full access to the agricultural database.
 
-CRITICAL REPORT GENERATION RULES:
-1. LOCATION EXTRACTION: Any time a user mentions a Sri Lankan district name (e.g., Ampara, Galle, Kurunegala, Anuradhapura, Colombo, Kandy, etc.), treat that as the 'district' for a report.
-2. IMMEDIATE REPORT TRIGGER: If the user's query contains a district name AND asks for a report, PDF, summary, or analysis — call 'generate_agricultural_report' IMMEDIATELY with that district.
-3. AUTO-SEASON: You do NOT need the user to specify the season. The tool will auto-derive it from today's date.
-4. AUTO-DATE: You do NOT need the user to specify a date. The tool will default to today.
-5. So for a query like "give me the Ampara report" — call generate_agricultural_report(district="Ampara") right away.
-
-MISSING DISTRICT ONLY:
-- If the user asks for a report but does NOT name a district, ask which district using [SUGGEST:] chips:
-  Example: "Which district would you like a report for? [SUGGEST: Ampara] [SUGGEST: Colombo] [SUGGEST: Kandy] [SUGGEST: Galle] [SUGGEST: Kurunegala]"
+CRITICAL RULES:
+1. LOCATION EXTRACTION: Any time a user mentions a Sri Lankan district name (e.g., Ampara, Galle, Kurunegala, Anuradhapura, Colombo, Kandy, etc.), treat that as the 'district' and use the appropriate data tools to provide insights.
+2. AUTO-SEASON: You do NOT need the user to specify the season. Use current date if not specified.
+3. AUTO-DATE: You do NOT need the user to specify a date. Defaults to today.
 
 INTERACTIVE CHIPS:
 - Always append [SUGGEST: X] chips at the end of your message when prompting for a value.
@@ -228,10 +176,10 @@ INTERACTIVE CHIPS:
 - District chips: [SUGGEST: Ampara] [SUGGEST: Anuradhapura] [SUGGEST: Colombo] [SUGGEST: Kandy] [SUGGEST: Galle]
 
 QUERY HANDLING:
-- For data-only queries (no report request), use the appropriate data tools.
+- For data-only queries, use the appropriate data tools.
 - Always back data responses with real metrics from tools — no plain text summaries.
-- After showing data, offer the report: "Want the full PDF report? [SUGGEST: Download PDF]"
 """
+
 
 # ─── REQUEST MODELS ───────────────────────────────────────────────────────────
 
@@ -285,10 +233,8 @@ async def chat(req: ChatRequest):
             "messages": history_msgs + [HumanMessage(content=req.question)]
         })
 
-        # Extract intermediate steps (tool usage) + detect PDF payload
+        # Extract intermediate steps (tool usage)
         intermediate_steps = []
-        pdf_base64 = None
-        pdf_filename = None
 
         for msg in result["messages"]:
             # Capture tool_calls for display
@@ -298,29 +244,15 @@ async def chat(req: ChatRequest):
                         "tool": tc["name"],
                         "input": tc["args"]
                     })
-            # Detect PDF payload embedded by the generate_agricultural_report tool
-            if hasattr(msg, "content") and isinstance(msg.content, str):
-                if msg.content.startswith("PDF_PAYLOAD:"):
-                    parts = msg.content.split(":", 2)
-                    if len(parts) >= 3:
-                        pdf_base64 = parts[1]
-                        pdf_filename = parts[2].split("\n")[0]
 
         # Final response
         final_message = result["messages"][-1]
         reply_text = final_message.content
 
-        # Strip the PDF_PAYLOAD line from final reply if it leaked through
-        if reply_text.startswith("PDF_PAYLOAD:"):
-            reply_text = reply_text.split("\n", 2)[-1].strip()
-
         response = {
             "reply": reply_text,
             "intermediate_steps": intermediate_steps,
         }
-        if pdf_base64:
-            response["pdf_base64"] = pdf_base64
-            response["pdf_filename"] = pdf_filename
 
         return response
 
