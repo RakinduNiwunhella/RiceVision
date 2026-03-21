@@ -642,13 +642,22 @@ const Report = () => {
     doc.setFillColor(...WHITE);
     doc.rect(0, 0, PW, 40, "F");
 
-    doc.setFillColor(...TEAL_BG);
-    doc.roundedRect(PW - M - 56, 7, 56, 8, 2, 2, "F");
 
+    // --- Centered background for 'COMPARATIVE INTELLIGENCE' ---
+    const compText = "COMPARATIVE INTELLIGENCE";
     doc.setFont("helvetica", "bold");
     doc.setFontSize(7);
+    const compTextWidth = doc.getTextWidth(compText);
+    const compPadX = 8; // horizontal padding
+    const compPadY = 2; // vertical padding
+    const compRectW = compTextWidth + compPadX * 2;
+    const compRectH = 8;
+    const compRectX = PW - M - compRectW;
+    const compRectY = 7;
+    doc.setFillColor(...TEAL_BG);
+    doc.roundedRect(compRectX, compRectY, compRectW, compRectH, 2, 2, "F");
     doc.setTextColor(...GREEN);
-    doc.text("COMPARATIVE INTELLIGENCE", PW - M - 2, 12, { align: "right" });
+    doc.text(compText, compRectX + compRectW / 2, compRectY + compRectH / 2 + 1, { align: "center", baseline: "middle" });
 
     doc.setFillColor(0, 100, 50);
     doc.rect(0, 40, PW, 2, "F");
@@ -700,12 +709,6 @@ const Report = () => {
 
     doc.text("Sri Lanka · Comparative Yield Analytics", M, 59);
 
-    doc.setFillColor(...GREEN);
-    doc.roundedRect(PW - M - 34, 48, 34, 7, 1.5, 1.5, "F");
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(6.5);
-    doc.setTextColor(...WHITE);
-    doc.text("REPORT SNAPSHOT", PW - M - 17, 52.6, { align: "center" });
 
     /* ---------------- SUMMARY CARDS ---------------- */
 
@@ -945,6 +948,18 @@ const Report = () => {
         <span className="material-symbols-outlined text-5xl text-red-300 mb-4 block">signal_disconnected</span>
         <h3 className="text-red-400 font-black uppercase tracking-widest mb-3 text-sm">{t('dataUnavailable')}</h3>
         <p className="text-xs text-white/85 mb-6">{report.message}</p>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center mb-4">
+          <CustomSelect
+            value={config.district}
+            onChange={(val) => setConfig({ ...config, district: val })}
+            options={districtOptions}
+          />
+          <CustomSelect
+            value={config.season}
+            onChange={(val) => setConfig({ ...config, season: val })}
+            options={["Maha", "Yala"]}
+          />
+        </div>
         {availableDates.length > 0 && (
           <CustomSelect
             value={config.date}

@@ -44,8 +44,23 @@ app.add_middleware(
     allow_origin_regex=r"^https://([a-z0-9-]+\.)?ricevisionlanka\.com$",
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allow_headers=["*"],
-    expose_headers=["*"],
+    allow_headers=[
+        "Content-Type",
+        "Authorization",
+        "Origin",
+        "Accept",
+        "Accept-Language",
+        "DNT",
+        "Cache-Control",
+        "X-Requested-With",
+        "X-CSRF-Token",
+    ],
+    expose_headers=[
+        "Content-Type",
+        "Authorization",
+        "X-Total-Count",
+        "X-Page-Count",
+    ],
     max_age=600,  # Cache preflight requests for 10 minutes
 )
 

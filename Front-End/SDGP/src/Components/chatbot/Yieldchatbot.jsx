@@ -68,8 +68,8 @@ export default function YieldChatbot() {
     if (isOpen) setTimeout(() => inputRef.current?.focus(), 100);
   }, [isOpen]);
 
-  const send = async () => {
-    if (!input.trim() || loading || dataLoading || !yieldData) return;
+    const send = async () => {
+        if (!input.trim() || loading || dataLoading || !yieldData) return;
 
         const userMsg = { role: "user", content: input.trim() };
         const updated = [...messages, userMsg];
@@ -78,16 +78,101 @@ export default function YieldChatbot() {
         setIntermediateSteps([]);
         setLoading(true);
 
+        // Helper: Try to extract district, season, and date from user's message or yieldData
+        function getReportParams() {
+            if (!yieldData || !yieldData.length) return null;
+
+            // Try to extract from user message
+            const msg = userMsg.content.toLowerCase();
+            // District: match any district in yieldData
+            let district = "";
+            let season = "";
+            let date = "";
+
+            // Build sets for matching
+            const allDistricts = Array.from(new Set(yieldData.map(r => (r.districtname || "").toLowerCase())));
+            const allSeasons = Array.from(new Set(yieldData.map(r => (r.season || "").toLowerCase())));
+            // Date: match yyyy-mm-dd or dd[th|st|nd|rd] month yyyy
+            const dateRegex1 = /(\d{4}-\d{2}-\d{2})/; // 2026-03-17
+            const dateRegex2 = /(\d{1,2})(?:st|nd|rd|th)?\s+([a-zA-Z]+)\s+(\d{4})/; // 17th March 2026
+
+            // District
+            for (const d of allDistricts) {
+                if (d && msg.includes(d)) { district = d; break; }
+            }
+            // Season
+            for (const s of allSeasons) {
+                if (s && msg.includes(s)) { season = s; break; }
+            }
+            // Date
+            let dateMatch = msg.match(dateRegex1);
+            if (dateMatch) {
+                date = dateMatch[1];
+            } else {
+                dateMatch = msg.match(dateRegex2);
+                if (dateMatch) {
+                    // Convert to yyyy-mm-dd
+                    const day = dateMatch[1].padStart(2, '0');
+                    const monthStr = dateMatch[2];
+                    const year = dateMatch[3];
+                    // Map month name to number
+                    const months = ["january","february","march","april","may","june","july","august","september","october","november","december"];
+                    const mIdx = months.findIndex(m => monthStr.toLowerCase().startsWith(m.slice(0,3)));
+                    if (mIdx >= 0) {
+                        const month = String(mIdx+1).padStart(2,'0');
+                        date = `${year}-${month}-${day}`;
+                    }
+                }
+            }
+
+            // Try to find a matching row in yieldData
+            let row = null;
+            for (const r of yieldData) {
+                const d = (r.districtname || "").toLowerCase();
+                const s = (r.season || "").toLowerCase();
+                const dt = r.date ? String(r.date).split(" ")[0] : "";
+                if ((district ? d === district : true) && (season ? s === season : true) && (date ? dt === date : true)) {
+                    row = r;
+                    break;
+                }
+            }
+            // Fallback: use first row
+            if (!row) row = yieldData[0];
+            return {
+                district: row.districtname || "",
+                season: row.season || "",
+                date: row.date ? String(row.date).split(" ")[0] : ""
+            };
+        }
+
+        // Detect if user is asking for a report
+        const reportRegex = /\b(report|pdf|summary)\b/i;
+        const isReportRequest = reportRegex.test(userMsg.content);
+
         try {
-            const res = await apiFetch(`/api/chat`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ question: userMsg.content, yieldData, chatHistory: messages }),
-            });
-
-            if (!res.ok) throw new Error(`Server error ${res.status}`);
-            const { reply, intermediate_steps } = await res.json();
-
+            let reply = "";
+            let intermediate_steps = null;
+            if (isReportRequest) {
+                // Generate a PDF link using backend endpoint
+                const params = getReportParams();
+                if (params && params.district && params.season && params.date) {
+                    const pdfUrl = `/api/download-pdf?date=${encodeURIComponent(params.date)}&district=${encodeURIComponent(params.district)}&season=${encodeURIComponent(params.season)}`;
+                    reply = `Okay, here is your yield report. [Download Yield Report](${pdfUrl})`;
+                } else {
+                    reply = "Sorry, I couldn't determine the correct district, season, or date for the report.";
+                }
+            } else {
+                // Default: call the chat API as before
+                const res = await apiFetch(`/api/chat`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ question: userMsg.content, yieldData, chatHistory: messages }),
+                });
+                if (!res.ok) throw new Error(`Server error ${res.status}`);
+                const data = await res.json();
+                reply = data.reply;
+                intermediate_steps = data.intermediate_steps;
+            }
             if (intermediate_steps) setIntermediateSteps(intermediate_steps);
             setMessages([...updated, { role: "assistant", content: reply }]);
         } catch (e) {
@@ -523,7 +608,7 @@ export default function YieldChatbot() {
                                     <div style={dynamicStyles.bubble(m.role)}>
                                         <RenderMessage content={m.content} role={m.role} />
                                     </div>
-                                    {m.role === "assistant" && (
+                                    {m.role === "assistant" && /\[(.*?(report|pdf).*?)\]\((.*?)\)/i.test(m.content) && (
                                         <button
                                             onClick={() => downloadMessageAsPDF(m.content)}
                                             style={{
