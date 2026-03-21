@@ -33,7 +33,7 @@ def get_reports(crop: Optional[str] = None, ndvi_threshold: Optional[float] = No
         query = query.lt("ndvi", ndvi_threshold)
 
     result = query.execute()
-    return result.data
+    return str(result.data)
 
 
 @tool
@@ -47,7 +47,7 @@ def get_yield_summary(year: Optional[int] = None):
         if year:
             query = query.eq("year", year)
         response = query.execute()
-        return response.data
+        return str(response.data)
     except Exception as e:
         return f"Error fetching summary: {str(e)}"
 
@@ -68,7 +68,7 @@ def get_district_details(district_name: str, year: Optional[int] = None):
 
         response = query.execute()
 
-        return response.data if response.data else (
+        return str(response.data) if response.data else (
             f"No data found for {district_name}" +
             (f" in year {year}" if year else "")
         )
@@ -96,7 +96,7 @@ def get_stress_analysis(year: Optional[int] = None):
             or d.get("health_index_z", 0) < -1
         ]
 
-        return high_stress
+        return str(high_stress)
 
     except Exception as e:
         return f"Error analyzing stress: {str(e)}"
@@ -156,7 +156,7 @@ def get_field_stats():
     try:
         summary = supabase.table("field_summary_view").select("*").single().execute().data
         health = supabase.table("sri_lanka_paddy_health_summary").select("*").single().execute().data
-        return {"summary": summary, "health_distribution": health}
+        return str({"summary": summary, "health_distribution": health})
     except Exception as e:
         return f"Error fetching field stats: {str(e)}"
 
@@ -169,7 +169,7 @@ def get_alerts_and_risks():
         alerts = supabase.table("alerts").select("*").order("date", desc=True).limit(10).execute().data
         pest = supabase.table("pest_risk_view").select("*").execute().data
         disasters = supabase.table("disaster_risk_view").select("*").limit(10).execute().data
-        return {"active_alerts": alerts, "pest_risks": pest, "disaster_risks": disasters}
+        return str({"active_alerts": alerts, "pest_risks": pest, "disaster_risks": disasters})
     except Exception as e:
         return f"Error fetching alerts: {str(e)}"
 
@@ -181,7 +181,7 @@ def get_growth_stages():
     """
     try:
         data = supabase.table("stage_name_counts_view").select("*").execute().data
-        return data
+        return str(data)
     except Exception as e:
         return f"Error fetching growth stages: {str(e)}"
 
@@ -192,7 +192,7 @@ def get_faq_answer(query: str):
     """
     try:
         data = supabase.table("faq").select("question, answer").ilike("question", f"%{query}%").execute().data
-        return data if data else "No matching FAQ found. Rephrase or ask for general help."
+        return str(data) if data else "No matching FAQ found. Rephrase or ask for general help."
     except Exception as e:
         return f"Error searching FAQs: {str(e)}"
 
@@ -321,8 +321,14 @@ async def chat(req: ChatRequest):
         final_message = result["messages"][-1]
         reply_text = final_message.content
 
+        if isinstance(reply_text, list):
+            reply_text = " ".join([
+                t.get("text", "") if isinstance(t, dict) else str(t)
+                for t in reply_text
+            ])
+            
         # Strip the PDF_PAYLOAD line from final reply if it leaked through
-        if reply_text.startswith("PDF_PAYLOAD:"):
+        if isinstance(reply_text, str) and reply_text.startswith("PDF_PAYLOAD:"):
             reply_text = reply_text.split("\n", 2)[-1].strip()
 
         response = {
