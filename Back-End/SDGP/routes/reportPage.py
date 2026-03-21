@@ -3,7 +3,6 @@ import os
 import boto3
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 import time
 from fpdf import FPDF
 from botocore.exceptions import BotoCoreError, ClientError
@@ -105,6 +104,7 @@ class UnifiedPDF(FPDF):
         self.ln(2)
 
 def _create_chart(predicted, historical):
+    import matplotlib.pyplot as plt
     plt.figure(figsize=(4, 2.2))
     plt.style.use('default') # matching White background of PDF better or keeping brand dark? 
     # Frontend uses transparent on dark. Backend PDF is white. Let's use clean white chart.

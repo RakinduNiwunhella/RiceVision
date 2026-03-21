@@ -18,11 +18,7 @@ from .routes.signup import router as signup_router
 from .routes.payment import router as payment_router
 from pdf_report import router as pdf_router
 
-app = FastAPI(title="RiceVision API", version="1.0.0")
-
-
-app = FastAPI()
- 
+app = FastAPI(title="RiceVision API", version="1.0.0") 
 def _get_cors_origins() -> list[str]:
     """Get allowed origin URLs from environment or use defaults."""
     configured = os.getenv("CORS_ORIGINS", "")
