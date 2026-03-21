@@ -11,7 +11,7 @@ from langchain_core.tools import tool
 from langgraph.prebuilt import create_react_agent
 
 from ..db import supabase
-from routes.reportPage import generate_report_for_district
+from ..routes.reportPage import generate_report_for_district
 
 router = APIRouter()
 
