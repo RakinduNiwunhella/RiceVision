@@ -7,7 +7,7 @@ function Signin() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
-  const navigate = useNavigate()
+  window.location.href = "https://app.ricevisionlanka.com/signin"
 
   const handleSignin = async (e) => {
     e.preventDefault()
