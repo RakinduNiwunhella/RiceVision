@@ -4,31 +4,22 @@ const OVERLAY_KEYS = ["ndvi", "evi", "vv", "vh"];
 
 export default function MapLayersPanel({ layers, setLayers, districtSelected }) {
   const { t } = useLanguage();
-  const [open, setOpen] = React.useState(false);
 
   const toggleLayer = (layer) => {
-
     if (!districtSelected) return;
 
     setLayers((prev) => {
-
-      const updated = {
-        ...prev,
-        [layer]: !prev[layer],
-      };
+      const updated = { ...prev, [layer]: !prev[layer] };
 
       if (layer === "showSatellite" && prev.showSatellite === true) {
         updated.showRoadOverlay = false;
       }
 
       if (OVERLAY_KEYS.includes(layer) && !prev[layer]) {
-        OVERLAY_KEYS.forEach((k) => {
-          if (k !== layer) updated[k] = false;
-        });
+        OVERLAY_KEYS.forEach((k) => { if (k !== layer) updated[k] = false; });
       }
 
       return updated;
-
     });
   };
 
@@ -45,52 +36,17 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
   const anyIndexActive = layers.ndvi || layers.evi || layers.vv || layers.vh;
 
   const LEGEND_ITEMS = [
-    {
-      key: "ndvi",
-      label: "NDVI",
-      gradient: "linear-gradient(to right, #7f2700, #d4a017, #aaff44, #228b22, #004d00)",
-      min: "-0.2",
-      max: "0.9",
-    },
-    {
-      key: "evi",
-      label: "EVI",
-      gradient: "linear-gradient(to right, #7f2700, #d4a017, #aaff44, #228b22, #004d00)",
-      min: "-0.2",
-      max: "0.9",
-    },
-    {
-      key: "vv",
-      label: "VV (dB)",
-      gradient: "linear-gradient(to right, #000080, #0000ff, #00ffff, #ffff00, #ff0000)",
-      min: "-25",
-      max: "0",
-    },
-    {
-      key: "vh",
-      label: "VH (dB)",
-      gradient: "linear-gradient(to right, #000080, #0000ff, #00ffff, #ffff00, #ff0000)",
-      min: "-30",
-      max: "-5",
-    },
+    { key: "ndvi", label: "NDVI", gradient: "linear-gradient(to right, #7f2700, #d4a017, #aaff44, #228b22, #004d00)", min: "-0.2", max: "0.9" },
+    { key: "evi",  label: "EVI",  gradient: "linear-gradient(to right, #7f2700, #d4a017, #aaff44, #228b22, #004d00)", min: "-0.2", max: "0.9" },
+    { key: "vv",   label: "VV (dB)", gradient: "linear-gradient(to right, #000080, #0000ff, #00ffff, #ffff00, #ff0000)", min: "-25", max: "0" },
+    { key: "vh",   label: "VH (dB)", gradient: "linear-gradient(to right, #000080, #0000ff, #00ffff, #ffff00, #ff0000)", min: "-30", max: "-5" },
   ];
 
   return (
-    <>
-      {/* Mobile Toggle Button */}
-      <button
-        onClick={() => setOpen(!open)}
-        className="md:hidden fixed top-20 right-4 z-[1000] bg-emerald-500 text-white p-3 rounded-full shadow-lg"
-      >
-        <span className="material-symbols-outlined">layers</span>
-      </button>
+    // Static block — always rendered inline. FieldMap controls mobile show/hide.
+    <div className="relative w-full glass p-4 sm:p-6 shadow-xl rounded-2xl lg:w-72">
 
-      <div
-        className={`${open ? "block" : "hidden"} md:block fixed md:relative top-0 right-0 h-full md:h-auto w-72 glass p-4 sm:p-6 shadow-xl transition-transform duration-300 z-[999] md:translate-x-0`}
-      >
-
-      {/* BLURRED PANEL CONTENT */}
-
+      {/* Blurred overlay when no district selected */}
       <div className={`${!districtSelected ? "blur-sm opacity-40 pointer-events-none" : ""}`}>
 
         <h2 className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/85 mb-6">
@@ -98,152 +54,80 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
         </h2>
 
         <div className="space-y-2">
-
           {layerList.map(({ key, label, tag }) => (
             <div key={key}>
-
               <div
                 onClick={() => toggleLayer(key)}
                 className="group flex items-center justify-between p-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition cursor-pointer"
               >
-
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-white/90">{label}</span>
-
                   {tag && (
                     <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-white/10 text-white/85 tracking-wider">
                       {tag}
                     </span>
                   )}
-
                 </div>
-
-                <div
-                  className={`relative w-8 h-4 rounded-full ${
-                    layers[key] ? "bg-emerald-500" : "bg-white/10"
-                  }`}
-                >
-                  <div
-                    className={`absolute top-0.5 left-0.5 w-3 h-3 bg-white rounded-full transition-transform ${
-                      layers[key] ? "translate-x-4" : ""
-                    }`}
-                  />
+                <div className={`relative w-8 h-4 rounded-full ${layers[key] ? "bg-emerald-500" : "bg-white/10"}`}>
+                  <div className={`absolute top-0.5 left-0.5 w-3 h-3 bg-white rounded-full transition-transform ${layers[key] ? "translate-x-4" : ""}`} />
                 </div>
-
               </div>
 
               {key === "showSatellite" && layers.showSatellite && (
-
                 <div className="ml-4 mt-3 border-l border-white/10 pl-4 space-y-3">
-
                   <div
                     onClick={() => toggleLayer("showRoadOverlay")}
                     className="flex items-center justify-between text-sm cursor-pointer"
                   >
-
                     <span className="text-white/85">Road Overlay</span>
-
-                    <div
-                      className={`relative w-8 h-4 rounded-full ${
-                        layers.showRoadOverlay ? "bg-emerald-500" : "bg-white/10"
-                      }`}
-                    >
-                      <div
-                        className={`absolute top-0.5 left-0.5 w-3 h-3 bg-white rounded-full transition-transform ${
-                          layers.showRoadOverlay ? "translate-x-4" : ""
-                        }`}
-                      />
+                    <div className={`relative w-8 h-4 rounded-full ${layers.showRoadOverlay ? "bg-emerald-500" : "bg-white/10"}`}>
+                      <div className={`absolute top-0.5 left-0.5 w-3 h-3 bg-white rounded-full transition-transform ${layers.showRoadOverlay ? "translate-x-4" : ""}`} />
                     </div>
-
                   </div>
-
                   {layers.showRoadOverlay && (
                     <input
-                      type="range"
-                      min="0"
-                      max="1"
-                      step="0.1"
+                      type="range" min="0" max="1" step="0.1"
                       value={layers.roadOpacity}
-                      onChange={(e) =>
-                        setLayers((prev) => ({
-                          ...prev,
-                          roadOpacity: parseFloat(e.target.value),
-                        }))
-                      }
+                      onChange={(e) => setLayers((prev) => ({ ...prev, roadOpacity: parseFloat(e.target.value) }))}
                       className="w-full accent-emerald-500"
                     />
                   )}
-
                 </div>
-
               )}
-
             </div>
           ))}
-
         </div>
 
         {anyIndexActive && (
-
           <div className="mt-6 pt-5 border-t border-white/10 space-y-5">
-
             <div>
-
               <div className="flex justify-between text-[10px] text-white/85 font-bold uppercase tracking-widest mb-2">
                 <span>Overlay Opacity</span>
                 <span>{Math.round((layers.overlayOpacity ?? 0.75) * 100)}%</span>
               </div>
-
               <input
-                type="range"
-                min="0.1"
-                max="1"
-                step="0.05"
+                type="range" min="0.1" max="1" step="0.05"
                 value={layers.overlayOpacity ?? 0.75}
-                onChange={(e) =>
-                  setLayers((prev) => ({
-                    ...prev,
-                    overlayOpacity: parseFloat(e.target.value),
-                  }))
-                }
+                onChange={(e) => setLayers((prev) => ({ ...prev, overlayOpacity: parseFloat(e.target.value) }))}
                 className="w-full accent-emerald-500"
               />
-
             </div>
 
             {LEGEND_ITEMS.filter((l) => layers[l.key]).map((l) => (
-
               <div key={l.key}>
-
-                <p className="text-[10px] font-bold uppercase tracking-widest text-white/85 mb-1.5">
-                  {l.label}
-                </p>
-
-                <div
-                  className="h-3 w-full rounded-full"
-                  style={{ background: l.gradient }}
-                />
-
+                <p className="text-[10px] font-bold uppercase tracking-widest text-white/85 mb-1.5">{l.label}</p>
+                <div className="h-3 w-full rounded-full" style={{ background: l.gradient }} />
                 <div className="flex justify-between text-[9px] text-white/85 mt-1">
-                  <span>{l.min}</span>
-                  <span>{l.max}</span>
+                  <span>{l.min}</span><span>{l.max}</span>
                 </div>
-
               </div>
-
             ))}
-
           </div>
-
         )}
 
         <div className="mt-8 pt-6 border-t border-white/10">
-          <p className="text-[10px] text-white/85 italic">
-            {t("mapLayersHintIntro")}
-          </p>
-          <p className="text-[9px] text-white/85 mt-1">
-            {t("mapLayersHintSensors")}
-          </p>
+          <p className="text-[10px] text-white/85 italic">{t("mapLayersHintIntro")}</p>
+          <p className="text-[9px] text-white/85 mt-1">{t("mapLayersHintSensors")}</p>
           <div className="mt-3 space-y-1">
             <p className="text-[9px] text-white/85">{t("mapLayersHintNDVI")}</p>
             <p className="text-[9px] text-white/85">{t("mapLayersHintEVI")}</p>
@@ -251,33 +135,17 @@ export default function MapLayersPanel({ layers, setLayers, districtSelected }) 
             <p className="text-[9px] text-white/85">{t("mapLayersHintVH")}</p>
           </div>
         </div>
-
       </div>
-      
 
-      {/* CENTER LOCK MESSAGE */}
-
+      {/* Center lock message */}
       {!districtSelected && (
-
-        <div className="absolute inset-0 flex items-center justify-center text-center z-20 animate-fade">
-
+        <div className="absolute inset-0 flex items-center justify-center text-center z-20">
           <div className="flex flex-col items-center">
-
-            <span className="material-symbols-outlined text-white text-5xl mb-3 drop-shadow-[0_0_8px_rgba(255,255,255,0.6)]">
-              lock
-            </span>
-
-            <p className="text-sm text-white font-medium px-6">
-              {t("mapLayersSelectDistrict")}
-            </p>
-
+            <span className="material-symbols-outlined text-white text-5xl mb-3 drop-shadow-[0_0_8px_rgba(255,255,255,0.6)]">lock</span>
+            <p className="text-sm text-white font-medium px-6">{t("Please Select a District to Unlock the Filters")}</p>
           </div>
-
         </div>
-
       )}
-
-      </div>
-    </>
+    </div>
   );
 }

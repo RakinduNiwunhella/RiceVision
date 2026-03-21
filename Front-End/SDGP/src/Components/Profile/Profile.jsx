@@ -77,12 +77,9 @@ export default function Profile() {
 
         {/* Header */}
         <div ref={headerRef} className="mb-8 relative">
-          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-400 mb-3 flex items-center gap-2">
-            <span className="material-symbols-outlined text-sm">verified_user</span>
-            {t("operatorAuth")}
-          </p>
 
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tighter uppercase mb-3 sm:mb-4">
+
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tighter mb-3 sm:mb-4">
             {activeTab === "identity" ? t("identityProfile") : t("myPaddyField")}
           </h1>
 
@@ -94,7 +91,7 @@ export default function Profile() {
         </div>
 
         {/* Tab switcher */}
-        <div ref={tabSwitcherRef} className="flex gap-3 mt-10 sm:mt-12 mb-6 sm:mb-8 relative overflow-x-auto no-scrollbar">
+        <div ref={tabSwitcherRef} className="flex flex-wrap gap-3 mt-10 sm:mt-12 mb-6 sm:mb-8 relative">
           {TABS.map((tab) => (
             <button
               key={tab.id}

@@ -60,7 +60,7 @@ export default function TermsAndConditions() {
         <p>
           All payments are processed by PayHere and are subject to PayHere's own terms. We do not store
           your card or bank details. For refund eligibility, refer to our{" "}
-          <Link to="/return-policy" className="text-emerald-400 hover:underline">Return Policy</Link>.
+          <Link to="/returns" className="text-emerald-400 hover:underline">Return Policy</Link>.
         </p>
       </Section>
 
@@ -143,9 +143,7 @@ function PolicyShell({ title, lastUpdated, children }) {
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group">
             <img src="/logoSDGP.webp" alt="RiceVision" className="h-8 w-auto" />
-            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400 hidden sm:block">
-              ricevisionlanka.com
-            </span>
+
           </Link>
           <Link
             to="/dashboard"
@@ -168,9 +166,9 @@ function PolicyShell({ title, lastUpdated, children }) {
         <div className="h-px bg-white/10 mb-10" />
         <div className="space-y-10">{children}</div>
         <div className="mt-16 pt-8 border-t border-white/10 flex flex-wrap gap-5 text-xs text-white/40">
-          <Link to="/privacy-policy" className="hover:text-white/70 transition-colors">Privacy Policy</Link>
+          <Link to="/privacy" className="hover:text-white/70 transition-colors">Privacy Policy</Link>
           <Link to="/terms" className="hover:text-white/70 transition-colors">Terms &amp; Conditions</Link>
-          <Link to="/return-policy" className="hover:text-white/70 transition-colors">Return Policy</Link>
+          <Link to="/returns" className="hover:text-white/70 transition-colors">Return Policy</Link>
           <a href={`mailto:${CONTACT_EMAIL}`} className="hover:text-white/70 transition-colors ml-auto">{CONTACT_EMAIL}</a>
         </div>
       </div>

@@ -62,7 +62,7 @@ const Notifications = ({ onRead, onUnreadCountChange, style }) => {
       <div
         style={style}
         onClick={(e) => e.stopPropagation()}
-        className="glass border border-white/10 rounded-2xl overflow-hidden shadow-2xl max-h-[calc(100vh-20px)] overflow-y-auto p-4 bg-slate-800 dark:bg-slate-900 transition-all"
+        className="glass fixed top-16 right-2 sm:right-4 w-[92vw] sm:w-[360px] max-w-md border border-white/10 rounded-2xl overflow-hidden shadow-2xl max-h-[80vh] overflow-y-auto p-4 bg-slate-800 dark:bg-slate-900 transition-all z-50"
       >
         <div className="mb-4">
           <h3 className="text-lg font-semibold text-white">

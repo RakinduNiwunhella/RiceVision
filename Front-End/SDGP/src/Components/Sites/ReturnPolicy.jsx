@@ -79,9 +79,7 @@ function PolicyShell({ title, lastUpdated, children }) {
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group">
             <img src="/logoSDGP.webp" alt="RiceVision" className="h-8 w-auto" />
-            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400 hidden sm:block">
-              ricevisionlanka.com
-            </span>
+
           </Link>
           <Link
             to="/dashboard"
@@ -111,9 +109,9 @@ function PolicyShell({ title, lastUpdated, children }) {
 
         {/* Footer links */}
         <div className="mt-16 pt-8 border-t border-white/10 flex flex-wrap gap-5 text-xs text-white/40">
-          <Link to="/privacy-policy" className="hover:text-white/70 transition-colors">Privacy Policy</Link>
+          <Link to="/privacy" className="hover:text-white/70 transition-colors">Privacy Policy</Link>
           <Link to="/terms" className="hover:text-white/70 transition-colors">Terms &amp; Conditions</Link>
-          <Link to="/return-policy" className="hover:text-white/70 transition-colors">Return Policy</Link>
+          <Link to="/returns" className="hover:text-white/70 transition-colors">Return Policy</Link>
           <a href={`mailto:${CONTACT_EMAIL}`} className="hover:text-white/70 transition-colors ml-auto">{CONTACT_EMAIL}</a>
         </div>
       </div>

@@ -23,52 +23,52 @@ export const translations = {
     dashboardTutTitle: "See all your fields",
     dashboardTutAction: "View crop health, yield, threats",
     dashboardTutOutcome: "All field information in one place",
-    
+
     fieldDataTutTitle: "Your field records",
     fieldDataTutAction: "Check field statistics and data",
     fieldDataTutOutcome: "See all field details and history",
-    
+
     mapTutTitle: "Satellite view of fields",
     mapTutAction: "View field imagery and layers",
     mapTutOutcome: "See health status on the map",
-    
+
     weatherTutTitle: "Check weather forecast",
     weatherTutAction: "See temperature, rain, soil",
     weatherTutOutcome: "Plan farming based on weather",
-    
+
     alertsTutTitle: "Get pest and disease warnings",
     alertsTutAction: "See active threats to crops",
     alertsTutOutcome: "Know about risks to your crops",
-    
+
     reportTutTitle: "Analyze yield performance",
     reportTutAction: "Compare districts and yields",
     reportTutOutcome: "Understand yield results",
-    
+
     helpTutTitle: "Get help and support",
     helpTutAction: "Find answers and FAQs",
     helpTutOutcome: "Get help when needed",
-    
+
     chatbotTutTitle: "Get instant AI advice",
     chatbotTutAction: "Click to open chat assistant",
     chatbotTutOutcome: "Ask questions and get instant answers",
-    
+
     // ── Header Action Button Tutorials (FLAT KEYS) ──
     searchHeaderTitle: "Find pages quickly",
     searchHeaderAction: "Type page or district name",
     searchHeaderOutcome: "Jump to any page instantly",
-    
+
     languageTitle: "Switch language",
     languageAction: "Choose English, Sinhala, or Tamil",
     languageOutcome: "App displays in your language",
-    
+
     themeTitle: "Change brightness level",
     themeAction: "Click sun/moon icon",
     themeOutcome: "Toggle dark or light mode",
-    
+
     notificationsTitle: "Check messages",
     notificationsAction: "See alerts and updates",
     notificationsOutcome: "Stay informed",
-    
+
     profileTitle: "Your account settings",
     profileAction: "Edit your information",
     profileOutcome: "Update your profile details",
@@ -135,7 +135,7 @@ export const translations = {
     disasters: "Disasters",
     pestRisks: "Pest Risks",
     pastAlerts: "Past Alerts",
-    findAnomaly: "Find specific anomaly...",
+    findAnomaly: "Find District...",
     noThreats: "No active threats detected",
     resolveBtn: "Resolve",
     ignoreBtn: "Ignore",
@@ -175,7 +175,7 @@ export const translations = {
     detailedMessage: "Detailed Message",
     describeIssue: "Describe the issue in detail so we can help you...",
     transmitting: "Transmitting...",
-    submitReport: "Submit Your Report",
+    submitReport: "Submit Your Complaint",
     quickHelp: "Quick Help",
     decryptingFaqs: "Loading FAQs...",
     helpFaqMonitorFieldsQ: "How does RiceVision monitor paddy fields?",
@@ -196,7 +196,7 @@ export const translations = {
     helpFaqWhatIsQ: "What is RiceVision?",
     helpFaqWhatIsA:
       "RiceVision is a digital agricultural intelligence platform that helps monitor paddy fields, identify risks early, and support better crop planning.",
-   
+
     helpFaqWhoCanUseQ: "Who can use RiceVision?",
     helpFaqWhoCanUseA:
       "Farmers, agricultural officers, researchers, and related institutions can use RiceVision to monitor and manage paddy cultivation.",
@@ -242,7 +242,6 @@ export const translations = {
     loading: "Loading...",
 
     // ── Profile ──
-    operatorAuth: "Operator Authorization",
     identityProfile: "Profile Details",
     profileDesc:
       "Update your name, phone number, email address, and profile photo.",
@@ -351,7 +350,7 @@ export const translations = {
     totalAreaLabel: "Total Area",
     areaSqmLabel: "Area (m²)",
     rateLabel: "Rate",
-    annualCostLabel: "Annual Cost",
+    annualCostLabel: "Monthly Cost",
     securePaymentTitle: "Secure Payment",
     previewOnlyBadge: "Preview Only",
     cardNumberLabel: "Card Number",
@@ -464,7 +463,7 @@ export const translations = {
     resolutionNoteOptional: "Resolution Note (optional)",
     resolutionNotePlaceholder: "Describe how this was resolved...",
     confirmBtn: "Confirm",
-    alertsRealtimeSubtitle: "Real-time field health intelligence",
+    alertsRealtimeSubtitle: "Real-time field health",
     noPastThreats: "No past threats detected",
     noteLabel: "Note",
     alertsTutorialTabsTitle: "Alert Tabs",
@@ -791,7 +790,7 @@ export const translations = {
     mapHintToolName: "polygon / rectangle tool",
     mapHintUseToolSuffix: "(top-right of map) to outline your field",
     mapHintCurrentField: "Dashed blue = your current field",
-  
+
 
     // ── Crop Health Categories ──
     healthNormal: "Normal",
@@ -803,7 +802,7 @@ export const translations = {
     stageVegetative: "Vegetative",
     stageTransplant: "Transplant",
     stageReproductive: "Reproductive",
-   
+
     stageRipening: "Ripening",
     stageHarvest: "Harvest",
 
@@ -903,52 +902,52 @@ export const translations = {
     dashboardTutTitle: "ඔබගේ සියලු ක්ෂේත්‍ර බලන්න",
     dashboardTutAction: "බෝග සෞඛ්‍ය, අස්වැන්න, තර්ජන පරීක්ෂා කරන්න",
     dashboardTutOutcome: "එකම ස්ථානයේ සියලු ක්ෂේත්‍ර තොරතුරු",
-    
+
     fieldDataTutTitle: "ඔබේ ක්ෂේත්‍ර වාර්තා",
     fieldDataTutAction: "ක්ෂේත්‍ර සංඛ්‍යා සහ දත්ත පරීක්ෂා කරන්න",
     fieldDataTutOutcome: "සියලු ක්ෂේත්‍ර විස්තර සහ ඉතිහාසය බලන්න",
-    
+
     mapTutTitle: "චන්ද්‍රිකා ක්ෂේත්‍ර දර්ශනය",
     mapTutAction: "ක්ෂේත්‍ර පින්තූර සහ ස්ථර බලන්න",
     mapTutOutcome: "සිතියමේ සෞඛ්‍ය බලන්න",
-    
+
     weatherTutTitle: "කාලගුණ අනාවැකිය පරීක්ෂා කරන්න",
     weatherTutAction: "උෂ්ණත්වය, වර්ෂා සහ පස බලන්න",
     weatherTutOutcome: "කාලගුණය මත පදනම්ව ගොවිතැන සැලසුම් කරන්න",
-    
+
     alertsTutTitle: "පළිබෝධ හා රෝග අනතුරු ඇඟවීම් ලබා ගන්න",
     alertsTutAction: "බෝගවලට ඇති සක්‍රිය තර්ජන බලන්න",
     alertsTutOutcome: "ඔබේ බෝගවලට තර්ජන ගැන දැන ගන්න",
-    
+
     reportTutTitle: "අස්වැන්න කාර්ය සාධනය විශ්ලේෂණය කරන්න",
     reportTutAction: "දිස්ත්‍රික් සහ අස්වැන්න සංසන්දනය කරන්න",
     reportTutOutcome: "අස්වැන්න ප්‍රතිඵල තේරුම් ගන්න",
-    
+
     helpTutTitle: "සහාය සහ ආධාර ලබා ගන්න",
     helpTutAction: "පිළිතුරු සහ FAQ සොයන්න",
     helpTutOutcome: "ඔබට අවශ්‍ය විට සහාය ලබා ගන්න",
-    
+
     chatbotTutTitle: "ක්ෂණික AI උපදෙස් ලබා ගන්න",
     chatbotTutAction: "චැට් සහායකය විවෘත කිරීමට ක්ලික් කරන්න",
     chatbotTutOutcome: "ප්‍රශ්න අසන්න සහ ක්ෂණික පිළිතුරු ලබා ගන්න",
-    
+
     // ── Header Action Button Tutorials (FLAT KEYS) ──
     searchHeaderTitle: "පිටු ඉක්මනින් සොයන්න",
     searchHeaderAction: "පිටුවේ හෝ දිස්ත්‍රික්කයේ නාමය ටයිප් කරන්න",
     searchHeaderOutcome: "ඕනෑම පිටුවට ක්ෂණිකව පනින්න",
-    
+
     languageTitle: "භාෂාව මාරු කරන්න",
     languageAction: "ඉංග්‍රීසි, සිංහල හෝ දෙමළ තෝරා ගැනීමට ක්ලික් කරන්න",
     languageOutcome: "යෙදුම ඔබේ භාෂාවෙන් පෙන්වයි",
-    
+
     themeTitle: "දර්ශන මාදිලිය වෙනස් කරන්න",
     themeAction: "සඳ/සූර්ය අයිකනය ක්ලික් කරන්න",
     themeOutcome: "අඳුරු හෝ ආලෝක මාදිලිය අතර මාරු කරන්න",
-    
+
     notificationsTitle: "පණිවිඩ පරීක්ෂා කරන්න",
     notificationsAction: "අනතුරු ඇඟවීම් සහ යාවත්කාලීන බලන්න",
     notificationsOutcome: "වැදගත් දැනුම්දීම් පිළිබඳ යාවත්කාලීනව සිටින්න",
-    
+
     profileTitle: "ඔබේ ගිණුම් සැකසීම්",
     profileAction: "ඔබේ තොරතුරු සංස්කරණය කරන්න",
     profileOutcome: "ඔබේ පැතිකඩ විස්තර යාවත්කාල කරන්න",
@@ -1076,7 +1075,7 @@ export const translations = {
     helpFaqWhatIsQ: "RiceVision යනු කුමක්ද?",
     helpFaqWhatIsA:
       "RiceVision යනු  කෙත්වතු නිරීක්ෂණය කිරීමට, අවදානම් මුල් අදියරේ හඳුනාගැනීමට සහ බෝග සැලසුම් කිරීම වැඩිදියුණු කිරීමට උපකාර කරන ඩිජිටල් කෘෂි බුද්ධි වේදිකාවකි.",
-    
+
     helpFaqWhoCanUseQ: "RiceVision භාවිතා කළ හැක්කේ කවුද?",
     helpFaqWhoCanUseA:
       "ගොවීන්, කෘෂි නිලධාරීන්, පර්යේෂකයන් සහ සම්බන්ධ ආයතන කෙත්වතු වගාව නිරීක්ෂණය කර කළමනාකරණය කිරීමට RiceVision භාවිතා කළ හැක.",
@@ -1122,7 +1121,6 @@ export const translations = {
     loading: "පූරණය...",
 
     // ── Profile ──
-    operatorAuth: "ක්‍රියාකරු අනුමැතිය",
     identityProfile: "අනන්‍යතා  විස්තරය",
     profileDesc:
       "RiceVision තුළ හොඳ අත්දැකීමක් සඳහා ඔබේ තොරතුරු යාවත්කාලීනව තබා ගන්න.",
@@ -1644,7 +1642,7 @@ export const translations = {
     mapLayerSatelliteView: "චන්ද්‍රිකා දර්ශනය",
     mapLayersHintIntro: "චන්ද්‍රිකා දත්ත එකතු කිරීමට ස්තර තෝරන්න",
     mapLayersHintSensors: "S2 = Sentinel-2 දෘශ්‍ය දත්ත · S1 = Sentinel-1 රේඩාර් දත්ත",
-   
+
 
     // ── Crop Health Categories ──
     healthNormal: "නීරෝගී",
@@ -1653,13 +1651,13 @@ export const translations = {
     healthNotApplicable: "අදාළ නොවේ",
 
     // ── Growth Stages ──
-   
+
     stageTransplant: "පැළ අවධිය",
     stageVegetative: "වර්ධන අවධිය",
-    
+
     stageReproductive: "වගාවේ බීජ බිහිවන අවස්ථාව",
-    
-    
+
+
     stageRipening: "නෙලීමට සූදානම් වන අවධිය",
     stageHarvest: "අස්වනු නෙලීමේ අවධිය",
 
@@ -1759,52 +1757,52 @@ export const translations = {
     dashboardTutTitle: "உங்கள் சகல வயல்களைப் பார்க்கவும்",
     dashboardTutAction: "பயிர் ஆரோக்கியம், மகசூல், அச்சுறுத்தல்கள் பார்க்கவும்",
     dashboardTutOutcome: "ஒரே இடத்தில் சகல வயல் தகவல்",
-    
+
     fieldDataTutTitle: "உங்கள் வயல் பதிவுகள்",
     fieldDataTutAction: "வயல் இலக்கங்கள் மற்றும் செயல்திறன் பரிசோதிக்கவும்",
     fieldDataTutOutcome: "சகல வயல் விவரங்களையும் பார்க்கவும்",
-    
+
     mapTutTitle: "செயற்கைக்கோள் வயல் காட்சிப்படுத்தல்",
     mapTutAction: "வயல் படங்கள் மற்றும் அடுக்குகளை பார்க்கவும்",
     mapTutOutcome: "வரைபடத்தில் ஆரோக்கியம் பார்க்கவும்",
-    
+
     weatherTutTitle: "வானிலை முன்னறிவிப்பை சரிபார்க்கவும்",
     weatherTutAction: "வெப்பநிலை, மழை, மண் பார்க்கவும்",
     weatherTutOutcome: "வானிலையின் அடிப்படையில் விவசாய திட்டமிடுங்கள்",
-    
+
     alertsTutTitle: "பூச்சி மற்றும் நோய் எச்சரிக்கைகளைப் பெறுங்கள்",
     alertsTutAction: "பயிர்களுக்கான செயலில் அச்சுறுத்தல்கள் பார்க்கவும்",
     alertsTutOutcome: "உங்கள் பயிர்களுக்கான ஆபத்து பற்றி அறிந்து கொள்ளுங்கள்",
-    
+
     reportTutTitle: "மகசூல் செயல்திறனை பகுப்பாய்வு செய்யவும்",
     reportTutAction: "மாவட்டம் மற்றும் மகசூல் ஒப்பிடுங்கள்",
     reportTutOutcome: "மகசூல் முடிவுகளை புரிந்து கொள்ளுங்கள்",
-    
+
     helpTutTitle: "உதவி மற்றும் ஆதரவு பெறுங்கள்",
     helpTutAction: "பதில்கள் மற்றும் FAQ-ஐ கண்டுபிடிக்கவும்",
     helpTutOutcome: "உங்களுக்கு தேவை எனில் உதவி பெறுங்கள்",
-    
+
     chatbotTutTitle: "உடனடி AI ஆலோசனை பெறுங்கள்",
     chatbotTutAction: "அரட்டை உதவியாளரை திறக்க கிளிக் செய்யவும்",
     chatbotTutOutcome: "கேள்விகள் கேட்டு உடனடி பதில்கள் பெறுங்கள்",
-    
+
     // ── Header Action Button Tutorials (FLAT KEYS) ──
     searchHeaderTitle: "பக்கங்களை விரைவாக கண்டுபிடிக்கவும்",
     searchHeaderAction: "பக்கம் அல்லது மாவட்ட பெயர் தட்டச்சு செய்யவும்",
     searchHeaderOutcome: "எந்த பக்கத்திற்கும் உடனடியாக குதிக்கவும்",
-    
+
     languageTitle: "மொழி மாற்றவும்",
     languageAction: "ஆங்கிலம், சிங்களம் அல்லது தமிழை தேர்வு செய்யவும்",
     languageOutcome: "பயன்பாடு உங்கள் மொழியில் தோன்றும்",
-    
+
     themeTitle: "காட்சி முறையை மாற்றவும்",
     themeAction: "சந்திரன்/சூரியன் ஐகனைக் கிளிக் செய்யவும்",
     themeOutcome: "இருள் அல்லது வெளிச்ச முறையை மாற்றவும்",
-    
+
     notificationsTitle: "செய்திகளை சரிபார்க்கவும்",
     notificationsAction: "எச்சரிக்கைகள் மற்றும் புதுப்பிப்புகளைப் பார்க்கவும்",
     notificationsOutcome: "முக்கிய அறிவிப்புகளை உடனுக்குடன் தெரிந்து கொள்ளுங்கள்",
-    
+
     profileTitle: "உங்கள் கணக்கு அமைப்புகள்",
     profileAction: "உங்கள் தகவலைத் திருத்தவும்",
     profileOutcome: "உங்கள் சுயவிவர விவரங்களை புதுப்பிக்கவும்",
@@ -1932,7 +1930,7 @@ export const translations = {
     helpFaqWhatIsQ: "RiceVision என்றால் என்ன?",
     helpFaqWhatIsA:
       "RiceVision என்பது நெல் வயல்களை கண்காணிக்க, அபாயங்களை முன்கூட்டியே கண்டறிய, மேலும் சிறந்த பயிர் திட்டமிடலை ஆதரிக்க உதவும் ஒரு டிஜிட்டல் விவசாய நுண்ணறிவு தளம்.",
-    
+
     helpFaqWhoCanUseQ: "RiceVision-ஐ யார் பயன்படுத்தலாம்?",
     helpFaqWhoCanUseA:
       "விவசாயிகள், வேளாண்மை அதிகாரிகள், ஆய்வாளர்கள் மற்றும் தொடர்புடைய நிறுவனங்கள் நெல் சாகுபடியை கண்காணிக்கவும் நிர்வகிக்கவும் RiceVision-ஐ பயன்படுத்தலாம்.",
@@ -1978,7 +1976,6 @@ export const translations = {
     loading: "ஏற்றுகிறது...",
 
     // ── Profile ──
-    operatorAuth: "இயக்குநர் அங்கீகாரம்",
     identityProfile: "அடையாள சுயவிவரம்",
     profileDesc:
       "RiceVision-இல் சிறந்த அனுபவத்திற்காக உங்கள் சுயவிவர தகவலை புதுப்பித்த நிலையில் வைத்திருங்கள்.",
@@ -2629,7 +2626,7 @@ export const translations = {
 
 const LanguageContext = createContext({
   language: "en",
-  setLanguage: () => {},
+  setLanguage: () => { },
   t: (key) => key,
 });
 
