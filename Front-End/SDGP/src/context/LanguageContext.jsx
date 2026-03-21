@@ -135,7 +135,7 @@ export const translations = {
     disasters: "Disasters",
     pestRisks: "Pest Risks",
     pastAlerts: "Past Alerts",
-    findAnomaly: "Find District...",
+    findAnomaly: "Find specific anomaly...",
     noThreats: "No active threats detected",
     resolveBtn: "Resolve",
     ignoreBtn: "Ignore",
@@ -242,6 +242,7 @@ export const translations = {
     loading: "Loading...",
 
     // ── Profile ──
+    operatorAuth: "Operator Authorization",
     identityProfile: "Profile Details",
     profileDesc:
       "Update your name, phone number, email address, and profile photo.",
@@ -350,7 +351,7 @@ export const translations = {
     totalAreaLabel: "Total Area",
     areaSqmLabel: "Area (m²)",
     rateLabel: "Rate",
-    annualCostLabel: "Monthly Cost",
+    annualCostLabel: "Annual Cost",
     securePaymentTitle: "Secure Payment",
     previewOnlyBadge: "Preview Only",
     cardNumberLabel: "Card Number",
@@ -463,7 +464,7 @@ export const translations = {
     resolutionNoteOptional: "Resolution Note (optional)",
     resolutionNotePlaceholder: "Describe how this was resolved...",
     confirmBtn: "Confirm",
-    alertsRealtimeSubtitle: "Real-time field health",
+    alertsRealtimeSubtitle: "Real-time field health intelligence",
     noPastThreats: "No past threats detected",
     noteLabel: "Note",
     alertsTutorialTabsTitle: "Alert Tabs",
@@ -1121,6 +1122,7 @@ export const translations = {
     loading: "පූරණය...",
 
     // ── Profile ──
+    operatorAuth: "ක්‍රියාකරු අනුමැතිය",
     identityProfile: "අනන්‍යතා  විස්තරය",
     profileDesc:
       "RiceVision තුළ හොඳ අත්දැකීමක් සඳහා ඔබේ තොරතුරු යාවත්කාලීනව තබා ගන්න.",
@@ -1976,6 +1978,7 @@ export const translations = {
     loading: "ஏற்றுகிறது...",
 
     // ── Profile ──
+    operatorAuth: "இயக்குநர் அங்கீகாரம்",
     identityProfile: "அடையாள சுயவிவரம்",
     profileDesc:
       "RiceVision-இல் சிறந்த அனுபவத்திற்காக உங்கள் சுயவிவர தகவலை புதுப்பித்த நிலையில் வைத்திருங்கள்.",

@@ -81,7 +81,7 @@ export const updateAlertStatus = async (
 };
 
 export const submitComplaint = async (payload) => {
-  const res = await apiFetch("/api/help/complaint", {
+  const res = await apiFetch("/api/help/complaints", {
     method: "POST",
     body: JSON.stringify(payload),
   });

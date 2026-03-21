@@ -21,9 +21,8 @@ def _s3():
 
 
 def sanitize(val):
-    if pd.isna(val): return None
-    if isinstance(val, (np.integer, int, np.int64)): return int(val)
-    if isinstance(val, (np.floating, float, np.float64)): return float(val)
+    if isinstance(val, (np.integer, np.int64)): return int(val)
+    if isinstance(val, (np.floating, np.float64)): return float(val)
     if isinstance(val, pd.Timestamp): return str(val)
     if isinstance(val, dict): return {k: sanitize(v) for k, v in val.items()}
     if isinstance(val, list): return [sanitize(v) for v in val]
@@ -91,42 +90,27 @@ async def get_detailed_report(date: str, district: str, season: str):
 
         row = y_match.iloc[0]
 
-        def safe_float(val, default=0.0):
-            try: return float(val) if not pd.isna(val) else default
-            except: return default
-
-        def safe_int(val, default=0):
-            try: return int(val) if not pd.isna(val) else default
-            except: return default
-
-        def safe_str(val, default="N/A"):
-            return str(val) if pd.notna(val) else default
-
-        stress_pct = safe_float(row.get("severe_stress_pct"))
-
-        response_dict = {
+        return {
             "summary": {
-                "yield":      safe_float(row.get("predictedyield_kg_ha")),
-                "historical": safe_float(row.get("historicalavg_kg_ha")),
-                "total_kg":   safe_float(row.get("totalyield_kg")),
-                "gap":        safe_float(row.get("yieldgap_kg_ha")),
+                "yield":      float(row["predictedyield_kg_ha"]),
+                "historical": float(row["historicalavg_kg_ha"]),
+                "total_kg":   float(row["totalyield_kg"]),
+                "gap":        float(row["yieldgap_kg_ha"]),
             },
             "categories": {
-                "current_stage": safe_str(row.get("most_common_stage")),
-                "health_status": "Normal" if stress_pct < 5 else "Action Required",
+                "current_stage": str(row["most_common_stage"]),
+                "health_status": "Normal" if float(row["severe_stress_pct"]) < 5 else "Action Required",
             },
             "metrics": {
-                "stress_pct":   stress_pct,
-                "pest_count":   safe_int(row.get("pest_attack_count")),
-                "risk_score":   safe_float(row.get("risk_score")),
-                "harvest_date": safe_str(row.get("est_harvest_date")).split(" ")[0],
+                "stress_pct":   float(row["severe_stress_pct"]),
+                "pest_count":   int(row["pest_attack_count"]),
+                "risk_score":   float(row["risk_score"]),
+                "harvest_date": str(row["est_harvest_date"]).split(" ")[0],
             },
             "raw_data": {
-                "yield_csv": row.to_dict(),
+                "yield_csv": sanitize(row.to_dict()),
             },
         }
-
-        return sanitize(response_dict)
 
     except HTTPException:
         raise

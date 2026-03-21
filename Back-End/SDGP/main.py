@@ -1,7 +1,6 @@
 import os
-import traceback
-from fastapi import FastAPI, Depends, Request
-from fastapi.responses import JSONResponse
+
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from .auth import get_current_user
 from .routes.dashboard import router as yield_router
@@ -19,27 +18,8 @@ from .routes.signin import router as signin_router
 from .routes.signup import router as signup_router
 from .routes.payment import router as payment_router
 
-app = FastAPI(title="RiceVision API", version="1.0.0") 
+app = FastAPI(title="RiceVision API", version="1.0.0")
 
-@app.exception_handler(Exception)
-async def global_exception_handler(request: Request, exc: Exception):
-    traceback.print_exc()
-    origin = request.headers.get("origin", "*")
-    return JSONResponse(
-        status_code=500,
-        content={"detail": "Internal Server Error", "message": str(exc)},
-        headers={
-            "Access-Control-Allow-Origin": origin,
-            "Access-Control-Allow-Credentials": "true",
-            "Access-Control-Allow-Methods": "*",
-            "Access-Control-Allow-Headers": "*",
-        }
-    )
-
-@app.get("/api/available-dates")
-def get_available_dates():
-    """Fallback dummy endpoint for Earth Engine layers."""
-    return ["2026-03-01", "2026-02-15", "2026-02-01", "2026-01-15", "2025-12-01", "2025-11-15"]
 
 def _get_cors_origins() -> list[str]:
     """Get allowed origin URLs from environment or use defaults."""
@@ -92,4 +72,5 @@ app.include_router(map_router, dependencies=[Depends(get_current_user)])
 app.include_router(user_field_router, dependencies=[Depends(get_current_user)])
 app.include_router(alerts_router, prefix="/api", dependencies=[Depends(get_current_user)])
 app.include_router(notifications_router, dependencies=[Depends(get_current_user)])
-app.include_router(chat_router, prefix="/api")
+app.include_router(chat_router, dependencies=[Depends(get_current_user)])
+

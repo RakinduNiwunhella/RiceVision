@@ -1,21 +1,13 @@
 import { useState } from 'react'
 import { supabase } from '../supabaseClient'
-
-const getPostSigninUrl = () => {
-  const fromEnv = import.meta.env.VITE_RICEVISION_SIGNIN_URL || import.meta.env.VITE_SDGP_APP_URL
-
-  if (typeof fromEnv === 'string' && fromEnv.trim().length > 0) {
-    return fromEnv.trim()
-  }
-
-  return 'https://app.ricevisionlanka.com/signin'
-}
+import { useNavigate } from 'react-router-dom'
 
 function Signin() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
+  const navigate = useNavigate()
 
   const handleSignin = async (e) => {
     e.preventDefault()
@@ -30,8 +22,7 @@ function Signin() {
       setErrorMessage(error.message)
     } else {
       setErrorMessage('')
-      window.location.assign(getPostSigninUrl())
-    }
+      navigate('/building')    }
 
     setLoading(false)
   }
