@@ -51,7 +51,7 @@ def _get_csv_from_s3(client, key):
 
 # --- LLM for Summary ---
 llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
-    report_prompt = ChatPromptTemplate.from_template("""
+report_prompt = ChatPromptTemplate.from_template("""
 You are an agricultural analysis expert.
 Generate a professional report summary based on the following data:
 DATA: {data}
