@@ -70,3 +70,7 @@ uritemplate==4.2.0
 urllib3==2.6.3
 uvicorn==0.40.0
 websockets==12.0
+fpdf
+langchain-openai
+langchain-google-genai
+matplotlib
