@@ -9,7 +9,8 @@ from fpdf import FPDF
 from botocore.exceptions import BotoCoreError, ClientError
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
-from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
+import os
 from langchain_core.prompts import ChatPromptTemplate
 
 router = APIRouter()
@@ -50,7 +51,7 @@ def _get_csv_from_s3(client, key):
 
 
 # --- LLM for Summary ---
-llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+llm = ChatGoogleGenerativeAI(model="gemini-pro", google_api_key=os.getenv("GEMINI_API_KEY"))
 report_prompt = ChatPromptTemplate.from_template("""
 You are an agricultural analysis expert.
 Generate a professional report summary based on the following data:
