@@ -3,3 +3,94 @@
 html {
   scroll-behavior: smooth;
 }
+
+@keyframes rv-redirect-progress {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes rv-redirect-shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes rv-redirect-float {
+  0%,
+  100% {
+    transform: translateY(0px);
+    opacity: 0.55;
+  }
+
+  50% {
+    transform: translateY(-14px);
+    opacity: 0.85;
+  }
+}
+
+@keyframes rv-redirect-dot {
+  0%,
+  80%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.45;
+  }
+
+  40% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+.rv-redirect-shimmer {
+  animation: rv-redirect-shimmer 1.7s linear infinite;
+}
+
+.rv-redirect-float {
+  animation: rv-redirect-float 2.4s ease-in-out infinite;
+}
+
+.rv-redirect-float-delayed {
+  animation: rv-redirect-float 2.8s ease-in-out 0.35s infinite;
+}
+
+.rv-redirect-progress {
+  animation: rv-redirect-progress 1.35s ease-out forwards;
+}
+
+.rv-redirect-dot-1 {
+  animation: rv-redirect-dot 1.2s ease-in-out infinite;
+}
+
+.rv-redirect-dot-2 {
+  animation: rv-redirect-dot 1.2s ease-in-out 0.15s infinite;
+}
+
+.rv-redirect-dot-3 {
+  animation: rv-redirect-dot 1.2s ease-in-out 0.3s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rv-redirect-shimmer,
+  .rv-redirect-float,
+  .rv-redirect-float-delayed,
+  .rv-redirect-progress {
+    animation: none;
+  }
+
+  .rv-redirect-dot-1,
+  .rv-redirect-dot-2,
+  .rv-redirect-dot-3 {
+    animation: none;
+    opacity: 0.8;
+  }
+}

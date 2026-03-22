@@ -1,13 +1,21 @@
 import { useState } from 'react'
 import { supabase } from '../supabaseClient'
-import { useNavigate } from 'react-router-dom'
+
+const getSdgpAppUrl = () => {
+  const fromEnv = import.meta.env.VITE_SDGP_APP_URL
+
+  if (typeof fromEnv === 'string' && fromEnv.trim().length > 0) {
+    return fromEnv.trim()
+  }
+
+  return 'http://localhost:5173/dashboard'
+}
 
 function Signin() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
-  const navigate = useNavigate()
 
   const handleSignin = async (e) => {
     e.preventDefault()
@@ -22,7 +30,8 @@ function Signin() {
       setErrorMessage(error.message)
     } else {
       setErrorMessage('')
-      navigate('/building')    }
+      window.location.assign(getSdgpAppUrl())
+    }
 
     setLoading(false)
   }
