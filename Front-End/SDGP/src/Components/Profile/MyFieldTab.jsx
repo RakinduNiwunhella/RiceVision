@@ -210,7 +210,7 @@ export default function MyFieldTab() {
               { icon: "location_on",  label: t('districtStat'),   value: localizedExistingDistrict                                   },
               { icon: "straighten",   label: t('areaStat'),       value: `${parseFloat(existing.area_acres).toFixed(3)} ${t('unitAcres')}` },
               { icon: "crop_square",  label: t('areaSqmLabel'),   value: `${(existing.area_acres * 4046.86).toFixed(0)} m²`        },
-              { icon: "paid",         label: t('annualFeeStat'),  value: `Rs. ${existing.price_lkr.toLocaleString()}`              },
+              { icon: "paid",         label: t('monthlyFeeStat'),  value: `Rs. ${existing.price_lkr.toLocaleString()}`              },
             ].map(({ icon, label, value }) => (
               <div
                 key={label}
@@ -304,7 +304,7 @@ export default function MyFieldTab() {
                 </div>
               </div>
               <div className="flex flex-col items-center justify-center gap-1 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30">
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-300">{t('annualCostLabel')}</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-300">{t('monthlyCostLabel')}</span>
                 <span className="text-3xl font-black text-emerald-400">Rs. {price.toLocaleString()}</span>
                 <span className="text-[10px] text-white/85">Rs. {PRICE_PER_ACRE_LKR.toLocaleString()} {t('mapPerAcreSuffix')}</span>
               </div>
