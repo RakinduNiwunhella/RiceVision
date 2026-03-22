@@ -11,7 +11,7 @@ export default function Profile() {
   // Tutorial setup
   const tutorialSteps = useMemo(() => [
     {
-      title: t("profileTitle"),
+      title: t("Profile Details"),
       action: t("profileAction"),
       outcome: t("profileOutcome"),
     },
@@ -35,8 +35,8 @@ export default function Profile() {
   const contentRef = useRef(null)
 
   const TABS = [
-    { id: "identity", label: t("identityProfile"), icon: "verified_user" },
-    { id: "field", label: t("myPaddyField"), icon: "landscape" },
+    { id: "identity", label: t("Profile Details"), icon: "verified_user" },
+    { id: "field", label: t("My Paddy Field"), icon: "landscape" },
   ];
   const [activeTab, setActiveTab] = useState("identity");
   const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
@@ -82,8 +82,8 @@ export default function Profile() {
             {t("operatorAuth")}
           </p>
 
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tighter uppercase mb-3 sm:mb-4">
-            {activeTab === "identity" ? t("identityProfile") : t("myPaddyField")}
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tighter mb-3 sm:mb-4">
+            {activeTab === "identity" ? t("Profile Details") : t("My Paddy Field")}
           </h1>
 
           <p className="text-white/85 text-sm font-medium max-w-xl leading-relaxed">

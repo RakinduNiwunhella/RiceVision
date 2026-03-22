@@ -33,7 +33,7 @@ def get_faqs():
 
 # -------------------- POST Complaint --------------------
 
-@router.post("/complaint")
+@router.post("/complaints")
 def create_complaint(complaint: Complaint):
     try:
         data = {

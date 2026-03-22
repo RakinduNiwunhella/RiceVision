@@ -48,3 +48,5 @@ AWS/Lambda/**/bin/
 AWS/Lambda/**/*.zip
 AWS/Lambda/**/gee_auth.json
 ricevision-pipeline/google-chrome-stable_current_x86_64.rpm
+/Users/rakinduniwunhella/Desktop/IIT Study Meterias/SDGP/GITHUB/Back-End/SDGP/.venv311
+Back-End/SDGP/.venv311

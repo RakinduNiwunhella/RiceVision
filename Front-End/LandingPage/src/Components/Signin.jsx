@@ -1,14 +1,14 @@
 import { useState } from 'react'
 import { supabase } from '../supabaseClient'
 
-const getPostSigninUrl = () => {
-  const fromEnv = import.meta.env.VITE_RICEVISION_SIGNIN_URL || import.meta.env.VITE_SDGP_APP_URL
+const getSdgpAppUrl = () => {
+  const fromEnv = import.meta.env.VITE_SDGP_APP_URL
 
   if (typeof fromEnv === 'string' && fromEnv.trim().length > 0) {
     return fromEnv.trim()
   }
 
-  return 'https://app.ricevisionlanka.com/signin'
+  return 'http://localhost:5173/dashboard'
 }
 
 function Signin() {
@@ -30,7 +30,7 @@ function Signin() {
       setErrorMessage(error.message)
     } else {
       setErrorMessage('')
-      window.location.assign(getPostSigninUrl())
+      window.location.assign(getSdgpAppUrl())
     }
 
     setLoading(false)

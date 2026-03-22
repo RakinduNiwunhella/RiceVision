@@ -69,7 +69,7 @@ function App() {
             <Footer />
 
             {isRedirecting && (
-              <div className="fixed inset-0 z-60 flex items-center justify-center overflow-hidden bg-slate-100/75 backdrop-blur-md dark:bg-slate-950/85">
+              <div className="fixed inset-0 z-60 flex items-center justify-center overflow-hidden bg-slate-100/80 backdrop-blur-md dark:bg-slate-950/85">
                 <div className="pointer-events-none absolute -left-16 top-12 h-48 w-48 rounded-full bg-emerald-400/30 blur-3xl rv-redirect-float dark:bg-emerald-400/20" />
                 <div className="pointer-events-none absolute -right-12 bottom-8 h-64 w-64 rounded-full bg-cyan-300/25 blur-3xl rv-redirect-float-delayed dark:bg-cyan-300/10" />
 
@@ -94,9 +94,9 @@ function App() {
                     </div>
 
                     <div className="mt-4 flex items-center justify-center gap-1.5 text-emerald-700/70 dark:text-emerald-100/85">
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-200 rv-redirect-dot-1" />
-                      <span className="h-1.5 w-1.5 rounded-full bg-cyan-200 rv-redirect-dot-2" />
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-100 rv-redirect-dot-3" />
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 rv-redirect-dot-1 dark:bg-emerald-200" />
+                      <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 rv-redirect-dot-2 dark:bg-cyan-200" />
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 rv-redirect-dot-3 dark:bg-emerald-100" />
                     </div>
                   </div>
                 </div>

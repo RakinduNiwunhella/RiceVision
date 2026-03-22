@@ -981,14 +981,10 @@ const Report = () => {
               className={`flex items-center gap-2 text-[10px] font-black px-4 py-1.5 rounded-xl border transition-all duration-300 hover:scale-[1.02] cursor-pointer uppercase tracking-widest ${isSingleMode
                 ? "border-emerald-400/70 bg-emerald-500/10 hover:bg-emerald-500/20 hover:border-emerald-300"
                 : "border-white/10 hover:bg-white/10 hover:border-white/20"
-                }`}
-            >
+                }`}            >
               <span className="material-symbols-outlined text-xs">download</span>
               {t('downloadPdf')}
             </button>
-
-            
-
           </div>
           <div ref={districtSelectorRef}>
             <CustomSelect
@@ -1114,7 +1110,10 @@ const Report = () => {
                 {t('compare')}
               </button>
             </div>
-
+            <div className="glass px-4 py-2 rounded-xl border-white/10 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-white/85">{t('liveData')}</span>
+            </div>
             {mode === "compare" && dataA && dataB && (
               <button
                 onClick={() => generateComparisonPDF()}
