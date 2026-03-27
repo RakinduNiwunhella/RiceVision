@@ -203,8 +203,8 @@ const TutorialTooltip = ({
           </span>
 
           <div className="flex gap-2">
-            {step > 0 && <button onClick={onPrevious}><ChevronLeft size={16} /></button>}
-            {step < totalSteps - 1 && <button onClick={onNext}><ChevronRight size={16} /></button>}
+            {step > 0 && <button onClick={onPrevious} aria-label="Previous step"><ChevronLeft size={16} /></button>}
+            {step < totalSteps - 1 && <button onClick={onNext} aria-label="Next step"><ChevronRight size={16} /></button>}
             {step === totalSteps - 1 && <button onClick={onDismiss}>Done</button>}
           </div>
         </div>
