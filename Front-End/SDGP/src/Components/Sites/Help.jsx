@@ -12,9 +12,7 @@ import { fetchFaqs, submitComplaint } from "../../api/api";
 import { useLanguage } from "../../context/LanguageContext";
 import { useNavigate } from "react-router-dom";
 
-/* ─────────────────────────────────────────────
-   Shared constants
-───────────────────────────────────────────── */
+
 const SUPPORT_EMAIL = "support@ricevisionlanka.com";
 const SUPPORT_PHONE = "+94 74 291 2929";
 const WEBSITE = "app.ricevisionlanka.com";
