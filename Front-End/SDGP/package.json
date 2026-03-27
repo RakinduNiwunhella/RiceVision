@@ -55,6 +55,7 @@
     "@vitejs/plugin-react": "^5.1.0",
     "autoprefixer": "^10.4.22",
     "babel-jest": "^30.3.0",
+    "babel-plugin-transform-vite-meta-env": "^1.0.3",
     "baseline-browser-mapping": "^2.9.17",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
