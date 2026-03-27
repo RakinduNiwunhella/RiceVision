@@ -11,6 +11,7 @@ import {
 import { translateDistrictName } from "../../utils/locationTranslations";
 import TutorialTooltip from "../../Components/TutorialTooltip";
 import { usePageTutorial } from "../../hooks/usePageTutorial";
+import { motion, AnimatePresence } from "framer-motion";
 
 const TAB_KEYS = ["Pest Risks", "Disasters", "Past Alerts"];
 
@@ -147,7 +148,7 @@ const Alerts = () => {
   } = usePageTutorial("alerts", tutorialSteps);
 
   const [alerts, setAlerts] = useState([]);
-  const [globalAlerts, setGlobalAlerts] = useState([]);
+  const [globalAlerts, setGlobalAlerts] = useState({ Open: 0, Resolved: 0 });
   const [activeTab, setActiveTab] = useState(
     () => localStorage.getItem("alerts_tab") || "Disasters",
   );
@@ -288,71 +289,69 @@ const Alerts = () => {
   /* ---------------- LOAD GLOBAL ALERT COUNTS ---------------- */
 
   useEffect(() => {
-    const loadAllAlerts = async () => {
+    const loadCounts = async () => {
       try {
-        const res = await apiFetch("/api/alerts/all");
+        const res = await apiFetch("/api/alerts/status-counts");
         const data = await res.json();
-        setGlobalAlerts(data);
+
+        setGlobalAlerts({
+          Open: data.Open || 0,
+          Resolved: data.Resolved || 0,
+        });
       } catch (err) {
         console.error("Failed to load alert counters", err);
       }
     };
 
-    loadAllAlerts();
+    loadCounts();
   }, []);
 
   /* ---------------- COUNTERS ---------------- */
 
   const counts = useMemo(() => {
-    const seenPest = new Set();
-    const countObj = { Open: 0, Resolved: 0, Ignored: 0 };
-
-    globalAlerts.forEach((alert) => {
-      const status = alert.status || "Open";
-      if (!(status in countObj)) return;
-
-      if (alert.is_pest) {
-        const key = `${alert.field}-${status}`;
-        if (seenPest.has(key)) return;
-        seenPest.add(key);
-      }
-
-      countObj[status]++;
-    });
-
-    return countObj;
+    return {
+      Open: globalAlerts.Open,
+      Resolved: globalAlerts.Resolved,
+    };
   }, [globalAlerts]);
 
   /* ---------------- STATUS UPDATE (optimistic) ---------------- */
 
   const updateStatus = async (id, newStatus, note = null) => {
+    // Prevent double-clicks
+    if (exitingId === id) return;
+    setExitingId(id);
+
     const snapshot = alerts.find((a) => a.id === id);
     if (!snapshot) return;
 
-    const isPest = activeTab === "Pest Risks";
-    const globalSnapshot = globalAlerts;
+    // Optimistically update counts
+    setGlobalAlerts((prev) => ({
+      Open: Math.max(0, prev.Open - 1),
+      Resolved: newStatus === "Resolved" ? prev.Resolved + 1 : prev.Resolved,
+    }));
 
-    // Kick off exit animation, then remove after it completes
-    setExitingId(id);
-    setTimeout(() => {
-      setExitingId(null);
-      setAlerts((prev) => prev.filter((a) => a.id !== id));
-    }, 260);
-
-    // Optimistic counter update
-    setGlobalAlerts((prev) =>
-      prev.map((a) => {
-        const matches = isPest ? a.field === id : a.id === id;
-        return matches ? { ...a, status: newStatus } : a;
-      }),
+    // Optimistically update status
+    // (This triggers AnimatePresence since the item is removed from filteredAlerts instantly)
+    setAlerts((prev) =>
+      prev.map((a) => (a.id === id ? { ...a, status: newStatus } : a))
     );
+
+    const isPest = activeTab === "Pest Risks";
 
     try {
       await updateAlertStatus(id, newStatus, isPest ? "pest" : "normal", note);
     } catch (err) {
       console.error("Error updating alert:", err);
-      setAlerts((prev) => [snapshot, ...prev]);
-      setGlobalAlerts(globalSnapshot);
+      // Rollback
+      setGlobalAlerts((prev) => ({
+        Open: prev.Open + 1,
+        Resolved: newStatus === "Resolved" ? Math.max(0, prev.Resolved - 1) : prev.Resolved,
+      }));
+      setAlerts((prev) => prev.map((a) => (a.id === id ? snapshot : a)));
+    } finally {
+      // Small delay helps avoid flicker if request is blazingly fast
+      setTimeout(() => setExitingId(null), 300);
     }
   };
 
@@ -463,11 +462,10 @@ const Alerts = () => {
                     setActiveTab(key);
                     localStorage.setItem("alerts_tab", key);
                   }}
-                  className={`px-5 py-2 rounded-xl text-xs font-bold transition-all ${
-                    activeTab === key
+                  className={`px-5 py-2 rounded-xl text-xs font-bold transition-all ${activeTab === key
                       ? "bg-white/15 text-white"
                       : "text-white/85 hover:text-white/90"
-                  }`}
+                    }`}
                 >
                   {tabLabels[idx]}
                 </button>
@@ -496,11 +494,15 @@ const Alerts = () => {
             </div>
           )}
 
-          {filteredAlerts.map((alert) => (
-            <div
-              key={alert.id}
-              className={`glass p-6 rounded-3xl border border-white/10${exitingId === alert.id ? " alert-exit" : ""}`}
-            >
+          <AnimatePresence>
+            {filteredAlerts.map((alert) => (
+              <motion.div
+                key={alert.id}
+                initial={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: "100%", scale: 0.95 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className={`glass p-6 rounded-3xl border border-white/10 ${exitingId === alert.id ? "pointer-events-none" : ""}`}
+              >
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                   <h2
@@ -533,7 +535,8 @@ const Alerts = () => {
                     <button
                       ref={(currentStep === 2 && resolveRef) || undefined}
                       onClick={() => handleResolve(alert.id)}
-                      className="px-4 sm:px-6 py-2 bg-emerald-500/30 text-emerald-300 rounded-xl text-xs font-bold"
+                      disabled={exitingId === alert.id}
+                      className={`px-4 sm:px-6 py-2 bg-emerald-500/30 text-emerald-300 rounded-xl text-xs font-bold ${exitingId === alert.id ? "opacity-50 cursor-not-allowed" : ""}`}
                     >
                       {t("resolveBtn")}
                     </button>
@@ -541,7 +544,8 @@ const Alerts = () => {
                     <button
                       ref={(currentStep === 3 && ignoreRef) || undefined}
                       onClick={() => handleIgnore(alert.id)}
-                      className="btn-ignore glass-btn text-[10px] px-3 py-1 tracking-widest bg-white/10 hover:bg-white/20"
+                      disabled={exitingId === alert.id}
+                      className={`btn-ignore glass-btn text-[10px] px-3 py-1 tracking-widest bg-white/10 hover:bg-white/20 ${exitingId === alert.id ? "opacity-50 cursor-not-allowed" : ""}`}
                     >
                       {t("ignoreBtn")}
                     </button>
@@ -556,8 +560,9 @@ const Alerts = () => {
                   </div>
                 )}
               </div>
-            </div>
+            </motion.div>
           ))}
+          </AnimatePresence>
         </div>
 
         {/* Tutorial Tooltips */}

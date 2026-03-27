@@ -1,0 +1,64 @@
+﻿  console.warn
+    ΓÜá∩╕Å React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+
+    [0m [90m 129 |[39m
+     [90m 130 |[39m   [36mconst[39m renderComponent [33m=[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 131 |[39m     [36mreturn[39m render(
+     [90m     |[39m                  [31m[1m^[22m[39m
+     [90m 132 |[39m       [33m<[39m[33mBrowserRouter[39m[33m>[39m
+     [90m 133 |[39m         [33m<[39m[33mAlerts[39m [33m/[39m[33m>[39m
+     [90m 134 |[39m       [33m<[39m[33m/[39m[33mBrowserRouter[39m[33m>[39m[0m
+
+      at warn (node_modules/react-router/lib/deprecations.ts:9:13)
+      at warnOnce (node_modules/react-router/lib/deprecations.ts:14:3)
+      at Object.logDeprecation [as UNSAFE_logV6DeprecationWarnings] (node_modules/react-router/lib/deprecations.ts:26:5)
+      at logV6DeprecationWarnings (node_modules/react-router-dom/index.tsx:816:25)
+      at Object.react_stack_bottom_frame (node_modules/react-dom/cjs/react-dom-client.development.js:25989:20)
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at commitHookEffectListMount (node_modules/react-dom/cjs/react-dom-client.development.js:13249:29)
+      at commitHookPassiveMountEffects (node_modules/react-dom/cjs/react-dom-client.development.js:13336:11)
+      at commitPassiveMountOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:15484:13)
+      at recursivelyTraversePassiveMountEffects (node_modules/react-dom/cjs/react-dom-client.development.js:15439:11)
+      at commitPassiveMountOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:15519:11)
+      at flushPassiveEffects (node_modules/react-dom/cjs/react-dom-client.development.js:18432:9)
+      at node_modules/react-dom/cjs/react-dom-client.development.js:17923:15
+      at flushActQueue (node_modules/react/cjs/react.development.js:590:34)
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:884:10)
+      at node_modules/@testing-library/react/dist/act-compat.js:46:25
+      at renderRoot (node_modules/@testing-library/react/dist/pure.js:189:26)
+      at render (node_modules/@testing-library/react/dist/pure.js:291:10)
+      at renderComponent (src/Components/Sites/Alerts.test.jsx:131:18)
+      at Object.renderComponent (src/Components/Sites/Alerts.test.jsx:139:5)
+
+  console.warn
+    ΓÜá∩╕Å React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+    [0m [90m 129 |[39m
+     [90m 130 |[39m   [36mconst[39m renderComponent [33m=[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 131 |[39m     [36mreturn[39m render(
+     [90m     |[39m                  [31m[1m^[22m[39m
+     [90m 132 |[39m       [33m<[39m[33mBrowserRouter[39m[33m>[39m
+     [90m 133 |[39m         [33m<[39m[33mAlerts[39m [33m/[39m[33m>[39m
+     [90m 134 |[39m       [33m<[39m[33m/[39m[33mBrowserRouter[39m[33m>[39m[0m
+
+      at warn (node_modules/react-router/lib/deprecations.ts:9:13)
+      at warnOnce (node_modules/react-router/lib/deprecations.ts:14:3)
+      at Object.logDeprecation [as UNSAFE_logV6DeprecationWarnings] (node_modules/react-router/lib/deprecations.ts:37:5)
+      at logV6DeprecationWarnings (node_modules/react-router-dom/index.tsx:816:25)
+      at Object.react_stack_bottom_frame (node_modules/react-dom/cjs/react-dom-client.development.js:25989:20)
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at commitHookEffectListMount (node_modules/react-dom/cjs/react-dom-client.development.js:13249:29)
+      at commitHookPassiveMountEffects (node_modules/react-dom/cjs/react-dom-client.development.js:13336:11)
+      at commitPassiveMountOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:15484:13)
+      at recursivelyTraversePassiveMountEffects (node_modules/react-dom/cjs/react-dom-client.development.js:15439:11)
+      at commitPassiveMountOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:15519:11)
+      at flushPassiveEffects (node_modules/react-dom/cjs/react-dom-client.development.js:18432:9)
+      at node_modules/react-dom/cjs/react-dom-client.development.js:17923:15
+      at flushActQueue (node_modules/react/cjs/react.development.js:590:34)
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:884:10)
+      at node_modules/@testing-library/react/dist/act-compat.js:46:25
+      at renderRoot (node_modules/@testing-library/react/dist/pure.js:189:26)
+      at render (node_modules/@testing-library/react/dist/pure.js:291:10)
+      at renderComponent (src/Components/Sites/Alerts.test.jsx:131:18)
+      at Object.renderComponent (src/Components/Sites/Alerts.test.jsx:139:5)
+
