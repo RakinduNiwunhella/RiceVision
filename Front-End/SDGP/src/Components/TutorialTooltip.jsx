@@ -31,11 +31,9 @@ const TutorialTooltip = ({
     // 🔥 Fallback for step 0 (navbar)
     if (!element && step === 0) {
       element = document.querySelector('[data-tour="navbar"]')
-      console.log("🔍 Fallback navbar selector:", element)
     }
 
     if (!element) {
-      console.log("❌ No element found for highlight", { step })
       return
     }
 
@@ -55,7 +53,6 @@ const TutorialTooltip = ({
 
     const calculatePosition = () => {
       if (!elementRef?.current) {
-        console.log("❌ REF NULL", elementRef)
         return
       }
 
@@ -68,7 +65,6 @@ const TutorialTooltip = ({
 
       const tooltip = document.querySelector('[data-tutorial-tooltip="true"]')
       if (!tooltip) {
-        console.log("❌ TOOLTIP NOT FOUND")
         return
       }
 
@@ -203,8 +199,8 @@ const TutorialTooltip = ({
           </span>
 
           <div className="flex gap-2">
-            {step > 0 && <button onClick={onPrevious}><ChevronLeft size={16} /></button>}
-            {step < totalSteps - 1 && <button onClick={onNext}><ChevronRight size={16} /></button>}
+            {step > 0 && <button onClick={onPrevious} aria-label="Previous step"><ChevronLeft size={16} /></button>}
+            {step < totalSteps - 1 && <button onClick={onNext} aria-label="Next step"><ChevronRight size={16} /></button>}
             {step === totalSteps - 1 && <button onClick={onDismiss}>Done</button>}
           </div>
         </div>

@@ -264,3 +264,40 @@ async def get_past_alerts():
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# -----------------------------
+# 7️⃣ GET ALERT STATUS COUNTS
+# -----------------------------
+@router.get("/status-counts")
+async def get_alert_status_counts():
+    try:
+        response = (
+            supabase
+            .table("alerts")
+            .select("status")
+            .execute()
+        )
+
+        if not response.data:
+            return {
+                "Open": 0,
+                "Ignored": 0,
+                "Resolved": 0
+            }
+
+        counts = {
+            "Open": 0,
+            "Ignored": 0,
+            "Resolved": 0
+        }
+
+        for row in response.data:
+            status = row.get("status")
+            if status in counts:
+                counts[status] += 1
+
+        return counts
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
