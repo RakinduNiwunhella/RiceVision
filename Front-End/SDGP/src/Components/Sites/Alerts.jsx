@@ -147,7 +147,7 @@ const Alerts = () => {
   } = usePageTutorial("alerts", tutorialSteps);
 
   const [alerts, setAlerts] = useState([]);
-  const [globalAlerts, setGlobalAlerts] = useState([]);
+  const [globalAlerts, setGlobalAlerts] = useState({ Open: 0, Resolved: 0 });
   const [activeTab, setActiveTab] = useState(
     () => localStorage.getItem("alerts_tab") || "Disasters",
   );
@@ -288,39 +288,30 @@ const Alerts = () => {
   /* ---------------- LOAD GLOBAL ALERT COUNTS ---------------- */
 
   useEffect(() => {
-    const loadAllAlerts = async () => {
+    const loadCounts = async () => {
       try {
-        const res = await apiFetch("/api/alerts/all");
+        const res = await apiFetch("/api/alerts/status-counts");
         const data = await res.json();
-        setGlobalAlerts(data);
+
+        setGlobalAlerts({
+          Open: data.Open || 0,
+          Resolved: data.Resolved || 0,
+        });
       } catch (err) {
         console.error("Failed to load alert counters", err);
       }
     };
 
-    loadAllAlerts();
+    loadCounts();
   }, []);
 
   /* ---------------- COUNTERS ---------------- */
 
   const counts = useMemo(() => {
-    const seenPest = new Set();
-    const countObj = { Open: 0, Resolved: 0, Ignored: 0 };
-
-    globalAlerts.forEach((alert) => {
-      const status = alert.status || "Open";
-      if (!(status in countObj)) return;
-
-      if (alert.is_pest) {
-        const key = `${alert.field}-${status}`;
-        if (seenPest.has(key)) return;
-        seenPest.add(key);
-      }
-
-      countObj[status]++;
-    });
-
-    return countObj;
+    return {
+      Open: globalAlerts.Open,
+      Resolved: globalAlerts.Resolved,
+    };
   }, [globalAlerts]);
 
   /* ---------------- STATUS UPDATE (optimistic) ---------------- */
@@ -330,7 +321,6 @@ const Alerts = () => {
     if (!snapshot) return;
 
     const isPest = activeTab === "Pest Risks";
-    const globalSnapshot = globalAlerts;
 
     // Kick off exit animation, then remove after it completes
     setExitingId(id);
@@ -339,20 +329,11 @@ const Alerts = () => {
       setAlerts((prev) => prev.filter((a) => a.id !== id));
     }, 260);
 
-    // Optimistic counter update
-    setGlobalAlerts((prev) =>
-      prev.map((a) => {
-        const matches = isPest ? a.field === id : a.id === id;
-        return matches ? { ...a, status: newStatus } : a;
-      }),
-    );
-
     try {
       await updateAlertStatus(id, newStatus, isPest ? "pest" : "normal", note);
     } catch (err) {
       console.error("Error updating alert:", err);
       setAlerts((prev) => [snapshot, ...prev]);
-      setGlobalAlerts(globalSnapshot);
     }
   };
 
