@@ -6,4 +6,5 @@ module.exports = {
   moduleNameMapper: {
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
   },
+  testPathIgnorePatterns: ['/node_modules/', '\\.vitest\\.jsx$'],
 };
