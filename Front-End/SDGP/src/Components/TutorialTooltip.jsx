@@ -31,11 +31,9 @@ const TutorialTooltip = ({
     // 🔥 Fallback for step 0 (navbar)
     if (!element && step === 0) {
       element = document.querySelector('[data-tour="navbar"]')
-      console.log("🔍 Fallback navbar selector:", element)
     }
 
     if (!element) {
-      console.log("❌ No element found for highlight", { step })
       return
     }
 
@@ -55,7 +53,6 @@ const TutorialTooltip = ({
 
     const calculatePosition = () => {
       if (!elementRef?.current) {
-        console.log("❌ REF NULL", elementRef)
         return
       }
 
@@ -68,7 +65,6 @@ const TutorialTooltip = ({
 
       const tooltip = document.querySelector('[data-tutorial-tooltip="true"]')
       if (!tooltip) {
-        console.log("❌ TOOLTIP NOT FOUND")
         return
       }
 
