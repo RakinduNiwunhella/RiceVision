@@ -1,0 +1,3882 @@
+﻿  console.warn
+    ΓÜá∩╕Å React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+
+    [0m [90m 60 |[39m
+     [90m 61 |[39m   [36mconst[39m renderComponent [33m=[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 62 |[39m     [36mreturn[39m render(
+     [90m    |[39m                  [31m[1m^[22m[39m
+     [90m 63 |[39m       [33m<[39m[33mBrowserRouter[39m[33m>[39m
+     [90m 64 |[39m         [33m<[39m[33mSignupPage[39m [33m/[39m[33m>[39m
+     [90m 65 |[39m       [33m<[39m[33m/[39m[33mBrowserRouter[39m[33m>[39m[0m
+
+      at warn (node_modules/react-router/lib/deprecations.ts:9:13)
+      at warnOnce (node_modules/react-router/lib/deprecations.ts:14:3)
+      at Object.logDeprecation [as UNSAFE_logV6DeprecationWarnings] (node_modules/react-router/lib/deprecations.ts:26:5)
+      at logV6DeprecationWarnings (node_modules/react-router-dom/index.tsx:816:25)
+      at Object.react_stack_bottom_frame (node_modules/react-dom/cjs/react-dom-client.development.js:25989:20)
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at commitHookEffectListMount (node_modules/react-dom/cjs/react-dom-client.development.js:13249:29)
+      at commitHookPassiveMountEffects (node_modules/react-dom/cjs/react-dom-client.development.js:13336:11)
+      at commitPassiveMountOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:15484:13)
+      at recursivelyTraversePassiveMountEffects (node_modules/react-dom/cjs/react-dom-client.development.js:15439:11)
+      at commitPassiveMountOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:15519:11)
+      at flushPassiveEffects (node_modules/react-dom/cjs/react-dom-client.development.js:18432:9)
+      at node_modules/react-dom/cjs/react-dom-client.development.js:17923:15
+      at flushActQueue (node_modules/react/cjs/react.development.js:590:34)
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:884:10)
+      at node_modules/@testing-library/react/dist/act-compat.js:46:25
+      at renderRoot (node_modules/@testing-library/react/dist/pure.js:189:26)
+      at render (node_modules/@testing-library/react/dist/pure.js:291:10)
+      at renderComponent (src/Components/Authentication/Signup.test.jsx:62:18)
+      at Object.renderComponent (src/Components/Authentication/Signup.test.jsx:70:5)
+
+  console.warn
+    ΓÜá∩╕Å React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+    [0m [90m 60 |[39m
+     [90m 61 |[39m   [36mconst[39m renderComponent [33m=[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 62 |[39m     [36mreturn[39m render(
+     [90m    |[39m                  [31m[1m^[22m[39m
+     [90m 63 |[39m       [33m<[39m[33mBrowserRouter[39m[33m>[39m
+     [90m 64 |[39m         [33m<[39m[33mSignupPage[39m [33m/[39m[33m>[39m
+     [90m 65 |[39m       [33m<[39m[33m/[39m[33mBrowserRouter[39m[33m>[39m[0m
+
+      at warn (node_modules/react-router/lib/deprecations.ts:9:13)
+      at warnOnce (node_modules/react-router/lib/deprecations.ts:14:3)
+      at Object.logDeprecation [as UNSAFE_logV6DeprecationWarnings] (node_modules/react-router/lib/deprecations.ts:37:5)
+      at logV6DeprecationWarnings (node_modules/react-router-dom/index.tsx:816:25)
+      at Object.react_stack_bottom_frame (node_modules/react-dom/cjs/react-dom-client.development.js:25989:20)
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at commitHookEffectListMount (node_modules/react-dom/cjs/react-dom-client.development.js:13249:29)
+      at commitHookPassiveMountEffects (node_modules/react-dom/cjs/react-dom-client.development.js:13336:11)
+      at commitPassiveMountOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:15484:13)
+      at recursivelyTraversePassiveMountEffects (node_modules/react-dom/cjs/react-dom-client.development.js:15439:11)
+      at commitPassiveMountOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:15519:11)
+      at flushPassiveEffects (node_modules/react-dom/cjs/react-dom-client.development.js:18432:9)
+      at node_modules/react-dom/cjs/react-dom-client.development.js:17923:15
+      at flushActQueue (node_modules/react/cjs/react.development.js:590:34)
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:884:10)
+      at node_modules/@testing-library/react/dist/act-compat.js:46:25
+      at renderRoot (node_modules/@testing-library/react/dist/pure.js:189:26)
+      at render (node_modules/@testing-library/react/dist/pure.js:291:10)
+      at renderComponent (src/Components/Authentication/Signup.test.jsx:62:18)
+      at Object.renderComponent (src/Components/Authentication/Signup.test.jsx:70:5)
+
+node.exe : FAIL src/Com
+ponents/Authentication/
+Signup.test.jsx
+At C:\Program Files\nod
+ejs\npx.ps1:29 char:3
++   & $NODE_EXE 
+$NPX_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~
+    + CategoryInfo     
+         : 
+NotSpecified: (FAI    
+L src/Compon...Signup. 
+   test.jsx:String) 
+[], R    emoteException
+    + 
+FullyQualifiedErrorI   
+ d : NativeCommandError
+ 
+  SignupPage Component
+    ├ù renders all 
+form fields and submit 
+button (207 ms)
+    ΓêÜ valdiates 
+missing fields 
+correctly when 
+submitted empty (71 ms)
+    ΓêÜ shows error on 
+invalid email address 
+(279 ms)
+    ΓêÜ shows error 
+when passwords do not 
+match (389 ms)
+    ΓêÜ shows error on 
+short password (109 ms)
+    ├ù successfully 
+submits the form and 
+navigates on success 
+(1023 ms)
+    ΓêÜ shows error 
+alert on bad response 
+from API (1002 ms)
+    ├ù simulates 
+Google Signup 
+correctly (42 ms)
+    ├ù alerts on 
+Google Signup error 
+(41 ms)
+
+  ΓùÅ SignupPage 
+Component ΓÇ║ renders 
+all form fields and 
+submit button
+
+    TestingLibraryEleme
+ntError: Unable to 
+find an accessible 
+element with the role 
+"button" and name 
+"continueGoogle"
+
+    Here are the 
+accessible roles:
+
+      button:
+
+      Name "":
+      [36m<button[39m
+        [33mclass[39m
+=[32m"fixed top-6 
+right-6 p-3 
+rounded-full 
+bg-slate-100 
+dark:bg-slate-800 
+hover:rotate-12 
+transition-all 
+shadow-md z-50"[39m
+        [33mtype[39m=
+[32m"button"[39m
+      [36m/>[39m
+
+      Name "signUpBtn":
+      [36m<button[39m
+        [33mclass[39m
+=[32m"w-full py-3 
+sm:py-4 px-6 
+bg-indigo-600 
+hover:bg-indigo-700 
+text-white font-bold 
+rounded-xl shadow-xl 
+shadow-indigo-500/20 
+transition-all 
+active:scale-[0.97] 
+disabled:opacity-70 dis
+abled:cursor-not-allowe
+d"[39m
+        [33mtype[39m=
+[32m"submit"[39m
+      [36m/>[39m
+
+      Name "Google 
+continueGoogle":
+      [36m<button[39m
+        [33mclass[39m
+=[32m"w-full py-3 
+border 
+border-slate-300 
+dark:border-slate-700 
+rounded-xl flex 
+items-center 
+justify-center gap-3 
+hover:bg-slate-50 dark:
+hover:bg-slate-800 
+transition"[39m
+        [33mtype[39m=
+[32m"button"[39m
+      [36m/>[39m
+
+      -----------------
+-----------------------
+----------
+      img:
+
+      Name "SDGP Logo":
+      [36m<img[39m
+        [33malt[39m=
+[32m"SDGP Logo"[39m
+        [33mclass[39m
+=[32m"h-12 sm:h-16 
+md:h-18 w-auto"[39m
+        [33msrc[39m=
+[32m"/logoSDGP.webp"[3
+9m
+      [36m/>[39m
+
+      Name "Google":
+      [36m<img[39m
+        [33malt[39m=
+[32m"Google"[39m
+        [33mclass[39m
+=[32m"h-5 w-5"[39m
+        [33msrc[39m=
+[32m"https://www.svgrep
+o.com/show/475656/googl
+e-color.svg"[39m
+      [36m/>[39m
+
+      Name "Rice Field 
+Day":
+      [36m<img[39m
+        [33malt[39m=
+[32m"Rice Field 
+Day"[39m
+        [33mclass[39m
+=[32m"absolute 
+inset-0 w-full h-full 
+object-cover 
+transition-opacity 
+duration-700 
+opacity-100 
+dark:opacity-0"[39m
+        [33mfetchprior
+ity[39m=[32m"high"[3
+9m
+        [33mloading[3
+9m=[32m"eager"[39m
+        [33msrc[39m=
+[32m"/images/rice-day-2
+.webp"[39m
+      [36m/>[39m
+
+      Name "Rice Field 
+Night":
+      [36m<img[39m
+        [33malt[39m=
+[32m"Rice Field 
+Night"[39m
+        [33mclass[39m
+=[32m"absolute 
+inset-0 w-full h-full 
+object-cover 
+transition-opacity 
+duration-700 opacity-0 
+dark:opacity-100"[39m
+        [33mfetchprior
+ity[39m=[32m"high"[3
+9m
+        [33mloading[3
+9m=[32m"eager"[39m
+        [33msrc[39m=
+[32m"/images/dark 
+image 2.jpeg"[39m
+      [36m/>[39m
+
+      -----------------
+-----------------------
+----------
+      heading:
+
+      Name 
+"createAccount":
+      [36m<h2[39m
+        [33mclass[39m
+=[32m"text-2xl 
+sm:text-3xl 
+lg:text-4xl 
+font-extrabold mb-3 
+tracking-tight"[39m
+      [36m/>[39m
+
+      -----------------
+-----------------------
+----------
+      paragraph:
+
+      Name "":
+      [36m<p[39m
+        [33mclass[39m
+=[32m"text-gray-500 
+dark:text-gray-400 
+mb-6"[39m
+      [36m/>[39m
+
+      Name "":
+      [36m<p[39m
+        [33mclass[39m
+=[32m"mt-3 
+text-center text-sm 
+text-slate-500 dark:tex
+t-slate-400"[39m
+      [36m/>[39m
+
+      -----------------
+-----------------------
+----------
+      textbox:
+
+      Name "":
+      [36m<input[39m
+        [33mclass[39m
+=[32m"w-full 
+rounded-xl px-4 py-3 
+transition-all 
+duration-200 
+bg-gray-100 
+text-gray-900 border 
+border-gray-300 
+placeholder-gray-500 
+dark:bg-neutral-800/80 
+dark:text-white dark:bo
+rder-neutral-600 dark:p
+laceholder-gray-400 
+hover:border-gray-400 d
+ark:hover:border-neutra
+l-500 
+focus:outline-none 
+focus:ring-2 
+focus:ring-indigo-500 d
+ark:focus:ring-indigo-4
+00 
+backdrop-blur-sm"[39m
+        [33mplaceholde
+r[39m=[32m"John 
+Doe"[39m
+        [33mrequired[
+39m=[32m""[39m
+        [33mtype[39m=
+[32m"text"[39m
+      [36m/>[39m
+
+      Name "":
+      [36m<input[39m
+        [33mclass[39m
+=[32m"w-full 
+rounded-xl px-4 py-3 
+transition-all 
+duration-200 
+text-gray-900 
+dark:text-white 
+placeholder-gray-500 da
+rk:placeholder-gray-400
+ border outline-none 
+backdrop-blur-sm 
+focus:ring-2 
+bg-gray-100 
+dark:bg-neutral-800/80 
+border-gray-300 dark:bo
+rder-neutral-600 
+hover:border-gray-400 d
+ark:hover:border-neutra
+l-500 
+focus:ring-indigo-500 d
+ark:focus:ring-indigo-4
+00"[39m
+        [33mplaceholde
+r[39m=[32m"name@compa
+ny.com"[39m
+        [33mrequired[
+39m=[32m""[39m
+        [33mtype[39m=
+[32m"email"[39m
+      [36m/>[39m
+
+      -----------------
+-----------------------
+----------
+      link:
+
+      Name 
+"signInLink":
+      [36m<a[39m
+        [33mclass[39m
+=[32m"text-indigo-500 
+hover:text-indigo-400 
+font-bold 
+underline-offset-4 
+hover:underline"[39m
+        [33mhref[39m=
+[32m"/"[39m
+      [36m/>[39m
+
+      -----------------
+-----------------------
+----------
+
+    Ignored nodes: 
+comments, script, style
+    [36m<body>[39m
+      [36m<div>[39m
+        [36m<div[39m
+          [33mclass[3
+9m=[32m"min-h-screen 
+flex flex-col 
+md:flex-row 
+transition-colors 
+duration-500 bg-white 
+dark:bg-neutral-900 
+text-black 
+dark:text-white"[39m
+        [36m>[39m
+          
+[36m<button[39m
+            [33mclass
+[39m=[32m"fixed top-6 
+right-6 p-3 
+rounded-full 
+bg-slate-100 
+dark:bg-slate-800 
+hover:rotate-12 
+transition-all 
+shadow-md z-50"[39m
+            [33mtype[
+39m=[32m"button"[39m
+          [36m>[39m
+            
+[36m<svg[39m
+              [33mclas
+s[39m=[32m"text-indig
+o-600 text-xl"[39m
+              [33mfill
+[39m=[32m"currentColo
+r"[39m
+              [33mheig
+ht[39m=[32m"1em"[39m
+              [33mstro
+ke[39m=[32m"currentCo
+lor"[39m
+              [33mstro
+ke-width[39m=[32m"0"
+[39m
+              [33mview
+Box[39m=[32m"0 0 512 
+512"[39m
+              [33mwidt
+h[39m=[32m"1em"[39m
+              [33mxmln
+s[39m=[32m"http://www
+.w3.org/2000/svg"[39m
+            [36m>[39m
+              
+[36m<path[39m
+                [33md
+[39m=[32m"M283.211 
+512c78.962 0 
+151.079-35.925 
+198.857-94.792 7.068-8.
+708-.639-21.43-11.562-1
+9.35-124.203 23.654-238
+.262-71.576-238.262-196
+.954 0-72.222 
+38.662-138.635 
+101.498-174.394 
+9.686-5.512 7.25-20.197
+-3.756-22.23A258.156 
+258.156 0 0 0 283.211 
+0c-141.309 0-256 
+114.511-256 256 0 
+141.309 114.511 256 
+256 256z"[39m
+              
+[36m/>[39m
+            
+[36m</svg>[39m
+          
+[36m</button>[39m
+          
+[36m<div[39m
+            [33mclass
+[39m=[32m"flex-1 flex 
+flex-col 
+justify-center px-5 
+sm:px-8 py-8 md:py-12 
+md:w-1/2 lg:px-20 z-10 
+w-full mx-auto md:mx-0 
+order-2 
+md:order-1"[39m
+          [36m>[39m
+            
+[36m<div[39m
+              [33mclas
+s[39m=[32m"w-full 
+max-w-md mx-auto"[39m
+            [36m>[39m
+              
+[36m<div[39m
+                [33mcl
+ass[39m=[32m"flex 
+items-center mb-0 
+space-x-3"[39m
+              
+[36m>[39m
+                
+[36m<div[39m
+                  [33m
+class[39m=[32m"items-
+center group"[39m
+                
+[36m>[39m
+                  
+[36m<img[39m
+                    [3
+3malt[39m=[32m"SDGP 
+Logo"[39m
+                    [3
+3mclass[39m=[32m"h-12
+ sm:h-16 md:h-18 
+w-auto"[39m
+                    [3
+3msrc[39m=[32m"/logoS
+DGP.webp"[39m
+                  
+[36m/>[39m
+                
+[36m</div>[39m
+              
+[36m</div>[39m
+              
+[36m<h2[39m
+                [33mcl
+ass[39m=[32m"text-2xl
+ sm:text-3xl 
+lg:text-4xl 
+font-extrabold mb-3 
+tracking-tight"[39m
+              
+[36m>[39m
+                
+[0mcreateAccount[0m
+              
+[36m</h2>[39m
+              
+[36m<p[39m
+                [33mcl
+ass[39m=[32m"text-gra
+y-500 
+dark:text-gray-400 
+mb-6"[39m
+              
+[36m>[39m
+                [0mcre
+ateAccountSubtitle[0m
+              
+[36m</p>[39m
+              
+[36m<form[39m
+                [33mcl
+ass[39m=[32m"space-y-
+4"[39m
+              
+[36m>[39m
+                
+[36m<div>[39m
+                  
+[36m<label[39m
+                    [3
+3mclass[39m=[32m"bloc
+k text-sm 
+font-semibold 
+mb-2"[39m
+                  
+[36m>[39m
+                    
+[0mfullName[0m
+                  
+[36m</label>[39m
+                  
+[36m<input[39m
+                    [3
+3mclass[39m=[32m"w-fu
+ll rounded-xl px-4 
+py-3 transition-all 
+duration-200 
+bg-gray-100 
+text-gray-900 border 
+border-gray-300 
+placeholder-gray-500 
+dark:bg-neutral-800/80 
+dark:text-white dark:bo
+rder-neutral-600 dark:p
+laceholder-gray-400 
+hover:border-gray-400 d
+ark:hover:border-neutra
+l-500 
+focus:outline-none 
+focus:ring-2 
+focus:ring-indigo-500 d
+ark:focus:ring-indigo-4
+00 
+backdrop-blur-sm"[39m
+                    [3
+3mplaceholder[39m=[32
+m"John Doe"[39m
+                    [3
+3mrequired[39m=[32m""
+[39m
+                    [3
+3mtype[39m=[32m"text"
+[39m
+                  
+[36m/>[39m
+                
+[36m</div>[39m
+                
+[36m<div>[39m
+                  
+[36m<label[39m
+                    [3
+3mclass[39m=[32m"bloc
+k text-sm 
+font-semibold 
+mb-2"[39m
+                  
+[36m>[39m
+                    
+[0memailAddress[0m
+                  
+[36m</label>[39m
+                  
+[36m<input[39m
+                    [3
+3mclass[39m=[32m"w-fu
+ll rounded-xl px-4 
+py-3 transition-all 
+duration-200 
+text-gray-900 
+dark:text-white 
+placeholder-gray-500 da
+rk:placeholder-gray-400
+ border outline-none 
+backdrop-blur-sm 
+focus:ring-2 
+bg-gray-100 
+dark:bg-neutral-800/80 
+border-gray-300 dark:bo
+rder-neutral-600 
+hover:border-gray-400 d
+ark:hover:border-neutra
+l-500 
+focus:ring-indigo-500 d
+ark:focus:ring-indigo-4
+00"[39m
+                    [3
+3mplaceholder[39m=[32
+m"name@company.com"[39
+m
+                    [3
+3mrequired[39m=[32m""
+[39m
+                    [3
+3mtype[39m=[32m"email
+"[39m
+                  
+[36m/>[39m
+                
+[36m</div>[39m
+                
+[36m<div[39m
+                  [33m
+class[39m=[32m"grid 
+grid-cols-1 
+md:grid-cols-2 
+gap-4"[39m
+                
+[36m>[39m
+                  
+[36m<div>[39m
+                    
+[36m<label[39m
+                      
+[33mclass[39m=[32m"bl
+ock text-sm 
+font-semibold 
+mb-2"[39m
+                    
+[36m>[39m
+                      
+[0mpassword[0m
+                    
+[36m</label>[39m
+                    
+[36m<input[39m
+                      
+[33mclass[39m=[32m"w-
+full rounded-xl px-4 
+py-3 transition-all 
+duration-200 
+text-gray-900 
+dark:text-white 
+placeholder-gray-500 da
+rk:placeholder-gray-400
+ border outline-none 
+backdrop-blur-sm 
+focus:ring-2 
+bg-gray-100 
+dark:bg-neutral-800/80 
+border-gray-300 dark:bo
+rder-neutral-600 
+hover:border-gray-400 d
+ark:hover:border-neutra
+l-500 
+focus:ring-indigo-500 d
+ark:focus:ring-indigo-4
+00"[39m
+                      
+[33mplaceholder[39m=[
+32m"ΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓ
+ÇóΓÇó"[39m
+                      
+[33mrequired[39m=[32m
+""[39m
+                      
+[33mtype[39m=[32m"pas
+sword"[39m
+                    
+[36m/>[39m
+                  
+[36m</div>[39m
+                  
+[36m<div>[39m
+                    
+[36m<label[39m
+                      
+[33mclass[39m=[32m"bl
+ock text-sm 
+font-semibold 
+mb-2"[39m
+                    
+[36m>[39m
+                      
+[0mconfirmPassword[0m
+                    
+[36m</label>[39m
+                    
+[36m<input[39m
+                      
+[33mclass[39m=[32m"w-
+full rounded-xl px-4 
+py-3 transition-all 
+duration-200 
+text-gray-900 
+dark:text-white 
+placeholder-gray-500 da
+rk:placeholder-gray-400
+ border outline-none 
+backdrop-blur-sm 
+focus:ring-2 
+bg-gray-100 
+dark:bg-neutral-800/80 
+border-gray-300 dark:bo
+rder-neutral-600 
+hover:border-gray-400 d
+ark:hover:border-neutra
+l-500 
+focus:ring-indigo-500 d
+ark:focus:ring-indigo-4
+00"[39m
+                      
+[33mplaceholder[39m=[
+32m"ΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓ
+ÇóΓÇó"[39m
+                      
+[33mrequired[39m=[32m
+""[39m
+                      
+[33mtype[39m=[32m"pas
+sword"[39m
+                    
+[36m/>[39m
+                  
+[36m</div>[39m
+                
+[36m</div>[39m
+                
+[36m<button[39m
+                  [33m
+class[39m=[32m"w-full
+ py-3 sm:py-4 px-6 
+bg-indigo-600 
+hover:bg-indigo-700 
+text-white font-bold 
+rounded-xl shadow-xl 
+shadow-indigo-500/20 
+transition-all 
+active:scale-[0.97] 
+disabled:opacity-70 dis
+abled:cursor-not-allowe
+d"[39m
+                  [33m
+type[39m=[32m"submit"
+[39m
+                
+[36m>[39m
+                  
+[0msignUpBtn[0m
+                
+[36m</button>[39m
+                
+[36m<div[39m
+                  [33m
+class[39m=[32m"flex 
+items-center"[39m
+                
+[36m>[39m
+                  
+[36m<div[39m
+                    [3
+3mclass[39m=[32m"flex
+-grow h-px 
+bg-slate-300 
+dark:bg-slate-700"[39m
+                  
+[36m/>[39m
+                  
+[36m<span[39m
+                    [3
+3mclass[39m=[32m"px-4
+ text-sm 
+text-slate-500"[39m
+                  
+[36m>[39m
+                    
+[0morDivider[0m
+                  
+[36m</span>[39m
+                  
+[36m<div[39m
+                    [3
+3mclass[39m=[32m"flex
+-grow h-px 
+bg-slate-300 
+dark:bg-slate-700"[39m
+                  
+[36m/>[39m
+                
+[36m</div>[39m
+                
+[36m<button[39m
+                  [33m
+class[39m=[32m"w-full
+ py-3 border 
+border-slate-300 
+dark:border-slate-700 
+rounded-xl flex 
+items-center 
+justify-center gap-3 
+hover:bg-slate-50 dark:
+hover:bg-slate-800 
+transition"[39m
+                  [33m
+type[39m=[32m"button"
+[39m
+                
+[36m>[39m
+                  
+[36m<img[39m
+                    [3
+3malt[39m=[32m"Google
+"[39m
+                    [3
+3mclass[39m=[32m"h-5 
+w-5"[39m
+                    [3
+3msrc[39m=[32m"https:
+//www.svgrepo.com/show/
+475656/google-color.svg
+"[39m
+                  
+[36m/>[39m
+                  
+[0mcontinueGoogle[0m
+                
+[36m</button>[39m
+              
+[36m</form>[39m
+              
+[36m<p[39m
+                [33mcl
+ass[39m=[32m"mt-3 
+text-center text-sm 
+text-slate-500 dark:tex
+t-slate-400"[39m
+              
+[36m>[39m
+                
+[0malreadyAccount[0m
+                [0m 
+[0m
+                
+[36m<a[39m
+                  [33m
+class[39m=[32m"text-i
+ndigo-500 
+hover:text-indigo-400 
+font-bold 
+underline-offset-4 
+hover:underline"[39m
+                  [33m
+href[39m=[32m"/"[39m
+                
+[36m>[39m
+                  
+[0msignInLink[0m
+                
+[36m</a>[39m
+              
+[36m</p>[39m
+            
+[36m</div>[39m
+          
+[36m</div>[39m
+          
+[36m<div[39m
+            [33mclass
+[39m=[32m"w-full 
+h-[40vh] md:h-auto 
+md:w-1/2 relative 
+bg-neutral-900 order-1 
+md:order-2"[39m
+          [36m>[39m
+            
+[36m<img[39m
+              [33malt
+[39m=[32m"Rice Field 
+Day"[39m
+              [33mclas
+s[39m=[32m"absolute 
+inset-0 w-full h-full 
+object-cover 
+transition-opacity 
+duration-700 
+opacity-100 
+dark:opacity-0"[39m
+              [33mfetc
+hpriority[39m=[32m"hi
+gh"[39m
+              [33mload
+ing[39m=[32m"eager"[
+39m
+              [33msrc
+[39m=[32m"/images/rice
+-day-2.webp"[39m
+            
+[36m/>[39m
+            
+[36m<img[39m
+              [33malt
+[39m=[32m"Rice Field 
+Night"[39m
+              [33mclas
+s[39m=[32m"absolute 
+inset-0 w-full h-full 
+object-cover 
+transition-opacity 
+duration-700 opacity-0 
+dark:opacity-100"[39m
+              [33mfetc
+hpriority[39m=[32m"hi
+gh"[39m
+              [33mload
+ing[39m=[32m"eager"[
+39m
+              [33msrc
+[39m=[32m"/images/dark
+ image 2.jpeg"[39m
+            
+[36m/>[39m
+            
+[36m<div[39m
+              [33mclas
+s[39m=[32m"absolute 
+inset-0 
+bg-gradient-to-t 
+from-black/60 
+via-transparent 
+to-transparent pointer-
+events-none"[39m
+            
+[36m/>[39m
+            
+[36m<div[39m
+              [33mclas
+s[39m=[32m"absolute 
+inset-0 bg-transparent 
+dark:bg-black/30 
+transition-colors 
+duration-700 pointer-ev
+ents-none"[39m
+            
+[36m/>[39m
+          
+[36m</div>[39m
+        
+[36m</div>[39m
+      [36m</div>[39m
+    [36m</body>[39m
+
+    [0m [90m 82 
+|[39m
+     [90m 83 |[39m   
+  expect(screen[33m.[
+39mgetByRole([32m'butt
+on'[39m[33m,[39m { 
+name[33m:[39m 
+[32m'signUpBtn'[39m }
+))[33m.[39mtoBeInTheD
+ocument()[33m;[39m
+    [31m[1m>[22m[39
+m[90m 84 |[39m     ex
+pect(screen[33m.[39mg
+etByRole([32m'button'
+[39m[33m,[39m { 
+name[33m:[39m [32m'c
+ontinueGoogle'[39m }))
+[33m.[39mtoBeInTheDoc
+ument()[33m;[39m
+     [90m    |[39m   
+                
+[31m[1m^[22m[39m
+     [90m 85 |[39m   
+})[33m;[39m
+     [90m 86 |[39m
+     [90m 87 |[39m   
+it([32m'valdiates 
+missing fields 
+correctly when 
+submitted 
+empty'[39m[33m,[39m 
+[36masync[39m () 
+[33m=>[39m {[0m
+
+      at 
+Object.getElementError 
+(node_modules/@testing-
+library/dom/dist/config
+.js:37:19)
+      at node_modules/@
+testing-library/dom/dis
+t/query-helpers.js:76:3
+8
+      at node_modules/@
+testing-library/dom/dis
+t/query-helpers.js:52:1
+7
+      at node_modules/@
+testing-library/dom/dis
+t/query-helpers.js:95:1
+9
+      at 
+Object.getByRole (src/C
+omponents/Authenticatio
+n/Signup.test.jsx:84:19
+)
+
+  ΓùÅ SignupPage 
+Component ΓÇ║ 
+successfully submits 
+the form and navigates 
+on success
+
+    TestingLibraryEleme
+ntError: Unable to 
+find an accessible 
+element with the role 
+"button" and name 
+"signingUp"
+
+    Here are the 
+accessible roles:
+
+      button:
+
+      Name "":
+      [36m<button[39m
+        [33mclass[39m
+=[32m"fixed top-6 
+right-6 p-3 
+rounded-full 
+bg-slate-100 
+dark:bg-slate-800 
+hover:rotate-12 
+transition-all 
+shadow-md z-50"[39m
+        [33mtype[39m=
+[32m"button"[39m
+      [36m/>[39m
+
+      Name "signUpBtn":
+      [36m<button[39m
+        [33mclass[39m
+=[32m"w-full py-3 
+sm:py-4 px-6 
+bg-indigo-600 
+hover:bg-indigo-700 
+text-white font-bold 
+rounded-xl shadow-xl 
+shadow-indigo-500/20 
+transition-all 
+active:scale-[0.97] 
+disabled:opacity-70 dis
+abled:cursor-not-allowe
+d"[39m
+        [33mtype[39m=
+[32m"submit"[39m
+      [36m/>[39m
+
+      Name "Google 
+continueGoogle":
+      [36m<button[39m
+        [33mclass[39m
+=[32m"w-full py-3 
+border 
+border-slate-300 
+dark:border-slate-700 
+rounded-xl flex 
+items-center 
+justify-center gap-3 
+hover:bg-slate-50 dark:
+hover:bg-slate-800 
+transition"[39m
+        [33mtype[39m=
+[32m"button"[39m
+      [36m/>[39m
+
+      -----------------
+-----------------------
+----------
+      img:
+
+      Name "SDGP Logo":
+      [36m<img[39m
+        [33malt[39m=
+[32m"SDGP Logo"[39m
+        [33mclass[39m
+=[32m"h-12 sm:h-16 
+md:h-18 w-auto"[39m
+        [33msrc[39m=
+[32m"/logoSDGP.webp"[3
+9m
+      [36m/>[39m
+
+      Name "Google":
+      [36m<img[39m
+        [33malt[39m=
+[32m"Google"[39m
+        [33mclass[39m
+=[32m"h-5 w-5"[39m
+        [33msrc[39m=
+[32m"https://www.svgrep
+o.com/show/475656/googl
+e-color.svg"[39m
+      [36m/>[39m
+
+      Name "Rice Field 
+Day":
+      [36m<img[39m
+        [33malt[39m=
+[32m"Rice Field 
+Day"[39m
+        [33mclass[39m
+=[32m"absolute 
+inset-0 w-full h-full 
+object-cover 
+transition-opacity 
+duration-700 
+opacity-100 
+dark:opacity-0"[39m
+        [33mfetchprior
+ity[39m=[32m"high"[3
+9m
+        [33mloading[3
+9m=[32m"eager"[39m
+        [33msrc[39m=
+[32m"/images/rice-day-2
+.webp"[39m
+      [36m/>[39m
+
+      Name "Rice Field 
+Night":
+      [36m<img[39m
+        [33malt[39m=
+[32m"Rice Field 
+Night"[39m
+        [33mclass[39m
+=[32m"absolute 
+inset-0 w-full h-full 
+object-cover 
+transition-opacity 
+duration-700 opacity-0 
+dark:opacity-100"[39m
+        [33mfetchprior
+ity[39m=[32m"high"[3
+9m
+        [33mloading[3
+9m=[32m"eager"[39m
+        [33msrc[39m=
+[32m"/images/dark 
+image 2.jpeg"[39m
+      [36m/>[39m
+
+      -----------------
+-----------------------
+----------
+      heading:
+
+      Name 
+"createAccount":
+      [36m<h2[39m
+        [33mclass[39m
+=[32m"text-2xl 
+sm:text-3xl 
+lg:text-4xl 
+font-extrabold mb-3 
+tracking-tight"[39m
+      [36m/>[39m
+
+      -----------------
+-----------------------
+----------
+      paragraph:
+
+      Name "":
+      [36m<p[39m
+        [33mclass[39m
+=[32m"text-gray-500 
+dark:text-gray-400 
+mb-6"[39m
+      [36m/>[39m
+
+      Name "":
+      [36m<p[39m
+        [33mclass[39m
+=[32m"mt-3 
+text-center text-sm 
+text-slate-500 dark:tex
+t-slate-400"[39m
+      [36m/>[39m
+
+      -----------------
+-----------------------
+----------
+      textbox:
+
+      Name "":
+      [36m<input[39m
+        [33mclass[39m
+=[32m"w-full 
+rounded-xl px-4 py-3 
+transition-all 
+duration-200 
+bg-gray-100 
+text-gray-900 border 
+border-gray-300 
+placeholder-gray-500 
+dark:bg-neutral-800/80 
+dark:text-white dark:bo
+rder-neutral-600 dark:p
+laceholder-gray-400 
+hover:border-gray-400 d
+ark:hover:border-neutra
+l-500 
+focus:outline-none 
+focus:ring-2 
+focus:ring-indigo-500 d
+ark:focus:ring-indigo-4
+00 
+backdrop-blur-sm"[39m
+        [33mplaceholde
+r[39m=[32m"John 
+Doe"[39m
+        [33mrequired[
+39m=[32m""[39m
+        [33mtype[39m=
+[32m"text"[39m
+      [36m/>[39m
+
+      Name "":
+      [36m<input[39m
+        [33mclass[39m
+=[32m"w-full 
+rounded-xl px-4 py-3 
+transition-all 
+duration-200 
+text-gray-900 
+dark:text-white 
+placeholder-gray-500 da
+rk:placeholder-gray-400
+ border outline-none 
+backdrop-blur-sm 
+focus:ring-2 
+bg-gray-100 
+dark:bg-neutral-800/80 
+border-gray-300 dark:bo
+rder-neutral-600 
+hover:border-gray-400 d
+ark:hover:border-neutra
+l-500 
+focus:ring-indigo-500 d
+ark:focus:ring-indigo-4
+00"[39m
+        [33mplaceholde
+r[39m=[32m"name@compa
+ny.com"[39m
+        [33mrequired[
+39m=[32m""[39m
+        [33mtype[39m=
+[32m"email"[39m
+      [36m/>[39m
+
+      -----------------
+-----------------------
+----------
+      link:
+
+      Name 
+"signInLink":
+      [36m<a[39m
+        [33mclass[39m
+=[32m"text-indigo-500 
+hover:text-indigo-400 
+font-bold 
+underline-offset-4 
+hover:underline"[39m
+        [33mhref[39m=
+[32m"/"[39m
+      [36m/>[39m
+
+      -----------------
+-----------------------
+----------
+
+    Ignored nodes: 
+comments, script, style
+    [36m<body>[39m
+      [36m<div>[39m
+        [36m<div[39m
+          [33mclass[3
+9m=[32m"min-h-screen 
+flex flex-col 
+md:flex-row 
+transition-colors 
+duration-500 bg-white 
+dark:bg-neutral-900 
+text-black 
+dark:text-white"[39m
+        [36m>[39m
+          
+[36m<button[39m
+            [33mclass
+[39m=[32m"fixed top-6 
+right-6 p-3 
+rounded-full 
+bg-slate-100 
+dark:bg-slate-800 
+hover:rotate-12 
+transition-all 
+shadow-md z-50"[39m
+            [33mtype[
+39m=[32m"button"[39m
+          [36m>[39m
+            
+[36m<svg[39m
+              [33mclas
+s[39m=[32m"text-indig
+o-600 text-xl"[39m
+              [33mfill
+[39m=[32m"currentColo
+r"[39m
+              [33mheig
+ht[39m=[32m"1em"[39m
+              [33mstro
+ke[39m=[32m"currentCo
+lor"[39m
+              [33mstro
+ke-width[39m=[32m"0"
+[39m
+              [33mview
+Box[39m=[32m"0 0 512 
+512"[39m
+              [33mwidt
+h[39m=[32m"1em"[39m
+              [33mxmln
+s[39m=[32m"http://www
+.w3.org/2000/svg"[39m
+            [36m>[39m
+              
+[36m<path[39m
+                [33md
+[39m=[32m"M283.211 
+512c78.962 0 
+151.079-35.925 
+198.857-94.792 7.068-8.
+708-.639-21.43-11.562-1
+9.35-124.203 23.654-238
+.262-71.576-238.262-196
+.954 0-72.222 
+38.662-138.635 
+101.498-174.394 
+9.686-5.512 7.25-20.197
+-3.756-22.23A258.156 
+258.156 0 0 0 283.211 
+0c-141.309 0-256 
+114.511-256 256 0 
+141.309 114.511 256 
+256 256z"[39m
+              
+[36m/>[39m
+            
+[36m</svg>[39m
+          
+[36m</button>[39m
+          
+[36m<div[39m
+            [33mclass
+[39m=[32m"flex-1 flex 
+flex-col 
+justify-center px-5 
+sm:px-8 py-8 md:py-12 
+md:w-1/2 lg:px-20 z-10 
+w-full mx-auto md:mx-0 
+order-2 
+md:order-1"[39m
+          [36m>[39m
+            
+[36m<div[39m
+              [33mclas
+s[39m=[32m"w-full 
+max-w-md mx-auto"[39m
+            [36m>[39m
+              
+[36m<div[39m
+                [33mcl
+ass[39m=[32m"flex 
+items-center mb-0 
+space-x-3"[39m
+              
+[36m>[39m
+                
+[36m<div[39m
+                  [33m
+class[39m=[32m"items-
+center group"[39m
+                
+[36m>[39m
+                  
+[36m<img[39m
+                    [3
+3malt[39m=[32m"SDGP 
+Logo"[39m
+                    [3
+3mclass[39m=[32m"h-12
+ sm:h-16 md:h-18 
+w-auto"[39m
+                    [3
+3msrc[39m=[32m"/logoS
+DGP.webp"[39m
+                  
+[36m/>[39m
+                
+[36m</div>[39m
+              
+[36m</div>[39m
+              
+[36m<h2[39m
+                [33mcl
+ass[39m=[32m"text-2xl
+ sm:text-3xl 
+lg:text-4xl 
+font-extrabold mb-3 
+tracking-tight"[39m
+              
+[36m>[39m
+                
+[0mcreateAccount[0m
+              
+[36m</h2>[39m
+              
+[36m<p[39m
+                [33mcl
+ass[39m=[32m"text-gra
+y-500 
+dark:text-gray-400 
+mb-6"[39m
+              
+[36m>[39m
+                [0mcre
+ateAccountSubtitle[0m
+              
+[36m</p>[39m
+              
+[36m<form[39m
+                [33mcl
+ass[39m=[32m"space-y-
+4"[39m
+              
+[36m>[39m
+                
+[36m<div>[39m
+                  
+[36m<label[39m
+                    [3
+3mclass[39m=[32m"bloc
+k text-sm 
+font-semibold 
+mb-2"[39m
+                  
+[36m>[39m
+                    
+[0mfullName[0m
+                  
+[36m</label>[39m
+                  
+[36m<input[39m
+                    [3
+3mclass[39m=[32m"w-fu
+ll rounded-xl px-4 
+py-3 transition-all 
+duration-200 
+bg-gray-100 
+text-gray-900 border 
+border-gray-300 
+placeholder-gray-500 
+dark:bg-neutral-800/80 
+dark:text-white dark:bo
+rder-neutral-600 dark:p
+laceholder-gray-400 
+hover:border-gray-400 d
+ark:hover:border-neutra
+l-500 
+focus:outline-none 
+focus:ring-2 
+focus:ring-indigo-500 d
+ark:focus:ring-indigo-4
+00 
+backdrop-blur-sm"[39m
+                    [3
+3mplaceholder[39m=[32
+m"John Doe"[39m
+                    [3
+3mrequired[39m=[32m""
+[39m
+                    [3
+3mtype[39m=[32m"text"
+[39m
+                  
+[36m/>[39m
+                
+[36m</div>[39m
+                
+[36m<div>[39m
+                  
+[36m<label[39m
+                    [3
+3mclass[39m=[32m"bloc
+k text-sm 
+font-semibold 
+mb-2"[39m
+                  
+[36m>[39m
+                    
+[0memailAddress[0m
+                  
+[36m</label>[39m
+                  
+[36m<input[39m
+                    [3
+3mclass[39m=[32m"w-fu
+ll rounded-xl px-4 
+py-3 transition-all 
+duration-200 
+text-gray-900 
+dark:text-white 
+placeholder-gray-500 da
+rk:placeholder-gray-400
+ border outline-none 
+backdrop-blur-sm 
+focus:ring-2 
+bg-gray-100 
+dark:bg-neutral-800/80 
+border-gray-300 dark:bo
+rder-neutral-600 
+hover:border-gray-400 d
+ark:hover:border-neutra
+l-500 
+focus:ring-indigo-500 d
+ark:focus:ring-indigo-4
+00"[39m
+                    [3
+3mplaceholder[39m=[32
+m"name@company.com"[39
+m
+                    [3
+3mrequired[39m=[32m""
+[39m
+                    [3
+3mtype[39m=[32m"email
+"[39m
+                  
+[36m/>[39m
+                
+[36m</div>[39m
+                
+[36m<div[39m
+                  [33m
+class[39m=[32m"grid 
+grid-cols-1 
+md:grid-cols-2 
+gap-4"[39m
+                
+[36m>[39m
+                  
+[36m<div>[39m
+                    
+[36m<label[39m
+                      
+[33mclass[39m=[32m"bl
+ock text-sm 
+font-semibold 
+mb-2"[39m
+                    
+[36m>[39m
+                      
+[0mpassword[0m
+                    
+[36m</label>[39m
+                    
+[36m<input[39m
+                      
+[33mclass[39m=[32m"w-
+full rounded-xl px-4 
+py-3 transition-all 
+duration-200 
+text-gray-900 
+dark:text-white 
+placeholder-gray-500 da
+rk:placeholder-gray-400
+ border outline-none 
+backdrop-blur-sm 
+focus:ring-2 
+bg-gray-100 
+dark:bg-neutral-800/80 
+border-gray-300 dark:bo
+rder-neutral-600 
+hover:border-gray-400 d
+ark:hover:border-neutra
+l-500 
+focus:ring-indigo-500 d
+ark:focus:ring-indigo-4
+00"[39m
+                      
+[33mplaceholder[39m=[
+32m"ΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓ
+ÇóΓÇó"[39m
+                      
+[33mrequired[39m=[32m
+""[39m
+                      
+[33mtype[39m=[32m"pas
+sword"[39m
+                    
+[36m/>[39m
+                  
+[36m</div>[39m
+                  
+[36m<div>[39m
+                    
+[36m<label[39m
+                      
+[33mclass[39m=[32m"bl
+ock text-sm 
+font-semibold 
+mb-2"[39m
+                    
+[36m>[39m
+                      
+[0mconfirmPassword[0m
+                    
+[36m</label>[39m
+                    
+[36m<input[39m
+                      
+[33mclass[39m=[32m"w-
+full rounded-xl px-4 
+py-3 transition-all 
+duration-200 
+text-gray-900 
+dark:text-white 
+placeholder-gray-500 da
+rk:placeholder-gray-400
+ border outline-none 
+backdrop-blur-sm 
+focus:ring-2 
+bg-gray-100 
+dark:bg-neutral-800/80 
+border-gray-300 dark:bo
+rder-neutral-600 
+hover:border-gray-400 d
+ark:hover:border-neutra
+l-500 
+focus:ring-indigo-500 d
+ark:focus:ring-indigo-4
+00"[39m
+                      
+[33mplaceholder[39m=[
+32m"ΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓ
+ÇóΓÇó"[39m
+                      
+[33mrequired[39m=[32m
+""[39m
+                      
+[33mtype[39m=[32m"pas
+sword"[39m
+                    
+[36m/>[39m
+                  
+[36m</div>[39m
+                
+[36m</div>[39m
+                
+[36m<button[39m
+                  [33m
+class[39m=[32m"w-full
+ py-3 sm:py-4 px-6 
+bg-indigo-600 
+hover:bg-indigo-700 
+text-white font-bold 
+rounded-xl shadow-xl 
+shadow-indigo-500/20 
+transition-all 
+active:scale-[0.97] 
+disabled:opacity-70 dis
+abled:cursor-not-allowe
+d"[39m
+                  [33m
+type[39m=[32m"submit"
+[39m
+                
+[36m>[39m
+                  
+[0msignUpBtn[0m
+                
+[36m</button>[39m
+                
+[36m<div[39m
+                  [33m
+class[39m=[32m"flex 
+items-center"[39m
+                
+[36m>[39m
+                  
+[36m<div[39m
+                    [3
+3mclass[39m=[32m"flex
+-grow h-px 
+bg-slate-300 
+dark:bg-slate-700"[39m
+                  
+[36m/>[39m
+                  
+[36m<span[39m
+                    [3
+3mclass[39m=[32m"px-4
+ text-sm 
+text-slate-500"[39m
+                  
+[36m>[39m
+                    
+[0morDivider[0m
+                  
+[36m</span>[39m
+                  
+[36m<div[39m
+                    [3
+3mclass[39m=[32m"flex
+-grow h-px 
+bg-slate-300 
+dark:bg-slate-700"[39m
+                  
+[36m/>[39m
+                
+[36m</div>[39m
+                
+[36m<button[39m
+                  [33m
+class[39m=[32m"w-full
+ py-3 border 
+border-slate-300 
+dark:border-slate-700 
+rounded-xl flex 
+items-center 
+justify-center gap-3 
+hover:bg-slate-50 dark:
+hover:bg-slate-800 
+transition"[39m
+                  [33m
+type[39m=[32m"button"
+[39m
+                
+[36m>[39m
+                  
+[36m<img[39m
+                    [3
+3malt[39m=[32m"Google
+"[39m
+                    [3
+3mclass[39m=[32m"h-5 
+w-5"[39m
+                    [3
+3msrc[39m=[32m"https:
+//www.svgrepo.com/show/
+475656/google-color.svg
+"[39m
+                  
+[36m/>[39m
+                  
+[0mcontinueGoogle[0m
+                
+[36m</button>[39m
+              
+[36m</form>[39m
+              
+[36m<p[39m
+                [33mcl
+ass[39m=[32m"mt-3 
+text-center text-sm 
+text-slate-500 dark:tex
+t-slate-400"[39m
+              
+[36m>[39m
+                
+[0malreadyAccount[0m
+                [0m 
+[0m
+                
+[36m<a[39m
+                  [33m
+class[39m=[32m"text-i
+ndigo-500 
+hover:text-indigo-400 
+font-bold 
+underline-offset-4 
+hover:underline"[39m
+                  [33m
+href[39m=[32m"/"[39m
+                
+[36m>[39m
+                  
+[0msignInLink[0m
+                
+[36m</a>[39m
+              
+[36m</p>[39m
+            
+[36m</div>[39m
+          
+[36m</div>[39m
+          
+[36m<div[39m
+            [33mclass
+[39m=[32m"w-full 
+h-[40vh] md:h-auto 
+md:w-1/2 relative 
+bg-neutral-900 order-1 
+md:order-2"[39m
+          [36m>[39m
+            
+[36m<img[39m
+              [33malt
+[39m=[32m"Rice Field 
+Day"[39m
+              [33mclas
+s[39m=[32m"absolute 
+inset-0 w-full h-full 
+object-cover 
+transition-opacity 
+duration-700 
+opacity-100 
+dark:opacity-0"[39m
+              [33mfetc
+hpriority[39m=[32m"hi
+gh"[39m
+              [33mload
+ing[39m=[32m"eager"[
+39m
+              [33msrc
+[39m=[32m"/images/rice
+-day-2.webp"[39m
+            
+[36m/>[39m
+            
+[36m<img[39m
+              [33malt
+[39m=[32m"Rice Field 
+Night"[39m
+              [33mclas
+s[39m=[32m"absolute 
+inset-0 w-full h-full 
+object-cover 
+transition-opacity 
+duration-700 opacity-0 
+dark:opacity-100"[39m
+              [33mfetc
+hpriority[39m=[32m"hi
+gh"[39m
+              [33mload
+ing[39m=[32m"eager"[
+39m
+              [33msrc
+[39m=[32m"/images/dark
+ image 2.jpeg"[39m
+            
+[36m/>[39m
+            
+[36m<div[39m
+              [33mclas
+s[39m=[32m"absolute 
+inset-0 
+bg-gradient-to-t 
+from-black/60 
+via-transparent 
+to-transparent pointer-
+events-none"[39m
+            
+[36m/>[39m
+            
+[36m<div[39m
+              [33mclas
+s[39m=[32m"absolute 
+inset-0 bg-transparent 
+dark:bg-black/30 
+transition-colors 
+duration-700 pointer-ev
+ents-none"[39m
+            
+[36m/>[39m
+          
+[36m</div>[39m
+        
+[36m</div>[39m
+      [36m</div>[39m
+    [36m</body>[39m
+
+    [0m [90m 151 
+|[39m
+     [90m 152 |[39m  
+   [90m// Verify 
+loading state changes 
+text to 
+'signingUp'[39m
+    [31m[1m>[22m[39
+m[90m 153 |[39m     e
+xpect(screen[33m.[39m
+getByRole([32m'button'
+[39m[33m,[39m { 
+name[33m:[39m 
+[32m'signingUp'[39m }
+))[33m.[39mtoBeInTheD
+ocument()[33m;[39m
+     [90m     |[39m  
+                 
+[31m[1m^[22m[39m
+     [90m 154 |[39m
+     [90m 155 |[39m  
+   [36mawait[39m 
+waitFor(() 
+[33m=>[39m {
+     [90m 156 |[39m  
+     [90m// Fetch 
+should be called 
+correctly[39m[0m
+
+      at 
+Object.getElementError 
+(node_modules/@testing-
+library/dom/dist/config
+.js:37:19)
+      at node_modules/@
+testing-library/dom/dis
+t/query-helpers.js:76:3
+8
+      at node_modules/@
+testing-library/dom/dis
+t/query-helpers.js:52:1
+7
+      at node_modules/@
+testing-library/dom/dis
+t/query-helpers.js:95:1
+9
+      at 
+Object.getByRole (src/C
+omponents/Authenticatio
+n/Signup.test.jsx:153:1
+9)
+
+  ΓùÅ SignupPage 
+Component ΓÇ║ 
+simulates Google 
+Signup correctly
+
+    TestingLibraryEleme
+ntError: Unable to 
+find an accessible 
+element with the role 
+"button" and name 
+"continueGoogle"
+
+    Here are the 
+accessible roles:
+
+      button:
+
+      Name "":
+      [36m<button[39m
+        [33mclass[39m
+=[32m"fixed top-6 
+right-6 p-3 
+rounded-full 
+bg-slate-100 
+dark:bg-slate-800 
+hover:rotate-12 
+transition-all 
+shadow-md z-50"[39m
+        [33mtype[39m=
+[32m"button"[39m
+      [36m/>[39m
+
+      Name "signUpBtn":
+      [36m<button[39m
+        [33mclass[39m
+=[32m"w-full py-3 
+sm:py-4 px-6 
+bg-indigo-600 
+hover:bg-indigo-700 
+text-white font-bold 
+rounded-xl shadow-xl 
+shadow-indigo-500/20 
+transition-all 
+active:scale-[0.97] 
+disabled:opacity-70 dis
+abled:cursor-not-allowe
+d"[39m
+        [33mtype[39m=
+[32m"submit"[39m
+      [36m/>[39m
+
+      Name "Google 
+continueGoogle":
+      [36m<button[39m
+        [33mclass[39m
+=[32m"w-full py-3 
+border 
+border-slate-300 
+dark:border-slate-700 
+rounded-xl flex 
+items-center 
+justify-center gap-3 
+hover:bg-slate-50 dark:
+hover:bg-slate-800 
+transition"[39m
+        [33mtype[39m=
+[32m"button"[39m
+      [36m/>[39m
+
+      -----------------
+-----------------------
+----------
+      img:
+
+      Name "SDGP Logo":
+      [36m<img[39m
+        [33malt[39m=
+[32m"SDGP Logo"[39m
+        [33mclass[39m
+=[32m"h-12 sm:h-16 
+md:h-18 w-auto"[39m
+        [33msrc[39m=
+[32m"/logoSDGP.webp"[3
+9m
+      [36m/>[39m
+
+      Name "Google":
+      [36m<img[39m
+        [33malt[39m=
+[32m"Google"[39m
+        [33mclass[39m
+=[32m"h-5 w-5"[39m
+        [33msrc[39m=
+[32m"https://www.svgrep
+o.com/show/475656/googl
+e-color.svg"[39m
+      [36m/>[39m
+
+      Name "Rice Field 
+Day":
+      [36m<img[39m
+        [33malt[39m=
+[32m"Rice Field 
+Day"[39m
+        [33mclass[39m
+=[32m"absolute 
+inset-0 w-full h-full 
+object-cover 
+transition-opacity 
+duration-700 
+opacity-100 
+dark:opacity-0"[39m
+        [33mfetchprior
+ity[39m=[32m"high"[3
+9m
+        [33mloading[3
+9m=[32m"eager"[39m
+        [33msrc[39m=
+[32m"/images/rice-day-2
+.webp"[39m
+      [36m/>[39m
+
+      Name "Rice Field 
+Night":
+      [36m<img[39m
+        [33malt[39m=
+[32m"Rice Field 
+Night"[39m
+        [33mclass[39m
+=[32m"absolute 
+inset-0 w-full h-full 
+object-cover 
+transition-opacity 
+duration-700 opacity-0 
+dark:opacity-100"[39m
+        [33mfetchprior
+ity[39m=[32m"high"[3
+9m
+        [33mloading[3
+9m=[32m"eager"[39m
+        [33msrc[39m=
+[32m"/images/dark 
+image 2.jpeg"[39m
+      [36m/>[39m
+
+      -----------------
+-----------------------
+----------
+      heading:
+
+      Name 
+"createAccount":
+      [36m<h2[39m
+        [33mclass[39m
+=[32m"text-2xl 
+sm:text-3xl 
+lg:text-4xl 
+font-extrabold mb-3 
+tracking-tight"[39m
+      [36m/>[39m
+
+      -----------------
+-----------------------
+----------
+      paragraph:
+
+      Name "":
+      [36m<p[39m
+        [33mclass[39m
+=[32m"text-gray-500 
+dark:text-gray-400 
+mb-6"[39m
+      [36m/>[39m
+
+      Name "":
+      [36m<p[39m
+        [33mclass[39m
+=[32m"mt-3 
+text-center text-sm 
+text-slate-500 dark:tex
+t-slate-400"[39m
+      [36m/>[39m
+
+      -----------------
+-----------------------
+----------
+      textbox:
+
+      Name "":
+      [36m<input[39m
+        [33mclass[39m
+=[32m"w-full 
+rounded-xl px-4 py-3 
+transition-all 
+duration-200 
+bg-gray-100 
+text-gray-900 border 
+border-gray-300 
+placeholder-gray-500 
+dark:bg-neutral-800/80 
+dark:text-white dark:bo
+rder-neutral-600 dark:p
+laceholder-gray-400 
+hover:border-gray-400 d
+ark:hover:border-neutra
+l-500 
+focus:outline-none 
+focus:ring-2 
+focus:ring-indigo-500 d
+ark:focus:ring-indigo-4
+00 
+backdrop-blur-sm"[39m
+        [33mplaceholde
+r[39m=[32m"John 
+Doe"[39m
+        [33mrequired[
+39m=[32m""[39m
+        [33mtype[39m=
+[32m"text"[39m
+      [36m/>[39m
+
+      Name "":
+      [36m<input[39m
+        [33mclass[39m
+=[32m"w-full 
+rounded-xl px-4 py-3 
+transition-all 
+duration-200 
+text-gray-900 
+dark:text-white 
+placeholder-gray-500 da
+rk:placeholder-gray-400
+ border outline-none 
+backdrop-blur-sm 
+focus:ring-2 
+bg-gray-100 
+dark:bg-neutral-800/80 
+border-gray-300 dark:bo
+rder-neutral-600 
+hover:border-gray-400 d
+ark:hover:border-neutra
+l-500 
+focus:ring-indigo-500 d
+ark:focus:ring-indigo-4
+00"[39m
+        [33mplaceholde
+r[39m=[32m"name@compa
+ny.com"[39m
+        [33mrequired[
+39m=[32m""[39m
+        [33mtype[39m=
+[32m"email"[39m
+      [36m/>[39m
+
+      -----------------
+-----------------------
+----------
+      link:
+
+      Name 
+"signInLink":
+      [36m<a[39m
+        [33mclass[39m
+=[32m"text-indigo-500 
+hover:text-indigo-400 
+font-bold 
+underline-offset-4 
+hover:underline"[39m
+        [33mhref[39m=
+[32m"/"[39m
+      [36m/>[39m
+
+      -----------------
+-----------------------
+----------
+
+    Ignored nodes: 
+comments, script, style
+    [36m<body>[39m
+      [36m<div>[39m
+        [36m<div[39m
+          [33mclass[3
+9m=[32m"min-h-screen 
+flex flex-col 
+md:flex-row 
+transition-colors 
+duration-500 bg-white 
+dark:bg-neutral-900 
+text-black 
+dark:text-white"[39m
+        [36m>[39m
+          
+[36m<button[39m
+            [33mclass
+[39m=[32m"fixed top-6 
+right-6 p-3 
+rounded-full 
+bg-slate-100 
+dark:bg-slate-800 
+hover:rotate-12 
+transition-all 
+shadow-md z-50"[39m
+            [33mtype[
+39m=[32m"button"[39m
+          [36m>[39m
+            
+[36m<svg[39m
+              [33mclas
+s[39m=[32m"text-indig
+o-600 text-xl"[39m
+              [33mfill
+[39m=[32m"currentColo
+r"[39m
+              [33mheig
+ht[39m=[32m"1em"[39m
+              [33mstro
+ke[39m=[32m"currentCo
+lor"[39m
+              [33mstro
+ke-width[39m=[32m"0"
+[39m
+              [33mview
+Box[39m=[32m"0 0 512 
+512"[39m
+              [33mwidt
+h[39m=[32m"1em"[39m
+              [33mxmln
+s[39m=[32m"http://www
+.w3.org/2000/svg"[39m
+            [36m>[39m
+              
+[36m<path[39m
+                [33md
+[39m=[32m"M283.211 
+512c78.962 0 
+151.079-35.925 
+198.857-94.792 7.068-8.
+708-.639-21.43-11.562-1
+9.35-124.203 23.654-238
+.262-71.576-238.262-196
+.954 0-72.222 
+38.662-138.635 
+101.498-174.394 
+9.686-5.512 7.25-20.197
+-3.756-22.23A258.156 
+258.156 0 0 0 283.211 
+0c-141.309 0-256 
+114.511-256 256 0 
+141.309 114.511 256 
+256 256z"[39m
+              
+[36m/>[39m
+            
+[36m</svg>[39m
+          
+[36m</button>[39m
+          
+[36m<div[39m
+            [33mclass
+[39m=[32m"flex-1 flex 
+flex-col 
+justify-center px-5 
+sm:px-8 py-8 md:py-12 
+md:w-1/2 lg:px-20 z-10 
+w-full mx-auto md:mx-0 
+order-2 
+md:order-1"[39m
+          [36m>[39m
+            
+[36m<div[39m
+              [33mclas
+s[39m=[32m"w-full 
+max-w-md mx-auto"[39m
+            [36m>[39m
+              
+[36m<div[39m
+                [33mcl
+ass[39m=[32m"flex 
+items-center mb-0 
+space-x-3"[39m
+              
+[36m>[39m
+                
+[36m<div[39m
+                  [33m
+class[39m=[32m"items-
+center group"[39m
+                
+[36m>[39m
+                  
+[36m<img[39m
+                    [3
+3malt[39m=[32m"SDGP 
+Logo"[39m
+                    [3
+3mclass[39m=[32m"h-12
+ sm:h-16 md:h-18 
+w-auto"[39m
+                    [3
+3msrc[39m=[32m"/logoS
+DGP.webp"[39m
+                  
+[36m/>[39m
+                
+[36m</div>[39m
+              
+[36m</div>[39m
+              
+[36m<h2[39m
+                [33mcl
+ass[39m=[32m"text-2xl
+ sm:text-3xl 
+lg:text-4xl 
+font-extrabold mb-3 
+tracking-tight"[39m
+              
+[36m>[39m
+                
+[0mcreateAccount[0m
+              
+[36m</h2>[39m
+              
+[36m<p[39m
+                [33mcl
+ass[39m=[32m"text-gra
+y-500 
+dark:text-gray-400 
+mb-6"[39m
+              
+[36m>[39m
+                [0mcre
+ateAccountSubtitle[0m
+              
+[36m</p>[39m
+              
+[36m<form[39m
+                [33mcl
+ass[39m=[32m"space-y-
+4"[39m
+              
+[36m>[39m
+                
+[36m<div>[39m
+                  
+[36m<label[39m
+                    [3
+3mclass[39m=[32m"bloc
+k text-sm 
+font-semibold 
+mb-2"[39m
+                  
+[36m>[39m
+                    
+[0mfullName[0m
+                  
+[36m</label>[39m
+                  
+[36m<input[39m
+                    [3
+3mclass[39m=[32m"w-fu
+ll rounded-xl px-4 
+py-3 transition-all 
+duration-200 
+bg-gray-100 
+text-gray-900 border 
+border-gray-300 
+placeholder-gray-500 
+dark:bg-neutral-800/80 
+dark:text-white dark:bo
+rder-neutral-600 dark:p
+laceholder-gray-400 
+hover:border-gray-400 d
+ark:hover:border-neutra
+l-500 
+focus:outline-none 
+focus:ring-2 
+focus:ring-indigo-500 d
+ark:focus:ring-indigo-4
+00 
+backdrop-blur-sm"[39m
+                    [3
+3mplaceholder[39m=[32
+m"John Doe"[39m
+                    [3
+3mrequired[39m=[32m""
+[39m
+                    [3
+3mtype[39m=[32m"text"
+[39m
+                  
+[36m/>[39m
+                
+[36m</div>[39m
+                
+[36m<div>[39m
+                  
+[36m<label[39m
+                    [3
+3mclass[39m=[32m"bloc
+k text-sm 
+font-semibold 
+mb-2"[39m
+                  
+[36m>[39m
+                    
+[0memailAddress[0m
+                  
+[36m</label>[39m
+                  
+[36m<input[39m
+                    [3
+3mclass[39m=[32m"w-fu
+ll rounded-xl px-4 
+py-3 transition-all 
+duration-200 
+text-gray-900 
+dark:text-white 
+placeholder-gray-500 da
+rk:placeholder-gray-400
+ border outline-none 
+backdrop-blur-sm 
+focus:ring-2 
+bg-gray-100 
+dark:bg-neutral-800/80 
+border-gray-300 dark:bo
+rder-neutral-600 
+hover:border-gray-400 d
+ark:hover:border-neutra
+l-500 
+focus:ring-indigo-500 d
+ark:focus:ring-indigo-4
+00"[39m
+                    [3
+3mplaceholder[39m=[32
+m"name@company.com"[39
+m
+                    [3
+3mrequired[39m=[32m""
+[39m
+                    [3
+3mtype[39m=[32m"email
+"[39m
+                  
+[36m/>[39m
+                
+[36m</div>[39m
+                
+[36m<div[39m
+                  [33m
+class[39m=[32m"grid 
+grid-cols-1 
+md:grid-cols-2 
+gap-4"[39m
+                
+[36m>[39m
+                  
+[36m<div>[39m
+                    
+[36m<label[39m
+                      
+[33mclass[39m=[32m"bl
+ock text-sm 
+font-semibold 
+mb-2"[39m
+                    
+[36m>[39m
+                      
+[0mpassword[0m
+                    
+[36m</label>[39m
+                    
+[36m<input[39m
+                      
+[33mclass[39m=[32m"w-
+full rounded-xl px-4 
+py-3 transition-all 
+duration-200 
+text-gray-900 
+dark:text-white 
+placeholder-gray-500 da
+rk:placeholder-gray-400
+ border outline-none 
+backdrop-blur-sm 
+focus:ring-2 
+bg-gray-100 
+dark:bg-neutral-800/80 
+border-gray-300 dark:bo
+rder-neutral-600 
+hover:border-gray-400 d
+ark:hover:border-neutra
+l-500 
+focus:ring-indigo-500 d
+ark:focus:ring-indigo-4
+00"[39m
+                      
+[33mplaceholder[39m=[
+32m"ΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓ
+ÇóΓÇó"[39m
+                      
+[33mrequired[39m=[32m
+""[39m
+                      
+[33mtype[39m=[32m"pas
+sword"[39m
+                    
+[36m/>[39m
+                  
+[36m</div>[39m
+                  
+[36m<div>[39m
+                    
+[36m<label[39m
+                      
+[33mclass[39m=[32m"bl
+ock text-sm 
+font-semibold 
+mb-2"[39m
+                    
+[36m>[39m
+                      
+[0mconfirmPassword[0m
+                    
+[36m</label>[39m
+                    
+[36m<input[39m
+                      
+[33mclass[39m=[32m"w-
+full rounded-xl px-4 
+py-3 transition-all 
+duration-200 
+text-gray-900 
+dark:text-white 
+placeholder-gray-500 da
+rk:placeholder-gray-400
+ border outline-none 
+backdrop-blur-sm 
+focus:ring-2 
+bg-gray-100 
+dark:bg-neutral-800/80 
+border-gray-300 dark:bo
+rder-neutral-600 
+hover:border-gray-400 d
+ark:hover:border-neutra
+l-500 
+focus:ring-indigo-500 d
+ark:focus:ring-indigo-4
+00"[39m
+                      
+[33mplaceholder[39m=[
+32m"ΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓ
+ÇóΓÇó"[39m
+                      
+[33mrequired[39m=[32m
+""[39m
+                      
+[33mtype[39m=[32m"pas
+sword"[39m
+                    
+[36m/>[39m
+                  
+[36m</div>[39m
+                
+[36m</div>[39m
+                
+[36m<button[39m
+                  [33m
+class[39m=[32m"w-full
+ py-3 sm:py-4 px-6 
+bg-indigo-600 
+hover:bg-indigo-700 
+text-white font-bold 
+rounded-xl shadow-xl 
+shadow-indigo-500/20 
+transition-all 
+active:scale-[0.97] 
+disabled:opacity-70 dis
+abled:cursor-not-allowe
+d"[39m
+                  [33m
+type[39m=[32m"submit"
+[39m
+                
+[36m>[39m
+                  
+[0msignUpBtn[0m
+                
+[36m</button>[39m
+                
+[36m<div[39m
+                  [33m
+class[39m=[32m"flex 
+items-center"[39m
+                
+[36m>[39m
+                  
+[36m<div[39m
+                    [3
+3mclass[39m=[32m"flex
+-grow h-px 
+bg-slate-300 
+dark:bg-slate-700"[39m
+                  
+[36m/>[39m
+                  
+[36m<span[39m
+                    [3
+3mclass[39m=[32m"px-4
+ text-sm 
+text-slate-500"[39m
+                  
+[36m>[39m
+                    
+[0morDivider[0m
+                  
+[36m</span>[39m
+                  
+[36m<div[39m
+                    [3
+3mclass[39m=[32m"flex
+-grow h-px 
+bg-slate-300 
+dark:bg-slate-700"[39m
+                  
+[36m/>[39m
+                
+[36m</div>[39m
+                
+[36m<button[39m
+                  [33m
+class[39m=[32m"w-full
+ py-3 border 
+border-slate-300 
+dark:border-slate-700 
+rounded-xl flex 
+items-center 
+justify-center gap-3 
+hover:bg-slate-50 dark:
+hover:bg-slate-800 
+transition"[39m
+                  [33m
+type[39m=[32m"button"
+[39m
+                
+[36m>[39m
+                  
+[36m<img[39m
+                    [3
+3malt[39m=[32m"Google
+"[39m
+                    [3
+3mclass[39m=[32m"h-5 
+w-5"[39m
+                    [3
+3msrc[39m=[32m"https:
+//www.svgrepo.com/show/
+475656/google-color.svg
+"[39m
+                  
+[36m/>[39m
+                  
+[0mcontinueGoogle[0m
+                
+[36m</button>[39m
+              
+[36m</form>[39m
+              
+[36m<p[39m
+                [33mcl
+ass[39m=[32m"mt-3 
+text-center text-sm 
+text-slate-500 dark:tex
+t-slate-400"[39m
+              
+[36m>[39m
+                
+[0malreadyAccount[0m
+                [0m 
+[0m
+                
+[36m<a[39m
+                  [33m
+class[39m=[32m"text-i
+ndigo-500 
+hover:text-indigo-400 
+font-bold 
+underline-offset-4 
+hover:underline"[39m
+                  [33m
+href[39m=[32m"/"[39m
+                
+[36m>[39m
+                  
+[0msignInLink[0m
+                
+[36m</a>[39m
+              
+[36m</p>[39m
+            
+[36m</div>[39m
+          
+[36m</div>[39m
+          
+[36m<div[39m
+            [33mclass
+[39m=[32m"w-full 
+h-[40vh] md:h-auto 
+md:w-1/2 relative 
+bg-neutral-900 order-1 
+md:order-2"[39m
+          [36m>[39m
+            
+[36m<img[39m
+              [33malt
+[39m=[32m"Rice Field 
+Day"[39m
+              [33mclas
+s[39m=[32m"absolute 
+inset-0 w-full h-full 
+object-cover 
+transition-opacity 
+duration-700 
+opacity-100 
+dark:opacity-0"[39m
+              [33mfetc
+hpriority[39m=[32m"hi
+gh"[39m
+              [33mload
+ing[39m=[32m"eager"[
+39m
+              [33msrc
+[39m=[32m"/images/rice
+-day-2.webp"[39m
+            
+[36m/>[39m
+            
+[36m<img[39m
+              [33malt
+[39m=[32m"Rice Field 
+Night"[39m
+              [33mclas
+s[39m=[32m"absolute 
+inset-0 w-full h-full 
+object-cover 
+transition-opacity 
+duration-700 opacity-0 
+dark:opacity-100"[39m
+              [33mfetc
+hpriority[39m=[32m"hi
+gh"[39m
+              [33mload
+ing[39m=[32m"eager"[
+39m
+              [33msrc
+[39m=[32m"/images/dark
+ image 2.jpeg"[39m
+            
+[36m/>[39m
+            
+[36m<div[39m
+              [33mclas
+s[39m=[32m"absolute 
+inset-0 
+bg-gradient-to-t 
+from-black/60 
+via-transparent 
+to-transparent pointer-
+events-none"[39m
+            
+[36m/>[39m
+            
+[36m<div[39m
+              [33mclas
+s[39m=[32m"absolute 
+inset-0 bg-transparent 
+dark:bg-black/30 
+transition-colors 
+duration-700 pointer-ev
+ents-none"[39m
+            
+[36m/>[39m
+          
+[36m</div>[39m
+        
+[36m</div>[39m
+      [36m</div>[39m
+    [36m</body>[39m
+
+    [0m [90m 196 
+|[39m     renderCompon
+ent()[33m;[39m
+     [90m 197 |[39m
+    [31m[1m>[22m[39
+m[90m 198 |[39m     
+[36mconst[39m 
+googleBtn [33m=[39m s
+creen[33m.[39mgetByRo
+le([32m'button'[39m[
+33m,[39m { 
+name[33m:[39m [32m'c
+ontinueGoogle'[39m 
+})[33m;[39m
+     [90m     |[39m  
+                       
+     
+[31m[1m^[22m[39m
+     [90m 199 |[39m  
+   [36mawait[39m user
+[33m.[39mclick(google
+Btn)[33m;[39m
+     [90m 200 |[39m
+     [90m 201 |[39m  
+   [36mawait[39m 
+waitFor(() 
+[33m=>[39m {[0m
+
+      at 
+Object.getElementError 
+(node_modules/@testing-
+library/dom/dist/config
+.js:37:19)
+      at node_modules/@
+testing-library/dom/dis
+t/query-helpers.js:76:3
+8
+      at node_modules/@
+testing-library/dom/dis
+t/query-helpers.js:52:1
+7
+      at node_modules/@
+testing-library/dom/dis
+t/query-helpers.js:95:1
+9
+      at 
+Object.getByRole (src/C
+omponents/Authenticatio
+n/Signup.test.jsx:198:3
+0)
+
+  ΓùÅ SignupPage 
+Component ΓÇ║ alerts 
+on Google Signup error
+
+    TestingLibraryEleme
+ntError: Unable to 
+find an accessible 
+element with the role 
+"button" and name 
+"continueGoogle"
+
+    Here are the 
+accessible roles:
+
+      button:
+
+      Name "":
+      [36m<button[39m
+        [33mclass[39m
+=[32m"fixed top-6 
+right-6 p-3 
+rounded-full 
+bg-slate-100 
+dark:bg-slate-800 
+hover:rotate-12 
+transition-all 
+shadow-md z-50"[39m
+        [33mtype[39m=
+[32m"button"[39m
+      [36m/>[39m
+
+      Name "signUpBtn":
+      [36m<button[39m
+        [33mclass[39m
+=[32m"w-full py-3 
+sm:py-4 px-6 
+bg-indigo-600 
+hover:bg-indigo-700 
+text-white font-bold 
+rounded-xl shadow-xl 
+shadow-indigo-500/20 
+transition-all 
+active:scale-[0.97] 
+disabled:opacity-70 dis
+abled:cursor-not-allowe
+d"[39m
+        [33mtype[39m=
+[32m"submit"[39m
+      [36m/>[39m
+
+      Name "Google 
+continueGoogle":
+      [36m<button[39m
+        [33mclass[39m
+=[32m"w-full py-3 
+border 
+border-slate-300 
+dark:border-slate-700 
+rounded-xl flex 
+items-center 
+justify-center gap-3 
+hover:bg-slate-50 dark:
+hover:bg-slate-800 
+transition"[39m
+        [33mtype[39m=
+[32m"button"[39m
+      [36m/>[39m
+
+      -----------------
+-----------------------
+----------
+      img:
+
+      Name "SDGP Logo":
+      [36m<img[39m
+        [33malt[39m=
+[32m"SDGP Logo"[39m
+        [33mclass[39m
+=[32m"h-12 sm:h-16 
+md:h-18 w-auto"[39m
+        [33msrc[39m=
+[32m"/logoSDGP.webp"[3
+9m
+      [36m/>[39m
+
+      Name "Google":
+      [36m<img[39m
+        [33malt[39m=
+[32m"Google"[39m
+        [33mclass[39m
+=[32m"h-5 w-5"[39m
+        [33msrc[39m=
+[32m"https://www.svgrep
+o.com/show/475656/googl
+e-color.svg"[39m
+      [36m/>[39m
+
+      Name "Rice Field 
+Day":
+      [36m<img[39m
+        [33malt[39m=
+[32m"Rice Field 
+Day"[39m
+        [33mclass[39m
+=[32m"absolute 
+inset-0 w-full h-full 
+object-cover 
+transition-opacity 
+duration-700 
+opacity-100 
+dark:opacity-0"[39m
+        [33mfetchprior
+ity[39m=[32m"high"[3
+9m
+        [33mloading[3
+9m=[32m"eager"[39m
+        [33msrc[39m=
+[32m"/images/rice-day-2
+.webp"[39m
+      [36m/>[39m
+
+      Name "Rice Field 
+Night":
+      [36m<img[39m
+        [33malt[39m=
+[32m"Rice Field 
+Night"[39m
+        [33mclass[39m
+=[32m"absolute 
+inset-0 w-full h-full 
+object-cover 
+transition-opacity 
+duration-700 opacity-0 
+dark:opacity-100"[39m
+        [33mfetchprior
+ity[39m=[32m"high"[3
+9m
+        [33mloading[3
+9m=[32m"eager"[39m
+        [33msrc[39m=
+[32m"/images/dark 
+image 2.jpeg"[39m
+      [36m/>[39m
+
+      -----------------
+-----------------------
+----------
+      heading:
+
+      Name 
+"createAccount":
+      [36m<h2[39m
+        [33mclass[39m
+=[32m"text-2xl 
+sm:text-3xl 
+lg:text-4xl 
+font-extrabold mb-3 
+tracking-tight"[39m
+      [36m/>[39m
+
+      -----------------
+-----------------------
+----------
+      paragraph:
+
+      Name "":
+      [36m<p[39m
+        [33mclass[39m
+=[32m"text-gray-500 
+dark:text-gray-400 
+mb-6"[39m
+      [36m/>[39m
+
+      Name "":
+      [36m<p[39m
+        [33mclass[39m
+=[32m"mt-3 
+text-center text-sm 
+text-slate-500 dark:tex
+t-slate-400"[39m
+      [36m/>[39m
+
+      -----------------
+-----------------------
+----------
+      textbox:
+
+      Name "":
+      [36m<input[39m
+        [33mclass[39m
+=[32m"w-full 
+rounded-xl px-4 py-3 
+transition-all 
+duration-200 
+bg-gray-100 
+text-gray-900 border 
+border-gray-300 
+placeholder-gray-500 
+dark:bg-neutral-800/80 
+dark:text-white dark:bo
+rder-neutral-600 dark:p
+laceholder-gray-400 
+hover:border-gray-400 d
+ark:hover:border-neutra
+l-500 
+focus:outline-none 
+focus:ring-2 
+focus:ring-indigo-500 d
+ark:focus:ring-indigo-4
+00 
+backdrop-blur-sm"[39m
+        [33mplaceholde
+r[39m=[32m"John 
+Doe"[39m
+        [33mrequired[
+39m=[32m""[39m
+        [33mtype[39m=
+[32m"text"[39m
+      [36m/>[39m
+
+      Name "":
+      [36m<input[39m
+        [33mclass[39m
+=[32m"w-full 
+rounded-xl px-4 py-3 
+transition-all 
+duration-200 
+text-gray-900 
+dark:text-white 
+placeholder-gray-500 da
+rk:placeholder-gray-400
+ border outline-none 
+backdrop-blur-sm 
+focus:ring-2 
+bg-gray-100 
+dark:bg-neutral-800/80 
+border-gray-300 dark:bo
+rder-neutral-600 
+hover:border-gray-400 d
+ark:hover:border-neutra
+l-500 
+focus:ring-indigo-500 d
+ark:focus:ring-indigo-4
+00"[39m
+        [33mplaceholde
+r[39m=[32m"name@compa
+ny.com"[39m
+        [33mrequired[
+39m=[32m""[39m
+        [33mtype[39m=
+[32m"email"[39m
+      [36m/>[39m
+
+      -----------------
+-----------------------
+----------
+      link:
+
+      Name 
+"signInLink":
+      [36m<a[39m
+        [33mclass[39m
+=[32m"text-indigo-500 
+hover:text-indigo-400 
+font-bold 
+underline-offset-4 
+hover:underline"[39m
+        [33mhref[39m=
+[32m"/"[39m
+      [36m/>[39m
+
+      -----------------
+-----------------------
+----------
+
+    Ignored nodes: 
+comments, script, style
+    [36m<body>[39m
+      [36m<div>[39m
+        [36m<div[39m
+          [33mclass[3
+9m=[32m"min-h-screen 
+flex flex-col 
+md:flex-row 
+transition-colors 
+duration-500 bg-white 
+dark:bg-neutral-900 
+text-black 
+dark:text-white"[39m
+        [36m>[39m
+          
+[36m<button[39m
+            [33mclass
+[39m=[32m"fixed top-6 
+right-6 p-3 
+rounded-full 
+bg-slate-100 
+dark:bg-slate-800 
+hover:rotate-12 
+transition-all 
+shadow-md z-50"[39m
+            [33mtype[
+39m=[32m"button"[39m
+          [36m>[39m
+            
+[36m<svg[39m
+              [33mclas
+s[39m=[32m"text-indig
+o-600 text-xl"[39m
+              [33mfill
+[39m=[32m"currentColo
+r"[39m
+              [33mheig
+ht[39m=[32m"1em"[39m
+              [33mstro
+ke[39m=[32m"currentCo
+lor"[39m
+              [33mstro
+ke-width[39m=[32m"0"
+[39m
+              [33mview
+Box[39m=[32m"0 0 512 
+512"[39m
+              [33mwidt
+h[39m=[32m"1em"[39m
+              [33mxmln
+s[39m=[32m"http://www
+.w3.org/2000/svg"[39m
+            [36m>[39m
+              
+[36m<path[39m
+                [33md
+[39m=[32m"M283.211 
+512c78.962 0 
+151.079-35.925 
+198.857-94.792 7.068-8.
+708-.639-21.43-11.562-1
+9.35-124.203 23.654-238
+.262-71.576-238.262-196
+.954 0-72.222 
+38.662-138.635 
+101.498-174.394 
+9.686-5.512 7.25-20.197
+-3.756-22.23A258.156 
+258.156 0 0 0 283.211 
+0c-141.309 0-256 
+114.511-256 256 0 
+141.309 114.511 256 
+256 256z"[39m
+              
+[36m/>[39m
+            
+[36m</svg>[39m
+          
+[36m</button>[39m
+          
+[36m<div[39m
+            [33mclass
+[39m=[32m"flex-1 flex 
+flex-col 
+justify-center px-5 
+sm:px-8 py-8 md:py-12 
+md:w-1/2 lg:px-20 z-10 
+w-full mx-auto md:mx-0 
+order-2 
+md:order-1"[39m
+          [36m>[39m
+            
+[36m<div[39m
+              [33mclas
+s[39m=[32m"w-full 
+max-w-md mx-auto"[39m
+            [36m>[39m
+              
+[36m<div[39m
+                [33mcl
+ass[39m=[32m"flex 
+items-center mb-0 
+space-x-3"[39m
+              
+[36m>[39m
+                
+[36m<div[39m
+                  [33m
+class[39m=[32m"items-
+center group"[39m
+                
+[36m>[39m
+                  
+[36m<img[39m
+                    [3
+3malt[39m=[32m"SDGP 
+Logo"[39m
+                    [3
+3mclass[39m=[32m"h-12
+ sm:h-16 md:h-18 
+w-auto"[39m
+                    [3
+3msrc[39m=[32m"/logoS
+DGP.webp"[39m
+                  
+[36m/>[39m
+                
+[36m</div>[39m
+              
+[36m</div>[39m
+              
+[36m<h2[39m
+                [33mcl
+ass[39m=[32m"text-2xl
+ sm:text-3xl 
+lg:text-4xl 
+font-extrabold mb-3 
+tracking-tight"[39m
+              
+[36m>[39m
+                
+[0mcreateAccount[0m
+              
+[36m</h2>[39m
+              
+[36m<p[39m
+                [33mcl
+ass[39m=[32m"text-gra
+y-500 
+dark:text-gray-400 
+mb-6"[39m
+              
+[36m>[39m
+                [0mcre
+ateAccountSubtitle[0m
+              
+[36m</p>[39m
+              
+[36m<form[39m
+                [33mcl
+ass[39m=[32m"space-y-
+4"[39m
+              
+[36m>[39m
+                
+[36m<div>[39m
+                  
+[36m<label[39m
+                    [3
+3mclass[39m=[32m"bloc
+k text-sm 
+font-semibold 
+mb-2"[39m
+                  
+[36m>[39m
+                    
+[0mfullName[0m
+                  
+[36m</label>[39m
+                  
+[36m<input[39m
+                    [3
+3mclass[39m=[32m"w-fu
+ll rounded-xl px-4 
+py-3 transition-all 
+duration-200 
+bg-gray-100 
+text-gray-900 border 
+border-gray-300 
+placeholder-gray-500 
+dark:bg-neutral-800/80 
+dark:text-white dark:bo
+rder-neutral-600 dark:p
+laceholder-gray-400 
+hover:border-gray-400 d
+ark:hover:border-neutra
+l-500 
+focus:outline-none 
+focus:ring-2 
+focus:ring-indigo-500 d
+ark:focus:ring-indigo-4
+00 
+backdrop-blur-sm"[39m
+                    [3
+3mplaceholder[39m=[32
+m"John Doe"[39m
+                    [3
+3mrequired[39m=[32m""
+[39m
+                    [3
+3mtype[39m=[32m"text"
+[39m
+                  
+[36m/>[39m
+                
+[36m</div>[39m
+                
+[36m<div>[39m
+                  
+[36m<label[39m
+                    [3
+3mclass[39m=[32m"bloc
+k text-sm 
+font-semibold 
+mb-2"[39m
+                  
+[36m>[39m
+                    
+[0memailAddress[0m
+                  
+[36m</label>[39m
+                  
+[36m<input[39m
+                    [3
+3mclass[39m=[32m"w-fu
+ll rounded-xl px-4 
+py-3 transition-all 
+duration-200 
+text-gray-900 
+dark:text-white 
+placeholder-gray-500 da
+rk:placeholder-gray-400
+ border outline-none 
+backdrop-blur-sm 
+focus:ring-2 
+bg-gray-100 
+dark:bg-neutral-800/80 
+border-gray-300 dark:bo
+rder-neutral-600 
+hover:border-gray-400 d
+ark:hover:border-neutra
+l-500 
+focus:ring-indigo-500 d
+ark:focus:ring-indigo-4
+00"[39m
+                    [3
+3mplaceholder[39m=[32
+m"name@company.com"[39
+m
+                    [3
+3mrequired[39m=[32m""
+[39m
+                    [3
+3mtype[39m=[32m"email
+"[39m
+                  
+[36m/>[39m
+                
+[36m</div>[39m
+                
+[36m<div[39m
+                  [33m
+class[39m=[32m"grid 
+grid-cols-1 
+md:grid-cols-2 
+gap-4"[39m
+                
+[36m>[39m
+                  
+[36m<div>[39m
+                    
+[36m<label[39m
+                      
+[33mclass[39m=[32m"bl
+ock text-sm 
+font-semibold 
+mb-2"[39m
+                    
+[36m>[39m
+                      
+[0mpassword[0m
+                    
+[36m</label>[39m
+                    
+[36m<input[39m
+                      
+[33mclass[39m=[32m"w-
+full rounded-xl px-4 
+py-3 transition-all 
+duration-200 
+text-gray-900 
+dark:text-white 
+placeholder-gray-500 da
+rk:placeholder-gray-400
+ border outline-none 
+backdrop-blur-sm 
+focus:ring-2 
+bg-gray-100 
+dark:bg-neutral-800/80 
+border-gray-300 dark:bo
+rder-neutral-600 
+hover:border-gray-400 d
+ark:hover:border-neutra
+l-500 
+focus:ring-indigo-500 d
+ark:focus:ring-indigo-4
+00"[39m
+                      
+[33mplaceholder[39m=[
+32m"ΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓ
+ÇóΓÇó"[39m
+                      
+[33mrequired[39m=[32m
+""[39m
+                      
+[33mtype[39m=[32m"pas
+sword"[39m
+                    
+[36m/>[39m
+                  
+[36m</div>[39m
+                  
+[36m<div>[39m
+                    
+[36m<label[39m
+                      
+[33mclass[39m=[32m"bl
+ock text-sm 
+font-semibold 
+mb-2"[39m
+                    
+[36m>[39m
+                      
+[0mconfirmPassword[0m
+                    
+[36m</label>[39m
+                    
+[36m<input[39m
+                      
+[33mclass[39m=[32m"w-
+full rounded-xl px-4 
+py-3 transition-all 
+duration-200 
+text-gray-900 
+dark:text-white 
+placeholder-gray-500 da
+rk:placeholder-gray-400
+ border outline-none 
+backdrop-blur-sm 
+focus:ring-2 
+bg-gray-100 
+dark:bg-neutral-800/80 
+border-gray-300 dark:bo
+rder-neutral-600 
+hover:border-gray-400 d
+ark:hover:border-neutra
+l-500 
+focus:ring-indigo-500 d
+ark:focus:ring-indigo-4
+00"[39m
+                      
+[33mplaceholder[39m=[
+32m"ΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓ
+ÇóΓÇó"[39m
+                      
+[33mrequired[39m=[32m
+""[39m
+                      
+[33mtype[39m=[32m"pas
+sword"[39m
+                    
+[36m/>[39m
+                  
+[36m</div>[39m
+                
+[36m</div>[39m
+                
+[36m<button[39m
+                  [33m
+class[39m=[32m"w-full
+ py-3 sm:py-4 px-6 
+bg-indigo-600 
+hover:bg-indigo-700 
+text-white font-bold 
+rounded-xl shadow-xl 
+shadow-indigo-500/20 
+transition-all 
+active:scale-[0.97] 
+disabled:opacity-70 dis
+abled:cursor-not-allowe
+d"[39m
+                  [33m
+type[39m=[32m"submit"
+[39m
+                
+[36m>[39m
+                  
+[0msignUpBtn[0m
+                
+[36m</button>[39m
+                
+[36m<div[39m
+                  [33m
+class[39m=[32m"flex 
+items-center"[39m
+                
+[36m>[39m
+                  
+[36m<div[39m
+                    [3
+3mclass[39m=[32m"flex
+-grow h-px 
+bg-slate-300 
+dark:bg-slate-700"[39m
+                  
+[36m/>[39m
+                  
+[36m<span[39m
+                    [3
+3mclass[39m=[32m"px-4
+ text-sm 
+text-slate-500"[39m
+                  
+[36m>[39m
+                    
+[0morDivider[0m
+                  
+[36m</span>[39m
+                  
+[36m<div[39m
+                    [3
+3mclass[39m=[32m"flex
+-grow h-px 
+bg-slate-300 
+dark:bg-slate-700"[39m
+                  
+[36m/>[39m
+                
+[36m</div>[39m
+                
+[36m<button[39m
+                  [33m
+class[39m=[32m"w-full
+ py-3 border 
+border-slate-300 
+dark:border-slate-700 
+rounded-xl flex 
+items-center 
+justify-center gap-3 
+hover:bg-slate-50 dark:
+hover:bg-slate-800 
+transition"[39m
+                  [33m
+type[39m=[32m"button"
+[39m
+                
+[36m>[39m
+                  
+[36m<img[39m
+                    [3
+3malt[39m=[32m"Google
+"[39m
+                    [3
+3mclass[39m=[32m"h-5 
+w-5"[39m
+                    [3
+3msrc[39m=[32m"https:
+//www.svgrepo.com/show/
+475656/google-color.svg
+"[39m
+                  
+[36m/>[39m
+                  
+[0mcontinueGoogle[0m
+                
+[36m</button>[39m
+              
+[36m</form>[39m
+              
+[36m<p[39m
+                [33mcl
+ass[39m=[32m"mt-3 
+text-center text-sm 
+text-slate-500 dark:tex
+t-slate-400"[39m
+              
+[36m>[39m
+                
+[0malreadyAccount[0m
+                [0m 
+[0m
+                
+[36m<a[39m
+                  [33m
+class[39m=[32m"text-i
+ndigo-500 
+hover:text-indigo-400 
+font-bold 
+underline-offset-4 
+hover:underline"[39m
+                  [33m
+href[39m=[32m"/"[39m
+                
+[36m>[39m
+                  
+[0msignInLink[0m
+                
+[36m</a>[39m
+              
+[36m</p>[39m
+            
+[36m</div>[39m
+          
+[36m</div>[39m
+          
+[36m<div[39m
+            [33mclass
+[39m=[32m"w-full 
+h-[40vh] md:h-auto 
+md:w-1/2 relative 
+bg-neutral-900 order-1 
+md:order-2"[39m
+          [36m>[39m
+            
+[36m<img[39m
+              [33malt
+[39m=[32m"Rice Field 
+Day"[39m
+              [33mclas
+s[39m=[32m"absolute 
+inset-0 w-full h-full 
+object-cover 
+transition-opacity 
+duration-700 
+opacity-100 
+dark:opacity-0"[39m
+              [33mfetc
+hpriority[39m=[32m"hi
+gh"[39m
+              [33mload
+ing[39m=[32m"eager"[
+39m
+              [33msrc
+[39m=[32m"/images/rice
+-day-2.webp"[39m
+            
+[36m/>[39m
+            
+[36m<img[39m
+              [33malt
+[39m=[32m"Rice Field 
+Night"[39m
+              [33mclas
+s[39m=[32m"absolute 
+inset-0 w-full h-full 
+object-cover 
+transition-opacity 
+duration-700 opacity-0 
+dark:opacity-100"[39m
+              [33mfetc
+hpriority[39m=[32m"hi
+gh"[39m
+              [33mload
+ing[39m=[32m"eager"[
+39m
+              [33msrc
+[39m=[32m"/images/dark
+ image 2.jpeg"[39m
+            
+[36m/>[39m
+            
+[36m<div[39m
+              [33mclas
+s[39m=[32m"absolute 
+inset-0 
+bg-gradient-to-t 
+from-black/60 
+via-transparent 
+to-transparent pointer-
+events-none"[39m
+            
+[36m/>[39m
+            
+[36m<div[39m
+              [33mclas
+s[39m=[32m"absolute 
+inset-0 bg-transparent 
+dark:bg-black/30 
+transition-colors 
+duration-700 pointer-ev
+ents-none"[39m
+            
+[36m/>[39m
+          
+[36m</div>[39m
+        
+[36m</div>[39m
+      [36m</div>[39m
+    [36m</body>[39m
+
+    [0m [90m 215 
+|[39m     renderCompon
+ent()[33m;[39m
+     [90m 216 |[39m
+    [31m[1m>[22m[39
+m[90m 217 |[39m     
+[36mconst[39m 
+googleBtn [33m=[39m s
+creen[33m.[39mgetByRo
+le([32m'button'[39m[
+33m,[39m { 
+name[33m:[39m [32m'c
+ontinueGoogle'[39m 
+})[33m;[39m
+     [90m     |[39m  
+                       
+     
+[31m[1m^[22m[39m
+     [90m 218 |[39m  
+   [36mawait[39m user
+[33m.[39mclick(google
+Btn)[33m;[39m
+     [90m 219 |[39m
+     [90m 220 |[39m  
+   [36mawait[39m 
+waitFor(() 
+[33m=>[39m {[0m
+
+      at 
+Object.getElementError 
+(node_modules/@testing-
+library/dom/dist/config
+.js:37:19)
+      at node_modules/@
+testing-library/dom/dis
+t/query-helpers.js:76:3
+8
+      at node_modules/@
+testing-library/dom/dis
+t/query-helpers.js:52:1
+7
+      at node_modules/@
+testing-library/dom/dis
+t/query-helpers.js:95:1
+9
+      at 
+Object.getByRole (src/C
+omponents/Authenticatio
+n/Signup.test.jsx:217:3
+0)
+
+Test Suites: 1 failed, 
+1 total
+Tests:       4 failed, 
+5 passed, 9 total
+Snapshots:   0 total
+Time:        5.047 s
+Ran all test suites 
+matching src/Components
+/Authentication/Signup.
+test.jsx.

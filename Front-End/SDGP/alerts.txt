@@ -1,0 +1,961 @@
+﻿  console.warn
+    ΓÜá∩╕Å React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+
+    [0m [90m 132 |[39m
+     [90m 133 |[39m   [36mconst[39m renderComponent [33m=[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 134 |[39m     [36mreturn[39m render(
+     [90m     |[39m                  [31m[1m^[22m[39m
+     [90m 135 |[39m       [33m<[39m[33mBrowserRouter[39m[33m>[39m
+     [90m 136 |[39m         [33m<[39m[33mAlerts[39m [33m/[39m[33m>[39m
+     [90m 137 |[39m       [33m<[39m[33m/[39m[33mBrowserRouter[39m[33m>[39m[0m
+
+      at warn (node_modules/react-router/lib/deprecations.ts:9:13)
+      at warnOnce (node_modules/react-router/lib/deprecations.ts:14:3)
+      at Object.logDeprecation [as UNSAFE_logV6DeprecationWarnings] (node_modules/react-router/lib/deprecations.ts:26:5)
+      at logV6DeprecationWarnings (node_modules/react-router-dom/index.tsx:816:25)
+      at Object.react_stack_bottom_frame (node_modules/react-dom/cjs/react-dom-client.development.js:25989:20)
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at commitHookEffectListMount (node_modules/react-dom/cjs/react-dom-client.development.js:13249:29)
+      at commitHookPassiveMountEffects (node_modules/react-dom/cjs/react-dom-client.development.js:13336:11)
+      at commitPassiveMountOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:15484:13)
+      at recursivelyTraversePassiveMountEffects (node_modules/react-dom/cjs/react-dom-client.development.js:15439:11)
+      at commitPassiveMountOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:15519:11)
+      at flushPassiveEffects (node_modules/react-dom/cjs/react-dom-client.development.js:18432:9)
+      at node_modules/react-dom/cjs/react-dom-client.development.js:17923:15
+      at flushActQueue (node_modules/react/cjs/react.development.js:590:34)
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:884:10)
+      at node_modules/@testing-library/react/dist/act-compat.js:46:25
+      at renderRoot (node_modules/@testing-library/react/dist/pure.js:189:26)
+      at render (node_modules/@testing-library/react/dist/pure.js:291:10)
+      at renderComponent (src/Components/Sites/Alerts.test.jsx:134:18)
+      at Object.renderComponent (src/Components/Sites/Alerts.test.jsx:142:5)
+
+  console.warn
+    ΓÜá∩╕Å React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+    [0m [90m 132 |[39m
+     [90m 133 |[39m   [36mconst[39m renderComponent [33m=[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 134 |[39m     [36mreturn[39m render(
+     [90m     |[39m                  [31m[1m^[22m[39m
+     [90m 135 |[39m       [33m<[39m[33mBrowserRouter[39m[33m>[39m
+     [90m 136 |[39m         [33m<[39m[33mAlerts[39m [33m/[39m[33m>[39m
+     [90m 137 |[39m       [33m<[39m[33m/[39m[33mBrowserRouter[39m[33m>[39m[0m
+
+      at warn (node_modules/react-router/lib/deprecations.ts:9:13)
+      at warnOnce (node_modules/react-router/lib/deprecations.ts:14:3)
+      at Object.logDeprecation [as UNSAFE_logV6DeprecationWarnings] (node_modules/react-router/lib/deprecations.ts:37:5)
+      at logV6DeprecationWarnings (node_modules/react-router-dom/index.tsx:816:25)
+      at Object.react_stack_bottom_frame (node_modules/react-dom/cjs/react-dom-client.development.js:25989:20)
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at commitHookEffectListMount (node_modules/react-dom/cjs/react-dom-client.development.js:13249:29)
+      at commitHookPassiveMountEffects (node_modules/react-dom/cjs/react-dom-client.development.js:13336:11)
+      at commitPassiveMountOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:15484:13)
+      at recursivelyTraversePassiveMountEffects (node_modules/react-dom/cjs/react-dom-client.development.js:15439:11)
+      at commitPassiveMountOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:15519:11)
+      at flushPassiveEffects (node_modules/react-dom/cjs/react-dom-client.development.js:18432:9)
+      at node_modules/react-dom/cjs/react-dom-client.development.js:17923:15
+      at flushActQueue (node_modules/react/cjs/react.development.js:590:34)
+      at process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:884:10)
+      at node_modules/@testing-library/react/dist/act-compat.js:46:25
+      at renderRoot (node_modules/@testing-library/react/dist/pure.js:189:26)
+      at render (node_modules/@testing-library/react/dist/pure.js:291:10)
+      at renderComponent (src/Components/Sites/Alerts.test.jsx:134:18)
+      at Object.renderComponent (src/Components/Sites/Alerts.test.jsx:142:5)
+
+node.exe : FAIL src/Compone
+nts/Sites/Alerts.test.jsx
+At C:\Program 
+Files\nodejs\npx.ps1:29 
+char:3
++   & $NODE_EXE 
+$NPX_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~
+    + CategoryInfo         
+     : NotSpecified: (FAI  
+  L src/Compon...Alerts.   
+ test.jsx:String) [], R    
+emoteException
+    + FullyQualifiedErrorI 
+   d : NativeCommandError
+ 
+  Alerts Component
+    ΓêÜ renders tab 
+headers, counts, and 
+fetches disaster alerts by 
+default (119 ms)
+    ΓêÜ allows switching 
+between tabs (171 ms)
+    ├ù resolves an alert 
+successfully with 
+optimistic updates (1484 
+ms)
+    ├ù ignores an alert 
+using optimistic UI 
+updates (1082 ms)
+
+  ΓùÅ Alerts Component ΓÇ║ 
+resolves an alert 
+successfully with 
+optimistic updates
+
+    expect(element).not.toB
+eInTheDocument()
+
+    expected document not 
+to contain element, found 
+<h2 class="text-xl 
+font-black 
+text-emerald-400">Flood 
+alertRiskLabel</h2> instead
+
+    Ignored nodes: 
+comments, script, style
+    [36m<html>[39m
+      [36m<head />[39m
+      [36m<body>[39m
+        [36m<div>[39m
+          [36m<div[39m
+            [33mclass[39m
+=[32m"min-h-full p-6 
+lg:p-10 text-white 
+font-sans"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[3
+9m=[32m"max-w-7xl mx-auto 
+space-y-8 pb-12"[39m
+            [36m>[39m
+              
+[36m<div[39m
+                
+[33mclass[39m=[32m"flex 
+flex-col md:flex-row 
+justify-between 
+items-start 
+md:items-center gap-6"[39m
+              [36m>[39m
+                
+[36m<div>[39m
+                  
+[36m<h1[39m
+                    [33mcl
+ass[39m=[32m"text-3xl 
+md:text-5xl font-black 
+text-white"[39m
+                  
+[36m>[39m
+                    
+[0mfieldRiskAlerts[0m
+                  
+[36m</h1>[39m
+                  
+[36m<p[39m
+                    [33mcl
+ass[39m=[32m"text-white/8
+5 text-xs mt-1 font-bold 
+uppercase 
+tracking-[0.2em]"[39m
+                  
+[36m>[39m
+                    [0male
+rtsRealtimeSubtitle[0m
+                  
+[36m</p>[39m
+                
+[36m</div>[39m
+                
+[36m<div[39m
+                  
+[33mclass[39m=[32m"flex 
+gap-3"[39m
+                [36m>[39m
+                  
+[36m<div[39m
+                    [33mcl
+ass[39m=[32m"glass px-4 
+py-2 rounded-xl 
+border-white/10"[39m
+                  
+[36m>[39m
+                    
+[36m<span[39m
+                      [33m
+class[39m=[32m"text-[10px
+] font-black uppercase 
+text-white/85 block"[39m
+                    
+[36m>[39m
+                      
+[0mactive[0m
+                    
+[36m</span>[39m
+                    
+[36m<span[39m
+                      [33m
+class[39m=[32m"text-lg 
+font-black 
+text-red-400"[39m
+                    
+[36m>[39m
+                      
+[0m4[0m
+                    
+[36m</span>[39m
+                  
+[36m</div>[39m
+                  
+[36m<div[39m
+                    [33mcl
+ass[39m=[32m"glass px-4 
+py-2 rounded-xl 
+border-white/10"[39m
+                  
+[36m>[39m
+                    
+[36m<span[39m
+                      [33m
+class[39m=[32m"text-[10px
+] font-black uppercase 
+text-white/85 block"[39m
+                    
+[36m>[39m
+                      
+[0mresolved[0m
+                    
+[36m</span>[39m
+                    
+[36m<span[39m
+                      [33m
+class[39m=[32m"text-lg 
+font-black 
+text-emerald-400"[39m
+                    
+[36m>[39m
+                      
+[0m11[0m
+                    
+[36m</span>[39m
+                  
+[36m</div>[39m
+                
+[36m</div>[39m
+              
+[36m</div>[39m
+              
+[36m<div[39m
+                [33mclass
+[39m=[32m"glass p-6 
+rounded-[2rem] 
+border-white/20"[39m
+              [36m>[39m
+                
+[36m<div[39m
+                  
+[33mclass[39m=[32m"flex 
+flex-col lg:flex-row gap-6 
+justify-between"[39m
+                [36m>[39m
+                  
+[36m<div[39m
+                    
+[33mclass[39m=[32m"flex 
+p-1 rounded-2xl bg-white/5 
+border border-white/10 
+w-full sm:w-fit 
+overflow-x-auto 
+no-scrollbar"[39m
+                  
+[36m>[39m
+                    
+[36m<button[39m
+                      
+[33mclass[39m=[32m"px-5 
+py-2 rounded-xl text-xs 
+font-bold transition-all 
+text-white/85 
+hover:text-white/90"[39m
+                    
+[36m>[39m
+                      
+[0mpestRisks[0m
+                    
+[36m</button>[39m
+                    
+[36m<button[39m
+                      
+[33mclass[39m=[32m"px-5 
+py-2 rounded-xl text-xs 
+font-bold transition-all 
+bg-white/15 
+text-white"[39m
+                    
+[36m>[39m
+                      
+[0mdisasters[0m
+                    
+[36m</button>[39m
+                    
+[36m<button[39m
+                      
+[33mclass[39m=[32m"px-5 
+py-2 rounded-xl text-xs 
+font-bold transition-all 
+text-white/85 
+hover:text-white/90"[39m
+                    
+[36m>[39m
+                      
+[0mpastAlerts[0m
+                    
+[36m</button>[39m
+                  
+[36m</div>[39m
+                  
+[36m<input[39m
+                    [33mcl
+ass[39m=[32m"bg-white/5 
+border border-white/10 
+rounded-2xl py-3 px-6 
+text-sm text-white placehol
+der:text-white/85"[39m
+                    [33mpl
+aceholder[39m=[32m"findAn
+omaly"[39m
+                    [33mty
+pe[39m=[32m"text"[39m
+                    [33mva
+lue[39m=[32m""[39m
+                  
+[36m/>[39m
+                
+[36m</div>[39m
+              
+[36m</div>[39m
+              
+[36m<div[39m
+                [33mclass
+[39m=[32m"space-y-6"[39m
+              [36m>[39m
+                
+[36m<div[39m
+                  [33mclas
+s[39m=[32m"glass p-6 
+rounded-3xl border 
+border-white/10 "[39m
+                [36m>[39m
+                  
+[36m<div[39m
+                    
+[33mclass[39m=[32m"flex 
+flex-col md:flex-row 
+justify-between 
+items-start 
+md:items-center gap-4"[39m
+                  
+[36m>[39m
+                    
+[36m<div>[39m
+                      
+[36m<h2[39m
+                        [3
+3mclass[39m=[32m"text-xl 
+font-black 
+text-emerald-400"[39m
+                      
+[36m>[39m
+                        
+[0mFlood 
+alertRiskLabel[0m
+                      
+[36m</h2>[39m
+                      
+[36m<p[39m
+                        [3
+3mclass[39m=[32m"text-whi
+te/85 text-sm mt-1"[39m
+                      
+[36m>[39m
+                        
+[0malertStage: Vegetative 
+| alertHealth: Poor[0m
+                      
+[36m</p>[39m
+                      
+[36m<span[39m
+                        [3
+3mclass[39m=[32m"text-xs 
+text-white/85"[39m
+                      
+[36m>[39m
+                        
+[0m1/1/2026, 5:30:00 
+AM[0m
+                      
+[36m</span>[39m
+                    
+[36m</div>[39m
+                    
+[36m<div[39m
+                      
+[33mclass[39m=[32m"flex 
+gap-3"[39m
+                    
+[36m>[39m
+                      
+[36m<button[39m
+                        
+[33mclass[39m=[32m"px-4 
+sm:px-6 py-2 
+bg-emerald-500/30 
+text-emerald-300 
+rounded-xl text-xs 
+font-bold "[39m
+                      
+[36m>[39m
+                        
+[0mresolveBtn[0m
+                      
+[36m</button>[39m
+                      
+[36m<button[39m
+                        [3
+3mclass[39m=[32m"btn-igno
+re glass-btn text-[10px] 
+px-3 py-1 tracking-widest 
+bg-white/10 
+hover:bg-white/20 "[39m
+                      
+[36m>[39m
+                        
+[0mignoreBtn[0m
+                      
+[36m</button>[39m
+                      
+[36m<button[39m
+                        [3
+3mclass[39m=[32m"glass-bt
+n text-[10px] px-3 py-1 
+tracking-widest 
+bg-white/10 
+hover:bg-white/20"[39m
+                      
+[36m>[39m
+                        
+[0mviewInMap[0m
+                      
+[36m</button>[39m
+                    
+[36m</div>[39m
+                  
+[36m</div>[39m
+                
+[36m</div>[39m
+              
+[36m</div>[39m
+            
+[36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</body>[39m
+    [36m</html>[39m
+
+    [0m [90m 219 |[39m  
+     
+     [90m 220 |[39m      
+ [90m// 1. Alert is 
+removed from UI 
+immediately[39m
+    
+[31m[1m>[22m[39m[90m 
+221 |[39m       expect(scr
+een[33m.[39mqueryByText(
+[32m'Flood alertRiskLabel'
+[39m))[33m.[39mnot[33m.
+[39mtoBeInTheDocument()[33
+m;[39m
+     [90m     |[39m      
+                           
+                           
+  [31m[1m^[22m[39m
+     [90m 222 |[39m
+     [90m 223 |[39m      
+ [90m// 3. API was called 
+with the note[39m
+     [90m 224 |[39m      
+ expect(updateAlertStatus)
+[33m.[39mtoHaveBeenCalledW
+ith([35m101[39m[33m,[39
+m [32m'Resolved'[39m[33m
+,[39m [32m'normal'[39m[
+33m,[39m [32m'Deploying s
+andbags'[39m)[33m;[39m[
+0m
+
+      at toBeInTheDocument 
+(src/Components/Sites/Alert
+s.test.jsx:221:62)
+      at runWithExpensiveEr
+rorDiagnosticsDisabled (nod
+e_modules/@testing-library/
+dom/dist/config.js:47:12)
+      at checkCallback (nod
+e_modules/@testing-library/
+dom/dist/wait-for.js:124:77
+)
+      at MutationObserver.c
+heckRealTimersCallback (nod
+e_modules/@testing-library/
+dom/dist/wait-for.js:118:16
+)
+      at MutationObserver.i
+nvokeTheCallbackFunction (n
+ode_modules/jsdom/lib/jsdom
+/living/generated/MutationC
+allback.js:19:26)
+      at 
+notifyMutationObservers (no
+de_modules/jsdom/lib/jsdom/
+living/helpers/mutation-obs
+ervers.js:160:22)
+      at node_modules/jsdom
+/lib/jsdom/living/helpers/m
+utation-observers.js:133:5
+
+  ΓùÅ Alerts Component ΓÇ║ 
+ignores an alert using 
+optimistic UI updates
+
+    expect(element).not.toB
+eInTheDocument()
+
+    expected document not 
+to contain element, found 
+<h2 class="text-xl 
+font-black 
+text-emerald-400">Flood 
+alertRiskLabel</h2> instead
+
+    Ignored nodes: 
+comments, script, style
+    [36m<html>[39m
+      [36m<head />[39m
+      [36m<body>[39m
+        [36m<div>[39m
+          [36m<div[39m
+            [33mclass[39m
+=[32m"min-h-full p-6 
+lg:p-10 text-white 
+font-sans"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[3
+9m=[32m"max-w-7xl mx-auto 
+space-y-8 pb-12"[39m
+            [36m>[39m
+              
+[36m<div[39m
+                
+[33mclass[39m=[32m"flex 
+flex-col md:flex-row 
+justify-between 
+items-start 
+md:items-center gap-6"[39m
+              [36m>[39m
+                
+[36m<div>[39m
+                  
+[36m<h1[39m
+                    [33mcl
+ass[39m=[32m"text-3xl 
+md:text-5xl font-black 
+text-white"[39m
+                  
+[36m>[39m
+                    
+[0mfieldRiskAlerts[0m
+                  
+[36m</h1>[39m
+                  
+[36m<p[39m
+                    [33mcl
+ass[39m=[32m"text-white/8
+5 text-xs mt-1 font-bold 
+uppercase 
+tracking-[0.2em]"[39m
+                  
+[36m>[39m
+                    [0male
+rtsRealtimeSubtitle[0m
+                  
+[36m</p>[39m
+                
+[36m</div>[39m
+                
+[36m<div[39m
+                  
+[33mclass[39m=[32m"flex 
+gap-3"[39m
+                [36m>[39m
+                  
+[36m<div[39m
+                    [33mcl
+ass[39m=[32m"glass px-4 
+py-2 rounded-xl 
+border-white/10"[39m
+                  
+[36m>[39m
+                    
+[36m<span[39m
+                      [33m
+class[39m=[32m"text-[10px
+] font-black uppercase 
+text-white/85 block"[39m
+                    
+[36m>[39m
+                      
+[0mactive[0m
+                    
+[36m</span>[39m
+                    
+[36m<span[39m
+                      [33m
+class[39m=[32m"text-lg 
+font-black 
+text-red-400"[39m
+                    
+[36m>[39m
+                      
+[0m4[0m
+                    
+[36m</span>[39m
+                  
+[36m</div>[39m
+                  
+[36m<div[39m
+                    [33mcl
+ass[39m=[32m"glass px-4 
+py-2 rounded-xl 
+border-white/10"[39m
+                  
+[36m>[39m
+                    
+[36m<span[39m
+                      [33m
+class[39m=[32m"text-[10px
+] font-black uppercase 
+text-white/85 block"[39m
+                    
+[36m>[39m
+                      
+[0mresolved[0m
+                    
+[36m</span>[39m
+                    
+[36m<span[39m
+                      [33m
+class[39m=[32m"text-lg 
+font-black 
+text-emerald-400"[39m
+                    
+[36m>[39m
+                      
+[0m10[0m
+                    
+[36m</span>[39m
+                  
+[36m</div>[39m
+                
+[36m</div>[39m
+              
+[36m</div>[39m
+              
+[36m<div[39m
+                [33mclass
+[39m=[32m"glass p-6 
+rounded-[2rem] 
+border-white/20"[39m
+              [36m>[39m
+                
+[36m<div[39m
+                  
+[33mclass[39m=[32m"flex 
+flex-col lg:flex-row gap-6 
+justify-between"[39m
+                [36m>[39m
+                  
+[36m<div[39m
+                    
+[33mclass[39m=[32m"flex 
+p-1 rounded-2xl bg-white/5 
+border border-white/10 
+w-full sm:w-fit 
+overflow-x-auto 
+no-scrollbar"[39m
+                  
+[36m>[39m
+                    
+[36m<button[39m
+                      
+[33mclass[39m=[32m"px-5 
+py-2 rounded-xl text-xs 
+font-bold transition-all 
+text-white/85 
+hover:text-white/90"[39m
+                    
+[36m>[39m
+                      
+[0mpestRisks[0m
+                    
+[36m</button>[39m
+                    
+[36m<button[39m
+                      
+[33mclass[39m=[32m"px-5 
+py-2 rounded-xl text-xs 
+font-bold transition-all 
+bg-white/15 
+text-white"[39m
+                    
+[36m>[39m
+                      
+[0mdisasters[0m
+                    
+[36m</button>[39m
+                    
+[36m<button[39m
+                      
+[33mclass[39m=[32m"px-5 
+py-2 rounded-xl text-xs 
+font-bold transition-all 
+text-white/85 
+hover:text-white/90"[39m
+                    
+[36m>[39m
+                      
+[0mpastAlerts[0m
+                    
+[36m</button>[39m
+                  
+[36m</div>[39m
+                  
+[36m<input[39m
+                    [33mcl
+ass[39m=[32m"bg-white/5 
+border border-white/10 
+rounded-2xl py-3 px-6 
+text-sm text-white placehol
+der:text-white/85"[39m
+                    [33mpl
+aceholder[39m=[32m"findAn
+omaly"[39m
+                    [33mty
+pe[39m=[32m"text"[39m
+                    [33mva
+lue[39m=[32m""[39m
+                  
+[36m/>[39m
+                
+[36m</div>[39m
+              
+[36m</div>[39m
+              
+[36m<div[39m
+                [33mclass
+[39m=[32m"space-y-6"[39m
+              [36m>[39m
+                
+[36m<div[39m
+                  [33mclas
+s[39m=[32m"glass p-6 
+rounded-3xl border 
+border-white/10 "[39m
+                [36m>[39m
+                  
+[36m<div[39m
+                    
+[33mclass[39m=[32m"flex 
+flex-col md:flex-row 
+justify-between 
+items-start 
+md:items-center gap-4"[39m
+                  
+[36m>[39m
+                    
+[36m<div>[39m
+                      
+[36m<h2[39m
+                        [3
+3mclass[39m=[32m"text-xl 
+font-black 
+text-emerald-400"[39m
+                      
+[36m>[39m
+                        
+[0mFlood 
+alertRiskLabel[0m
+                      
+[36m</h2>[39m
+                      
+[36m<p[39m
+                        [3
+3mclass[39m=[32m"text-whi
+te/85 text-sm mt-1"[39m
+                      
+[36m>[39m
+                        
+[0malertStage: Vegetative 
+| alertHealth: Poor[0m
+                      
+[36m</p>[39m
+                      
+[36m<span[39m
+                        [3
+3mclass[39m=[32m"text-xs 
+text-white/85"[39m
+                      
+[36m>[39m
+                        
+[0m1/1/2026, 5:30:00 
+AM[0m
+                      
+[36m</span>[39m
+                    
+[36m</div>[39m
+                    
+[36m<div[39m
+                      
+[33mclass[39m=[32m"flex 
+gap-3"[39m
+                    
+[36m>[39m
+                      
+[36m<button[39m
+                        
+[33mclass[39m=[32m"px-4 
+sm:px-6 py-2 
+bg-emerald-500/30 
+text-emerald-300 
+rounded-xl text-xs 
+font-bold "[39m
+                      
+[36m>[39m
+                        
+[0mresolveBtn[0m
+                      
+[36m</button>[39m
+                      
+[36m<button[39m
+                        [3
+3mclass[39m=[32m"btn-igno
+re glass-btn text-[10px] 
+px-3 py-1 tracking-widest 
+bg-white/10 
+hover:bg-white/20 "[39m
+                      
+[36m>[39m
+                        
+[0mignoreBtn[0m
+                      
+[36m</button>[39m
+                      
+[36m<button[39m
+                        [3
+3mclass[39m=[32m"glass-bt
+n text-[10px] px-3 py-1 
+tracking-widest 
+bg-white/10 
+hover:bg-white/20"[39m
+                      
+[36m>[39m
+                        
+[0mviewInMap[0m
+                      
+[36m</button>[39m
+                    
+[36m</div>[39m
+                  
+[36m</div>[39m
+                
+[36m</div>[39m
+              
+[36m</div>[39m
+            
+[36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</body>[39m
+    [36m</html>[39m
+
+    [0m [90m 241 |[39m  
+     [90m// Counts for 
+Open decrease to 4[39m
+     [90m 242 |[39m      
+ expect(screen[33m.[39mge
+tByText([32m'4'[39m))[33
+m.[39mtoBeInTheDocument()
+[33m;[39m
+    
+[31m[1m>[22m[39m[90m 
+243 |[39m       expect(scr
+een[33m.[39mqueryByText(
+[32m'Flood alertRiskLabel'
+[39m))[33m.[39mnot[33m.
+[39mtoBeInTheDocument()[33
+m;[39m
+     [90m     |[39m      
+                           
+                           
+  [31m[1m^[22m[39m
+     [90m 244 |[39m      
+ expect(updateAlertStatus)
+[33m.[39mtoHaveBeenCalledW
+ith([35m101[39m[33m,[39
+m [32m'Ignored'[39m[33m,
+[39m [32m'normal'[39m[3
+3m,[39m 
+[36mnull[39m)[33m;[39m
+     [90m 245 |[39m     
+})[33m;[39m
+     [90m 246 |[39m   
+})[33m;[39m[0m
+
+      at toBeInTheDocument 
+(src/Components/Sites/Alert
+s.test.jsx:243:62)
+      at runWithExpensiveEr
+rorDiagnosticsDisabled (nod
+e_modules/@testing-library/
+dom/dist/config.js:47:12)
+      at checkCallback (nod
+e_modules/@testing-library/
+dom/dist/wait-for.js:124:77
+)
+      at MutationObserver.c
+heckRealTimersCallback (nod
+e_modules/@testing-library/
+dom/dist/wait-for.js:118:16
+)
+      at MutationObserver.i
+nvokeTheCallbackFunction (n
+ode_modules/jsdom/lib/jsdom
+/living/generated/MutationC
+allback.js:19:26)
+      at 
+notifyMutationObservers (no
+de_modules/jsdom/lib/jsdom/
+living/helpers/mutation-obs
+ervers.js:160:22)
+      at node_modules/jsdom
+/lib/jsdom/living/helpers/m
+utation-observers.js:133:5
+
+Test Suites: 1 failed, 1 
+total
+Tests:       2 failed, 2 
+passed, 4 total
+Snapshots:   0 total
+Time:        4.508 s
+Ran all test suites 
+matching src/Components/Sit
+es/Alerts.test.jsx.
